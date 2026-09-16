@@ -278,7 +278,8 @@
   .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }
 
   .conj-hint { display: none; }
-  .conj-scroll { overflow-x: auto; margin: 0 -22px; padding: 0 22px; }
+  .conj-wrap { display: flex; align-items: flex-start; }
+  .conj-scroll { overflow-x: auto; flex: 1 1 auto; min-width: 0; margin-right: -22px; padding-right: 22px; }
   table.conj { border-collapse: collapse; width: 100%; min-width: 560px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
   table.conj th, table.conj td { padding: 7px 10px; text-align: left; white-space: nowrap; }
   table.conj thead tr.mood-row th {
@@ -294,13 +295,17 @@
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
   table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
-  table.conj th.pronoun-col {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    background: var(--paper-raised);
-    box-shadow: 2px 0 4px -2px var(--shadow);
+  /* frozen pronoun column, as its own small table beside the scrolling one
+     rather than a sticky cell inside it (sticky-in-table renders unreliably,
+     especially in mobile Safari, causing the column to visibly pop/duplicate
+     as it re-syncs with the scroll position) */
+  table.conj.conj-pronouns {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    border-right: 1px solid var(--line);
   }
+  table.conj.conj-pronouns th { white-space: nowrap; }
 
   .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
   .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
@@ -343,14 +348,7 @@
     border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink);
   }
   table.conj-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  table.conj-form th.person-col {
-    min-width: 130px;
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    background: var(--paper-raised);
-    box-shadow: 2px 0 4px -2px var(--shadow);
-  }
+  table.conj-form th.person-col { min-width: 130px; }
 
   .nonpersonal-form { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
 
@@ -384,7 +382,7 @@
     .icon-btn { padding: 8px 12px; font-size: 13px; }
 
     .conj-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft); margin: 0 0 4px; }
-    .conj-scroll { margin: 0 -14px; padding: 0 14px; }
+    .conj-scroll { margin-right: -14px; padding-right: 14px; }
     table.conj { font-size: 12.5px; min-width: 480px; }
     table.conj th, table.conj td { padding: 6px 7px; }
     table.conj tbody th { font-size: 12px; }
@@ -464,18 +462,26 @@
     <p class="pattern-note" id="d-pattern"></p>
 
     <p class="conj-hint">deslizá para ver todos los tiempos &rarr;</p>
-    <div class="conj-scroll">
-      <table class="conj">
+    <div class="conj-wrap">
+      <table class="conj conj-pronouns">
         <thead>
-          <tr class="mood-row">
-            <th class="pronoun-col"></th>
-            <th colspan="5">Indicativo</th>
-            <th>Subjuntivo</th>
-          </tr>
-          <tr class="tense-row" id="d-tense-row"></tr>
+          <tr class="mood-row"><th>&nbsp;</th></tr>
+          <tr class="tense-row"><th>&nbsp;</th></tr>
         </thead>
-        <tbody id="d-conj-body"></tbody>
+        <tbody id="d-conj-pronoun-body"></tbody>
       </table>
+      <div class="conj-scroll">
+        <table class="conj conj-tenses">
+          <thead>
+            <tr class="mood-row">
+              <th colspan="5">Indicativo</th>
+              <th>Subjuntivo</th>
+            </tr>
+            <tr class="tense-row" id="d-tense-row"></tr>
+          </thead>
+          <tbody id="d-conj-body"></tbody>
+        </table>
+      </div>
     </div>
     <p class="conj-legend"><span class="swatch"></span> se aparta del patrón regular</p>
 
@@ -677,6 +683,7 @@
     dPattern: document.getElementById("d-pattern"),
     dTenseRow: document.getElementById("d-tense-row"),
     dConjBody: document.getElementById("d-conj-body"),
+    dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
     dGerundio: document.getElementById("d-gerundio"),
     dParticipio: document.getElementById("d-participio"),
     dEdit: document.getElementById("d-edit"),
@@ -706,9 +713,6 @@
   // ================= tense header =================
   function buildTenseHeader() {
     var frag = document.createDocumentFragment();
-    var thCorner = document.createElement("th");
-    thCorner.className = "pronoun-col";
-    frag.appendChild(thCorner);
     TENSES.forEach(function (t) {
       var th = document.createElement("th");
       th.textContent = t.label;
@@ -817,12 +821,15 @@
 
     buildTenseHeader();
     el.dConjBody.innerHTML = "";
+    el.dConjPronounBody.innerHTML = "";
     PERSONS.forEach(function (p) {
+      var prTr = document.createElement("tr");
+      var prTh = document.createElement("th");
+      prTh.textContent = p.label;
+      prTr.appendChild(prTh);
+      el.dConjPronounBody.appendChild(prTr);
+
       var tr = document.createElement("tr");
-      var th = document.createElement("th");
-      th.className = "pronoun-col";
-      th.textContent = p.label;
-      tr.appendChild(th);
       TENSES.forEach(function (t) {
         var td = document.createElement("td");
         var val = (forms[t.key] && forms[t.key][p.key]) || "";
