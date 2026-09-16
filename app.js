@@ -1,0 +1,598 @@
+(function () {
+  "use strict";
+
+  // ================= Supabase client =================
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+
+  // ================= conjugation model (unchanged from the original tool) =================
+  var PERSONS = [
+    { key: "yo", label: "yo" },
+    { key: "vos", label: "vos" },
+    { key: "el", label: "él / ella / ud." },
+    { key: "nosotros", label: "nosotros" },
+    { key: "ellos", label: "ellos / ellas / uds." }
+  ];
+  var TENSES = [
+    { key: "presente", label: "Presente" },
+    { key: "preterito", label: "Pretérito" },
+    { key: "imperfecto", label: "Imperfecto" },
+    { key: "futuro", label: "Futuro" },
+    { key: "condicional", label: "Condicional" }
+  ];
+  var SUBJ_KEY = "subjPresente";
+  var REFLEXIVE_PRONOUNS = { yo: "me", vos: "te", el: "se", nosotros: "nos", ellos: "se" };
+
+  function verbClass(baseInf) {
+    var end = baseInf.slice(-2).toLowerCase();
+    return (end === "ar" || end === "er" || end === "ir") ? end : null;
+  }
+
+  function regularForm(baseInf, tenseKey, personKey) {
+    var klass = verbClass(baseInf);
+    if (!klass) return null;
+    var stem = baseInf.slice(0, -2);
+    var inf = baseInf;
+
+    if (tenseKey === "presente") {
+      if (klass === "ar") return { yo: stem + "o", vos: stem + "ás", el: stem + "a", nosotros: stem + "amos", ellos: stem + "an" }[personKey];
+      if (klass === "er") return { yo: stem + "o", vos: stem + "és", el: stem + "e", nosotros: stem + "emos", ellos: stem + "en" }[personKey];
+      return { yo: stem + "o", vos: stem + "ís", el: stem + "e", nosotros: stem + "imos", ellos: stem + "en" }[personKey];
+    }
+    if (tenseKey === "preterito") {
+      if (klass === "ar") return { yo: stem + "é", vos: stem + "aste", el: stem + "ó", nosotros: stem + "amos", ellos: stem + "aron" }[personKey];
+      return { yo: stem + "í", vos: stem + "iste", el: stem + "ió", nosotros: stem + "imos", ellos: stem + "ieron" }[personKey];
+    }
+    if (tenseKey === "imperfecto") {
+      if (klass === "ar") return { yo: stem + "aba", vos: stem + "abas", el: stem + "aba", nosotros: stem + "ábamos", ellos: stem + "aban" }[personKey];
+      return { yo: stem + "ía", vos: stem + "ías", el: stem + "ía", nosotros: stem + "íamos", ellos: stem + "ían" }[personKey];
+    }
+    if (tenseKey === "futuro") {
+      return { yo: inf + "é", vos: inf + "ás", el: inf + "á", nosotros: inf + "emos", ellos: inf + "án" }[personKey];
+    }
+    if (tenseKey === "condicional") {
+      return { yo: inf + "ía", vos: inf + "ías", el: inf + "ía", nosotros: inf + "íamos", ellos: inf + "ían" }[personKey];
+    }
+    if (tenseKey === SUBJ_KEY) {
+      if (klass === "ar") return { yo: stem + "e", vos: stem + "es", el: stem + "e", nosotros: stem + "emos", ellos: stem + "en" }[personKey];
+      return { yo: stem + "a", vos: stem + "as", el: stem + "a", nosotros: stem + "amos", ellos: stem + "an" }[personKey];
+    }
+    return null;
+  }
+
+  function stripReflexivePronoun(form, personKey, reflexive) {
+    if (!reflexive || !form) return form;
+    var pron = REFLEXIVE_PRONOUNS[personKey];
+    var prefix = pron + " ";
+    if (form.toLowerCase().indexOf(prefix) === 0) return form.slice(prefix.length);
+    return form;
+  }
+
+  function baseInfinitive(infinitive, reflexive) {
+    if (!reflexive) return infinitive;
+    return (infinitive || "").toLowerCase().replace(/se$/, "");
+  }
+
+  function isCellIrregular(data, tenseKey, personKey, actualValue) {
+    if (!actualValue) return false;
+    var base = baseInfinitive(data.infinitive || "", data.reflexive);
+    var expected = regularForm(base, tenseKey, personKey);
+    if (expected == null) return false;
+    var actual = stripReflexivePronoun(actualValue, personKey, data.reflexive);
+    return actual.trim().toLowerCase() !== expected.trim().toLowerCase();
+  }
+
+  // ================= starter verbs (offered to a brand-new account) =================
+  var STARTER_VERBS = [
+    { infinitive: "ser", definition: "to be (essential)", type: "irregular", irregular: true, pattern: "fully irregular", reflexive: false, forms: { presente: { yo: "soy", vos: "sos", el: "es", nosotros: "somos", ellos: "son" }, preterito: { yo: "fui", vos: "fuiste", el: "fue", nosotros: "fuimos", ellos: "fueron" }, imperfecto: { yo: "era", vos: "eras", el: "era", nosotros: "éramos", ellos: "eran" }, futuro: { yo: "seré", vos: "serás", el: "será", nosotros: "seremos", ellos: "serán" }, condicional: { yo: "sería", vos: "serías", el: "sería", nosotros: "seríamos", ellos: "serían" }, subjPresente: { yo: "sea", vos: "seas", el: "sea", nosotros: "seamos", ellos: "sean" }, gerundio: "siendo", participio: "sido" } },
+    { infinitive: "estar", definition: "to be (state)", type: "-ar", irregular: true, pattern: "irregular yo + accents", reflexive: false, forms: { presente: { yo: "estoy", vos: "estás", el: "está", nosotros: "estamos", ellos: "están" }, preterito: { yo: "estuve", vos: "estuviste", el: "estuvo", nosotros: "estuvimos", ellos: "estuvieron" }, imperfecto: { yo: "estaba", vos: "estabas", el: "estaba", nosotros: "estábamos", ellos: "estaban" }, futuro: { yo: "estaré", vos: "estarás", el: "estará", nosotros: "estaremos", ellos: "estarán" }, condicional: { yo: "estaría", vos: "estarías", el: "estaría", nosotros: "estaríamos", ellos: "estarían" }, subjPresente: { yo: "esté", vos: "estés", el: "esté", nosotros: "estemos", ellos: "estén" }, gerundio: "estando", participio: "estado" } },
+    { infinitive: "tener", definition: "to have", type: "-er", irregular: true, pattern: "stem-change e→ie + irregular yo", reflexive: false, forms: { presente: { yo: "tengo", vos: "tenés", el: "tiene", nosotros: "tenemos", ellos: "tienen" }, preterito: { yo: "tuve", vos: "tuviste", el: "tuvo", nosotros: "tuvimos", ellos: "tuvieron" }, imperfecto: { yo: "tenía", vos: "tenías", el: "tenía", nosotros: "teníamos", ellos: "tenían" }, futuro: { yo: "tendré", vos: "tendrás", el: "tendrá", nosotros: "tendremos", ellos: "tendrán" }, condicional: { yo: "tendría", vos: "tendrías", el: "tendría", nosotros: "tendríamos", ellos: "tendrían" }, subjPresente: { yo: "tenga", vos: "tengas", el: "tenga", nosotros: "tengamos", ellos: "tengan" }, gerundio: "teniendo", participio: "tenido" } },
+    { infinitive: "hacer", definition: "to do/make", type: "-er", irregular: true, pattern: "irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "hago", vos: "hacés", el: "hace", nosotros: "hacemos", ellos: "hacen" }, preterito: { yo: "hice", vos: "hiciste", el: "hizo", nosotros: "hicimos", ellos: "hicieron" }, imperfecto: { yo: "hacía", vos: "hacías", el: "hacía", nosotros: "hacíamos", ellos: "hacían" }, futuro: { yo: "haré", vos: "harás", el: "hará", nosotros: "haremos", ellos: "harán" }, condicional: { yo: "haría", vos: "harías", el: "haría", nosotros: "haríamos", ellos: "harían" }, subjPresente: { yo: "haga", vos: "hagas", el: "haga", nosotros: "hagamos", ellos: "hagan" }, gerundio: "haciendo", participio: "hecho" } },
+    { infinitive: "poder", definition: "to be able to", type: "-er", irregular: true, pattern: "stem-change o→ue + irregular preterite", reflexive: false, forms: { presente: { yo: "puedo", vos: "podés", el: "puede", nosotros: "podemos", ellos: "pueden" }, preterito: { yo: "pude", vos: "pudiste", el: "pudo", nosotros: "pudimos", ellos: "pudieron" }, imperfecto: { yo: "podía", vos: "podías", el: "podía", nosotros: "podíamos", ellos: "podían" }, futuro: { yo: "podré", vos: "podrás", el: "podrá", nosotros: "podremos", ellos: "podrán" }, condicional: { yo: "podría", vos: "podrías", el: "podría", nosotros: "podríamos", ellos: "podrían" }, subjPresente: { yo: "pueda", vos: "puedas", el: "pueda", nosotros: "podamos", ellos: "puedan" }, gerundio: "pudiendo", participio: "podido" } },
+    { infinitive: "decir", definition: "to say/tell", type: "-ir", irregular: true, pattern: "stem-change e→i + irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "digo", vos: "decís", el: "dice", nosotros: "decimos", ellos: "dicen" }, preterito: { yo: "dije", vos: "dijiste", el: "dijo", nosotros: "dijimos", ellos: "dijeron" }, imperfecto: { yo: "decía", vos: "decías", el: "decía", nosotros: "decíamos", ellos: "decían" }, futuro: { yo: "diré", vos: "dirás", el: "dirá", nosotros: "diremos", ellos: "dirán" }, condicional: { yo: "diría", vos: "dirías", el: "diría", nosotros: "diríamos", ellos: "dirían" }, subjPresente: { yo: "diga", vos: "digas", el: "diga", nosotros: "digamos", ellos: "digan" }, gerundio: "diciendo", participio: "dicho" } },
+    { infinitive: "ir", definition: "to go", type: "irregular", irregular: true, pattern: "fully irregular", reflexive: false, forms: { presente: { yo: "voy", vos: "vas", el: "va", nosotros: "vamos", ellos: "van" }, preterito: { yo: "fui", vos: "fuiste", el: "fue", nosotros: "fuimos", ellos: "fueron" }, imperfecto: { yo: "iba", vos: "ibas", el: "iba", nosotros: "íbamos", ellos: "iban" }, futuro: { yo: "iré", vos: "irás", el: "irá", nosotros: "iremos", ellos: "irán" }, condicional: { yo: "iría", vos: "irías", el: "iría", nosotros: "iríamos", ellos: "irían" }, subjPresente: { yo: "vaya", vos: "vayas", el: "vaya", nosotros: "vayamos", ellos: "vayan" }, gerundio: "yendo", participio: "ido" } },
+    { infinitive: "venir", definition: "to come", type: "-ir", irregular: true, pattern: "stem-change e→ie + irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "vengo", vos: "venís", el: "viene", nosotros: "venimos", ellos: "vienen" }, preterito: { yo: "vine", vos: "viniste", el: "vino", nosotros: "vinimos", ellos: "vinieron" }, imperfecto: { yo: "venía", vos: "venías", el: "venía", nosotros: "veníamos", ellos: "venían" }, futuro: { yo: "vendré", vos: "vendrás", el: "vendrá", nosotros: "vendremos", ellos: "vendrán" }, condicional: { yo: "vendría", vos: "vendrías", el: "vendría", nosotros: "vendríamos", ellos: "vendrían" }, subjPresente: { yo: "venga", vos: "vengas", el: "venga", nosotros: "vengamos", ellos: "vengan" }, gerundio: "viniendo", participio: "venido" } },
+    { infinitive: "querer", definition: "to want/love", type: "-er", irregular: true, pattern: "stem-change e→ie + irregular preterite", reflexive: false, forms: { presente: { yo: "quiero", vos: "querés", el: "quiere", nosotros: "queremos", ellos: "quieren" }, preterito: { yo: "quise", vos: "quisiste", el: "quiso", nosotros: "quisimos", ellos: "quisieron" }, imperfecto: { yo: "quería", vos: "querías", el: "quería", nosotros: "queríamos", ellos: "querían" }, futuro: { yo: "querré", vos: "querrás", el: "querrá", nosotros: "querremos", ellos: "querrán" }, condicional: { yo: "querría", vos: "querrías", el: "querría", nosotros: "querríamos", ellos: "querrían" }, subjPresente: { yo: "quiera", vos: "quieras", el: "quiera", nosotros: "queramos", ellos: "quieran" }, gerundio: "queriendo", participio: "querido" } },
+    { infinitive: "levantarse", definition: "to get up", type: "-ar", irregular: false, pattern: "regular reflexive", reflexive: true, forms: { presente: { yo: "me levanto", vos: "te levantás", el: "se levanta", nosotros: "nos levantamos", ellos: "se levantan" }, preterito: { yo: "me levanté", vos: "te levantaste", el: "se levantó", nosotros: "nos levantamos", ellos: "se levantaron" }, imperfecto: { yo: "me levantaba", vos: "te levantabas", el: "se levantaba", nosotros: "nos levantábamos", ellos: "se levantaban" }, futuro: { yo: "me levantaré", vos: "te levantarás", el: "se levantará", nosotros: "nos levantaremos", ellos: "se levantarán" }, condicional: { yo: "me levantaría", vos: "te levantarías", el: "se levantaría", nosotros: "nos levantaríamos", ellos: "se levantarían" }, subjPresente: { yo: "me levante", vos: "te levantes", el: "se levante", nosotros: "nos levantemos", ellos: "se levanten" }, gerundio: "levantándose", participio: "levantado" } },
+    { infinitive: "haber", definition: "to have (auxiliary)", type: "irregular", irregular: true, pattern: "fully irregular (auxiliary verb)", reflexive: false, forms: { presente: { yo: "he", vos: "has", el: "ha", nosotros: "hemos", ellos: "han" }, preterito: { yo: "hube", vos: "hubiste", el: "hubo", nosotros: "hubimos", ellos: "hubieron" }, imperfecto: { yo: "había", vos: "habías", el: "había", nosotros: "habíamos", ellos: "habían" }, futuro: { yo: "habré", vos: "habrás", el: "habrá", nosotros: "habremos", ellos: "habrán" }, condicional: { yo: "habría", vos: "habrías", el: "habría", nosotros: "habríamos", ellos: "habrían" }, subjPresente: { yo: "haya", vos: "hayas", el: "haya", nosotros: "hayamos", ellos: "hayan" }, gerundio: "habiendo", participio: "habido" } },
+    { infinitive: "correr", definition: "to run", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "corro", vos: "corrés", el: "corre", nosotros: "corremos", ellos: "corren" }, preterito: { yo: "corrí", vos: "corriste", el: "corrió", nosotros: "corrimos", ellos: "corrieron" }, imperfecto: { yo: "corría", vos: "corrías", el: "corría", nosotros: "corríamos", ellos: "corrían" }, futuro: { yo: "correré", vos: "correrás", el: "correrá", nosotros: "correremos", ellos: "correrán" }, condicional: { yo: "correría", vos: "correrías", el: "correría", nosotros: "correríamos", ellos: "correrían" }, subjPresente: { yo: "corra", vos: "corras", el: "corra", nosotros: "corramos", ellos: "corran" }, gerundio: "corriendo", participio: "corrido" } },
+    { infinitive: "ver", definition: "to see", type: "-er", irregular: true, pattern: "irregular imperfect (veía) + irregular participle (visto)", reflexive: false, forms: { presente: { yo: "veo", vos: "ves", el: "ve", nosotros: "vemos", ellos: "ven" }, preterito: { yo: "vi", vos: "viste", el: "vio", nosotros: "vimos", ellos: "vieron" }, imperfecto: { yo: "veía", vos: "veías", el: "veía", nosotros: "veíamos", ellos: "veían" }, futuro: { yo: "veré", vos: "verás", el: "verá", nosotros: "veremos", ellos: "verán" }, condicional: { yo: "vería", vos: "verías", el: "vería", nosotros: "veríamos", ellos: "verían" }, subjPresente: { yo: "vea", vos: "veas", el: "vea", nosotros: "veamos", ellos: "vean" }, gerundio: "viendo", participio: "visto" } },
+    { infinitive: "subir", definition: "to go up / to climb", type: "-ir", irregular: false, pattern: "regular -ir", reflexive: false, forms: { presente: { yo: "subo", vos: "subís", el: "sube", nosotros: "subimos", ellos: "suben" }, preterito: { yo: "subí", vos: "subiste", el: "subió", nosotros: "subimos", ellos: "subieron" }, imperfecto: { yo: "subía", vos: "subías", el: "subía", nosotros: "subíamos", ellos: "subían" }, futuro: { yo: "subiré", vos: "subirás", el: "subirá", nosotros: "subiremos", ellos: "subirán" }, condicional: { yo: "subiría", vos: "subirías", el: "subiría", nosotros: "subiríamos", ellos: "subirían" }, subjPresente: { yo: "suba", vos: "subas", el: "suba", nosotros: "subamos", ellos: "suban" }, gerundio: "subiendo", participio: "subido" } },
+    { infinitive: "saber", definition: "to know (facts/skills)", type: "-er", irregular: true, pattern: "irregular yo (sé) + irregular preterite + irregular future stem + irregular subjunctive", reflexive: false, forms: { presente: { yo: "sé", vos: "sabés", el: "sabe", nosotros: "sabemos", ellos: "saben" }, preterito: { yo: "supe", vos: "supiste", el: "supo", nosotros: "supimos", ellos: "supieron" }, imperfecto: { yo: "sabía", vos: "sabías", el: "sabía", nosotros: "sabíamos", ellos: "sabían" }, futuro: { yo: "sabré", vos: "sabrás", el: "sabrá", nosotros: "sabremos", ellos: "sabrán" }, condicional: { yo: "sabría", vos: "sabrías", el: "sabría", nosotros: "sabríamos", ellos: "sabrían" }, subjPresente: { yo: "sepa", vos: "sepas", el: "sepa", nosotros: "sepamos", ellos: "sepan" }, gerundio: "sabiendo", participio: "sabido" } },
+    { infinitive: "conocer", definition: "to know (people/places)", type: "-er", irregular: true, pattern: "irregular yo (c→zc) + irregular subjunctive", reflexive: false, forms: { presente: { yo: "conozco", vos: "conocés", el: "conoce", nosotros: "conocemos", ellos: "conocen" }, preterito: { yo: "conocí", vos: "conociste", el: "conoció", nosotros: "conocimos", ellos: "conocieron" }, imperfecto: { yo: "conocía", vos: "conocías", el: "conocía", nosotros: "conocíamos", ellos: "conocían" }, futuro: { yo: "conoceré", vos: "conocerás", el: "conocerá", nosotros: "conoceremos", ellos: "conocerán" }, condicional: { yo: "conocería", vos: "conocerías", el: "conocería", nosotros: "conoceríamos", ellos: "conocerían" }, subjPresente: { yo: "conozca", vos: "conozcas", el: "conozca", nosotros: "conozcamos", ellos: "conozcan" }, gerundio: "conociendo", participio: "conocido" } },
+    { infinitive: "usar", definition: "to use", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "uso", vos: "usás", el: "usa", nosotros: "usamos", ellos: "usan" }, preterito: { yo: "usé", vos: "usaste", el: "usó", nosotros: "usamos", ellos: "usaron" }, imperfecto: { yo: "usaba", vos: "usabas", el: "usaba", nosotros: "usábamos", ellos: "usaban" }, futuro: { yo: "usaré", vos: "usarás", el: "usará", nosotros: "usaremos", ellos: "usarán" }, condicional: { yo: "usaría", vos: "usarías", el: "usaría", nosotros: "usaríamos", ellos: "usarían" }, subjPresente: { yo: "use", vos: "uses", el: "use", nosotros: "usemos", ellos: "usen" }, gerundio: "usando", participio: "usado" } },
+    { infinitive: "nacer", definition: "to be born", type: "-er", irregular: true, pattern: "irregular yo (c→zc) + irregular subjunctive", reflexive: false, forms: { presente: { yo: "nazco", vos: "nacés", el: "nace", nosotros: "nacemos", ellos: "nacen" }, preterito: { yo: "nací", vos: "naciste", el: "nació", nosotros: "nacimos", ellos: "nacieron" }, imperfecto: { yo: "nacía", vos: "nacías", el: "nacía", nosotros: "nacíamos", ellos: "nacían" }, futuro: { yo: "naceré", vos: "nacerás", el: "nacerá", nosotros: "naceremos", ellos: "nacerán" }, condicional: { yo: "nacería", vos: "nacerías", el: "nacería", nosotros: "naceríamos", ellos: "nacerían" }, subjPresente: { yo: "nazca", vos: "nazcas", el: "nazca", nosotros: "nazcamos", ellos: "nazcan" }, gerundio: "naciendo", participio: "nacido" } },
+    { infinitive: "nadar", definition: "to swim", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "nado", vos: "nadás", el: "nada", nosotros: "nadamos", ellos: "nadan" }, preterito: { yo: "nadé", vos: "nadaste", el: "nadó", nosotros: "nadamos", ellos: "nadaron" }, imperfecto: { yo: "nadaba", vos: "nadabas", el: "nadaba", nosotros: "nadábamos", ellos: "nadaban" }, futuro: { yo: "nadaré", vos: "nadarás", el: "nadará", nosotros: "nadaremos", ellos: "nadarán" }, condicional: { yo: "nadaría", vos: "nadarías", el: "nadaría", nosotros: "nadaríamos", ellos: "nadarían" }, subjPresente: { yo: "nade", vos: "nades", el: "nade", nosotros: "nademos", ellos: "naden" }, gerundio: "nadando", participio: "nadado" } },
+    { infinitive: "comer", definition: "to eat", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "como", vos: "comés", el: "come", nosotros: "comemos", ellos: "comen" }, preterito: { yo: "comí", vos: "comiste", el: "comió", nosotros: "comimos", ellos: "comieron" }, imperfecto: { yo: "comía", vos: "comías", el: "comía", nosotros: "comíamos", ellos: "comían" }, futuro: { yo: "comeré", vos: "comerás", el: "comerá", nosotros: "comeremos", ellos: "comerán" }, condicional: { yo: "comería", vos: "comerías", el: "comería", nosotros: "comeríamos", ellos: "comerían" }, subjPresente: { yo: "coma", vos: "comas", el: "coma", nosotros: "comamos", ellos: "coman" }, gerundio: "comiendo", participio: "comido" } }
+  ];
+
+  // ================= state =================
+  var allVerbs = [];      // [{id, data}]
+  var filtered = [];
+  var selectedId = null;
+  var editingId = null;
+
+  var el = {
+    authScreen: document.getElementById("auth-screen"),
+    appScreen: document.getElementById("app-screen"),
+    tabLogin: document.getElementById("tab-login"),
+    tabSignup: document.getElementById("tab-signup"),
+    authForm: document.getElementById("auth-form"),
+    authEmail: document.getElementById("auth-email"),
+    authPassword: document.getElementById("auth-password"),
+    authSubmit: document.getElementById("auth-submit"),
+    authMsg: document.getElementById("auth-msg"),
+    userEmail: document.getElementById("user-email"),
+    logoutBtn: document.getElementById("logout-btn"),
+
+    banner: document.getElementById("status-banner"),
+    search: document.getElementById("search"),
+    count: document.getElementById("count"),
+    list: document.getElementById("card-list"),
+    detail: document.getElementById("detail"),
+    dInfinitive: document.getElementById("d-infinitive"),
+    dDefinition: document.getElementById("d-definition"),
+    dBadges: document.getElementById("d-badges"),
+    dPattern: document.getElementById("d-pattern"),
+    dTenseRow: document.getElementById("d-tense-row"),
+    dConjBody: document.getElementById("d-conj-body"),
+    dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
+    dGerundio: document.getElementById("d-gerundio"),
+    dParticipio: document.getElementById("d-participio"),
+    dEdit: document.getElementById("d-edit"),
+    dDelete: document.getElementById("d-delete"),
+    toggleAdd: document.getElementById("toggle-add"),
+    seedToolbarBtn: document.getElementById("seed-toolbar-btn"),
+    form: document.getElementById("verb-form"),
+    formTitle: document.getElementById("form-title"),
+    formMsg: document.getElementById("form-msg"),
+    formCancel: document.getElementById("form-cancel"),
+    conjFormTable: document.getElementById("conj-form-table"),
+    fInfinitive: document.getElementById("f-infinitive"),
+    fDefinition: document.getElementById("f-definition"),
+    fType: document.getElementById("f-type"),
+    fPattern: document.getElementById("f-pattern"),
+    fIrregular: document.getElementById("f-irregular"),
+    fReflexive: document.getElementById("f-reflexive"),
+    fGerundio: document.getElementById("f-gerundio"),
+    fParticipio: document.getElementById("f-participio")
+  };
+
+  function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
+  function clearBanner() { el.banner.hidden = true; }
+
+  function stripAccents(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function norm(s) { return stripAccents(s).toLowerCase().trim(); }
+
+  // ================= tense header =================
+  function buildTenseHeader() {
+    var frag = document.createDocumentFragment();
+    TENSES.forEach(function (t) {
+      var th = document.createElement("th");
+      th.textContent = t.label;
+      frag.appendChild(th);
+    });
+    var thSubj = document.createElement("th");
+    thSubj.textContent = "Presente";
+    frag.appendChild(thSubj);
+    el.dTenseRow.innerHTML = "";
+    el.dTenseRow.appendChild(frag);
+  }
+
+  // ================= list =================
+  function cardRow(id, data) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card-row";
+
+    var inf = document.createElement("span");
+    inf.className = "inf";
+    inf.textContent = data.infinitive || id;
+    btn.appendChild(inf);
+
+    if (data.type) {
+      var tb = document.createElement("span");
+      tb.className = "badge type";
+      tb.textContent = data.type;
+      btn.appendChild(tb);
+    }
+    if (data.irregular) {
+      var ib = document.createElement("span");
+      ib.className = "badge irregular";
+      ib.textContent = "irregular";
+      btn.appendChild(ib);
+    }
+
+    var def = document.createElement("span");
+    def.className = "def";
+    def.textContent = data.definition || "";
+    btn.appendChild(def);
+
+    btn.addEventListener("click", function () { selectVerb(id); });
+    li.appendChild(btn);
+    return li;
+  }
+
+  function renderList() {
+    var q = norm(el.search.value);
+    filtered = allVerbs.filter(function (v) {
+      return !q || norm(v.data.infinitive || v.id).indexOf(q) !== -1;
+    });
+    filtered.sort(function (a, b) {
+      return (a.data.infinitive || a.id).localeCompare(b.data.infinitive || b.id, "es");
+    });
+
+    el.list.innerHTML = "";
+    if (filtered.length === 0) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "empty-note";
+      var p = document.createElement("p");
+      p.textContent = allVerbs.length === 0
+        ? "Todavía no hay verbos en tu cuenta."
+        : "Ningún infinitivo coincide con “" + el.search.value + "”.";
+      note.appendChild(p);
+      if (allVerbs.length === 0) {
+        var seedBtn = document.createElement("button");
+        seedBtn.type = "button";
+        seedBtn.className = "seed-btn";
+        seedBtn.textContent = "Cargar 20 verbos de ejemplo";
+        seedBtn.addEventListener("click", seedStarterVerbs);
+        note.appendChild(seedBtn);
+      }
+      li.appendChild(note);
+      el.list.appendChild(li);
+    } else {
+      filtered.forEach(function (v) { el.list.appendChild(cardRow(v.id, v.data)); });
+    }
+    el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
+  }
+
+  // ================= detail =================
+  function badge(cls, text) {
+    var s = document.createElement("span");
+    s.className = "badge " + cls;
+    s.textContent = text;
+    return s;
+  }
+
+  function selectVerb(id) {
+    selectedId = id;
+    var entry = allVerbs.find(function (v) { return v.id === id; });
+    if (!entry) { el.detail.hidden = true; return; }
+    var data = entry.data;
+    var forms = data.forms || {};
+
+    el.dInfinitive.textContent = data.infinitive || id;
+    el.dDefinition.textContent = data.definition || "";
+    el.dBadges.innerHTML = "";
+    if (data.type) el.dBadges.appendChild(badge("type", data.type));
+    el.dBadges.appendChild(badge("irregular", data.irregular ? "irregular" : "regular"));
+    if (data.reflexive) el.dBadges.appendChild(badge("reflexive", "reflexivo"));
+    el.dPattern.textContent = data.pattern || "";
+    el.dPattern.style.display = data.pattern ? "" : "none";
+
+    buildTenseHeader();
+    el.dConjBody.innerHTML = "";
+    el.dConjPronounBody.innerHTML = "";
+    PERSONS.forEach(function (p) {
+      var prTr = document.createElement("tr");
+      var prTh = document.createElement("th");
+      prTh.textContent = p.label;
+      prTr.appendChild(prTh);
+      el.dConjPronounBody.appendChild(prTr);
+
+      var tr = document.createElement("tr");
+      TENSES.forEach(function (t) {
+        var td = document.createElement("td");
+        var val = (forms[t.key] && forms[t.key][p.key]) || "";
+        td.textContent = val || "—";
+        if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
+        tr.appendChild(td);
+      });
+      var tdSubj = document.createElement("td");
+      var subjVal = (forms[SUBJ_KEY] && forms[SUBJ_KEY][p.key]) || "";
+      tdSubj.textContent = subjVal || "—";
+      if (isCellIrregular(data, SUBJ_KEY, p.key, subjVal)) tdSubj.classList.add("irreg");
+      tr.appendChild(tdSubj);
+      el.dConjBody.appendChild(tr);
+    });
+
+    el.dGerundio.textContent = forms.gerundio || "—";
+    el.dParticipio.textContent = forms.participio || "—";
+
+    el.detail.hidden = false;
+    el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ================= add/edit form =================
+  function buildConjFormTable() {
+    el.conjFormTable.innerHTML = "";
+    var thead = document.createElement("thead");
+    var htr = document.createElement("tr");
+    var th0 = document.createElement("th");
+    th0.className = "person-col";
+    htr.appendChild(th0);
+    TENSES.forEach(function (t) {
+      var th = document.createElement("th");
+      th.textContent = t.label;
+      htr.appendChild(th);
+    });
+    var thSubj = document.createElement("th");
+    thSubj.textContent = "Subj. presente";
+    htr.appendChild(thSubj);
+    thead.appendChild(htr);
+    el.conjFormTable.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    PERSONS.forEach(function (p) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.textContent = p.label;
+      th.className = "person-col";
+      tr.appendChild(th);
+      TENSES.forEach(function (t) {
+        var td = document.createElement("td");
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.id = "f-" + t.key + "-" + p.key;
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+      var tdSubj = document.createElement("td");
+      var inpSubj = document.createElement("input");
+      inpSubj.type = "text";
+      inpSubj.id = "f-" + SUBJ_KEY + "-" + p.key;
+      tdSubj.appendChild(inpSubj);
+      tr.appendChild(tdSubj);
+      tbody.appendChild(tr);
+    });
+    el.conjFormTable.appendChild(tbody);
+  }
+
+  function clearForm() {
+    el.fInfinitive.value = "";
+    el.fDefinition.value = "";
+    el.fType.value = "-ar";
+    el.fPattern.value = "";
+    el.fIrregular.checked = false;
+    el.fReflexive.checked = false;
+    el.fGerundio.value = "";
+    el.fParticipio.value = "";
+    PERSONS.forEach(function (p) {
+      TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        if (inp) inp.value = "";
+      });
+    });
+  }
+
+  function fillForm(data) {
+    el.fInfinitive.value = data.infinitive || "";
+    el.fDefinition.value = data.definition || "";
+    el.fType.value = data.type || "-ar";
+    el.fPattern.value = data.pattern || "";
+    el.fIrregular.checked = !!data.irregular;
+    el.fReflexive.checked = !!data.reflexive;
+    var forms = data.forms || {};
+    el.fGerundio.value = forms.gerundio || "";
+    el.fParticipio.value = forms.participio || "";
+    PERSONS.forEach(function (p) {
+      TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        if (inp) inp.value = (forms[t.key] && forms[t.key][p.key]) || "";
+      });
+    });
+  }
+
+  function openForm(mode, data) {
+    editingId = mode === "edit" ? selectedId : null;
+    el.formTitle.textContent = mode === "edit" ? "Editar verbo" : "Agregar verbo";
+    el.formMsg.textContent = "";
+    if (mode === "edit" && data) fillForm(data); else clearForm();
+    el.form.hidden = false;
+    el.toggleAdd.hidden = true;
+    el.seedToolbarBtn.hidden = true;
+    el.fInfinitive.focus();
+    el.form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function closeForm() {
+    el.form.hidden = true;
+    el.toggleAdd.hidden = false;
+    el.seedToolbarBtn.hidden = false;
+    editingId = null;
+    el.formMsg.textContent = "";
+  }
+
+  function collectFormData() {
+    var forms = {};
+    TENSES.forEach(function (t) {
+      forms[t.key] = {};
+      PERSONS.forEach(function (p) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        forms[t.key][p.key] = inp ? inp.value.trim() : "";
+      });
+    });
+    forms[SUBJ_KEY] = {};
+    PERSONS.forEach(function (p) {
+      var inp = document.getElementById("f-" + SUBJ_KEY + "-" + p.key);
+      forms[SUBJ_KEY][p.key] = inp ? inp.value.trim() : "";
+    });
+    forms.gerundio = el.fGerundio.value.trim();
+    forms.participio = el.fParticipio.value.trim();
+
+    return {
+      infinitive: el.fInfinitive.value.trim(),
+      definition: el.fDefinition.value.trim(),
+      type: el.fType.value,
+      irregular: el.fIrregular.checked,
+      pattern: el.fPattern.value.trim(),
+      reflexive: el.fReflexive.checked,
+      forms: forms
+    };
+  }
+
+  // ================= Supabase-backed data layer =================
+  function rowToVerb(row) {
+    return {
+      id: row.id,
+      data: {
+        infinitive: row.infinitive,
+        definition: row.definition || "",
+        type: row.type || "-ar",
+        irregular: !!row.irregular,
+        pattern: row.pattern || "",
+        reflexive: !!row.reflexive,
+        forms: row.forms || {}
+      }
+    };
+  }
+
+  function loadVerbs() {
+    return supabaseClient
+      .from("verbs")
+      .select("*")
+      .order("infinitive", { ascending: true })
+      .then(function (res) {
+        if (res.error) { showBanner("Error al cargar tus verbos: " + res.error.message); return; }
+        clearBanner();
+        allVerbs = (res.data || []).map(rowToVerb);
+        renderList();
+        if (selectedId) {
+          var still = allVerbs.find(function (v) { return v.id === selectedId; });
+          if (still) selectVerb(selectedId); else { el.detail.hidden = true; selectedId = null; }
+        }
+      });
+  }
+
+  function handleSubmit(evt) {
+    evt.preventDefault();
+    var data = collectFormData();
+    if (!data.infinitive) { el.formMsg.textContent = "Falta el infinitivo."; return; }
+    el.formMsg.textContent = "Guardando…";
+
+    var query = editingId
+      ? supabaseClient.from("verbs").update(data).eq("id", editingId).select().single()
+      : supabaseClient.from("verbs").insert(data).select().single();
+
+    query.then(function (res) {
+      if (res.error) { el.formMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      var savedId = res.data.id;
+      closeForm();
+      loadVerbs().then(function () { selectVerb(savedId); });
+    });
+  }
+
+  function handleDelete() {
+    if (!selectedId) return;
+    if (!window.confirm("¿Eliminar este verbo de tu índice?")) return;
+    supabaseClient.from("verbs").delete().eq("id", selectedId).then(function (res) {
+      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      el.detail.hidden = true;
+      selectedId = null;
+      loadVerbs();
+    });
+  }
+
+  function seedStarterVerbs() {
+    var existing = {};
+    allVerbs.forEach(function (v) { existing[norm(v.data.infinitive || "")] = true; });
+    var toInsert = STARTER_VERBS.filter(function (sv) { return !existing[norm(sv.infinitive)]; });
+    if (toInsert.length === 0) {
+      showBanner("Ya tenés todos los verbos de ejemplo en tu cuenta.");
+      return;
+    }
+    supabaseClient.from("verbs").insert(toInsert).then(function (res) {
+      if (res.error) { showBanner("No se pudieron cargar los verbos de ejemplo: " + res.error.message); return; }
+      loadVerbs();
+    });
+  }
+
+  // ================= auth =================
+  var authMode = "login";
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    el.tabLogin.classList.toggle("active", mode === "login");
+    el.tabSignup.classList.toggle("active", mode === "signup");
+    el.authSubmit.textContent = mode === "login" ? "Entrar" : "Crear cuenta";
+    el.authMsg.textContent = "";
+  }
+
+  function renderAuthState() {
+    if (currentUser) {
+      el.authScreen.hidden = true;
+      el.appScreen.hidden = false;
+      el.userEmail.textContent = currentUser.email || "";
+      loadVerbs();
+    } else {
+      el.authScreen.hidden = false;
+      el.appScreen.hidden = true;
+      allVerbs = [];
+      selectedId = null;
+      el.detail.hidden = true;
+      el.form.hidden = true;
+      el.toggleAdd.hidden = false;
+      el.seedToolbarBtn.hidden = false;
+    }
+  }
+
+  function handleAuthSubmit(evt) {
+    evt.preventDefault();
+    el.authMsg.textContent = "";
+    var email = el.authEmail.value.trim();
+    var password = el.authPassword.value;
+    el.authSubmit.disabled = true;
+
+    var action = authMode === "login"
+      ? supabaseClient.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
+          if (res.error) throw res.error;
+        })
+      : supabaseClient.auth.signUp({ email: email, password: password }).then(function (res) {
+          if (res.error) throw res.error;
+          if (res.data && !res.data.session) {
+            el.authMsg.textContent = "Te enviamos un email de confirmación a " + email + ". Confirmá tu cuenta y después iniciá sesión.";
+            el.authMsg.style.color = "var(--accent-deep)";
+            setAuthMode("login");
+          }
+        });
+
+    action.catch(function (err) {
+      el.authMsg.style.color = "var(--danger)";
+      el.authMsg.textContent = (err && err.message) || String(err);
+    }).finally(function () {
+      el.authSubmit.disabled = false;
+    });
+  }
+
+  // ================= wiring =================
+  el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
+  el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
+  el.authForm.addEventListener("submit", handleAuthSubmit);
+  el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
+
+  el.search.addEventListener("input", renderList);
+  el.toggleAdd.addEventListener("click", function () { openForm("add"); });
+  el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
+  el.formCancel.addEventListener("click", closeForm);
+  el.form.addEventListener("submit", handleSubmit);
+  el.dEdit.addEventListener("click", function () {
+    var entry = allVerbs.find(function (v) { return v.id === selectedId; });
+    if (entry) openForm("edit", entry.data);
+  });
+  el.dDelete.addEventListener("click", handleDelete);
+
+  buildConjFormTable();
+  buildTenseHeader();
+
+  supabaseClient.auth.onAuthStateChange(function (_event, session) {
+    currentUser = session ? session.user : null;
+    renderAuthState();
+  });
+  supabaseClient.auth.getSession().then(function (res) {
+    currentUser = (res.data && res.data.session) ? res.data.session.user : null;
+    renderAuthState();
+  });
+})();

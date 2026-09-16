@@ -1,0 +1,403 @@
+  :root {
+    color-scheme: light;
+    --paper: #EDEFF5;
+    --paper-raised: #E1E5F0;
+    --paper-sunken: #D5DAEA;
+    --ink: #1C2333;
+    --ink-soft: #565F7A;
+    --line: #C2C9DE;
+    --accent: #3B4B9E;
+    --accent-deep: #28336E;
+    --accent-ink: #F5F6FC;
+    --brick: #B5622E;
+    --brick-soft: #F0DCC8;
+    --gold: #8A6D1E;
+    --gold-soft: #F0E4C0;
+    --danger: #A23A3A;
+    --shadow: rgba(28, 35, 51, 0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #12141F;
+      --paper-raised: #171A2C;
+      --paper-sunken: #0D0E18;
+      --ink: #E7E9F5;
+      --ink-soft: #A7ADC9;
+      --line: #2C3049;
+      --accent: #8B95E8;
+      --accent-deep: #B4BBF2;
+      --accent-ink: #11132A;
+      --brick: #E19A6C;
+      --brick-soft: #3A2A1D;
+      --gold: #DDBE72;
+      --gold-soft: #35301C;
+      --danger: #E28881;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #12141F;
+    --paper-raised: #171A2C;
+    --paper-sunken: #0D0E18;
+    --ink: #E7E9F5;
+    --ink-soft: #A7ADC9;
+    --line: #2C3049;
+    --accent: #8B95E8;
+    --accent-deep: #B4BBF2;
+    --accent-ink: #11132A;
+    --brick: #E19A6C;
+    --brick-soft: #3A2A1D;
+    --gold: #DDBE72;
+    --gold-soft: #35301C;
+    --danger: #E28881;
+    --shadow: rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 28px 16px 72px;
+  }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  header.masthead {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header.masthead h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(28px, 6vw, 40px);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.masthead .tag {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .user-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .status-banner {
+    background: var(--brick-soft);
+    color: var(--ink);
+    border: 1px solid var(--brick);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+  }
+
+  /* ---------- auth screen ---------- */
+  .auth-wrap {
+    max-width: 400px;
+    margin: 12vh auto 0;
+  }
+  .auth-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    padding: 28px;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .auth-card h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 2px;
+  }
+  .auth-card .tag {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 20px 0 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .auth-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 8px 4px 10px;
+    font-family: "Public Sans", sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .auth-tab.active { color: var(--accent-deep); border-bottom-color: var(--accent); }
+  #auth-form { display: flex; flex-direction: column; gap: 12px; }
+  #auth-form .field label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  #auth-form input {
+    width: 100%;
+    font-family: "Public Sans", sans-serif;
+    font-size: 14px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  #auth-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #auth-submit { margin-top: 4px; }
+
+  /* ---------- search / list ---------- */
+  .search-box { position: relative; margin-bottom: 6px; }
+  .search-box input {
+    width: 100%;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 20px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    padding: 8px 2px 10px;
+    outline: none;
+  }
+  .search-box input::placeholder { color: var(--ink-soft); font-style: italic; }
+  .search-box .count {
+    position: absolute;
+    right: 2px;
+    bottom: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .card-list {
+    list-style: none;
+    margin: 10px 0 12px;
+    padding: 0;
+    max-height: 110px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-raised);
+  }
+  .card-list li + li { border-top: 1px solid var(--line); }
+  .card-row {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .card-row:hover, .card-row:focus-visible { background: var(--paper-sunken); }
+  .card-row .inf { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 17px; min-width: 120px; }
+  .card-row .def { color: var(--ink-soft); font-size: 13.5px; flex: 1; }
+  .card-row .badge { flex-shrink: 0; }
+  .empty-note { padding: 18px 14px; color: var(--ink-soft); font-size: 14px; }
+  .empty-note p { margin: 0 0 10px; font-style: italic; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .badge.type { background: var(--gold-soft); color: var(--gold); }
+  .badge.irregular { background: var(--brick-soft); color: var(--brick); }
+  .badge.reflexive { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
+
+  .detail {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    padding: 22px 22px 8px;
+    margin: 26px 0 24px;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .detail-actions-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin: 18px 0 4px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .detail-head h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 32px; margin: 0; }
+  .icon-btn {
+    background: none; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-soft);
+    font-family: "Public Sans", sans-serif; font-size: 12.5px; font-weight: 600; padding: 5px 10px; cursor: pointer;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
+  .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+  .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }
+
+  .conj-hint { display: none; }
+  .conj-wrap { display: flex; align-items: flex-start; }
+  .conj-scroll { overflow-x: auto; flex: 1 1 auto; min-width: 0; margin-right: -22px; padding-right: 22px; }
+  table.conj { border-collapse: collapse; width: 100%; min-width: 560px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  table.conj th, table.conj td { padding: 7px 10px; text-align: left; white-space: nowrap; line-height: 17px; }
+  table.conj thead tr.mood-row th {
+    font-family: "Public Sans", sans-serif; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent-deep); padding-bottom: 2px; border-bottom: none;
+  }
+  table.conj thead tr.tense-row th {
+    font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 12.5px; color: var(--ink-soft);
+    border-bottom: 2px solid var(--ink); padding-top: 0; padding-bottom: 8px;
+  }
+  table.conj tbody th { font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); white-space: normal; }
+  table.conj tbody tr + tr th, table.conj tbody tr + tr td { border-top: 1px solid var(--line); }
+  table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
+  table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
+
+  /* frozen pronoun column, as its own small table beside the scrolling one
+     rather than a sticky cell inside it (sticky-in-table renders unreliably,
+     especially in mobile Safari, causing the column to visibly pop/duplicate
+     as it re-syncs with the scroll position) */
+  table.conj.conj-pronouns {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    border-right: 1px solid var(--line);
+  }
+  table.conj.conj-pronouns th { white-space: nowrap; }
+
+  .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
+  .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
+
+  .nonpersonal { display: flex; gap: 10px; margin: 18px 0 20px; flex-wrap: wrap; }
+  .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
+  .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }
+  .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
+
+  .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .add-toggle {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: var(--accent-ink);
+    border: none; border-radius: 6px; padding: 9px 16px; font-family: "Public Sans", sans-serif; font-weight: 600;
+    font-size: 14px; cursor: pointer;
+  }
+  .add-toggle:hover { background: var(--accent-deep); }
+  .seed-btn {
+    background: none; border: 1px solid var(--accent); color: var(--accent-deep); border-radius: 6px;
+    padding: 7px 14px; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px; cursor: pointer;
+  }
+  .seed-btn:hover { background: var(--paper-sunken); }
+
+  form#verb-form { border: 1px dashed var(--line); border-radius: 10px; padding: 20px; background: var(--paper-raised); margin-bottom: 32px; }
+  form#verb-form h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 14px; }
+  .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.checks { flex-direction: row; align-items: center; gap: 8px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); font-weight: 600; }
+  .field input[type="text"], .field select {
+    font-family: "Public Sans", sans-serif; font-size: 14px; padding: 7px 9px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--paper); color: var(--ink);
+  }
+  .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .conj-form-scroll { overflow-x: auto; margin-bottom: 6px; }
+  table.conj-form { border-collapse: collapse; min-width: 560px; }
+  table.conj-form th { font-family: "Public Sans", sans-serif; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); text-align: left; padding: 4px 6px; }
+  table.conj-form td { padding: 4px 6px; }
+  table.conj-form input {
+    width: 92px; font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 5px 6px;
+    border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink);
+  }
+  table.conj-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  table.conj-form th.person-col { min-width: 130px; }
+
+  .nonpersonal-form { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+
+  .form-actions { display: flex; gap: 10px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px; padding: 9px 18px;
+    font-family: "Public Sans", sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--accent-deep); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
+  .btn-secondary {
+    background: none; border: 1px solid var(--line); color: var(--ink-soft); border-radius: 6px; padding: 9px 16px;
+    font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 14px; cursor: pointer;
+  }
+  .form-msg { font-size: 13px; color: var(--danger); }
+
+  footer.note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 40px; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width: 640px) {
+    body { padding: 16px 10px 56px; }
+
+    header.masthead h1 { font-size: 24px; }
+
+    .auth-wrap { margin: 6vh auto 0; }
+    .auth-card { padding: 20px 16px; }
+    .auth-card h1 { font-size: 24px; }
+
+    .detail { padding: 16px 14px 6px; margin: 20px 0 18px; }
+    .detail-head h2 { font-size: 24px; }
+    .icon-btn { padding: 8px 12px; font-size: 13px; }
+
+    .conj-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft); margin: 0 0 4px; }
+    .conj-scroll { margin-right: -14px; padding-right: 14px; }
+    table.conj { font-size: 12.5px; min-width: 480px; }
+    table.conj th, table.conj td { padding: 6px 7px; line-height: 15px; }
+    table.conj tbody th { font-size: 12px; }
+
+    .nonpersonal { gap: 8px; margin: 14px 0 16px; }
+    .nonpersonal .tile { min-width: calc(50% - 4px); padding: 7px 10px; }
+
+    .card-row { padding: 11px 12px; font-size: 14px; }
+    .card-row .inf { min-width: 0; flex: 0 1 auto; font-size: 16px; }
+    .card-row .def { font-size: 12.5px; }
+
+    form#verb-form { padding: 16px 14px; }
+    .conj-form-scroll { margin: 0 -14px; padding: 0 14px; }
+
+    .btn-primary, .btn-secondary { padding: 11px 16px; font-size: 14.5px; }
+
+    .toolbar-row { gap: 8px; }
+    .add-toggle, .seed-btn { padding: 10px 14px; font-size: 13.5px; }
+  }
