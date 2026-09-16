@@ -277,6 +277,7 @@
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
   .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }
 
+  .conj-hint { display: none; }
   .conj-scroll { overflow-x: auto; margin: 0 -22px; padding: 0 22px; }
   table.conj { border-collapse: collapse; width: 100%; min-width: 560px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
   table.conj th, table.conj td { padding: 7px 10px; text-align: left; white-space: nowrap; }
@@ -352,6 +353,39 @@
   .form-msg { font-size: 13px; color: var(--danger); }
 
   footer.note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 40px; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width: 640px) {
+    body { padding: 16px 10px 56px; }
+
+    header.masthead h1 { font-size: 24px; }
+
+    .auth-wrap { margin: 6vh auto 0; }
+    .auth-card { padding: 20px 16px; }
+    .auth-card h1 { font-size: 24px; }
+
+    .detail { padding: 16px 14px 6px; margin-bottom: 18px; }
+    .detail-head h2 { font-size: 24px; }
+    .icon-btn { padding: 8px 12px; font-size: 13px; }
+
+    .conj-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft); margin: 0 0 4px; }
+    .conj-scroll { margin: 0 -14px; padding: 0 14px; }
+    table.conj { font-size: 12.5px; min-width: 480px; }
+    table.conj th, table.conj td { padding: 6px 7px; }
+    table.conj tbody th { font-size: 12px; }
+
+    .nonpersonal { gap: 8px; margin: 14px 0 16px; }
+    .nonpersonal .tile { min-width: calc(50% - 4px); padding: 7px 10px; }
+
+    .card-row { padding: 11px 12px; font-size: 14px; }
+    .card-row .inf { min-width: 0; flex: 0 1 auto; font-size: 16px; }
+    .card-row .def { font-size: 12.5px; }
+
+    form#verb-form { padding: 16px 14px; }
+    .conj-form-scroll { margin: 0 -14px; padding: 0 14px; }
+
+    .btn-primary, .btn-secondary { padding: 11px 16px; font-size: 14.5px; }
+  }
 </style>
 </head>
 <body>
@@ -414,6 +448,7 @@
     <div class="badges" id="d-badges"></div>
     <p class="pattern-note" id="d-pattern"></p>
 
+    <p class="conj-hint">deslizá para ver todos los tiempos &rarr;</p>
     <div class="conj-scroll">
       <table class="conj">
         <thead>
