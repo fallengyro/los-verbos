@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Índice Verbal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #EDF1EF;
+    --paper-raised: #E3EAE6;
+    --paper-sunken: #DCE5E1;
+    --ink: #17282A;
+    --ink-soft: #52696A;
+    --line: #C5D0CB;
+    --accent: #2E6F77;
+    --accent-deep: #1D4B52;
+    --accent-ink: #F4FAFA;
+    --brick: #A85A28;
+    --brick-soft: #EADCCB;
+    --gold: #8C6A1E;
+    --gold-soft: #EFE3C4;
+    --danger: #A03A34;
+    --shadow: rgba(23, 40, 42, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #11201F;
+      --paper-raised: #16292A;
+      --paper-sunken: #0D1918;
+      --ink: #E7EFEC;
+      --ink-soft: #9FB8B4;
+      --line: #2B4341;
+      --accent: #6FC6C7;
+      --accent-deep: #8FD9D8;
+      --accent-ink: #0C1E1F;
+      --brick: #E19A6C;
+      --brick-soft: #3A2A1D;
+      --gold: #DDBE72;
+      --gold-soft: #35301C;
+      --danger: #E28881;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #11201F;
+    --paper-raised: #16292A;
+    --paper-sunken: #0D1918;
+    --ink: #E7EFEC;
+    --ink-soft: #9FB8B4;
+    --line: #2B4341;
+    --accent: #6FC6C7;
+    --accent-deep: #8FD9D8;
+    --accent-ink: #0C1E1F;
+    --brick: #E19A6C;
+    --brick-soft: #3A2A1D;
+    --gold: #DDBE72;
+    --gold-soft: #35301C;
+    --danger: #E28881;
+    --shadow: rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 28px 16px 72px;
+  }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  header.masthead {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header.masthead h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(28px, 6vw, 40px);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.masthead .tag {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .user-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .status-banner {
+    background: var(--brick-soft);
+    color: var(--ink);
+    border: 1px solid var(--brick);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+  }
+
+  /* ---------- auth screen ---------- */
+  .auth-wrap {
+    max-width: 400px;
+    margin: 12vh auto 0;
+  }
+  .auth-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    padding: 28px;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .auth-card h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 2px;
+  }
+  .auth-card .tag {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 20px 0 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .auth-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 8px 4px 10px;
+    font-family: "Public Sans", sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .auth-tab.active { color: var(--accent-deep); border-bottom-color: var(--accent); }
+  #auth-form { display: flex; flex-direction: column; gap: 12px; }
+  #auth-form .field label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  #auth-form input {
+    width: 100%;
+    font-family: "Public Sans", sans-serif;
+    font-size: 14px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  #auth-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #auth-submit { margin-top: 4px; }
+
+  /* ---------- search / list ---------- */
+  .search-box { position: relative; margin-bottom: 6px; }
+  .search-box input {
+    width: 100%;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 20px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    padding: 8px 2px 10px;
+    outline: none;
+  }
+  .search-box input::placeholder { color: var(--ink-soft); font-style: italic; }
+  .search-box .count {
+    position: absolute;
+    right: 2px;
+    bottom: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .card-list {
+    list-style: none;
+    margin: 10px 0 12px;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-raised);
+  }
+  .card-list li + li { border-top: 1px solid var(--line); }
+  .card-row {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .card-row:hover, .card-row:focus-visible { background: var(--paper-sunken); }
+  .card-row .inf { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 17px; min-width: 120px; }
+  .card-row .def { color: var(--ink-soft); font-size: 13.5px; flex: 1; }
+  .card-row .badge { flex-shrink: 0; }
+  .empty-note { padding: 18px 14px; color: var(--ink-soft); font-size: 14px; }
+  .empty-note p { margin: 0 0 10px; font-style: italic; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .badge.type { background: var(--gold-soft); color: var(--gold); }
+  .badge.irregular { background: var(--brick-soft); color: var(--brick); }
+  .badge.reflexive { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
+
+  .detail {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    padding: 22px 22px 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .detail-head h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 32px; margin: 0; }
+  .detail-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    background: none; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-soft);
+    font-family: "Public Sans", sans-serif; font-size: 12.5px; font-weight: 600; padding: 5px 10px; cursor: pointer;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
+  .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+  .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }
+
+  .conj-scroll { overflow-x: auto; margin: 0 -22px; padding: 0 22px; }
+  table.conj { border-collapse: collapse; width: 100%; min-width: 560px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  table.conj th, table.conj td { padding: 7px 10px; text-align: left; white-space: nowrap; }
+  table.conj thead tr.mood-row th {
+    font-family: "Public Sans", sans-serif; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent-deep); padding-bottom: 2px; border-bottom: none;
+  }
+  table.conj thead tr.tense-row th {
+    font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 12.5px; color: var(--ink-soft);
+    border-bottom: 2px solid var(--ink); padding-top: 0; padding-bottom: 8px;
+  }
+  table.conj tbody th { font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); white-space: normal; }
+  table.conj tbody tr + tr th, table.conj tbody tr + tr td { border-top: 1px solid var(--line); }
+  table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
+  table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
+
+  .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
+  .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
+
+  .nonpersonal { display: flex; gap: 10px; margin: 18px 0 20px; flex-wrap: wrap; }
+  .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
+  .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }
+  .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
+
+  .add-toggle {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: var(--accent-ink);
+    border: none; border-radius: 6px; padding: 9px 16px; font-family: "Public Sans", sans-serif; font-weight: 600;
+    font-size: 14px; cursor: pointer; margin-bottom: 16px;
+  }
+  .add-toggle:hover { background: var(--accent-deep); }
+  .seed-btn {
+    background: none; border: 1px solid var(--accent); color: var(--accent-deep); border-radius: 6px;
+    padding: 7px 14px; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px; cursor: pointer;
+  }
+  .seed-btn:hover { background: var(--paper-sunken); }
+
+  form#verb-form { border: 1px dashed var(--line); border-radius: 10px; padding: 20px; background: var(--paper-raised); margin-bottom: 32px; }
+  form#verb-form h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 14px; }
+  .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.checks { flex-direction: row; align-items: center; gap: 8px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); font-weight: 600; }
+  .field input[type="text"], .field select {
+    font-family: "Public Sans", sans-serif; font-size: 14px; padding: 7px 9px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--paper); color: var(--ink);
+  }
+  .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .conj-form-scroll { overflow-x: auto; margin-bottom: 6px; }
+  table.conj-form { border-collapse: collapse; min-width: 560px; }
+  table.conj-form th { font-family: "Public Sans", sans-serif; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); text-align: left; padding: 4px 6px; }
+  table.conj-form td { padding: 4px 6px; }
+  table.conj-form input {
+    width: 92px; font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 5px 6px;
+    border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink);
+  }
+  table.conj-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  table.conj-form th.person-col { min-width: 130px; }
+
+  .nonpersonal-form { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+
+  .form-actions { display: flex; gap: 10px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px; padding: 9px 18px;
+    font-family: "Public Sans", sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--accent-deep); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
+  .btn-secondary {
+    background: none; border: 1px solid var(--line); color: var(--ink-soft); border-radius: 6px; padding: 9px 16px;
+    font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 14px; cursor: pointer;
+  }
+  .form-msg { font-size: 13px; color: var(--danger); }
+
+  footer.note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<section id="auth-screen" class="auth-wrap">
+  <div class="auth-card">
+    <h1>Índice Verbal</h1>
+    <p class="tag">rioplatense · voseo</p>
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="tab-login">Iniciar sesión</button>
+      <button type="button" class="auth-tab" id="tab-signup">Crear cuenta</button>
+    </div>
+    <form id="auth-form">
+      <div class="field">
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" required autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="auth-password">Contraseña</label>
+        <input type="password" id="auth-password" required minlength="6" autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn-primary" id="auth-submit">Entrar</button>
+      <p class="form-msg" id="auth-msg"></p>
+    </form>
+  </div>
+</section>
+
+<div id="app-screen" class="wrap" hidden>
+  <header class="masthead">
+    <div>
+      <h1>Índice&nbsp;Verbal</h1>
+      <span class="tag">rioplatense &middot; voseo</span>
+    </div>
+    <div class="user-bar">
+      <span id="user-email"></span>
+      <button class="icon-btn" id="logout-btn" type="button">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="status-banner" id="status-banner" hidden></div>
+
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
+    <span class="count" id="count"></span>
+  </div>
+
+  <ul class="card-list" id="card-list"></ul>
+
+  <section class="detail" id="detail" hidden>
+    <div class="detail-head">
+      <div>
+        <h2 id="d-infinitive"></h2>
+        <p class="definition" id="d-definition"></p>
+      </div>
+      <div class="detail-actions">
+        <button class="icon-btn" id="d-edit" type="button">Editar</button>
+        <button class="icon-btn danger" id="d-delete" type="button">Eliminar</button>
+      </div>
+    </div>
+    <div class="badges" id="d-badges"></div>
+    <p class="pattern-note" id="d-pattern"></p>
+
+    <div class="conj-scroll">
+      <table class="conj">
+        <thead>
+          <tr class="mood-row">
+            <th></th>
+            <th colspan="5">Indicativo</th>
+            <th>Subjuntivo</th>
+          </tr>
+          <tr class="tense-row" id="d-tense-row"></tr>
+        </thead>
+        <tbody id="d-conj-body"></tbody>
+      </table>
+    </div>
+    <p class="conj-legend"><span class="swatch"></span> se aparta del patrón regular</p>
+
+    <div class="nonpersonal">
+      <div class="tile"><span class="label">Gerundio</span><span class="val" id="d-gerundio"></span></div>
+      <div class="tile"><span class="label">Participio</span><span class="val" id="d-participio"></span></div>
+    </div>
+  </section>
+
+  <button class="add-toggle" id="toggle-add" type="button">+ Agregar verbo</button>
+
+  <form id="verb-form" hidden>
+    <h3 id="form-title">Agregar verbo</h3>
+    <div class="field-grid">
+      <div class="field">
+        <label for="f-infinitive">Infinitivo</label>
+        <input type="text" id="f-infinitive" required />
+      </div>
+      <div class="field">
+        <label for="f-definition">Definición</label>
+        <input type="text" id="f-definition" />
+      </div>
+      <div class="field">
+        <label for="f-type">Tipo</label>
+        <select id="f-type">
+          <option value="-ar">-ar</option>
+          <option value="-er">-er</option>
+          <option value="-ir">-ir</option>
+          <option value="irregular">irregular</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-pattern">Patrón / notas</label>
+        <input type="text" id="f-pattern" />
+      </div>
+      <div class="field checks">
+        <input type="checkbox" id="f-irregular" />
+        <label for="f-irregular" style="margin:0;">¿Irregular?</label>
+      </div>
+      <div class="field checks">
+        <input type="checkbox" id="f-reflexive" />
+        <label for="f-reflexive" style="margin:0;">¿Reflexivo?</label>
+      </div>
+    </div>
+
+    <div class="conj-form-scroll">
+      <table class="conj-form" id="conj-form-table"></table>
+    </div>
+
+    <div class="nonpersonal-form">
+      <div class="field">
+        <label for="f-gerundio">Gerundio</label>
+        <input type="text" id="f-gerundio" />
+      </div>
+      <div class="field">
+        <label for="f-participio">Participio</label>
+        <input type="text" id="f-participio" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" id="form-save">Guardar</button>
+      <button type="button" class="btn-secondary" id="form-cancel">Cancelar</button>
+      <span class="form-msg" id="form-msg"></span>
+    </div>
+  </form>
+
+  <footer class="note">Tus verbos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ================= Supabase client =================
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+
+  // ================= conjugation model (unchanged from the original tool) =================
+  var PERSONS = [
+    { key: "yo", label: "yo" },
+    { key: "vos", label: "vos" },
+    { key: "el", label: "él / ella / Ud." },
+    { key: "nosotros", label: "nosotros" },
+    { key: "ellos", label: "ellos / ellas / Uds." }
+  ];
+  var TENSES = [
+    { key: "presente", label: "Presente" },
+    { key: "preterito", label: "Pretérito" },
+    { key: "imperfecto", label: "Imperfecto" },
+    { key: "futuro", label: "Futuro" },
+    { key: "condicional", label: "Condicional" }
+  ];
+  var SUBJ_KEY = "subjPresente";
+  var REFLEXIVE_PRONOUNS = { yo: "me", vos: "te", el: "se", nosotros: "nos", ellos: "se" };
+
+  function verbClass(baseInf) {
+    var end = baseInf.slice(-2).toLowerCase();
+    return (end === "ar" || end === "er" || end === "ir") ? end : null;
+  }
+
+  function regularForm(baseInf, tenseKey, personKey) {
+    var klass = verbClass(baseInf);
+    if (!klass) return null;
+    var stem = baseInf.slice(0, -2);
+    var inf = baseInf;
+
+    if (tenseKey === "presente") {
+      if (klass === "ar") return { yo: stem + "o", vos: stem + "ás", el: stem + "a", nosotros: stem + "amos", ellos: stem + "an" }[personKey];
+      if (klass === "er") return { yo: stem + "o", vos: stem + "és", el: stem + "e", nosotros: stem + "emos", ellos: stem + "en" }[personKey];
+      return { yo: stem + "o", vos: stem + "ís", el: stem + "e", nosotros: stem + "imos", ellos: stem + "en" }[personKey];
+    }
+    if (tenseKey === "preterito") {
+      if (klass === "ar") return { yo: stem + "é", vos: stem + "aste", el: stem + "ó", nosotros: stem + "amos", ellos: stem + "aron" }[personKey];
+      return { yo: stem + "í", vos: stem + "iste", el: stem + "ió", nosotros: stem + "imos", ellos: stem + "ieron" }[personKey];
+    }
+    if (tenseKey === "imperfecto") {
+      if (klass === "ar") return { yo: stem + "aba", vos: stem + "abas", el: stem + "aba", nosotros: stem + "ábamos", ellos: stem + "aban" }[personKey];
+      return { yo: stem + "ía", vos: stem + "ías", el: stem + "ía", nosotros: stem + "íamos", ellos: stem + "ían" }[personKey];
+    }
+    if (tenseKey === "futuro") {
+      return { yo: inf + "é", vos: inf + "ás", el: inf + "á", nosotros: inf + "emos", ellos: inf + "án" }[personKey];
+    }
+    if (tenseKey === "condicional") {
+      return { yo: inf + "ía", vos: inf + "ías", el: inf + "ía", nosotros: inf + "íamos", ellos: inf + "ían" }[personKey];
+    }
+    if (tenseKey === SUBJ_KEY) {
+      if (klass === "ar") return { yo: stem + "e", vos: stem + "es", el: stem + "e", nosotros: stem + "emos", ellos: stem + "en" }[personKey];
+      return { yo: stem + "a", vos: stem + "as", el: stem + "a", nosotros: stem + "amos", ellos: stem + "an" }[personKey];
+    }
+    return null;
+  }
+
+  function stripReflexivePronoun(form, personKey, reflexive) {
+    if (!reflexive || !form) return form;
+    var pron = REFLEXIVE_PRONOUNS[personKey];
+    var prefix = pron + " ";
+    if (form.toLowerCase().indexOf(prefix) === 0) return form.slice(prefix.length);
+    return form;
+  }
+
+  function baseInfinitive(infinitive, reflexive) {
+    if (!reflexive) return infinitive;
+    return (infinitive || "").toLowerCase().replace(/se$/, "");
+  }
+
+  function isCellIrregular(data, tenseKey, personKey, actualValue) {
+    if (!actualValue) return false;
+    var base = baseInfinitive(data.infinitive || "", data.reflexive);
+    var expected = regularForm(base, tenseKey, personKey);
+    if (expected == null) return false;
+    var actual = stripReflexivePronoun(actualValue, personKey, data.reflexive);
+    return actual.trim().toLowerCase() !== expected.trim().toLowerCase();
+  }
+
+  // ================= starter verbs (offered to a brand-new account) =================
+  var STARTER_VERBS = [
+    { infinitive: "ser", definition: "to be (essential)", type: "irregular", irregular: true, pattern: "fully irregular", reflexive: false, forms: { presente: { yo: "soy", vos: "sos", el: "es", nosotros: "somos", ellos: "son" }, preterito: { yo: "fui", vos: "fuiste", el: "fue", nosotros: "fuimos", ellos: "fueron" }, imperfecto: { yo: "era", vos: "eras", el: "era", nosotros: "éramos", ellos: "eran" }, futuro: { yo: "seré", vos: "serás", el: "será", nosotros: "seremos", ellos: "serán" }, condicional: { yo: "sería", vos: "serías", el: "sería", nosotros: "seríamos", ellos: "serían" }, subjPresente: { yo: "sea", vos: "seas", el: "sea", nosotros: "seamos", ellos: "sean" }, gerundio: "siendo", participio: "sido" } },
+    { infinitive: "estar", definition: "to be (state)", type: "-ar", irregular: true, pattern: "irregular yo + accents", reflexive: false, forms: { presente: { yo: "estoy", vos: "estás", el: "está", nosotros: "estamos", ellos: "están" }, preterito: { yo: "estuve", vos: "estuviste", el: "estuvo", nosotros: "estuvimos", ellos: "estuvieron" }, imperfecto: { yo: "estaba", vos: "estabas", el: "estaba", nosotros: "estábamos", ellos: "estaban" }, futuro: { yo: "estaré", vos: "estarás", el: "estará", nosotros: "estaremos", ellos: "estarán" }, condicional: { yo: "estaría", vos: "estarías", el: "estaría", nosotros: "estaríamos", ellos: "estarían" }, subjPresente: { yo: "esté", vos: "estés", el: "esté", nosotros: "estemos", ellos: "estén" }, gerundio: "estando", participio: "estado" } },
+    { infinitive: "tener", definition: "to have", type: "-er", irregular: true, pattern: "stem-change e→ie + irregular yo", reflexive: false, forms: { presente: { yo: "tengo", vos: "tenés", el: "tiene", nosotros: "tenemos", ellos: "tienen" }, preterito: { yo: "tuve", vos: "tuviste", el: "tuvo", nosotros: "tuvimos", ellos: "tuvieron" }, imperfecto: { yo: "tenía", vos: "tenías", el: "tenía", nosotros: "teníamos", ellos: "tenían" }, futuro: { yo: "tendré", vos: "tendrás", el: "tendrá", nosotros: "tendremos", ellos: "tendrán" }, condicional: { yo: "tendría", vos: "tendrías", el: "tendría", nosotros: "tendríamos", ellos: "tendrían" }, subjPresente: { yo: "tenga", vos: "tengas", el: "tenga", nosotros: "tengamos", ellos: "tengan" }, gerundio: "teniendo", participio: "tenido" } },
+    { infinitive: "hacer", definition: "to do/make", type: "-er", irregular: true, pattern: "irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "hago", vos: "hacés", el: "hace", nosotros: "hacemos", ellos: "hacen" }, preterito: { yo: "hice", vos: "hiciste", el: "hizo", nosotros: "hicimos", ellos: "hicieron" }, imperfecto: { yo: "hacía", vos: "hacías", el: "hacía", nosotros: "hacíamos", ellos: "hacían" }, futuro: { yo: "haré", vos: "harás", el: "hará", nosotros: "haremos", ellos: "harán" }, condicional: { yo: "haría", vos: "harías", el: "haría", nosotros: "haríamos", ellos: "harían" }, subjPresente: { yo: "haga", vos: "hagas", el: "haga", nosotros: "hagamos", ellos: "hagan" }, gerundio: "haciendo", participio: "hecho" } },
+    { infinitive: "poder", definition: "to be able to", type: "-er", irregular: true, pattern: "stem-change o→ue + irregular preterite", reflexive: false, forms: { presente: { yo: "puedo", vos: "podés", el: "puede", nosotros: "podemos", ellos: "pueden" }, preterito: { yo: "pude", vos: "pudiste", el: "pudo", nosotros: "pudimos", ellos: "pudieron" }, imperfecto: { yo: "podía", vos: "podías", el: "podía", nosotros: "podíamos", ellos: "podían" }, futuro: { yo: "podré", vos: "podrás", el: "podrá", nosotros: "podremos", ellos: "podrán" }, condicional: { yo: "podría", vos: "podrías", el: "podría", nosotros: "podríamos", ellos: "podrían" }, subjPresente: { yo: "pueda", vos: "puedas", el: "pueda", nosotros: "podamos", ellos: "puedan" }, gerundio: "pudiendo", participio: "podido" } },
+    { infinitive: "decir", definition: "to say/tell", type: "-ir", irregular: true, pattern: "stem-change e→i + irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "digo", vos: "decís", el: "dice", nosotros: "decimos", ellos: "dicen" }, preterito: { yo: "dije", vos: "dijiste", el: "dijo", nosotros: "dijimos", ellos: "dijeron" }, imperfecto: { yo: "decía", vos: "decías", el: "decía", nosotros: "decíamos", ellos: "decían" }, futuro: { yo: "diré", vos: "dirás", el: "dirá", nosotros: "diremos", ellos: "dirán" }, condicional: { yo: "diría", vos: "dirías", el: "diría", nosotros: "diríamos", ellos: "dirían" }, subjPresente: { yo: "diga", vos: "digas", el: "diga", nosotros: "digamos", ellos: "digan" }, gerundio: "diciendo", participio: "dicho" } },
+    { infinitive: "ir", definition: "to go", type: "irregular", irregular: true, pattern: "fully irregular", reflexive: false, forms: { presente: { yo: "voy", vos: "vas", el: "va", nosotros: "vamos", ellos: "van" }, preterito: { yo: "fui", vos: "fuiste", el: "fue", nosotros: "fuimos", ellos: "fueron" }, imperfecto: { yo: "iba", vos: "ibas", el: "iba", nosotros: "íbamos", ellos: "iban" }, futuro: { yo: "iré", vos: "irás", el: "irá", nosotros: "iremos", ellos: "irán" }, condicional: { yo: "iría", vos: "irías", el: "iría", nosotros: "iríamos", ellos: "irían" }, subjPresente: { yo: "vaya", vos: "vayas", el: "vaya", nosotros: "vayamos", ellos: "vayan" }, gerundio: "yendo", participio: "ido" } },
+    { infinitive: "venir", definition: "to come", type: "-ir", irregular: true, pattern: "stem-change e→ie + irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "vengo", vos: "venís", el: "viene", nosotros: "venimos", ellos: "vienen" }, preterito: { yo: "vine", vos: "viniste", el: "vino", nosotros: "vinimos", ellos: "vinieron" }, imperfecto: { yo: "venía", vos: "venías", el: "venía", nosotros: "veníamos", ellos: "venían" }, futuro: { yo: "vendré", vos: "vendrás", el: "vendrá", nosotros: "vendremos", ellos: "vendrán" }, condicional: { yo: "vendría", vos: "vendrías", el: "vendría", nosotros: "vendríamos", ellos: "vendrían" }, subjPresente: { yo: "venga", vos: "vengas", el: "venga", nosotros: "vengamos", ellos: "vengan" }, gerundio: "viniendo", participio: "venido" } },
+    { infinitive: "querer", definition: "to want/love", type: "-er", irregular: true, pattern: "stem-change e→ie + irregular preterite", reflexive: false, forms: { presente: { yo: "quiero", vos: "querés", el: "quiere", nosotros: "queremos", ellos: "quieren" }, preterito: { yo: "quise", vos: "quisiste", el: "quiso", nosotros: "quisimos", ellos: "quisieron" }, imperfecto: { yo: "quería", vos: "querías", el: "quería", nosotros: "queríamos", ellos: "querían" }, futuro: { yo: "querré", vos: "querrás", el: "querrá", nosotros: "querremos", ellos: "querrán" }, condicional: { yo: "querría", vos: "querrías", el: "querría", nosotros: "querríamos", ellos: "querrían" }, subjPresente: { yo: "quiera", vos: "quieras", el: "quiera", nosotros: "queramos", ellos: "quieran" }, gerundio: "queriendo", participio: "querido" } },
+    { infinitive: "levantarse", definition: "to get up", type: "-ar", irregular: false, pattern: "regular reflexive", reflexive: true, forms: { presente: { yo: "me levanto", vos: "te levantás", el: "se levanta", nosotros: "nos levantamos", ellos: "se levantan" }, preterito: { yo: "me levanté", vos: "te levantaste", el: "se levantó", nosotros: "nos levantamos", ellos: "se levantaron" }, imperfecto: { yo: "me levantaba", vos: "te levantabas", el: "se levantaba", nosotros: "nos levantábamos", ellos: "se levantaban" }, futuro: { yo: "me levantaré", vos: "te levantarás", el: "se levantará", nosotros: "nos levantaremos", ellos: "se levantarán" }, condicional: { yo: "me levantaría", vos: "te levantarías", el: "se levantaría", nosotros: "nos levantaríamos", ellos: "se levantarían" }, subjPresente: { yo: "me levante", vos: "te levantes", el: "se levante", nosotros: "nos levantemos", ellos: "se levanten" }, gerundio: "levantándose", participio: "levantado" } }
+  ];
+
+  // ================= state =================
+  var allVerbs = [];      // [{id, data}]
+  var filtered = [];
+  var selectedId = null;
+  var editingId = null;
+
+  var el = {
+    authScreen: document.getElementById("auth-screen"),
+    appScreen: document.getElementById("app-screen"),
+    tabLogin: document.getElementById("tab-login"),
+    tabSignup: document.getElementById("tab-signup"),
+    authForm: document.getElementById("auth-form"),
+    authEmail: document.getElementById("auth-email"),
+    authPassword: document.getElementById("auth-password"),
+    authSubmit: document.getElementById("auth-submit"),
+    authMsg: document.getElementById("auth-msg"),
+    userEmail: document.getElementById("user-email"),
+    logoutBtn: document.getElementById("logout-btn"),
+
+    banner: document.getElementById("status-banner"),
+    search: document.getElementById("search"),
+    count: document.getElementById("count"),
+    list: document.getElementById("card-list"),
+    detail: document.getElementById("detail"),
+    dInfinitive: document.getElementById("d-infinitive"),
+    dDefinition: document.getElementById("d-definition"),
+    dBadges: document.getElementById("d-badges"),
+    dPattern: document.getElementById("d-pattern"),
+    dTenseRow: document.getElementById("d-tense-row"),
+    dConjBody: document.getElementById("d-conj-body"),
+    dGerundio: document.getElementById("d-gerundio"),
+    dParticipio: document.getElementById("d-participio"),
+    dEdit: document.getElementById("d-edit"),
+    dDelete: document.getElementById("d-delete"),
+    toggleAdd: document.getElementById("toggle-add"),
+    form: document.getElementById("verb-form"),
+    formTitle: document.getElementById("form-title"),
+    formMsg: document.getElementById("form-msg"),
+    formCancel: document.getElementById("form-cancel"),
+    conjFormTable: document.getElementById("conj-form-table"),
+    fInfinitive: document.getElementById("f-infinitive"),
+    fDefinition: document.getElementById("f-definition"),
+    fType: document.getElementById("f-type"),
+    fPattern: document.getElementById("f-pattern"),
+    fIrregular: document.getElementById("f-irregular"),
+    fReflexive: document.getElementById("f-reflexive"),
+    fGerundio: document.getElementById("f-gerundio"),
+    fParticipio: document.getElementById("f-participio")
+  };
+
+  function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
+  function clearBanner() { el.banner.hidden = true; }
+
+  function stripAccents(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function norm(s) { return stripAccents(s).toLowerCase().trim(); }
+
+  // ================= tense header =================
+  function buildTenseHeader() {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(document.createElement("th"));
+    TENSES.forEach(function (t) {
+      var th = document.createElement("th");
+      th.textContent = t.label;
+      frag.appendChild(th);
+    });
+    var thSubj = document.createElement("th");
+    thSubj.textContent = "Presente";
+    frag.appendChild(thSubj);
+    el.dTenseRow.innerHTML = "";
+    el.dTenseRow.appendChild(frag);
+  }
+
+  // ================= list =================
+  function cardRow(id, data) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card-row";
+
+    var inf = document.createElement("span");
+    inf.className = "inf";
+    inf.textContent = data.infinitive || id;
+    btn.appendChild(inf);
+
+    if (data.type) {
+      var tb = document.createElement("span");
+      tb.className = "badge type";
+      tb.textContent = data.type;
+      btn.appendChild(tb);
+    }
+    if (data.irregular) {
+      var ib = document.createElement("span");
+      ib.className = "badge irregular";
+      ib.textContent = "irregular";
+      btn.appendChild(ib);
+    }
+
+    var def = document.createElement("span");
+    def.className = "def";
+    def.textContent = data.definition || "";
+    btn.appendChild(def);
+
+    btn.addEventListener("click", function () { selectVerb(id); });
+    li.appendChild(btn);
+    return li;
+  }
+
+  function renderList() {
+    var q = norm(el.search.value);
+    filtered = allVerbs.filter(function (v) {
+      return !q || norm(v.data.infinitive || v.id).indexOf(q) !== -1;
+    });
+    filtered.sort(function (a, b) {
+      return (a.data.infinitive || a.id).localeCompare(b.data.infinitive || b.id, "es");
+    });
+
+    el.list.innerHTML = "";
+    if (filtered.length === 0) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "empty-note";
+      var p = document.createElement("p");
+      p.textContent = allVerbs.length === 0
+        ? "Todavía no hay verbos en tu cuenta."
+        : "Ningún infinitivo coincide con “" + el.search.value + "”.";
+      note.appendChild(p);
+      if (allVerbs.length === 0) {
+        var seedBtn = document.createElement("button");
+        seedBtn.type = "button";
+        seedBtn.className = "seed-btn";
+        seedBtn.textContent = "Cargar 10 verbos de ejemplo";
+        seedBtn.addEventListener("click", seedStarterVerbs);
+        note.appendChild(seedBtn);
+      }
+      li.appendChild(note);
+      el.list.appendChild(li);
+    } else {
+      filtered.forEach(function (v) { el.list.appendChild(cardRow(v.id, v.data)); });
+    }
+    el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
+  }
+
+  // ================= detail =================
+  function badge(cls, text) {
+    var s = document.createElement("span");
+    s.className = "badge " + cls;
+    s.textContent = text;
+    return s;
+  }
+
+  function selectVerb(id) {
+    selectedId = id;
+    var entry = allVerbs.find(function (v) { return v.id === id; });
+    if (!entry) { el.detail.hidden = true; return; }
+    var data = entry.data;
+    var forms = data.forms || {};
+
+    el.dInfinitive.textContent = data.infinitive || id;
+    el.dDefinition.textContent = data.definition || "";
+    el.dBadges.innerHTML = "";
+    if (data.type) el.dBadges.appendChild(badge("type", data.type));
+    el.dBadges.appendChild(badge("irregular", data.irregular ? "irregular" : "regular"));
+    if (data.reflexive) el.dBadges.appendChild(badge("reflexive", "reflexivo"));
+    el.dPattern.textContent = data.pattern || "";
+    el.dPattern.style.display = data.pattern ? "" : "none";
+
+    buildTenseHeader();
+    el.dConjBody.innerHTML = "";
+    PERSONS.forEach(function (p) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.textContent = p.label;
+      tr.appendChild(th);
+      TENSES.forEach(function (t) {
+        var td = document.createElement("td");
+        var val = (forms[t.key] && forms[t.key][p.key]) || "";
+        td.textContent = val || "—";
+        if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
+        tr.appendChild(td);
+      });
+      var tdSubj = document.createElement("td");
+      var subjVal = (forms[SUBJ_KEY] && forms[SUBJ_KEY][p.key]) || "";
+      tdSubj.textContent = subjVal || "—";
+      if (isCellIrregular(data, SUBJ_KEY, p.key, subjVal)) tdSubj.classList.add("irreg");
+      tr.appendChild(tdSubj);
+      el.dConjBody.appendChild(tr);
+    });
+
+    el.dGerundio.textContent = forms.gerundio || "—";
+    el.dParticipio.textContent = forms.participio || "—";
+
+    el.detail.hidden = false;
+    el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ================= add/edit form =================
+  function buildConjFormTable() {
+    el.conjFormTable.innerHTML = "";
+    var thead = document.createElement("thead");
+    var htr = document.createElement("tr");
+    var th0 = document.createElement("th");
+    th0.className = "person-col";
+    htr.appendChild(th0);
+    TENSES.forEach(function (t) {
+      var th = document.createElement("th");
+      th.textContent = t.label;
+      htr.appendChild(th);
+    });
+    var thSubj = document.createElement("th");
+    thSubj.textContent = "Subj. presente";
+    htr.appendChild(thSubj);
+    thead.appendChild(htr);
+    el.conjFormTable.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    PERSONS.forEach(function (p) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.textContent = p.label;
+      th.className = "person-col";
+      tr.appendChild(th);
+      TENSES.forEach(function (t) {
+        var td = document.createElement("td");
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.id = "f-" + t.key + "-" + p.key;
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+      var tdSubj = document.createElement("td");
+      var inpSubj = document.createElement("input");
+      inpSubj.type = "text";
+      inpSubj.id = "f-" + SUBJ_KEY + "-" + p.key;
+      tdSubj.appendChild(inpSubj);
+      tr.appendChild(tdSubj);
+      tbody.appendChild(tr);
+    });
+    el.conjFormTable.appendChild(tbody);
+  }
+
+  function clearForm() {
+    el.fInfinitive.value = "";
+    el.fDefinition.value = "";
+    el.fType.value = "-ar";
+    el.fPattern.value = "";
+    el.fIrregular.checked = false;
+    el.fReflexive.checked = false;
+    el.fGerundio.value = "";
+    el.fParticipio.value = "";
+    PERSONS.forEach(function (p) {
+      TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        if (inp) inp.value = "";
+      });
+    });
+  }
+
+  function fillForm(data) {
+    el.fInfinitive.value = data.infinitive || "";
+    el.fDefinition.value = data.definition || "";
+    el.fType.value = data.type || "-ar";
+    el.fPattern.value = data.pattern || "";
+    el.fIrregular.checked = !!data.irregular;
+    el.fReflexive.checked = !!data.reflexive;
+    var forms = data.forms || {};
+    el.fGerundio.value = forms.gerundio || "";
+    el.fParticipio.value = forms.participio || "";
+    PERSONS.forEach(function (p) {
+      TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        if (inp) inp.value = (forms[t.key] && forms[t.key][p.key]) || "";
+      });
+    });
+  }
+
+  function openForm(mode, data) {
+    editingId = mode === "edit" ? selectedId : null;
+    el.formTitle.textContent = mode === "edit" ? "Editar verbo" : "Agregar verbo";
+    el.formMsg.textContent = "";
+    if (mode === "edit" && data) fillForm(data); else clearForm();
+    el.form.hidden = false;
+    el.toggleAdd.hidden = true;
+    el.fInfinitive.focus();
+    el.form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function closeForm() {
+    el.form.hidden = true;
+    el.toggleAdd.hidden = false;
+    editingId = null;
+    el.formMsg.textContent = "";
+  }
+
+  function collectFormData() {
+    var forms = {};
+    TENSES.forEach(function (t) {
+      forms[t.key] = {};
+      PERSONS.forEach(function (p) {
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        forms[t.key][p.key] = inp ? inp.value.trim() : "";
+      });
+    });
+    forms[SUBJ_KEY] = {};
+    PERSONS.forEach(function (p) {
+      var inp = document.getElementById("f-" + SUBJ_KEY + "-" + p.key);
+      forms[SUBJ_KEY][p.key] = inp ? inp.value.trim() : "";
+    });
+    forms.gerundio = el.fGerundio.value.trim();
+    forms.participio = el.fParticipio.value.trim();
+
+    return {
+      infinitive: el.fInfinitive.value.trim(),
+      definition: el.fDefinition.value.trim(),
+      type: el.fType.value,
+      irregular: el.fIrregular.checked,
+      pattern: el.fPattern.value.trim(),
+      reflexive: el.fReflexive.checked,
+      forms: forms
+    };
+  }
+
+  // ================= Supabase-backed data layer =================
+  function rowToVerb(row) {
+    return {
+      id: row.id,
+      data: {
+        infinitive: row.infinitive,
+        definition: row.definition || "",
+        type: row.type || "-ar",
+        irregular: !!row.irregular,
+        pattern: row.pattern || "",
+        reflexive: !!row.reflexive,
+        forms: row.forms || {}
+      }
+    };
+  }
+
+  function loadVerbs() {
+    return supabaseClient
+      .from("verbs")
+      .select("*")
+      .order("infinitive", { ascending: true })
+      .then(function (res) {
+        if (res.error) { showBanner("Error al cargar tus verbos: " + res.error.message); return; }
+        clearBanner();
+        allVerbs = (res.data || []).map(rowToVerb);
+        renderList();
+        if (selectedId) {
+          var still = allVerbs.find(function (v) { return v.id === selectedId; });
+          if (still) selectVerb(selectedId); else { el.detail.hidden = true; selectedId = null; }
+        }
+      });
+  }
+
+  function handleSubmit(evt) {
+    evt.preventDefault();
+    var data = collectFormData();
+    if (!data.infinitive) { el.formMsg.textContent = "Falta el infinitivo."; return; }
+    el.formMsg.textContent = "Guardando…";
+
+    var query = editingId
+      ? supabaseClient.from("verbs").update(data).eq("id", editingId).select().single()
+      : supabaseClient.from("verbs").insert(data).select().single();
+
+    query.then(function (res) {
+      if (res.error) { el.formMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      var savedId = res.data.id;
+      closeForm();
+      loadVerbs().then(function () { selectVerb(savedId); });
+    });
+  }
+
+  function handleDelete() {
+    if (!selectedId) return;
+    if (!window.confirm("¿Eliminar este verbo de tu índice?")) return;
+    supabaseClient.from("verbs").delete().eq("id", selectedId).then(function (res) {
+      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      el.detail.hidden = true;
+      selectedId = null;
+      loadVerbs();
+    });
+  }
+
+  function seedStarterVerbs() {
+    supabaseClient.from("verbs").insert(STARTER_VERBS).then(function (res) {
+      if (res.error) { showBanner("No se pudieron cargar los verbos de ejemplo: " + res.error.message); return; }
+      loadVerbs();
+    });
+  }
+
+  // ================= auth =================
+  var authMode = "login";
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    el.tabLogin.classList.toggle("active", mode === "login");
+    el.tabSignup.classList.toggle("active", mode === "signup");
+    el.authSubmit.textContent = mode === "login" ? "Entrar" : "Crear cuenta";
+    el.authMsg.textContent = "";
+  }
+
+  function renderAuthState() {
+    if (currentUser) {
+      el.authScreen.hidden = true;
+      el.appScreen.hidden = false;
+      el.userEmail.textContent = currentUser.email || "";
+      loadVerbs();
+    } else {
+      el.authScreen.hidden = false;
+      el.appScreen.hidden = true;
+      allVerbs = [];
+      selectedId = null;
+      el.detail.hidden = true;
+      el.form.hidden = true;
+      el.toggleAdd.hidden = false;
+    }
+  }
+
+  function handleAuthSubmit(evt) {
+    evt.preventDefault();
+    el.authMsg.textContent = "";
+    var email = el.authEmail.value.trim();
+    var password = el.authPassword.value;
+    el.authSubmit.disabled = true;
+
+    var action = authMode === "login"
+      ? supabaseClient.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
+          if (res.error) throw res.error;
+        })
+      : supabaseClient.auth.signUp({ email: email, password: password }).then(function (res) {
+          if (res.error) throw res.error;
+          if (res.data && !res.data.session) {
+            el.authMsg.textContent = "Te enviamos un email de confirmación a " + email + ". Confirmá tu cuenta y después iniciá sesión.";
+            el.authMsg.style.color = "var(--accent-deep)";
+            setAuthMode("login");
+          }
+        });
+
+    action.catch(function (err) {
+      el.authMsg.style.color = "var(--danger)";
+      el.authMsg.textContent = (err && err.message) || String(err);
+    }).finally(function () {
+      el.authSubmit.disabled = false;
+    });
+  }
+
+  // ================= wiring =================
+  el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
+  el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
+  el.authForm.addEventListener("submit", handleAuthSubmit);
+  el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
+
+  el.search.addEventListener("input", renderList);
+  el.toggleAdd.addEventListener("click", function () { openForm("add"); });
+  el.formCancel.addEventListener("click", closeForm);
+  el.form.addEventListener("submit", handleSubmit);
+  el.dEdit.addEventListener("click", function () {
+    var entry = allVerbs.find(function (v) { return v.id === selectedId; });
+    if (entry) openForm("edit", entry.data);
+  });
+  el.dDelete.addEventListener("click", handleDelete);
+
+  buildConjFormTable();
+  buildTenseHeader();
+
+  supabaseClient.auth.onAuthStateChange(function (_event, session) {
+    currentUser = session ? session.user : null;
+    renderAuthState();
+  });
+  supabaseClient.auth.getSession().then(function (res) {
+    currentUser = (res.data && res.data.session) ? res.data.session.user : null;
+    renderAuthState();
+  });
+})();
+</script>
+</body>
+</html>
