@@ -94,7 +94,7 @@
     { infinitive: "venir", definition: "to come", type: "-ir", irregular: true, pattern: "stem-change e→ie + irregular yo + irregular preterite", reflexive: false, forms: { presente: { yo: "vengo", vos: "venís", el: "viene", nosotros: "venimos", ellos: "vienen" }, preterito: { yo: "vine", vos: "viniste", el: "vino", nosotros: "vinimos", ellos: "vinieron" }, imperfecto: { yo: "venía", vos: "venías", el: "venía", nosotros: "veníamos", ellos: "venían" }, futuro: { yo: "vendré", vos: "vendrás", el: "vendrá", nosotros: "vendremos", ellos: "vendrán" }, condicional: { yo: "vendría", vos: "vendrías", el: "vendría", nosotros: "vendríamos", ellos: "vendrían" }, subjPresente: { yo: "venga", vos: "vengas", el: "venga", nosotros: "vengamos", ellos: "vengan" }, gerundio: "viniendo", participio: "venido" } },
     { infinitive: "querer", definition: "to want/love", type: "-er", irregular: true, pattern: "stem-change e→ie + irregular preterite", reflexive: false, forms: { presente: { yo: "quiero", vos: "querés", el: "quiere", nosotros: "queremos", ellos: "quieren" }, preterito: { yo: "quise", vos: "quisiste", el: "quiso", nosotros: "quisimos", ellos: "quisieron" }, imperfecto: { yo: "quería", vos: "querías", el: "quería", nosotros: "queríamos", ellos: "querían" }, futuro: { yo: "querré", vos: "querrás", el: "querrá", nosotros: "querremos", ellos: "querrán" }, condicional: { yo: "querría", vos: "querrías", el: "querría", nosotros: "querríamos", ellos: "querrían" }, subjPresente: { yo: "quiera", vos: "quieras", el: "quiera", nosotros: "queramos", ellos: "quieran" }, gerundio: "queriendo", participio: "querido" } },
     { infinitive: "levantarse", definition: "to get up", type: "-ar", irregular: false, pattern: "regular reflexive", reflexive: true, forms: { presente: { yo: "me levanto", vos: "te levantás", el: "se levanta", nosotros: "nos levantamos", ellos: "se levantan" }, preterito: { yo: "me levanté", vos: "te levantaste", el: "se levantó", nosotros: "nos levantamos", ellos: "se levantaron" }, imperfecto: { yo: "me levantaba", vos: "te levantabas", el: "se levantaba", nosotros: "nos levantábamos", ellos: "se levantaban" }, futuro: { yo: "me levantaré", vos: "te levantarás", el: "se levantará", nosotros: "nos levantaremos", ellos: "se levantarán" }, condicional: { yo: "me levantaría", vos: "te levantarías", el: "se levantaría", nosotros: "nos levantaríamos", ellos: "se levantarían" }, subjPresente: { yo: "me levante", vos: "te levantes", el: "se levante", nosotros: "nos levantemos", ellos: "se levanten" }, gerundio: "levantándose", participio: "levantado" } },
-    { infinitive: "haber", definition: "to have (auxiliary)", type: "irregular", irregular: true, pattern: "fully irregular (auxiliary verb)", reflexive: false, forms: { presente: { yo: "he", vos: "has", el: "ha", nosotros: "hemos", ellos: "han" }, preterito: { yo: "hube", vos: "hubiste", el: "hubo", nosotros: "hubimos", ellos: "hubieron" }, imperfecto: { yo: "había", vos: "habías", el: "había", nosotros: "habíamos", ellos: "habían" }, futuro: { yo: "habré", vos: "habrás", el: "habrá", nosotros: "habremos", ellos: "habrán" }, condicional: { yo: "habría", vos: "habrías", el: "habría", nosotros: "habríamos", ellos: "habrían" }, subjPresente: { yo: "haya", vos: "hayas", el: "haya", nosotros: "hayamos", ellos: "hayan" }, gerundio: "habiendo", participio: "habido" } },
+    { infinitive: "haber", definition: "to have (auxiliary)", type: "irregular", irregular: true, pattern: "fully irregular (auxiliary verb)", reflexive: false, forms: { presente: { yo: "he", vos: "has", el: "ha", nosotros: "hemos", ellos: "han" }, preterito: { yo: "hube", vos: "hubiste", el: "hubo", nosotros: "hubimos", ellos: "hubieron" }, imperfecto: { yo: "había", vos: "habías", el: "había", nosotros: "habíamos", ellos: "habían" }, futuro: { yo: "habré", vos: "habrás", el: "habrá", nosotros: "habremos", ellos: "habrán" }, condicional: { yo: "habría", vos: "habrías", el: "habría", nosotros: "habríamos", ellos: "habrían" }, subjPresente: { yo: "haya", vos: "hayas", el: "haya", nosotros: "hayamos", ellos: "hayan" }, gerundio: "habiendo", participio: "habido", impersonal: { presente: "hay", preterito: "hubo", imperfecto: "había", futuro: "habrá", condicional: "habría", subjPresente: "haya" } } },
     { infinitive: "correr", definition: "to run", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "corro", vos: "corrés", el: "corre", nosotros: "corremos", ellos: "corren" }, preterito: { yo: "corrí", vos: "corriste", el: "corrió", nosotros: "corrimos", ellos: "corrieron" }, imperfecto: { yo: "corría", vos: "corrías", el: "corría", nosotros: "corríamos", ellos: "corrían" }, futuro: { yo: "correré", vos: "correrás", el: "correrá", nosotros: "correremos", ellos: "correrán" }, condicional: { yo: "correría", vos: "correrías", el: "correría", nosotros: "correríamos", ellos: "correrían" }, subjPresente: { yo: "corra", vos: "corras", el: "corra", nosotros: "corramos", ellos: "corran" }, gerundio: "corriendo", participio: "corrido" } },
     { infinitive: "ver", definition: "to see", type: "-er", irregular: true, pattern: "irregular imperfect (veía) + irregular participle (visto)", reflexive: false, forms: { presente: { yo: "veo", vos: "ves", el: "ve", nosotros: "vemos", ellos: "ven" }, preterito: { yo: "vi", vos: "viste", el: "vio", nosotros: "vimos", ellos: "vieron" }, imperfecto: { yo: "veía", vos: "veías", el: "veía", nosotros: "veíamos", ellos: "veían" }, futuro: { yo: "veré", vos: "verás", el: "verá", nosotros: "veremos", ellos: "verán" }, condicional: { yo: "vería", vos: "verías", el: "vería", nosotros: "veríamos", ellos: "verían" }, subjPresente: { yo: "vea", vos: "veas", el: "vea", nosotros: "veamos", ellos: "vean" }, gerundio: "viendo", participio: "visto" } },
     { infinitive: "subir", definition: "to go up / to climb", type: "-ir", irregular: false, pattern: "regular -ir", reflexive: false, forms: { presente: { yo: "subo", vos: "subís", el: "sube", nosotros: "subimos", ellos: "suben" }, preterito: { yo: "subí", vos: "subiste", el: "subió", nosotros: "subimos", ellos: "subieron" }, imperfecto: { yo: "subía", vos: "subías", el: "subía", nosotros: "subíamos", ellos: "subían" }, futuro: { yo: "subiré", vos: "subirás", el: "subirá", nosotros: "subiremos", ellos: "subirán" }, condicional: { yo: "subiría", vos: "subirías", el: "subiría", nosotros: "subiríamos", ellos: "subirían" }, subjPresente: { yo: "suba", vos: "subas", el: "suba", nosotros: "subamos", ellos: "suban" }, gerundio: "subiendo", participio: "subido" } },
@@ -103,7 +103,25 @@
     { infinitive: "usar", definition: "to use", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "uso", vos: "usás", el: "usa", nosotros: "usamos", ellos: "usan" }, preterito: { yo: "usé", vos: "usaste", el: "usó", nosotros: "usamos", ellos: "usaron" }, imperfecto: { yo: "usaba", vos: "usabas", el: "usaba", nosotros: "usábamos", ellos: "usaban" }, futuro: { yo: "usaré", vos: "usarás", el: "usará", nosotros: "usaremos", ellos: "usarán" }, condicional: { yo: "usaría", vos: "usarías", el: "usaría", nosotros: "usaríamos", ellos: "usarían" }, subjPresente: { yo: "use", vos: "uses", el: "use", nosotros: "usemos", ellos: "usen" }, gerundio: "usando", participio: "usado" } },
     { infinitive: "nacer", definition: "to be born", type: "-er", irregular: true, pattern: "irregular yo (c→zc) + irregular subjunctive", reflexive: false, forms: { presente: { yo: "nazco", vos: "nacés", el: "nace", nosotros: "nacemos", ellos: "nacen" }, preterito: { yo: "nací", vos: "naciste", el: "nació", nosotros: "nacimos", ellos: "nacieron" }, imperfecto: { yo: "nacía", vos: "nacías", el: "nacía", nosotros: "nacíamos", ellos: "nacían" }, futuro: { yo: "naceré", vos: "nacerás", el: "nacerá", nosotros: "naceremos", ellos: "nacerán" }, condicional: { yo: "nacería", vos: "nacerías", el: "nacería", nosotros: "naceríamos", ellos: "nacerían" }, subjPresente: { yo: "nazca", vos: "nazcas", el: "nazca", nosotros: "nazcamos", ellos: "nazcan" }, gerundio: "naciendo", participio: "nacido" } },
     { infinitive: "nadar", definition: "to swim", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "nado", vos: "nadás", el: "nada", nosotros: "nadamos", ellos: "nadan" }, preterito: { yo: "nadé", vos: "nadaste", el: "nadó", nosotros: "nadamos", ellos: "nadaron" }, imperfecto: { yo: "nadaba", vos: "nadabas", el: "nadaba", nosotros: "nadábamos", ellos: "nadaban" }, futuro: { yo: "nadaré", vos: "nadarás", el: "nadará", nosotros: "nadaremos", ellos: "nadarán" }, condicional: { yo: "nadaría", vos: "nadarías", el: "nadaría", nosotros: "nadaríamos", ellos: "nadarían" }, subjPresente: { yo: "nade", vos: "nades", el: "nade", nosotros: "nademos", ellos: "naden" }, gerundio: "nadando", participio: "nadado" } },
-    { infinitive: "comer", definition: "to eat", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "como", vos: "comés", el: "come", nosotros: "comemos", ellos: "comen" }, preterito: { yo: "comí", vos: "comiste", el: "comió", nosotros: "comimos", ellos: "comieron" }, imperfecto: { yo: "comía", vos: "comías", el: "comía", nosotros: "comíamos", ellos: "comían" }, futuro: { yo: "comeré", vos: "comerás", el: "comerá", nosotros: "comeremos", ellos: "comerán" }, condicional: { yo: "comería", vos: "comerías", el: "comería", nosotros: "comeríamos", ellos: "comerían" }, subjPresente: { yo: "coma", vos: "comas", el: "coma", nosotros: "comamos", ellos: "coman" }, gerundio: "comiendo", participio: "comido" } }
+    { infinitive: "comer", definition: "to eat", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "como", vos: "comés", el: "come", nosotros: "comemos", ellos: "comen" }, preterito: { yo: "comí", vos: "comiste", el: "comió", nosotros: "comimos", ellos: "comieron" }, imperfecto: { yo: "comía", vos: "comías", el: "comía", nosotros: "comíamos", ellos: "comían" }, futuro: { yo: "comeré", vos: "comerás", el: "comerá", nosotros: "comeremos", ellos: "comerán" }, condicional: { yo: "comería", vos: "comerías", el: "comería", nosotros: "comeríamos", ellos: "comerían" }, subjPresente: { yo: "coma", vos: "comas", el: "coma", nosotros: "comamos", ellos: "coman" }, gerundio: "comiendo", participio: "comido" } },
+    // ---- remaining verbs from the 25 most common in Spanish, not already above ----
+    { infinitive: "dar", definition: "to give", type: "-ar", irregular: true, pattern: "irregular preterite (di, dio) + irregular subjunctive (dé)", reflexive: false, forms: { presente: { yo: "doy", vos: "das", el: "da", nosotros: "damos", ellos: "dan" }, preterito: { yo: "di", vos: "diste", el: "dio", nosotros: "dimos", ellos: "dieron" }, imperfecto: { yo: "daba", vos: "dabas", el: "daba", nosotros: "dábamos", ellos: "daban" }, futuro: { yo: "daré", vos: "darás", el: "dará", nosotros: "daremos", ellos: "darán" }, condicional: { yo: "daría", vos: "darías", el: "daría", nosotros: "daríamos", ellos: "darían" }, subjPresente: { yo: "dé", vos: "des", el: "dé", nosotros: "demos", ellos: "den" }, gerundio: "dando", participio: "dado" } },
+    { infinitive: "llegar", definition: "to arrive", type: "-ar", irregular: true, pattern: "cambio ortográfico g→gu ante e (llegué, llegue)", reflexive: false, forms: { presente: { yo: "llego", vos: "llegás", el: "llega", nosotros: "llegamos", ellos: "llegan" }, preterito: { yo: "llegué", vos: "llegaste", el: "llegó", nosotros: "llegamos", ellos: "llegaron" }, imperfecto: { yo: "llegaba", vos: "llegabas", el: "llegaba", nosotros: "llegábamos", ellos: "llegaban" }, futuro: { yo: "llegaré", vos: "llegarás", el: "llegará", nosotros: "llegaremos", ellos: "llegarán" }, condicional: { yo: "llegaría", vos: "llegarías", el: "llegaría", nosotros: "llegaríamos", ellos: "llegarían" }, subjPresente: { yo: "llegue", vos: "llegues", el: "llegue", nosotros: "lleguemos", ellos: "lleguen" }, gerundio: "llegando", participio: "llegado" } },
+    { infinitive: "pasar", definition: "to happen / to pass by", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "paso", vos: "pasás", el: "pasa", nosotros: "pasamos", ellos: "pasan" }, preterito: { yo: "pasé", vos: "pasaste", el: "pasó", nosotros: "pasamos", ellos: "pasaron" }, imperfecto: { yo: "pasaba", vos: "pasabas", el: "pasaba", nosotros: "pasábamos", ellos: "pasaban" }, futuro: { yo: "pasaré", vos: "pasarás", el: "pasará", nosotros: "pasaremos", ellos: "pasarán" }, condicional: { yo: "pasaría", vos: "pasarías", el: "pasaría", nosotros: "pasaríamos", ellos: "pasarían" }, subjPresente: { yo: "pase", vos: "pases", el: "pase", nosotros: "pasemos", ellos: "pasen" }, gerundio: "pasando", participio: "pasado" } },
+    { infinitive: "deber", definition: "should / to owe", type: "-er", irregular: false, pattern: "regular -er", reflexive: false, forms: { presente: { yo: "debo", vos: "debés", el: "debe", nosotros: "debemos", ellos: "deben" }, preterito: { yo: "debí", vos: "debiste", el: "debió", nosotros: "debimos", ellos: "debieron" }, imperfecto: { yo: "debía", vos: "debías", el: "debía", nosotros: "debíamos", ellos: "debían" }, futuro: { yo: "deberé", vos: "deberás", el: "deberá", nosotros: "deberemos", ellos: "deberán" }, condicional: { yo: "debería", vos: "deberías", el: "debería", nosotros: "deberíamos", ellos: "deberían" }, subjPresente: { yo: "deba", vos: "debas", el: "deba", nosotros: "debamos", ellos: "deban" }, gerundio: "debiendo", participio: "debido" } },
+    { infinitive: "poner", definition: "to put / to place", type: "-er", irregular: true, pattern: "irregular yo (pongo) + irregular preterite + irregular future stem + irregular participle (puesto)", reflexive: false, forms: { presente: { yo: "pongo", vos: "ponés", el: "pone", nosotros: "ponemos", ellos: "ponen" }, preterito: { yo: "puse", vos: "pusiste", el: "puso", nosotros: "pusimos", ellos: "pusieron" }, imperfecto: { yo: "ponía", vos: "ponías", el: "ponía", nosotros: "poníamos", ellos: "ponían" }, futuro: { yo: "pondré", vos: "pondrás", el: "pondrá", nosotros: "pondremos", ellos: "pondrán" }, condicional: { yo: "pondría", vos: "pondrías", el: "pondría", nosotros: "pondríamos", ellos: "pondrían" }, subjPresente: { yo: "ponga", vos: "pongas", el: "ponga", nosotros: "pongamos", ellos: "pongan" }, gerundio: "poniendo", participio: "puesto" } },
+    { infinitive: "parecer", definition: "to seem", type: "-er", irregular: true, pattern: "irregular yo (c→zc) + irregular subjunctive", reflexive: false, forms: { presente: { yo: "parezco", vos: "parecés", el: "parece", nosotros: "parecemos", ellos: "parecen" }, preterito: { yo: "parecí", vos: "pareciste", el: "pareció", nosotros: "parecimos", ellos: "parecieron" }, imperfecto: { yo: "parecía", vos: "parecías", el: "parecía", nosotros: "parecíamos", ellos: "parecían" }, futuro: { yo: "pareceré", vos: "parecerás", el: "parecerá", nosotros: "pareceremos", ellos: "parecerán" }, condicional: { yo: "parecería", vos: "parecerías", el: "parecería", nosotros: "pareceríamos", ellos: "parecerían" }, subjPresente: { yo: "parezca", vos: "parezcas", el: "parezca", nosotros: "parezcamos", ellos: "parezcan" }, gerundio: "pareciendo", participio: "parecido" } },
+    { infinitive: "quedar", definition: "to stay / to remain", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "quedo", vos: "quedás", el: "queda", nosotros: "quedamos", ellos: "quedan" }, preterito: { yo: "quedé", vos: "quedaste", el: "quedó", nosotros: "quedamos", ellos: "quedaron" }, imperfecto: { yo: "quedaba", vos: "quedabas", el: "quedaba", nosotros: "quedábamos", ellos: "quedaban" }, futuro: { yo: "quedaré", vos: "quedarás", el: "quedará", nosotros: "quedaremos", ellos: "quedarán" }, condicional: { yo: "quedaría", vos: "quedarías", el: "quedaría", nosotros: "quedaríamos", ellos: "quedarían" }, subjPresente: { yo: "quede", vos: "quedes", el: "quede", nosotros: "quedemos", ellos: "queden" }, gerundio: "quedando", participio: "quedado" } },
+    { infinitive: "creer", definition: "to believe", type: "-er", irregular: true, pattern: "cambio ortográfico i→y (creyó, creyendo)", reflexive: false, forms: { presente: { yo: "creo", vos: "creés", el: "cree", nosotros: "creemos", ellos: "creen" }, preterito: { yo: "creí", vos: "creíste", el: "creyó", nosotros: "creímos", ellos: "creyeron" }, imperfecto: { yo: "creía", vos: "creías", el: "creía", nosotros: "creíamos", ellos: "creían" }, futuro: { yo: "creeré", vos: "creerás", el: "creerá", nosotros: "creeremos", ellos: "creerán" }, condicional: { yo: "creería", vos: "creerías", el: "creería", nosotros: "creeríamos", ellos: "creerían" }, subjPresente: { yo: "crea", vos: "creas", el: "crea", nosotros: "creamos", ellos: "crean" }, gerundio: "creyendo", participio: "creído" } },
+    { infinitive: "hablar", definition: "to speak / to talk", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "hablo", vos: "hablás", el: "habla", nosotros: "hablamos", ellos: "hablan" }, preterito: { yo: "hablé", vos: "hablaste", el: "habló", nosotros: "hablamos", ellos: "hablaron" }, imperfecto: { yo: "hablaba", vos: "hablabas", el: "hablaba", nosotros: "hablábamos", ellos: "hablaban" }, futuro: { yo: "hablaré", vos: "hablarás", el: "hablará", nosotros: "hablaremos", ellos: "hablarán" }, condicional: { yo: "hablaría", vos: "hablarías", el: "hablaría", nosotros: "hablaríamos", ellos: "hablarían" }, subjPresente: { yo: "hable", vos: "hables", el: "hable", nosotros: "hablemos", ellos: "hablen" }, gerundio: "hablando", participio: "hablado" } },
+    { infinitive: "llevar", definition: "to carry / to take", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "llevo", vos: "llevás", el: "lleva", nosotros: "llevamos", ellos: "llevan" }, preterito: { yo: "llevé", vos: "llevaste", el: "llevó", nosotros: "llevamos", ellos: "llevaron" }, imperfecto: { yo: "llevaba", vos: "llevabas", el: "llevaba", nosotros: "llevábamos", ellos: "llevaban" }, futuro: { yo: "llevaré", vos: "llevarás", el: "llevará", nosotros: "llevaremos", ellos: "llevarán" }, condicional: { yo: "llevaría", vos: "llevarías", el: "llevaría", nosotros: "llevaríamos", ellos: "llevarían" }, subjPresente: { yo: "lleve", vos: "lleves", el: "lleve", nosotros: "llevemos", ellos: "lleven" }, gerundio: "llevando", participio: "llevado" } },
+    { infinitive: "dejar", definition: "to leave / to let", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "dejo", vos: "dejás", el: "deja", nosotros: "dejamos", ellos: "dejan" }, preterito: { yo: "dejé", vos: "dejaste", el: "dejó", nosotros: "dejamos", ellos: "dejaron" }, imperfecto: { yo: "dejaba", vos: "dejabas", el: "dejaba", nosotros: "dejábamos", ellos: "dejaban" }, futuro: { yo: "dejaré", vos: "dejarás", el: "dejará", nosotros: "dejaremos", ellos: "dejarán" }, condicional: { yo: "dejaría", vos: "dejarías", el: "dejaría", nosotros: "dejaríamos", ellos: "dejarían" }, subjPresente: { yo: "deje", vos: "dejes", el: "deje", nosotros: "dejemos", ellos: "dejen" }, gerundio: "dejando", participio: "dejado" } },
+    { infinitive: "seguir", definition: "to follow / to continue", type: "-ir", irregular: true, pattern: "cambio de raíz e→i + irregular yo (sigo)", reflexive: false, forms: { presente: { yo: "sigo", vos: "seguís", el: "sigue", nosotros: "seguimos", ellos: "siguen" }, preterito: { yo: "seguí", vos: "seguiste", el: "siguió", nosotros: "seguimos", ellos: "siguieron" }, imperfecto: { yo: "seguía", vos: "seguías", el: "seguía", nosotros: "seguíamos", ellos: "seguían" }, futuro: { yo: "seguiré", vos: "seguirás", el: "seguirá", nosotros: "seguiremos", ellos: "seguirán" }, condicional: { yo: "seguiría", vos: "seguirías", el: "seguiría", nosotros: "seguiríamos", ellos: "seguirían" }, subjPresente: { yo: "siga", vos: "sigas", el: "siga", nosotros: "sigamos", ellos: "sigan" }, gerundio: "siguiendo", participio: "seguido" } },
+    { infinitive: "encontrar", definition: "to find", type: "-ar", irregular: true, pattern: "cambio de raíz o→ue", reflexive: false, forms: { presente: { yo: "encuentro", vos: "encontrás", el: "encuentra", nosotros: "encontramos", ellos: "encuentran" }, preterito: { yo: "encontré", vos: "encontraste", el: "encontró", nosotros: "encontramos", ellos: "encontraron" }, imperfecto: { yo: "encontraba", vos: "encontrabas", el: "encontraba", nosotros: "encontrábamos", ellos: "encontraban" }, futuro: { yo: "encontraré", vos: "encontrarás", el: "encontrará", nosotros: "encontraremos", ellos: "encontrarán" }, condicional: { yo: "encontraría", vos: "encontrarías", el: "encontraría", nosotros: "encontraríamos", ellos: "encontrarían" }, subjPresente: { yo: "encuentre", vos: "encuentres", el: "encuentre", nosotros: "encontremos", ellos: "encuentren" }, gerundio: "encontrando", participio: "encontrado" } },
+    { infinitive: "llamar", definition: "to call", type: "-ar", irregular: false, pattern: "regular -ar", reflexive: false, forms: { presente: { yo: "llamo", vos: "llamás", el: "llama", nosotros: "llamamos", ellos: "llaman" }, preterito: { yo: "llamé", vos: "llamaste", el: "llamó", nosotros: "llamamos", ellos: "llamaron" }, imperfecto: { yo: "llamaba", vos: "llamabas", el: "llamaba", nosotros: "llamábamos", ellos: "llamaban" }, futuro: { yo: "llamaré", vos: "llamarás", el: "llamará", nosotros: "llamaremos", ellos: "llamarán" }, condicional: { yo: "llamaría", vos: "llamarías", el: "llamaría", nosotros: "llamaríamos", ellos: "llamarían" }, subjPresente: { yo: "llame", vos: "llames", el: "llame", nosotros: "llamemos", ellos: "llamen" }, gerundio: "llamando", participio: "llamado" } },
+    // ---- true impersonal verbs: only the impersonal form is ever used, no personal conjugation ----
+    { infinitive: "llover", definition: "to rain", type: "-er", irregular: true, pattern: "verbo impersonal — solo se usa en 3ª persona / forma impersonal (llueve)", reflexive: false, forms: { presente: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, preterito: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, imperfecto: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, futuro: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, condicional: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, subjPresente: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, gerundio: "lloviendo", participio: "llovido", impersonal: { presente: "llueve", preterito: "llovió", imperfecto: "llovía", futuro: "lloverá", condicional: "llovería", subjPresente: "llueva" } } },
+    { infinitive: "nevar", definition: "to snow", type: "-ar", irregular: true, pattern: "verbo impersonal — solo se usa en 3ª persona / forma impersonal (nieva)", reflexive: false, forms: { presente: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, preterito: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, imperfecto: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, futuro: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, condicional: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, subjPresente: { yo: "", vos: "", el: "", nosotros: "", ellos: "" }, gerundio: "nevando", participio: "nevado", impersonal: { presente: "nieva", preterito: "nevó", imperfecto: "nevaba", futuro: "nevará", condicional: "nevaría", subjPresente: "nieve" } } }
   ];
 
   // ================= state =================
@@ -237,7 +255,7 @@
         var seedBtn = document.createElement("button");
         seedBtn.type = "button";
         seedBtn.className = "seed-btn";
-        seedBtn.textContent = "Cargar 20 verbos de ejemplo";
+        seedBtn.textContent = "Cargar 36 verbos de ejemplo";
         seedBtn.addEventListener("click", seedStarterVerbs);
         note.appendChild(seedBtn);
       }
@@ -299,6 +317,29 @@
       el.dConjBody.appendChild(tr);
     });
 
+    var imp = forms.impersonal || {};
+    var hasImpersonal = TENSES.concat([{ key: SUBJ_KEY }]).some(function (t) { return imp[t.key]; });
+    if (hasImpersonal) {
+      var impPrTr = document.createElement("tr");
+      impPrTr.className = "impersonal-row";
+      var impPrTh = document.createElement("th");
+      impPrTh.textContent = "impersonal";
+      impPrTr.appendChild(impPrTh);
+      el.dConjPronounBody.appendChild(impPrTr);
+
+      var impTr = document.createElement("tr");
+      impTr.className = "impersonal-row";
+      TENSES.forEach(function (t) {
+        var td = document.createElement("td");
+        td.textContent = imp[t.key] || "—";
+        impTr.appendChild(td);
+      });
+      var impTdSubj = document.createElement("td");
+      impTdSubj.textContent = imp[SUBJ_KEY] || "—";
+      impTr.appendChild(impTdSubj);
+      el.dConjBody.appendChild(impTr);
+    }
+
     el.dGerundio.textContent = forms.gerundio || "—";
     el.dParticipio.textContent = forms.participio || "—";
 
@@ -348,6 +389,29 @@
       tr.appendChild(tdSubj);
       tbody.appendChild(tr);
     });
+
+    var impTr = document.createElement("tr");
+    impTr.className = "impersonal-row";
+    var impTh = document.createElement("th");
+    impTh.className = "person-col";
+    impTh.textContent = "impersonal (opcional)";
+    impTr.appendChild(impTh);
+    TENSES.forEach(function (t) {
+      var td = document.createElement("td");
+      var inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = "f-impersonal-" + t.key;
+      td.appendChild(inp);
+      impTr.appendChild(td);
+    });
+    var impTdSubj = document.createElement("td");
+    var impInpSubj = document.createElement("input");
+    impInpSubj.type = "text";
+    impInpSubj.id = "f-impersonal-" + SUBJ_KEY;
+    impTdSubj.appendChild(impInpSubj);
+    impTr.appendChild(impTdSubj);
+    tbody.appendChild(impTr);
+
     el.conjFormTable.appendChild(tbody);
   }
 
@@ -366,6 +430,10 @@
         if (inp) inp.value = "";
       });
     });
+    TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+      var inp = document.getElementById("f-impersonal-" + t.key);
+      if (inp) inp.value = "";
+    });
   }
 
   function fillForm(data) {
@@ -383,6 +451,11 @@
         var inp = document.getElementById("f-" + t.key + "-" + p.key);
         if (inp) inp.value = (forms[t.key] && forms[t.key][p.key]) || "";
       });
+    });
+    var imp = forms.impersonal || {};
+    TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+      var inp = document.getElementById("f-impersonal-" + t.key);
+      if (inp) inp.value = imp[t.key] || "";
     });
   }
 
@@ -422,6 +495,16 @@
     });
     forms.gerundio = el.fGerundio.value.trim();
     forms.participio = el.fParticipio.value.trim();
+
+    var imp = {};
+    var hasImp = false;
+    TENSES.concat([{ key: SUBJ_KEY }]).forEach(function (t) {
+      var inp = document.getElementById("f-impersonal-" + t.key);
+      var val = inp ? inp.value.trim() : "";
+      imp[t.key] = val;
+      if (val) hasImp = true;
+    });
+    if (hasImp) forms.impersonal = imp;
 
     return {
       infinitive: el.fInfinitive.value.trim(),

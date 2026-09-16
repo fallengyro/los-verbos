@@ -293,6 +293,13 @@
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
   table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
+  /* the optional impersonal row (hay, llueve...) sits apart from the
+     personal yo/vos/él/nosotros/ellos rows above it */
+  table.conj tbody tr.impersonal-row th, table.conj tbody tr.impersonal-row td {
+    border-top: 2px solid var(--line); font-style: italic; color: var(--ink-soft);
+  }
+  table.conj tbody tr.impersonal-row td { color: var(--accent-deep); }
+
   /* frozen pronoun column, as its own small table beside the scrolling one
      rather than a sticky cell inside it (sticky-in-table renders unreliably,
      especially in mobile Safari, causing the column to visibly pop/duplicate
@@ -348,6 +355,8 @@
   }
   table.conj-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   table.conj-form th.person-col { min-width: 130px; }
+  table.conj-form tr.impersonal-row th, table.conj-form tr.impersonal-row td { padding-top: 10px; border-top: 2px solid var(--line); }
+  table.conj-form tr.impersonal-row th { font-style: italic; }
 
   .nonpersonal-form { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
 
