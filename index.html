@@ -294,6 +294,14 @@
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
   table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
+  table.conj th.pronoun-col {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--paper-raised);
+    box-shadow: 2px 0 4px -2px var(--shadow);
+  }
+
   .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
   .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
 
@@ -335,7 +343,14 @@
     border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink);
   }
   table.conj-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  table.conj-form th.person-col { min-width: 130px; }
+  table.conj-form th.person-col {
+    min-width: 130px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--paper-raised);
+    box-shadow: 2px 0 4px -2px var(--shadow);
+  }
 
   .nonpersonal-form { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
 
@@ -453,7 +468,7 @@
       <table class="conj">
         <thead>
           <tr class="mood-row">
-            <th></th>
+            <th class="pronoun-col"></th>
             <th colspan="5">Indicativo</th>
             <th>Subjuntivo</th>
           </tr>
@@ -691,7 +706,9 @@
   // ================= tense header =================
   function buildTenseHeader() {
     var frag = document.createDocumentFragment();
-    frag.appendChild(document.createElement("th"));
+    var thCorner = document.createElement("th");
+    thCorner.className = "pronoun-col";
+    frag.appendChild(thCorner);
     TENSES.forEach(function (t) {
       var th = document.createElement("th");
       th.textContent = t.label;
@@ -803,6 +820,7 @@
     PERSONS.forEach(function (p) {
       var tr = document.createElement("tr");
       var th = document.createElement("th");
+      th.className = "pronoun-col";
       th.textContent = p.label;
       tr.appendChild(th);
       TENSES.forEach(function (t) {
