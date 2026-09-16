@@ -260,12 +260,19 @@
     border-radius: 10px;
     background: var(--paper-raised);
     padding: 22px 22px 8px;
-    margin-bottom: 24px;
+    margin: 26px 0 24px;
     box-shadow: 0 2px 10px var(--shadow);
   }
   .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .detail-actions-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin: 18px 0 4px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
   .detail-head h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 32px; margin: 0; }
-  .detail-actions { display: flex; gap: 8px; }
   .icon-btn {
     background: none; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-soft);
     font-family: "Public Sans", sans-serif; font-size: 12.5px; font-weight: 600; padding: 5px 10px; cursor: pointer;
@@ -377,7 +384,7 @@
     .auth-card { padding: 20px 16px; }
     .auth-card h1 { font-size: 24px; }
 
-    .detail { padding: 16px 14px 6px; margin-bottom: 18px; }
+    .detail { padding: 16px 14px 6px; margin: 20px 0 18px; }
     .detail-head h2 { font-size: 24px; }
     .icon-btn { padding: 8px 12px; font-size: 13px; }
 
@@ -453,10 +460,6 @@
         <h2 id="d-infinitive"></h2>
         <p class="definition" id="d-definition"></p>
       </div>
-      <div class="detail-actions">
-        <button class="icon-btn" id="d-edit" type="button">Editar</button>
-        <button class="icon-btn danger" id="d-delete" type="button">Eliminar</button>
-      </div>
     </div>
     <div class="badges" id="d-badges"></div>
     <p class="pattern-note" id="d-pattern"></p>
@@ -488,6 +491,11 @@
     <div class="nonpersonal">
       <div class="tile"><span class="label">Gerundio</span><span class="val" id="d-gerundio"></span></div>
       <div class="tile"><span class="label">Participio</span><span class="val" id="d-participio"></span></div>
+    </div>
+
+    <div class="detail-actions-footer">
+      <button class="icon-btn" id="d-edit" type="button">Editar</button>
+      <button class="icon-btn danger" id="d-delete" type="button">Eliminar</button>
     </div>
   </section>
 
@@ -566,9 +574,9 @@
   var PERSONS = [
     { key: "yo", label: "yo" },
     { key: "vos", label: "vos" },
-    { key: "el", label: "él / ella / Ud." },
+    { key: "el", label: "él / ella / ud." },
     { key: "nosotros", label: "nosotros" },
-    { key: "ellos", label: "ellos / ellas / Uds." }
+    { key: "ellos", label: "ellos / ellas / uds." }
   ];
   var TENSES = [
     { key: "presente", label: "Presente" },
