@@ -136,6 +136,11 @@
   var selectedId = null;
   var editingId = null;
 
+  var allWords = [];      // [{id, data}] — vocabulario (nouns, adjectives, etc.)
+  var filteredWords = [];
+  var selectedWordId = null;
+  var editingWordId = null;
+
   var el = {
     authScreen: document.getElementById("auth-screen"),
     appScreen: document.getElementById("app-screen"),
@@ -179,7 +184,31 @@
     fIrregular: document.getElementById("f-irregular"),
     fReflexive: document.getElementById("f-reflexive"),
     fGerundio: document.getElementById("f-gerundio"),
-    fParticipio: document.getElementById("f-participio")
+    fParticipio: document.getElementById("f-participio"),
+
+    tabVerbs: document.getElementById("tab-verbs"),
+    tabWords: document.getElementById("tab-words"),
+    verbsPanel: document.getElementById("verbs-panel"),
+    wordsPanel: document.getElementById("words-panel"),
+
+    wordSearch: document.getElementById("word-search"),
+    wordCount: document.getElementById("word-count"),
+    wordList: document.getElementById("word-list"),
+    wordDetail: document.getElementById("word-detail"),
+    wdWord: document.getElementById("wd-word"),
+    wdDefinition: document.getElementById("wd-definition"),
+    wdBadges: document.getElementById("wd-badges"),
+    wdEdit: document.getElementById("wd-edit"),
+    wdDelete: document.getElementById("wd-delete"),
+    toggleAddWord: document.getElementById("toggle-add-word"),
+    wordForm: document.getElementById("word-form"),
+    wordFormTitle: document.getElementById("word-form-title"),
+    wordFormMsg: document.getElementById("word-form-msg"),
+    wordFormCancel: document.getElementById("word-form-cancel"),
+    wfWord: document.getElementById("wf-word"),
+    wfDefinition: document.getElementById("wf-definition"),
+    wfPos: document.getElementById("wf-pos"),
+    wfGender: document.getElementById("wf-gender")
   };
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
@@ -599,6 +628,189 @@
     });
   }
 
+  // ================= vocabulario (general words) =================
+  function setMainTab(tab) {
+    var showWords = tab === "words";
+    el.tabVerbs.classList.toggle("active", !showWords);
+    el.tabWords.classList.toggle("active", showWords);
+    el.verbsPanel.hidden = showWords;
+    el.wordsPanel.hidden = !showWords;
+    try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
+  }
+
+  function wordCardRow(id, data) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card-row";
+
+    var w = document.createElement("span");
+    w.className = "inf";
+    w.textContent = data.word || id;
+    btn.appendChild(w);
+
+    if (data.partOfSpeech) btn.appendChild(badge("type", data.partOfSpeech));
+    if (data.gender) btn.appendChild(badge("gender", data.gender));
+
+    var def = document.createElement("span");
+    def.className = "def";
+    def.textContent = data.definition || "";
+    btn.appendChild(def);
+
+    btn.addEventListener("click", function () { selectWord(id); });
+    li.appendChild(btn);
+    return li;
+  }
+
+  function renderWordList() {
+    var q = norm(el.wordSearch.value);
+    filteredWords = allWords.filter(function (v) {
+      return !q || norm(v.data.word || v.id).indexOf(q) !== -1;
+    });
+    filteredWords.sort(function (a, b) {
+      return (a.data.word || a.id).localeCompare(b.data.word || b.id, "es");
+    });
+
+    el.wordList.innerHTML = "";
+    if (filteredWords.length === 0) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "empty-note";
+      var p = document.createElement("p");
+      p.textContent = allWords.length === 0
+        ? "Todavía no hay palabras en tu vocabulario."
+        : "Ninguna palabra coincide con “" + el.wordSearch.value + "”.";
+      note.appendChild(p);
+      li.appendChild(note);
+      el.wordList.appendChild(li);
+    } else {
+      filteredWords.forEach(function (v) { el.wordList.appendChild(wordCardRow(v.id, v.data)); });
+    }
+    el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
+  }
+
+  function selectWord(id) {
+    selectedWordId = id;
+    var entry = allWords.find(function (v) { return v.id === id; });
+    if (!entry) { el.wordDetail.hidden = true; return; }
+    var data = entry.data;
+
+    el.wdWord.textContent = data.word || id;
+    el.wdDefinition.textContent = data.definition || "";
+    el.wdBadges.innerHTML = "";
+    if (data.partOfSpeech) el.wdBadges.appendChild(badge("type", data.partOfSpeech));
+    if (data.gender) el.wdBadges.appendChild(badge("gender", data.gender));
+
+    el.wordDetail.hidden = false;
+    el.wordDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function clearWordForm() {
+    el.wfWord.value = "";
+    el.wfDefinition.value = "";
+    el.wfPos.value = "sustantivo";
+    el.wfGender.value = "";
+  }
+
+  function fillWordForm(data) {
+    el.wfWord.value = data.word || "";
+    el.wfDefinition.value = data.definition || "";
+    el.wfPos.value = data.partOfSpeech || "sustantivo";
+    el.wfGender.value = data.gender || "";
+  }
+
+  function openWordForm(mode, data) {
+    editingWordId = mode === "edit" ? selectedWordId : null;
+    el.wordFormTitle.textContent = mode === "edit" ? "Editar palabra" : "Agregar palabra";
+    el.wordFormMsg.textContent = "";
+    if (mode === "edit" && data) fillWordForm(data); else clearWordForm();
+    el.wordForm.hidden = false;
+    el.toggleAddWord.hidden = true;
+    el.wfWord.focus();
+    el.wordForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function closeWordForm() {
+    el.wordForm.hidden = true;
+    el.toggleAddWord.hidden = false;
+    editingWordId = null;
+    el.wordFormMsg.textContent = "";
+  }
+
+  function collectWordFormData() {
+    return {
+      word: el.wfWord.value.trim(),
+      definition: el.wfDefinition.value.trim(),
+      partOfSpeech: el.wfPos.value,
+      gender: el.wfGender.value
+    };
+  }
+
+  function rowToWord(row) {
+    return {
+      id: row.id,
+      data: {
+        word: row.word,
+        definition: row.definition || "",
+        partOfSpeech: row.part_of_speech || "sustantivo",
+        gender: row.gender || ""
+      }
+    };
+  }
+
+  function loadWords() {
+    return supabaseClient
+      .from("words")
+      .select("*")
+      .order("word", { ascending: true })
+      .then(function (res) {
+        if (res.error) { showBanner("Error al cargar tu vocabulario: " + res.error.message); return; }
+        clearBanner();
+        allWords = (res.data || []).map(rowToWord);
+        renderWordList();
+        if (selectedWordId) {
+          var still = allWords.find(function (v) { return v.id === selectedWordId; });
+          if (still) selectWord(selectedWordId); else { el.wordDetail.hidden = true; selectedWordId = null; }
+        }
+      });
+  }
+
+  function handleWordSubmit(evt) {
+    evt.preventDefault();
+    var data = collectWordFormData();
+    if (!data.word) { el.wordFormMsg.textContent = "Falta la palabra."; return; }
+    el.wordFormMsg.textContent = "Guardando…";
+
+    var row = {
+      word: data.word,
+      definition: data.definition,
+      part_of_speech: data.partOfSpeech,
+      gender: data.gender
+    };
+
+    var query = editingWordId
+      ? supabaseClient.from("words").update(row).eq("id", editingWordId).select().single()
+      : supabaseClient.from("words").insert(row).select().single();
+
+    query.then(function (res) {
+      if (res.error) { el.wordFormMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      var savedId = res.data.id;
+      closeWordForm();
+      loadWords().then(function () { selectWord(savedId); });
+    });
+  }
+
+  function handleWordDelete() {
+    if (!selectedWordId) return;
+    if (!window.confirm("¿Eliminar esta palabra de tu vocabulario?")) return;
+    supabaseClient.from("words").delete().eq("id", selectedWordId).then(function (res) {
+      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      el.wordDetail.hidden = true;
+      selectedWordId = null;
+      loadWords();
+    });
+  }
+
   // ================= auth =================
   var authMode = "login";
 
@@ -616,6 +828,7 @@
       el.appScreen.hidden = false;
       el.userEmail.textContent = currentUser.email || "";
       loadVerbs();
+      loadWords();
     } else {
       el.authScreen.hidden = false;
       el.appScreen.hidden = true;
@@ -625,6 +838,16 @@
       el.form.hidden = true;
       el.toggleAdd.hidden = false;
       el.seedToolbarBtn.hidden = false;
+
+      allWords = [];
+      filteredWords = [];
+      selectedWordId = null;
+      editingWordId = null;
+      el.wordDetail.hidden = true;
+      el.wordForm.hidden = true;
+      el.toggleAddWord.hidden = false;
+      el.wordList.innerHTML = "";
+      el.wordCount.textContent = "";
     }
   }
 
@@ -673,8 +896,27 @@
   });
   el.dDelete.addEventListener("click", handleDelete);
 
+  el.tabVerbs.addEventListener("click", function () { setMainTab("verbs"); });
+  el.tabWords.addEventListener("click", function () { setMainTab("words"); });
+
+  el.wordSearch.addEventListener("input", renderWordList);
+  el.toggleAddWord.addEventListener("click", function () { openWordForm("add"); });
+  el.wordFormCancel.addEventListener("click", closeWordForm);
+  el.wordForm.addEventListener("submit", handleWordSubmit);
+  el.wdEdit.addEventListener("click", function () {
+    var entry = allWords.find(function (v) { return v.id === selectedWordId; });
+    if (entry) openWordForm("edit", entry.data);
+  });
+  el.wdDelete.addEventListener("click", handleWordDelete);
+
   buildConjFormTable();
   buildTenseHeader();
+
+  (function restoreMainTab() {
+    var saved = null;
+    try { saved = localStorage.getItem("iv-main-tab"); } catch (e) {}
+    if (saved === "words") setMainTab("words");
+  })();
 
   supabaseClient.auth.onAuthStateChange(function (_event, session) {
     currentUser = session ? session.user : null;

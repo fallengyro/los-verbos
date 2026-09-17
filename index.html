@@ -47,6 +47,13 @@
 
   <div class="status-banner" id="status-banner" hidden></div>
 
+  <div class="main-tabs">
+    <button type="button" class="main-tab active" id="tab-verbs">Verbos</button>
+    <button type="button" class="main-tab" id="tab-words">Vocabulario</button>
+  </div>
+
+  <section id="verbs-panel">
+
   <div class="search-box">
     <input type="text" id="search" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
     <span class="count" id="count"></span>
@@ -160,7 +167,80 @@
     </div>
   </form>
 
-  <footer class="note">Tus verbos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
+  </section>
+
+  <section id="words-panel" hidden>
+
+  <div class="search-box">
+    <input type="text" id="word-search" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
+    <span class="count" id="word-count"></span>
+  </div>
+
+  <ul class="card-list" id="word-list"></ul>
+
+  <section class="detail" id="word-detail" hidden>
+    <div class="detail-head">
+      <div>
+        <h2 id="wd-word"></h2>
+        <p class="definition" id="wd-definition"></p>
+      </div>
+    </div>
+    <div class="badges" id="wd-badges"></div>
+
+    <div class="detail-actions-footer">
+      <button class="icon-btn" id="wd-edit" type="button">Editar</button>
+      <button class="icon-btn danger" id="wd-delete" type="button">Eliminar</button>
+    </div>
+  </section>
+
+  <div class="toolbar-row">
+    <button class="add-toggle" id="toggle-add-word" type="button">+ Agregar palabra</button>
+  </div>
+
+  <form id="word-form" hidden>
+    <h3 id="word-form-title">Agregar palabra</h3>
+    <div class="field-grid">
+      <div class="field">
+        <label for="wf-word">Palabra</label>
+        <input type="text" id="wf-word" required />
+      </div>
+      <div class="field">
+        <label for="wf-definition">Definición</label>
+        <input type="text" id="wf-definition" />
+      </div>
+      <div class="field">
+        <label for="wf-pos">Categoría gramatical</label>
+        <select id="wf-pos">
+          <option value="sustantivo">sustantivo</option>
+          <option value="adjetivo">adjetivo</option>
+          <option value="adverbio">adverbio</option>
+          <option value="pronombre">pronombre</option>
+          <option value="preposición">preposición</option>
+          <option value="conjunción">conjunción</option>
+          <option value="interjección">interjección</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="wf-gender">Género</label>
+        <select id="wf-gender">
+          <option value="">N/A</option>
+          <option value="masculino">masculino</option>
+          <option value="femenino">femenino</option>
+          <option value="neutro">neutro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" id="word-form-save">Guardar</button>
+      <button type="button" class="btn-secondary" id="word-form-cancel">Cancelar</button>
+      <span class="form-msg" id="word-form-msg"></span>
+    </div>
+  </form>
+
+  </section>
+
+  <footer class="note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

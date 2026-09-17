@@ -108,6 +108,16 @@
     margin-bottom: 18px;
   }
 
+  /* ---------- verbs / vocabulario tabs ---------- */
+  .main-tabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink); }
+  .main-tab {
+    background: none; border: none; padding: 9px 18px 11px; cursor: pointer;
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 17px;
+    color: var(--ink-soft); border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .main-tab:hover { color: var(--ink); }
+  .main-tab.active { color: var(--accent-deep); border-bottom-color: var(--accent); }
+
   /* ---------- auth screen ---------- */
   .auth-wrap {
     max-width: 400px;
@@ -245,6 +255,7 @@
   .badge.type { background: var(--gold-soft); color: var(--gold); }
   .badge.irregular { background: var(--brick-soft); color: var(--brick); }
   .badge.reflexive { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
+  .badge.gender { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
 
   .detail {
     border: 1px solid var(--line);
@@ -380,6 +391,7 @@
     body { padding: 16px 10px 56px; }
 
     header.masthead h1 { font-size: 24px; }
+    .main-tab { font-size: 15px; padding: 8px 12px 10px; }
 
     .auth-wrap { margin: 6vh auto 0; }
     .auth-card { padding: 20px 16px; }

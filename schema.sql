@@ -38,3 +38,34 @@ create policy "delete own verbs" on public.verbs
   for delete using (auth.uid() = user_id);
 
 create index if not exists verbs_user_id_idx on public.verbs (user_id);
+
+-- ---------------------------------------------------------------------------
+-- Vocabulario — general words (nouns, adjectives, adverbs...), kept separate
+-- from verb conjugations. Same private-per-user pattern as "verbs" above.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.words (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  word text not null,
+  definition text default '',
+  part_of_speech text default 'sustantivo',
+  gender text default '',
+  created_at timestamptz not null default now()
+);
+
+alter table public.words enable row level security;
+
+create policy "select own words" on public.words
+  for select using (auth.uid() = user_id);
+
+create policy "insert own words" on public.words
+  for insert with check (auth.uid() = user_id);
+
+create policy "update own words" on public.words
+  for update using (auth.uid() = user_id);
+
+create policy "delete own words" on public.words
+  for delete using (auth.uid() = user_id);
+
+create index if not exists words_user_id_idx on public.words (user_id);
