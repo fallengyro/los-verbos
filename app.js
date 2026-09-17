@@ -135,11 +135,15 @@
   var filtered = [];
   var selectedId = null;
   var editingId = null;
+  // facet filters: verb matches if, for every facet with a non-empty set,
+  // its value is a member of that set (AND across facets, OR within one).
+  var activeVerbFilters = { type: new Set(), flag: new Set() };
 
   var allWords = [];      // [{id, data}] — vocabulario (nouns, adjectives, etc.)
   var filteredWords = [];
   var selectedWordId = null;
   var editingWordId = null;
+  var activeWordFilters = { pos: new Set(), gender: new Set() };
 
   var el = {
     authScreen: document.getElementById("auth-screen"),
@@ -185,6 +189,8 @@
     fReflexive: document.getElementById("f-reflexive"),
     fGerundio: document.getElementById("f-gerundio"),
     fParticipio: document.getElementById("f-participio"),
+    verbFilters: document.getElementById("verb-filters"),
+    verbFiltersClear: document.getElementById("verb-filters-clear"),
 
     tabVerbs: document.getElementById("tab-verbs"),
     tabWords: document.getElementById("tab-words"),
@@ -208,7 +214,9 @@
     wfWord: document.getElementById("wf-word"),
     wfDefinition: document.getElementById("wf-definition"),
     wfPos: document.getElementById("wf-pos"),
-    wfGender: document.getElementById("wf-gender")
+    wfGender: document.getElementById("wf-gender"),
+    wordFilters: document.getElementById("word-filters"),
+    wordFiltersClear: document.getElementById("word-filters-clear")
   };
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
@@ -216,6 +224,44 @@
 
   function stripAccents(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   function norm(s) { return stripAccents(s).toLowerCase().trim(); }
+
+  // ================= filter chips (shared by verbs + vocabulario) =================
+  // A record matches an active-filters map if, for every facet that has at
+  // least one active value, the record's value for that facet is among the
+  // active ones (facets AND together; multiple values within one facet OR).
+  function facetOk(activeFilters, facet, value) {
+    var set = activeFilters[facet];
+    if (!set || set.size === 0) return true;
+    return set.has(value);
+  }
+
+  function anyFilterActive(activeFilters) {
+    return Object.keys(activeFilters).some(function (f) { return activeFilters[f].size > 0; });
+  }
+
+  function wireFilterChips(containerEl, clearBtnEl, activeFilters, onChange) {
+    var chips = containerEl.querySelectorAll(".chip");
+    for (var i = 0; i < chips.length; i++) {
+      (function (chip) {
+        var facet = chip.getAttribute("data-facet");
+        var value = chip.getAttribute("data-value");
+        chip.addEventListener("click", function () {
+          var set = activeFilters[facet];
+          if (set.has(value)) { set.delete(value); chip.classList.remove("active"); }
+          else { set.add(value); chip.classList.add("active"); }
+          clearBtnEl.hidden = !anyFilterActive(activeFilters);
+          onChange();
+        });
+      })(chips[i]);
+    }
+    clearBtnEl.addEventListener("click", function () {
+      Object.keys(activeFilters).forEach(function (f) { activeFilters[f].clear(); });
+      var activeChips = containerEl.querySelectorAll(".chip.active");
+      for (var j = 0; j < activeChips.length; j++) activeChips[j].classList.remove("active");
+      clearBtnEl.hidden = true;
+      onChange();
+    });
+  }
 
   // ================= tense header =================
   function buildTenseHeader() {
@@ -270,7 +316,13 @@
   function renderList() {
     var q = norm(el.search.value);
     filtered = allVerbs.filter(function (v) {
-      return !q || norm(v.data.infinitive || v.id).indexOf(q) !== -1;
+      if (q && norm(v.data.infinitive || v.id).indexOf(q) === -1) return false;
+      if (!facetOk(activeVerbFilters, "type", v.data.type || "")) return false;
+      // "flag" chips are independent boolean switches, not OR'd alternatives:
+      // ticking both "irregular" and "reflexivo" asks for verbs that are both.
+      if (activeVerbFilters.flag.has("irregular") && !v.data.irregular) return false;
+      if (activeVerbFilters.flag.has("reflexive") && !v.data.reflexive) return false;
+      return true;
     });
     filtered.sort(function (a, b) {
       return (a.data.infinitive || a.id).localeCompare(b.data.infinitive || b.id, "es");
@@ -665,7 +717,10 @@
   function renderWordList() {
     var q = norm(el.wordSearch.value);
     filteredWords = allWords.filter(function (v) {
-      return !q || norm(v.data.word || v.id).indexOf(q) !== -1;
+      if (q && norm(v.data.word || v.id).indexOf(q) === -1) return false;
+      if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "")) return false;
+      if (!facetOk(activeWordFilters, "gender", v.data.gender || "")) return false;
+      return true;
     });
     filteredWords.sort(function (a, b) {
       return (a.data.word || a.id).localeCompare(b.data.word || b.id, "es");
@@ -886,6 +941,7 @@
   el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
 
   el.search.addEventListener("input", renderList);
+  wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, renderList);
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
@@ -900,6 +956,7 @@
   el.tabWords.addEventListener("click", function () { setMainTab("words"); });
 
   el.wordSearch.addEventListener("input", renderWordList);
+  wireFilterChips(el.wordFilters, el.wordFiltersClear, activeWordFilters, renderWordList);
   el.toggleAddWord.addEventListener("click", function () { openWordForm("add"); });
   el.wordFormCancel.addEventListener("click", closeWordForm);
   el.wordForm.addEventListener("submit", handleWordSubmit);

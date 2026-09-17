@@ -59,6 +59,22 @@
     <span class="count" id="count"></span>
   </div>
 
+  <div class="filter-chips" id="verb-filters">
+    <div class="chip-group">
+      <span class="chip-label">Tipo</span>
+      <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
+      <button type="button" class="chip" data-facet="type" data-value="-er">-er</button>
+      <button type="button" class="chip" data-facet="type" data-value="-ir">-ir</button>
+      <button type="button" class="chip" data-facet="type" data-value="irregular">irregular</button>
+    </div>
+    <div class="chip-group">
+      <span class="chip-label">Marcas</span>
+      <button type="button" class="chip" data-facet="flag" data-value="irregular">irregular</button>
+      <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
+    </div>
+    <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
+  </div>
+
   <ul class="card-list" id="card-list"></ul>
 
   <section class="detail" id="detail" hidden>
@@ -174,6 +190,26 @@
   <div class="search-box">
     <input type="text" id="word-search" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
     <span class="count" id="word-count"></span>
+  </div>
+
+  <div class="filter-chips" id="word-filters">
+    <div class="chip-group">
+      <span class="chip-label">Categoría</span>
+      <button type="button" class="chip" data-facet="pos" data-value="sustantivo">sustantivo</button>
+      <button type="button" class="chip" data-facet="pos" data-value="adjetivo">adjetivo</button>
+      <button type="button" class="chip" data-facet="pos" data-value="adverbio">adverbio</button>
+      <button type="button" class="chip" data-facet="pos" data-value="pronombre">pronombre</button>
+      <button type="button" class="chip" data-facet="pos" data-value="preposición">preposición</button>
+      <button type="button" class="chip" data-facet="pos" data-value="conjunción">conjunción</button>
+      <button type="button" class="chip" data-facet="pos" data-value="interjección">interjección</button>
+    </div>
+    <div class="chip-group">
+      <span class="chip-label">Género</span>
+      <button type="button" class="chip" data-facet="gender" data-value="masculino">masculino</button>
+      <button type="button" class="chip" data-facet="gender" data-value="femenino">femenino</button>
+      <button type="button" class="chip" data-facet="gender" data-value="neutro">neutro</button>
+    </div>
+    <button type="button" class="chip-clear" id="word-filters-clear" hidden>Limpiar filtros</button>
   </div>
 
   <ul class="card-list" id="word-list"></ul>

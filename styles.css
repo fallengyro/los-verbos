@@ -211,6 +211,59 @@
     color: var(--ink-soft);
   }
 
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-top: 12px;
+  }
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-right: 2px;
+  }
+  .chip {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--ink); }
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+    font-weight: 600;
+  }
+  .chip-clear {
+    background: none;
+    border: none;
+    padding: 4px 2px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: auto;
+  }
+  .chip-clear:hover { color: var(--danger); }
+
   .card-list {
     list-style: none;
     margin: 10px 0 12px;
@@ -413,6 +466,9 @@
     .card-row { padding: 11px 12px; font-size: 14px; }
     .card-row .inf { min-width: 0; flex: 0 1 auto; font-size: 16px; }
     .card-row .def { font-size: 12.5px; }
+
+    .chip { padding: 4px 10px; font-size: 12px; }
+    .chip-clear { flex-basis: 100%; margin-left: 0; }
 
     form#verb-form { padding: 16px 14px; }
     .conj-form-scroll { margin: 0 -14px; padding: 0 14px; }
