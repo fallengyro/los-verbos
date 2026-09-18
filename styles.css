@@ -338,6 +338,9 @@
   .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
   .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }
+  .detail .example-note { font-size: 13.5px; color: var(--ink); background: var(--paper-sunken); border-radius: 8px; padding: 8px 12px; margin: 0 0 18px; }
+  .detail .example-note::before { content: "\201C"; color: var(--ink-soft); }
+  .detail .example-note::after { content: "\201D"; color: var(--ink-soft); }
 
   .conj-hint { display: none; }
   .conj-wrap { display: flex; align-items: flex-start; }
@@ -456,6 +459,69 @@
 
   footer.note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 40px; }
 
+  /* ---------- flashcards ---------- */
+  .flash-setup {
+    border: 1px solid var(--line); border-radius: 10px; background: var(--paper-raised);
+    padding: 22px; margin-bottom: 24px;
+  }
+  .flash-setup h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 24px; margin: 0 0 4px; }
+  .flash-setup-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 0 0 18px; }
+
+  .flash-source-toggle { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 6px; }
+  .switch-row { display: flex; align-items: center; gap: 8px; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; }
+  .switch-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+  .flash-count { color: var(--ink-soft); font-weight: 500; font-size: 13px; font-family: "JetBrains Mono", monospace; }
+
+  .flash-group-label {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--ink-soft); margin: 14px 0 6px;
+  }
+  .flash-check-grid { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+  .flash-check { display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer; }
+  .flash-check input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
+
+  .flash-verb-options, .flash-word-options { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 12px; }
+  .flash-radio-row { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13.5px; }
+  .flash-radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .flash-radio-row input[type="radio"] { accent-color: var(--accent); cursor: pointer; }
+
+  #flash-start-btn { margin-top: 20px; }
+  #flash-setup-msg:empty { margin: 0; }
+  #flash-setup-msg { margin: 10px 0 0; }
+
+  .flash-overlay {
+    position: fixed; inset: 0; background: var(--paper); z-index: 100;
+    display: flex; flex-direction: column; padding: 16px;
+  }
+  .flash-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .flash-progress { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-soft); }
+
+  .flash-stage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; perspective: 1200px; }
+  .flash-card {
+    position: relative; width: min(92vw, 420px); height: min(56vh, 320px);
+    cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
+  }
+  .flash-card.flipped { transform: rotateY(180deg); }
+  .flash-face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised);
+    box-shadow: 0 6px 24px var(--shadow);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 28px; text-align: center; gap: 10px;
+  }
+  .flash-back { transform: rotateY(180deg); }
+
+  .flash-prompt-main, .flash-answer {
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600;
+    font-size: clamp(22px, 6vw, 34px); color: var(--ink); word-break: break-word;
+  }
+  .flash-prompt-sub { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--accent-deep); }
+  .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
+  .flash-back-badges { justify-content: center; margin-top: 4px; }
+  .flash-hint { text-align: center; font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 10px 0 0; }
+
+  .flash-controls { display: flex; justify-content: center; gap: 14px; margin-top: 14px; }
+
   /* ---------- mobile ---------- */
   @media (max-width: 640px) {
     body { padding: 16px 10px 56px; }
@@ -494,4 +560,8 @@
 
     .toolbar-row { gap: 8px; }
     .add-toggle, .seed-btn { padding: 10px 14px; font-size: 13.5px; }
+
+    .flash-setup { padding: 16px 14px; }
+    .flash-card { width: min(94vw, 380px); height: min(48vh, 280px); }
+    .flash-controls { gap: 10px; }
   }

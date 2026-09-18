@@ -34,6 +34,23 @@
   ];
   var REFLEXIVE_PRONOUNS = { yo: "me", vos: "te", el: "se", nosotros: "nos", ellos: "se" };
 
+  // ================= flashcards =================
+  // "Personal" tenses/moods are the ones keyed by the 5-person PERSONS grid
+  // (presente..subjPasado). imperativo/gerundio/participio are handled as
+  // their own special-cased entries below since they don't fit that grid.
+  var FLASH_PERSONAL_TENSES = TENSES.concat(SUBJ_TENSES);
+  var FLASH_EXTRA_TENSES = [
+    { key: "imperativo", label: "Imperativo" },
+    { key: "gerundio", label: "Gerundio" },
+    { key: "participio", label: "Participio" }
+  ];
+  var FLASH_ALL_TENSES = FLASH_PERSONAL_TENSES.concat(FLASH_EXTRA_TENSES);
+  // imperativo only has 4 slots (no "yo"); map the same 5-person filter
+  // onto them the way the conjugation table already does — el's imperativo
+  // is really usted's command, ellos's is really ustedes's.
+  var IMPERATIVO_FORM_KEY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
+  var IMPERATIVO_DISPLAY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
+
   function verbClass(baseInf) {
     var end = baseInf.slice(-2).toLowerCase();
     return (end === "ar" || end === "er" || end === "ir") ? end : null;
@@ -272,6 +289,16 @@
   var editingWordId = null;
   var activeWordFilters = { pos: new Set(), gender: new Set() };
 
+  // flashcards draw from whatever is currently filtered on the Verbos/
+  // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
+  // their own source toggle and tense/person filters below.
+  var activeFlashSources = { verbs: true, words: true };
+  var activeFlashTenses = new Set(FLASH_ALL_TENSES.map(function (t) { return t.key; }));
+  var activeFlashPersons = new Set(PERSONS.map(function (p) { return p.key; }));
+  var flashDirection = "def2word"; // or "word2def"
+  var flashDeck = [];
+  var flashIndex = -1;
+
   var el = {
     authScreen: document.getElementById("auth-screen"),
     appScreen: document.getElementById("app-screen"),
@@ -322,8 +349,10 @@
 
     tabVerbs: document.getElementById("tab-verbs"),
     tabWords: document.getElementById("tab-words"),
+    tabFlashcards: document.getElementById("tab-flashcards"),
     verbsPanel: document.getElementById("verbs-panel"),
     wordsPanel: document.getElementById("words-panel"),
+    flashcardsPanel: document.getElementById("flashcards-panel"),
 
     wordSearch: document.getElementById("word-search"),
     wordCount: document.getElementById("word-count"),
@@ -332,6 +361,8 @@
     wdWord: document.getElementById("wd-word"),
     wdDefinition: document.getElementById("wd-definition"),
     wdBadges: document.getElementById("wd-badges"),
+    wdNotes: document.getElementById("wd-notes"),
+    wdExample: document.getElementById("wd-example"),
     wdEdit: document.getElementById("wd-edit"),
     wdDelete: document.getElementById("wd-delete"),
     toggleAddWord: document.getElementById("toggle-add-word"),
@@ -344,8 +375,35 @@
     wfDefinition: document.getElementById("wf-definition"),
     wfPos: document.getElementById("wf-pos"),
     wfGender: document.getElementById("wf-gender"),
+    wfNotes: document.getElementById("wf-notes"),
+    wfExample: document.getElementById("wf-example"),
     wordFilters: document.getElementById("word-filters"),
-    wordFiltersClear: document.getElementById("word-filters-clear")
+    wordFiltersClear: document.getElementById("word-filters-clear"),
+
+    flashSrcVerbs: document.getElementById("flash-src-verbs"),
+    flashSrcWords: document.getElementById("flash-src-words"),
+    flashVerbCount: document.getElementById("flash-verb-count"),
+    flashWordCount: document.getElementById("flash-word-count"),
+    flashVerbOptions: document.getElementById("flash-verb-options"),
+    flashWordOptions: document.getElementById("flash-word-options"),
+    flashTenseChecks: document.getElementById("flash-tense-checks"),
+    flashPersonChecks: document.getElementById("flash-person-checks"),
+    flashDirDef: document.getElementById("flash-dir-def"),
+    flashDirWord: document.getElementById("flash-dir-word"),
+    flashSetupMsg: document.getElementById("flash-setup-msg"),
+    flashStartBtn: document.getElementById("flash-start-btn"),
+
+    flashOverlay: document.getElementById("flash-overlay"),
+    flashCloseBtn: document.getElementById("flash-close-btn"),
+    flashProgress: document.getElementById("flash-progress"),
+    flashCard: document.getElementById("flash-card"),
+    flashFrontMain: document.getElementById("flash-front-main"),
+    flashFrontSub: document.getElementById("flash-front-sub"),
+    flashBackMain: document.getElementById("flash-back-main"),
+    flashBackSub: document.getElementById("flash-back-sub"),
+    flashBackBadges: document.getElementById("flash-back-badges"),
+    flashPrevBtn: document.getElementById("flash-prev-btn"),
+    flashNextBtn: document.getElementById("flash-next-btn")
   };
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
@@ -906,11 +964,13 @@
 
   // ================= vocabulario (general words) =================
   function setMainTab(tab) {
-    var showWords = tab === "words";
-    el.tabVerbs.classList.toggle("active", !showWords);
-    el.tabWords.classList.toggle("active", showWords);
-    el.verbsPanel.hidden = showWords;
-    el.wordsPanel.hidden = !showWords;
+    el.tabVerbs.classList.toggle("active", tab === "verbs");
+    el.tabWords.classList.toggle("active", tab === "words");
+    el.tabFlashcards.classList.toggle("active", tab === "flashcards");
+    el.verbsPanel.hidden = tab !== "verbs";
+    el.wordsPanel.hidden = tab !== "words";
+    el.flashcardsPanel.hidden = tab !== "flashcards";
+    if (tab === "flashcards") renderFlashSetup();
     try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
   }
 
@@ -987,6 +1047,10 @@
     el.wdBadges.innerHTML = "";
     if (data.partOfSpeech) el.wdBadges.appendChild(badge("type", data.partOfSpeech));
     if (data.gender) el.wdBadges.appendChild(badge("gender", data.gender));
+    el.wdNotes.textContent = data.notes || "";
+    el.wdNotes.style.display = data.notes ? "" : "none";
+    el.wdExample.textContent = data.example || "";
+    el.wdExample.style.display = data.example ? "" : "none";
 
     el.wordDetail.hidden = false;
     el.wordDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -997,6 +1061,8 @@
     el.wfDefinition.value = "";
     el.wfPos.value = "sustantivo";
     el.wfGender.value = "";
+    el.wfNotes.value = "";
+    el.wfExample.value = "";
   }
 
   function fillWordForm(data) {
@@ -1004,6 +1070,8 @@
     el.wfDefinition.value = data.definition || "";
     el.wfPos.value = data.partOfSpeech || "sustantivo";
     el.wfGender.value = data.gender || "";
+    el.wfNotes.value = data.notes || "";
+    el.wfExample.value = data.example || "";
   }
 
   function openWordForm(mode, data) {
@@ -1031,7 +1099,9 @@
       word: el.wfWord.value.trim(),
       definition: el.wfDefinition.value.trim(),
       partOfSpeech: el.wfPos.value,
-      gender: el.wfGender.value
+      gender: el.wfGender.value,
+      notes: el.wfNotes.value.trim(),
+      example: el.wfExample.value.trim()
     };
   }
 
@@ -1042,7 +1112,9 @@
         word: row.word,
         definition: row.definition || "",
         partOfSpeech: row.part_of_speech || "sustantivo",
-        gender: row.gender || ""
+        gender: row.gender || "",
+        notes: row.notes || "",
+        example: row.example || ""
       }
     };
   }
@@ -1074,7 +1146,9 @@
       word: data.word,
       definition: data.definition,
       part_of_speech: data.partOfSpeech,
-      gender: data.gender
+      gender: data.gender,
+      notes: data.notes,
+      example: data.example
     };
 
     var query = editingWordId
@@ -1112,6 +1186,205 @@
       if (res.error) { showBanner("No se pudieron cargar las palabras de ejemplo: " + res.error.message); return; }
       loadWords();
     });
+  }
+
+  // ================= flashcards =================
+  function buildFlashFilterChecks() {
+    el.flashTenseChecks.innerHTML = "";
+    FLASH_ALL_TENSES.forEach(function (t) {
+      var label = document.createElement("label");
+      label.className = "flash-check";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = activeFlashTenses.has(t.key);
+      input.addEventListener("change", function () {
+        if (input.checked) activeFlashTenses.add(t.key); else activeFlashTenses.delete(t.key);
+      });
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(" " + t.label));
+      el.flashTenseChecks.appendChild(label);
+    });
+
+    el.flashPersonChecks.innerHTML = "";
+    PERSONS.forEach(function (p) {
+      var label = document.createElement("label");
+      label.className = "flash-check";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = activeFlashPersons.has(p.key);
+      input.addEventListener("change", function () {
+        if (input.checked) activeFlashPersons.add(p.key); else activeFlashPersons.delete(p.key);
+      });
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(" " + p.label));
+      el.flashPersonChecks.appendChild(label);
+    });
+  }
+
+  function renderFlashSetup() {
+    el.flashVerbCount.textContent = "(" + filtered.length + ")";
+    el.flashWordCount.textContent = "(" + filteredWords.length + ")";
+    el.flashVerbOptions.hidden = !activeFlashSources.verbs;
+    el.flashWordOptions.hidden = !activeFlashSources.words;
+
+    var noSource = !activeFlashSources.verbs && !activeFlashSources.words;
+    el.flashStartBtn.disabled = noSource;
+    el.flashSetupMsg.textContent = noSource ? "Activá al menos una fuente (verbos o vocabulario)." : "";
+  }
+
+  // A flashcard is { kind: "verb"|"word", data, frontMain, frontSub, backMain, backSub }.
+  // frontMain/backMain are the big headline text; the *Sub lines and badges are secondary.
+  function buildFlashDeck() {
+    var deck = [];
+
+    if (activeFlashSources.verbs) {
+      filtered.forEach(function (v) {
+        var data = v.data;
+        var forms = data.forms || {};
+        var def = data.definition || "";
+        var inf = data.infinitive || v.id;
+
+        FLASH_PERSONAL_TENSES.forEach(function (t) {
+          if (!activeFlashTenses.has(t.key)) return;
+          PERSONS.forEach(function (p) {
+            if (!activeFlashPersons.has(p.key)) return;
+            var val = (forms[t.key] && forms[t.key][p.key]) || "";
+            if (!val) return;
+            deck.push({
+              kind: "verb", data: data,
+              frontMain: inf, frontSub: p.label + " · " + t.label.toLowerCase(),
+              backMain: val, backSub: def ? "(" + def + ")" : ""
+            });
+          });
+        });
+
+        // impersonal verbs (llover, nevar, haber's "hay"...) have no person —
+        // same idea as the extra row the conjugation table shows for them.
+        var imp = forms.impersonal || {};
+        FLASH_PERSONAL_TENSES.forEach(function (t) {
+          if (!activeFlashTenses.has(t.key)) return;
+          var val = imp[t.key] || "";
+          if (!val) return;
+          deck.push({
+            kind: "verb", data: data,
+            frontMain: inf, frontSub: "impersonal · " + t.label.toLowerCase(),
+            backMain: val, backSub: def ? "(" + def + ")" : ""
+          });
+        });
+
+        if (activeFlashTenses.has("imperativo") && forms.imperativo) {
+          Object.keys(IMPERATIVO_FORM_KEY).forEach(function (personKey) {
+            if (!activeFlashPersons.has(personKey)) return;
+            var val = forms.imperativo[IMPERATIVO_FORM_KEY[personKey]] || "";
+            if (!val) return;
+            deck.push({
+              kind: "verb", data: data,
+              frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · imperativo",
+              backMain: val, backSub: def ? "(" + def + ")" : ""
+            });
+          });
+        }
+
+        ["gerundio", "participio"].forEach(function (key) {
+          if (!activeFlashTenses.has(key)) return;
+          var val = forms[key] || "";
+          if (!val) return;
+          deck.push({
+            kind: "verb", data: data,
+            frontMain: inf, frontSub: key,
+            backMain: val, backSub: def ? "(" + def + ")" : ""
+          });
+        });
+      });
+    }
+
+    if (activeFlashSources.words) {
+      filteredWords.forEach(function (w) {
+        var data = w.data;
+        var word = data.word || w.id;
+        var def = data.definition || "";
+        if (flashDirection === "word2def") {
+          deck.push({ kind: "word", data: data, frontMain: word, frontSub: "", backMain: def || "—", backSub: "" });
+        } else {
+          deck.push({ kind: "word", data: data, frontMain: def || word, frontSub: "", backMain: word, backSub: "" });
+        }
+      });
+    }
+
+    return deck;
+  }
+
+  function flashBackBadges(card) {
+    var frag = document.createDocumentFragment();
+    var data = card.data;
+    if (card.kind === "verb") {
+      if (data.type) frag.appendChild(badge("type", data.type));
+      frag.appendChild(badge("irregular", data.irregularity || "regular"));
+      if (data.reflexive) frag.appendChild(badge("reflexive", "reflexivo"));
+    } else {
+      if (data.partOfSpeech) frag.appendChild(badge("type", data.partOfSpeech));
+      if (data.gender) frag.appendChild(badge("gender", data.gender));
+    }
+    return frag;
+  }
+
+  function shuffleArray(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function renderFlashCard() {
+    if (flashIndex < 0 || flashIndex >= flashDeck.length) return;
+    var card = flashDeck[flashIndex];
+    el.flashCard.classList.remove("flipped");
+    el.flashFrontMain.textContent = card.frontMain;
+    el.flashFrontSub.textContent = card.frontSub || "";
+    el.flashFrontSub.style.display = card.frontSub ? "" : "none";
+    el.flashBackMain.textContent = card.backMain;
+    el.flashBackSub.textContent = card.backSub || "";
+    el.flashBackSub.style.display = card.backSub ? "" : "none";
+    el.flashBackBadges.innerHTML = "";
+    el.flashBackBadges.appendChild(flashBackBadges(card));
+    el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
+    el.flashPrevBtn.disabled = flashIndex === 0;
+  }
+
+  function startFlashcards() {
+    flashDeck = shuffleArray(buildFlashDeck());
+    if (flashDeck.length === 0) {
+      el.flashSetupMsg.textContent = "No hay tarjetas para esta combinación de filtros — probá activar más tiempos, personas o fuentes.";
+      return;
+    }
+    el.flashSetupMsg.textContent = "";
+    flashIndex = 0;
+    el.flashOverlay.hidden = false;
+    renderFlashCard();
+  }
+
+  function nextFlashCard() {
+    flashIndex++;
+    if (flashIndex >= flashDeck.length) {
+      flashDeck = shuffleArray(flashDeck.slice());
+      flashIndex = 0;
+    }
+    renderFlashCard();
+  }
+
+  function prevFlashCard() {
+    if (flashIndex <= 0) return;
+    flashIndex--;
+    renderFlashCard();
+  }
+
+  function closeFlashcards() {
+    el.flashOverlay.hidden = true;
+  }
+
+  function toggleFlashFlip() {
+    el.flashCard.classList.toggle("flipped");
   }
 
   // ================= auth =================
@@ -1216,14 +1489,33 @@
   });
   el.wdDelete.addEventListener("click", handleWordDelete);
 
+  el.tabFlashcards.addEventListener("click", function () { setMainTab("flashcards"); });
+  el.flashSrcVerbs.addEventListener("change", function () {
+    activeFlashSources.verbs = el.flashSrcVerbs.checked;
+    renderFlashSetup();
+  });
+  el.flashSrcWords.addEventListener("change", function () {
+    activeFlashSources.words = el.flashSrcWords.checked;
+    renderFlashSetup();
+  });
+  el.flashDirDef.addEventListener("change", function () { if (el.flashDirDef.checked) flashDirection = "def2word"; });
+  el.flashDirWord.addEventListener("change", function () { if (el.flashDirWord.checked) flashDirection = "word2def"; });
+  el.flashStartBtn.addEventListener("click", startFlashcards);
+  el.flashCloseBtn.addEventListener("click", closeFlashcards);
+  el.flashCard.addEventListener("click", toggleFlashFlip);
+  el.flashNextBtn.addEventListener("click", nextFlashCard);
+  el.flashPrevBtn.addEventListener("click", prevFlashCard);
+
   buildConjFormTable();
   buildImperativoFormRow();
   buildTenseHeader();
+  buildFlashFilterChecks();
 
   (function restoreMainTab() {
     var saved = null;
     try { saved = localStorage.getItem("iv-main-tab"); } catch (e) {}
     if (saved === "words") setMainTab("words");
+    else if (saved === "flashcards") setMainTab("flashcards");
   })();
 
   supabaseClient.auth.onAuthStateChange(function (_event, session) {

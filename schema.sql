@@ -158,8 +158,14 @@ create table if not exists public.words (
   definition text default '',
   part_of_speech text default 'sustantivo',
   gender text default '',
+  notes text default '',
+  example text default '',
   created_at timestamptz not null default now()
 );
+
+-- for accounts whose "words" table predates the notes/example columns
+alter table public.words add column if not exists notes text default '';
+alter table public.words add column if not exists example text default '';
 
 alter table public.words enable row level security;
 

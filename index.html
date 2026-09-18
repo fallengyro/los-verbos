@@ -50,6 +50,7 @@
   <div class="main-tabs">
     <button type="button" class="main-tab active" id="tab-verbs">Verbos</button>
     <button type="button" class="main-tab" id="tab-words">Vocabulario</button>
+    <button type="button" class="main-tab" id="tab-flashcards">Tarjetas</button>
   </div>
 
   <section id="verbs-panel">
@@ -235,6 +236,8 @@
       </div>
     </div>
     <div class="badges" id="wd-badges"></div>
+    <p class="pattern-note" id="wd-notes"></p>
+    <p class="example-note" id="wd-example"></p>
 
     <div class="detail-actions-footer">
       <button class="icon-btn" id="wd-edit" type="button">Editar</button>
@@ -279,6 +282,14 @@
           <option value="neutro">neutro</option>
         </select>
       </div>
+      <div class="field">
+        <label for="wf-notes">Notas / excepciones</label>
+        <input type="text" id="wf-notes" placeholder="ej. femenino, pero usa &quot;el&quot;: el agua" />
+      </div>
+      <div class="field">
+        <label for="wf-example">Oración de ejemplo</label>
+        <input type="text" id="wf-example" placeholder="ej. Tomo mucha agua todos los días." />
+      </div>
     </div>
 
     <div class="form-actions">
@@ -290,7 +301,68 @@
 
   </section>
 
+  <section id="flashcards-panel" hidden>
+    <div class="flash-setup">
+      <h2>Modo tarjetas</h2>
+      <p class="flash-setup-note">Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.</p>
+
+      <div class="flash-source-toggle">
+        <label class="switch-row">
+          <input type="checkbox" id="flash-src-verbs" checked />
+          <span>Verbos <span class="flash-count" id="flash-verb-count"></span></span>
+        </label>
+        <label class="switch-row">
+          <input type="checkbox" id="flash-src-words" checked />
+          <span>Vocabulario <span class="flash-count" id="flash-word-count"></span></span>
+        </label>
+      </div>
+
+      <div class="flash-verb-options" id="flash-verb-options">
+        <p class="flash-group-label">Tiempos y modos</p>
+        <div class="flash-check-grid" id="flash-tense-checks"></div>
+        <p class="flash-group-label">Personas</p>
+        <div class="flash-check-grid" id="flash-person-checks"></div>
+      </div>
+
+      <div class="flash-word-options" id="flash-word-options">
+        <p class="flash-group-label">Dirección de la tarjeta</p>
+        <div class="flash-radio-row">
+          <label><input type="radio" name="flash-direction" id="flash-dir-def" value="def2word" checked /> Definición &rarr; palabra</label>
+          <label><input type="radio" name="flash-direction" id="flash-dir-word" value="word2def" /> Palabra &rarr; definición</label>
+        </div>
+      </div>
+
+      <p class="form-msg" id="flash-setup-msg"></p>
+      <button type="button" class="btn-primary" id="flash-start-btn">Empezar</button>
+    </div>
+  </section>
+
   <footer class="note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
+</div>
+
+<div class="flash-overlay" id="flash-overlay" hidden>
+  <div class="flash-topbar">
+    <button type="button" class="icon-btn" id="flash-close-btn">&times; Cerrar</button>
+    <span class="flash-progress" id="flash-progress"></span>
+  </div>
+  <div class="flash-stage">
+    <div class="flash-card" id="flash-card">
+      <div class="flash-face flash-front">
+        <div class="flash-prompt-main" id="flash-front-main"></div>
+        <div class="flash-prompt-sub" id="flash-front-sub"></div>
+      </div>
+      <div class="flash-face flash-back">
+        <div class="flash-answer" id="flash-back-main"></div>
+        <div class="flash-sub" id="flash-back-sub"></div>
+        <div class="badges flash-back-badges" id="flash-back-badges"></div>
+      </div>
+    </div>
+  </div>
+  <p class="flash-hint">Tocá la tarjeta para dar vuelta</p>
+  <div class="flash-controls">
+    <button type="button" class="btn-secondary" id="flash-prev-btn">&lsaquo; Anterior</button>
+    <button type="button" class="btn-primary" id="flash-next-btn">Siguiente &rsaquo;</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
