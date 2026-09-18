@@ -911,6 +911,13 @@
     el.detail.hidden = false;
     el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
     syncConjRowHeights();
+    // A second pass a couple frames later catches anything that settles
+    // just after this first synchronous one — a font swap finishing, or
+    // (see the note on syncConjRowHeights) a mobile browser's automatic
+    // text-size boost re-evaluating itself for the newly-inserted cells.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(syncConjRowHeights);
+    });
   }
 
   // The pronoun column is its own small <table> beside the scrolling tense

@@ -62,6 +62,17 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
 
+  /* Mobile Safari (and some Android browsers) auto-boosts font size in
+     text it judges "dense" or narrow-column content, as a readability
+     heuristic — and it can boost the wide gustar-type cells (long
+     "me gusta / me gustan" text) differently from the narrow pronoun
+     column right next to them, then not fully re-settle when the content
+     changes. That's what was throwing the two conjugation tables' row
+     heights out of sync specifically after viewing a gustar-type verb.
+     Turning the heuristic off keeps every cell at the size this stylesheet
+     actually asks for. */
+  html { -webkit-text-size-adjust: 100%; -moz-text-size-adjust: 100%; text-size-adjust: 100%; }
+
   /* nicer, on-theme scrollbars instead of the browser's bulky default —
      scrollbar-color/-width is inherited, so setting it on html covers the
      page scrollbar and every internal scroll area (conj tables, the
