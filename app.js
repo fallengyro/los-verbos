@@ -910,6 +910,37 @@
 
     el.detail.hidden = false;
     el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    syncConjRowHeights();
+  }
+
+  // The pronoun column is its own small <table> beside the scrolling tense
+  // table (see the note above table.conj-pronouns) rather than a column
+  // inside it, specifically to dodge a mobile Safari bug with sticky-in-
+  // table columns. The tradeoff: two independent tables lay out their own
+  // row heights, so anything that makes one table's natural row height
+  // differ ever so slightly from the other's — longer composite cell text
+  // (gustar-type verbs' "me gusta / me gustan" is much longer than a plain
+  // "gusto"), a webfont finishing its swap-in after this first paint, a
+  // sub-pixel border-rounding difference on a real device's screen — lets
+  // their rows drift out of sync, and once one row is off every row below
+  // it is too, so the pronoun labels stop lining up with their row.
+  // Forcing both tables' rows to the same explicit height (the taller of
+  // the two, per row) after every render removes the dependency on the
+  // two tables agreeing on their own.
+  function syncConjRowHeights() {
+    var prRows = el.dConjPronounBody.querySelectorAll("tr");
+    var teRows = el.dConjBody.querySelectorAll("tr");
+    var n = Math.min(prRows.length, teRows.length);
+    var i;
+    for (i = 0; i < n; i++) {
+      prRows[i].style.height = "";
+      teRows[i].style.height = "";
+    }
+    for (i = 0; i < n; i++) {
+      var h = Math.max(prRows[i].getBoundingClientRect().height, teRows[i].getBoundingClientRect().height);
+      prRows[i].style.height = h + "px";
+      teRows[i].style.height = h + "px";
+    }
   }
 
   // ================= add/edit form =================
@@ -2024,5 +2055,24 @@
   supabaseClient.auth.getSession().then(function (res) {
     currentUser = (res.data && res.data.session) ? res.data.session.user : null;
     renderAuthState();
+  });
+
+  // The conjugation table's row-height sync (see syncConjRowHeights) runs
+  // once when a verb is first shown, but the two independent tables it's
+  // syncing can still drift apart afterward: a webfont finishing its
+  // swap-in changes text metrics after that first pass, and resizing the
+  // window can cross the 640px breakpoint into/out of the mobile font
+  // sizes. Re-running the sync after either keeps them lined up.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      if (selectedId && !el.detail.hidden) syncConjRowHeights();
+    });
+  }
+  var resyncConjTimer = null;
+  window.addEventListener("resize", function () {
+    if (resyncConjTimer) clearTimeout(resyncConjTimer);
+    resyncConjTimer = setTimeout(function () {
+      if (selectedId && !el.detail.hidden) syncConjRowHeights();
+    }, 150);
   });
 })();
