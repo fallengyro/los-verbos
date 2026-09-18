@@ -21,6 +21,9 @@ create table if not exists public.verbs (
   irregular boolean not null default false,
   pattern text default '',
   reflexive boolean not null default false,
+  transitivity text not null default 'transitivo',
+  preposicion text default '',
+  auxiliar boolean not null default false,
   forms jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -145,6 +148,43 @@ update public.verbs set forms = forms || '{"subjPasado":{"yo":"aprendiera","vos"
 update public.verbs set forms = forms || '{"subjPasado":{"yo":"practicara","vos":"practicaras","el":"practicara","nosotros":"practicáramos","ellos":"practicaran"},"imperativo":{"vos":"practicá","usted":"practique","nosotros":"practiquemos","ustedes":"practiquen"}}'::jsonb where infinitive = 'practicar';
 update public.verbs set forms = forms || '{"subjPasado":{"yo":"estudiara","vos":"estudiaras","el":"estudiara","nosotros":"estudiáramos","ellos":"estudiaran"},"imperativo":{"vos":"estudiá","usted":"estudie","nosotros":"estudiemos","ustedes":"estudien"}}'::jsonb where infinitive = 'estudiar';
 update public.verbs set forms = forms || '{"subjPasado":{"yo":"escribiera","vos":"escribieras","el":"escribiera","nosotros":"escribiéramos","ellos":"escribieran"},"imperativo":{"vos":"escribí","usted":"escriba","nosotros":"escribamos","ustedes":"escriban"}}'::jsonb where infinitive = 'escribir';
+
+-- ---------------------------------------------------------------------------
+-- Three more verb tags:
+--   transitivity  — transitivo / intransitivo / ambos (takes a direct object,
+--                   doesn't, or commonly does both — e.g. "comer algo" vs.
+--                   "¿comiste?")
+--   preposicion   — a fixed preposition the verb idiomatically pairs with,
+--                   where the preposition changes or narrows the meaning
+--                   (creer EN algo, dejar DE hacer algo, ir A + infinitivo).
+--                   Free text, blank when there's no single fixed one.
+--   auxiliar      — true for verbs that combine with an infinitive/gerundio/
+--                   participio to build another construction rather than
+--                   standing alone (haber + participio, ir a + infinitivo,
+--                   estar + gerundio, poder/deber/querer + infinitivo,
+--                   tener que + infinitivo, ser + participio for the passive).
+-- ---------------------------------------------------------------------------
+
+alter table public.verbs add column if not exists transitivity text not null default 'transitivo';
+alter table public.verbs add column if not exists preposicion text default '';
+alter table public.verbs add column if not exists auxiliar boolean not null default false;
+
+update public.verbs set transitivity = 'intransitivo'
+  where infinitive in ('ser', 'estar', 'ir', 'venir', 'levantarse', 'haber', 'correr', 'nacer', 'nadar',
+                        'llegar', 'parecer', 'quedar', 'llover', 'nevar', 'irse', 'llamarse');
+update public.verbs set transitivity = 'ambos'
+  where infinitive in ('subir', 'comer', 'pasar', 'hablar');
+-- everything else (decir, tener, hacer, poder, querer, ver, saber, conocer,
+-- usar, dar, deber, poner, creer, llevar, dejar, seguir, encontrar, llamar,
+-- aprender, practicar, estudiar, escribir) keeps the 'transitivo' default.
+
+update public.verbs set preposicion = 'a' where infinitive in ('ir', 'llegar', 'subir', 'aprender');
+update public.verbs set preposicion = 'de' where infinitive = 'dejar';
+update public.verbs set preposicion = 'en' where infinitive in ('quedar', 'creer');
+update public.verbs set preposicion = 'por' where infinitive = 'pasar';
+
+update public.verbs set auxiliar = true
+  where infinitive in ('ser', 'estar', 'tener', 'poder', 'ir', 'querer', 'haber', 'deber');
 
 -- ---------------------------------------------------------------------------
 -- Vocabulario — general words (nouns, adjectives, adverbs...), kept separate

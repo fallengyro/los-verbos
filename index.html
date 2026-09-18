@@ -75,8 +75,15 @@
       <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)">irregular (total)</button>
     </div>
     <div class="chip-group">
+      <span class="chip-label">Transitividad</span>
+      <button type="button" class="chip" data-facet="transitivity" data-value="transitivo">transitivo</button>
+      <button type="button" class="chip" data-facet="transitivity" data-value="intransitivo">intransitivo</button>
+      <button type="button" class="chip" data-facet="transitivity" data-value="ambos">ambos</button>
+    </div>
+    <div class="chip-group">
       <span class="chip-label">Marcas</span>
       <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
+      <button type="button" class="chip" data-facet="flag" data-value="auxiliar">auxiliar</button>
     </div>
     <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
   </div>
@@ -92,6 +99,7 @@
     </div>
     <div class="badges" id="d-badges"></div>
     <p class="pattern-note" id="d-pattern"></p>
+    <p class="pattern-note" id="d-preposicion"></p>
 
     <p class="conj-hint">deslizá para ver todos los tiempos &rarr;</p>
     <div class="conj-wrap">
@@ -163,12 +171,28 @@
         </select>
       </div>
       <div class="field">
+        <label for="f-transitivity">Transitividad</label>
+        <select id="f-transitivity">
+          <option value="transitivo">transitivo</option>
+          <option value="intransitivo">intransitivo</option>
+          <option value="ambos">ambos</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="f-pattern">Patrón / notas</label>
         <input type="text" id="f-pattern" />
+      </div>
+      <div class="field">
+        <label for="f-preposicion">Preposición fija</label>
+        <input type="text" id="f-preposicion" placeholder="ej. en, de, a" />
       </div>
       <div class="field checks">
         <input type="checkbox" id="f-reflexive" />
         <label for="f-reflexive" style="margin:0;">¿Reflexivo?</label>
+      </div>
+      <div class="field checks">
+        <input type="checkbox" id="f-auxiliar" />
+        <label for="f-auxiliar" style="margin:0;">¿Auxiliar / modal?</label>
       </div>
     </div>
 

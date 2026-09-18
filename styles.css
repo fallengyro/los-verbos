@@ -309,6 +309,8 @@
   .badge.irregular { background: var(--brick-soft); color: var(--brick); }
   .badge.reflexive { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
   .badge.gender { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
+  .badge.transitivity { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
+  .badge.auxiliar { background: var(--paper-sunken); color: var(--accent-deep); border: 1px solid var(--line); }
 
   .detail {
     border: 1px solid var(--line);
