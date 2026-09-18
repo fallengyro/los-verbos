@@ -521,7 +521,9 @@
     def.textContent = data.definition || "";
     btn.appendChild(def);
 
-    btn.addEventListener("click", function () { selectVerb(id); });
+    btn.addEventListener("click", function () {
+      if (selectedId === id) deselectVerb(); else selectVerb(id);
+    });
     li.appendChild(btn);
     return li;
   }
@@ -574,6 +576,11 @@
     s.className = "badge " + cls;
     s.textContent = text;
     return s;
+  }
+
+  function deselectVerb() {
+    selectedId = null;
+    el.detail.hidden = true;
   }
 
   function selectVerb(id) {
@@ -1032,7 +1039,9 @@
     def.textContent = data.definition || "";
     btn.appendChild(def);
 
-    btn.addEventListener("click", function () { selectWord(id); });
+    btn.addEventListener("click", function () {
+      if (selectedWordId === id) deselectWord(); else selectWord(id);
+    });
     li.appendChild(btn);
     return li;
   }
@@ -1073,6 +1082,11 @@
       filteredWords.forEach(function (v) { el.wordList.appendChild(wordCardRow(v.id, v.data)); });
     }
     el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
+  }
+
+  function deselectWord() {
+    selectedWordId = null;
+    el.wordDetail.hidden = true;
   }
 
   function selectWord(id) {
