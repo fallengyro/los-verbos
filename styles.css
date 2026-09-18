@@ -557,7 +557,7 @@
   .flash-card {
     position: relative; width: min(92vw, 420px); height: min(56vh, 320px);
     cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
-    touch-action: none; will-change: transform, opacity;
+    touch-action: none;
     /* without these, holding a finger down on the card (or dragging it
        slowly) lets the browser's own touch feedback take over — a gray
        tap-highlight box, a text-selection tint, or iOS's press-and-hold
@@ -597,8 +597,17 @@
      painted — otherwise the still-flipped card would briefly show the new
      card's answer face mid-rotation. The tap-to-flip animation is unaffected
      since this class is only ever added and removed by the JS navigation
-     functions, never present during a user's tap. */
-  .flash-card.no-anim { transition: none; }
+     functions, never present during a user's tap.
+
+     It's also the same class the drag handlers add for the duration of an
+     active swipe (see app.js), so this is where will-change belongs too:
+     left on the base .flash-card permanently, it makes Chromium promote
+     the card to its own compositing layer, which breaks backface-visibility
+     on its two 3D-rotated faces — tapping to flip then shows the mirrored
+     FRONT face instead of the back one. Scoping it to the drag window keeps
+     the smoother compositing during a swipe without breaking the ordinary
+     tap-to-flip. */
+  .flash-card.no-anim { transition: none; will-change: transform, opacity; }
   .flash-arrow {
     flex: none; z-index: 5;
     width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);

@@ -146,6 +146,23 @@
     return actual.trim().toLowerCase() !== expected.trim().toLowerCase();
   }
 
+  // Gustar-type verbs (see GUSTAR_LIKE_PERSON above): every person's cell
+  // shows the SAME invariant singular/plural pair (from the stored él/ellos
+  // forms), just with that row's dative pronoun prefixed — "me gusta /
+  // gustan," "le gusta / gustan," etc. — instead of each person's own
+  // (misleading) conjugated form. Used by both the detail card and the
+  // flashcard deck builder so they stay in sync.
+  function gustarCellText(forms, tenseKey, personKey) {
+    var sing = (forms[tenseKey] && forms[tenseKey].el) || "";
+    var plur = (forms[tenseKey] && forms[tenseKey].ellos) || "";
+    if (!sing && !plur) return "—";
+    var pronoun = GUSTAR_LIKE_PERSON[personKey].pronoun;
+    var parts = [];
+    if (sing) parts.push(pronoun + " " + sing);
+    if (plur) parts.push(pronoun + " " + plur);
+    return parts.join(" / ") || "—";
+  }
+
   // ================= starter verbs (offered to a brand-new account) =================
   var STARTER_VERBS = [
     { infinitive: "ser", definition: "to be (essential)", type: "-er", irregularity: "irregular (total)", pattern: "fully irregular", reflexive: false, transitivity: "intransitivo", preposicion: "", auxiliar: true, forms: { presente: { yo: "soy", vos: "sos", el: "es", nosotros: "somos", ellos: "son" }, preterito: { yo: "fui", vos: "fuiste", el: "fue", nosotros: "fuimos", ellos: "fueron" }, imperfecto: { yo: "era", vos: "eras", el: "era", nosotros: "éramos", ellos: "eran" }, futuro: { yo: "seré", vos: "serás", el: "será", nosotros: "seremos", ellos: "serán" }, condicional: { yo: "sería", vos: "serías", el: "sería", nosotros: "seríamos", ellos: "serían" }, subjPresente: { yo: "sea", vos: "seas", el: "sea", nosotros: "seamos", ellos: "sean" }, subjPasado: { yo: "fuera", vos: "fueras", el: "fuera", nosotros: "fuéramos", ellos: "fueran" }, imperativo: { vos: "sé", usted: "sea", nosotros: "seamos", ustedes: "sean" }, gerundio: "siendo", participio: "sido" } },
@@ -819,21 +836,6 @@
       return td;
     }
 
-    // Gustar-type verbs: every row shows the same invariant singular/plural
-    // pair (from the stored él/ellos forms) with just the dative pronoun
-    // changing, e.g. "me gusta / gustan," "le gusta / gustan" — instead of
-    // each person's own (misleading) conjugated form.
-    function gustarCellText(t, personKey) {
-      var sing = (forms[t.key] && forms[t.key].el) || "";
-      var plur = (forms[t.key] && forms[t.key].ellos) || "";
-      if (!sing && !plur) return "—";
-      var pronoun = GUSTAR_LIKE_PERSON[personKey].pronoun;
-      var parts = [];
-      if (sing) parts.push(pronoun + " " + sing);
-      if (plur) parts.push(pronoun + " " + plur);
-      return parts.join(" / ") || "—";
-    }
-
     buildTenseHeader();
     el.dConjBody.innerHTML = "";
     el.dConjPronounBody.innerHTML = "";
@@ -850,7 +852,7 @@
       TENSES.forEach(function (t) {
         var td = document.createElement("td");
         if (data.gustar_like) {
-          td.textContent = gustarCellText(t, p.key);
+          td.textContent = gustarCellText(forms, t.key, p.key);
         } else {
           var val = (forms[t.key] && forms[t.key][p.key]) || "";
           td.textContent = val || "—";
@@ -861,7 +863,7 @@
       SUBJ_TENSES.forEach(function (t) {
         var tdSubj = document.createElement("td");
         if (data.gustar_like) {
-          tdSubj.textContent = gustarCellText(t, p.key);
+          tdSubj.textContent = gustarCellText(forms, t.key, p.key);
         } else {
           var subjVal = (forms[t.key] && forms[t.key][p.key]) || "";
           tdSubj.textContent = subjVal || "—";
@@ -1599,11 +1601,19 @@
         FLASH_PERSONAL_TENSES.forEach(function (t) {
           PERSONS.forEach(function (p) {
             if (!activeFlashCells.has(flashCellKey(t.key, p.key))) return;
-            var val = (forms[t.key] && forms[t.key][p.key]) || "";
-            if (!val) return;
+            var frontLabel, val;
+            if (data.gustar_like) {
+              val = gustarCellText(forms, t.key, p.key);
+              if (val === "—") return;
+              frontLabel = GUSTAR_LIKE_PERSON[p.key].label;
+            } else {
+              val = (forms[t.key] && forms[t.key][p.key]) || "";
+              if (!val) return;
+              frontLabel = p.label;
+            }
             deck.push({
               kind: "verb", data: data,
-              frontMain: inf, frontSub: p.label + " · " + t.label.toLowerCase(),
+              frontMain: inf, frontSub: frontLabel + " · " + t.label.toLowerCase(),
               backMain: val, backSub: def ? "(" + def + ")" : ""
             });
           });
