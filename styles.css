@@ -286,6 +286,12 @@
     background: var(--paper-raised);
   }
   .card-list li + li { border-top: 1px solid var(--line); }
+  /* the verb and word selection lists get their own taller heights (rather
+     than the shared 110px above) so more of the filtered list is visible
+     before you have to scroll — verbs about twice as tall, and words about
+     three times as tall since a word row is simpler to skim. */
+  #card-list { max-height: 220px; }
+  #word-list { max-height: 330px; }
   .card-row {
     width: 100%;
     display: flex;
@@ -355,33 +361,6 @@
   .detail .example-note::before { content: "\201C"; color: var(--ink-soft); }
   .detail .example-note::after { content: "\201D"; color: var(--ink-soft); }
 
-  /* The verb detail card runs noticeably larger than a plain ".detail" —
-     roughly double the type/spacing — since it's meant to be read from a
-     little distance while studying, not just skimmed. These override the
-     shared ".detail" rules above via ID specificity. */
-  #detail { padding: 40px 40px 16px; margin: 32px 0 30px; border-radius: 14px; }
-  #detail .detail-head h2 { font-size: 56px; }
-  #detail .definition { font-size: 22px; margin: 4px 0 14px; }
-  #detail .badges { gap: 9px; margin-bottom: 8px; }
-  #detail .badges .badge { font-size: 14px; padding: 4px 10px; }
-  #detail .pattern-note, #detail .example-note { font-size: 18px; }
-  #detail .example-note { padding: 11px 16px; }
-  #detail .detail-actions-footer { gap: 12px; margin: 24px 0 6px; padding-top: 18px; }
-  #detail .icon-btn { font-size: 16px; padding: 8px 16px; }
-
-  /* The word detail card runs larger still — its content is simpler than a
-     verb's (no conjugation table), so it can afford to be even roomier and
-     still not feel sparse. */
-  #word-detail { padding: 48px 48px 22px; margin: 32px 0 30px; border-radius: 16px; }
-  #word-detail .detail-head h2 { font-size: 64px; }
-  #word-detail .definition { font-size: 26px; margin: 4px 0 16px; }
-  #word-detail .badges { gap: 10px; margin-bottom: 10px; }
-  #word-detail .badges .badge { font-size: 16px; padding: 5px 12px; }
-  #word-detail .pattern-note, #word-detail .example-note { font-size: 20px; }
-  #word-detail .example-note { padding: 12px 18px; }
-  #word-detail .detail-actions-footer { gap: 14px; margin: 26px 0 8px; padding-top: 20px; }
-  #word-detail .icon-btn { font-size: 17px; padding: 9px 18px; }
-
   .conj-hint { display: none; }
   .conj-wrap { display: flex; align-items: flex-start; }
   .conj-scroll { overflow-x: auto; flex: 1 1 auto; min-width: 0; margin-right: -22px; padding-right: 22px; }
@@ -443,21 +422,6 @@
   .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
   .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }
   .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
-
-  /* rest of the "twice as large" verb-detail scale-up: the conjugation
-     table, its legend, and the gerundio/participio tiles */
-  #detail .conj-scroll { margin-right: -40px; padding-right: 40px; }
-  #detail table.conj { font-size: 19px; }
-  #detail table.conj th, #detail table.conj td { padding: 11px 14px; line-height: 24px; }
-  #detail table.conj thead tr.mood-row th { font-size: 14px; }
-  #detail table.conj thead tr.tense-row th { font-size: 17px; padding-bottom: 11px; }
-  #detail table.conj tbody th { font-size: 18px; }
-  #detail .conj-legend { font-size: 16px; gap: 8px; margin: 6px 0 18px; }
-  #detail .conj-legend .swatch { width: 16px; height: 16px; }
-  #detail .nonpersonal { gap: 14px; margin: 24px 0 26px; }
-  #detail .nonpersonal .tile { padding: 12px 20px; min-width: 180px; }
-  #detail .nonpersonal .tile .label { font-size: 13px; }
-  #detail .nonpersonal .tile .val { font-size: 21px; }
 
   .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .add-toggle {
@@ -664,29 +628,6 @@
 
     .nonpersonal { gap: 8px; margin: 14px 0 16px; }
     .nonpersonal .tile { min-width: calc(50% - 4px); padding: 7px 10px; }
-
-    /* the "twice as large" / "larger still" bump, scaled down to still fit
-       a phone screen — ID selectors here outrank the plain ".detail" rules
-       just above, so these are what actually apply on mobile. */
-    #detail { padding: 22px 18px 10px; margin: 24px 0 22px; }
-    #detail .detail-head h2 { font-size: 34px; }
-    #detail .definition { font-size: 17px; }
-    #detail .badges .badge { font-size: 12px; padding: 3px 8px; }
-    #detail .pattern-note, #detail .example-note { font-size: 14.5px; }
-    #detail .icon-btn { font-size: 14px; padding: 9px 13px; }
-    #detail .conj-scroll { margin-right: -18px; padding-right: 18px; }
-    #detail table.conj { font-size: 15px; min-width: 620px; }
-    #detail table.conj th, #detail table.conj td { padding: 8px 9px; line-height: 19px; }
-    #detail table.conj tbody th { font-size: 14.5px; }
-    #detail .nonpersonal .tile { padding: 9px 13px; }
-    #detail .nonpersonal .tile .val { font-size: 17px; }
-
-    #word-detail { padding: 26px 20px 12px; margin: 24px 0 22px; }
-    #word-detail .detail-head h2 { font-size: 40px; }
-    #word-detail .definition { font-size: 19px; }
-    #word-detail .badges .badge { font-size: 13px; padding: 4px 9px; }
-    #word-detail .pattern-note, #word-detail .example-note { font-size: 16px; }
-    #word-detail .icon-btn { font-size: 15px; padding: 10px 14px; }
 
     .card-row { padding: 11px 12px; font-size: 14px; }
     .card-row .inf { min-width: 0; flex: 0 1 auto; font-size: 16px; }
