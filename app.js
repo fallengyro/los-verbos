@@ -567,6 +567,12 @@
     } else {
       filtered.forEach(function (v) { el.list.appendChild(cardRow(v.id, v.data)); });
     }
+    // Re-rendering the list rebuilds the <li>s, so a scroll position from
+    // before the filter changed can now sit past the end of the (shorter)
+    // list. Browsers don't always re-clamp scrollTop right away in that
+    // case, which left the box looking empty and stuck until it was
+    // manually scrolled back up — resetting it here avoids that.
+    el.list.scrollTop = 0;
     el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
   }
 
@@ -1081,6 +1087,9 @@
     } else {
       filteredWords.forEach(function (v) { el.wordList.appendChild(wordCardRow(v.id, v.data)); });
     }
+    // See the matching comment in renderList(): reset scroll position so a
+    // filter that shrinks the list can't leave it scrolled past its own end.
+    el.wordList.scrollTop = 0;
     el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
   }
 
