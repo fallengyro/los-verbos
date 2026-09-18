@@ -36,20 +36,32 @@
 
   // ================= flashcards =================
   // "Personal" tenses/moods are the ones keyed by the 5-person PERSONS grid
-  // (presente..subjPasado). imperativo/gerundio/participio are handled as
-  // their own special-cased entries below since they don't fit that grid.
+  // (presente..subjPasado). imperativo is a 6th matrix column (it has no
+  // "yo" slot). gerundio/participio don't fit the person grid at all — no
+  // person distinguishes them — so they're separate standalone toggles.
   var FLASH_PERSONAL_TENSES = TENSES.concat(SUBJ_TENSES);
-  var FLASH_EXTRA_TENSES = [
-    { key: "imperativo", label: "Imperativo" },
-    { key: "gerundio", label: "Gerundio" },
-    { key: "participio", label: "Participio" }
-  ];
-  var FLASH_ALL_TENSES = FLASH_PERSONAL_TENSES.concat(FLASH_EXTRA_TENSES);
-  // imperativo only has 4 slots (no "yo"); map the same 5-person filter
+  var FLASH_MATRIX_COLUMNS = FLASH_PERSONAL_TENSES.concat([{ key: "imperativo", label: "Imperativo" }]);
+  // imperativo only has 4 slots (no "yo"); map the same 5-person grid
   // onto them the way the conjugation table already does — el's imperativo
   // is really usted's command, ellos's is really ustedes's.
   var IMPERATIVO_FORM_KEY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
   var IMPERATIVO_DISPLAY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
+
+  function flashCellKey(tenseKey, personKey) { return tenseKey + "|" + personKey; }
+  function flashCellSelectable(tenseKey, personKey) { return !(tenseKey === "imperativo" && personKey === "yo"); }
+  function flashColumnCellKeys(tenseKey) {
+    return PERSONS.filter(function (p) { return flashCellSelectable(tenseKey, p.key); })
+      .map(function (p) { return flashCellKey(tenseKey, p.key); });
+  }
+  function flashRowCellKeys(personKey) {
+    return FLASH_MATRIX_COLUMNS.filter(function (col) { return flashCellSelectable(col.key, personKey); })
+      .map(function (col) { return flashCellKey(col.key, personKey); });
+  }
+  function flashAllCellKeys() {
+    var keys = [];
+    FLASH_MATRIX_COLUMNS.forEach(function (col) { keys = keys.concat(flashColumnCellKeys(col.key)); });
+    return keys;
+  }
 
   function verbClass(baseInf) {
     var end = baseInf.slice(-2).toLowerCase();
@@ -293,8 +305,11 @@
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
   // their own source toggle and tense/person filters below.
   var activeFlashSources = { verbs: true, words: true };
-  var activeFlashTenses = new Set(FLASH_ALL_TENSES.map(function (t) { return t.key; }));
-  var activeFlashPersons = new Set(PERSONS.map(function (p) { return p.key; }));
+  // activeFlashCells holds every selected "tenseKey|personKey" grid cell
+  // (see FLASH_MATRIX_COLUMNS/flashCellKey above) — starts with everything on.
+  var activeFlashCells = new Set(flashAllCellKeys());
+  // gerundio/participio have no person axis, so they're plain on/off toggles.
+  var activeFlashStandalone = new Set(["gerundio", "participio"]);
   var flashDirection = "def2word"; // or "word2def"
   var flashDeck = [];
   var flashIndex = -1;
@@ -390,8 +405,8 @@
     flashWordCount: document.getElementById("flash-word-count"),
     flashVerbOptions: document.getElementById("flash-verb-options"),
     flashWordOptions: document.getElementById("flash-word-options"),
-    flashTenseChecks: document.getElementById("flash-tense-checks"),
-    flashPersonChecks: document.getElementById("flash-person-checks"),
+    flashMatrix: document.getElementById("flash-matrix"),
+    flashStandaloneToggles: document.getElementById("flash-standalone-toggles"),
     flashDirDef: document.getElementById("flash-dir-def"),
     flashDirWord: document.getElementById("flash-dir-word"),
     flashSetupMsg: document.getElementById("flash-setup-msg"),
@@ -407,7 +422,9 @@
     flashBackSub: document.getElementById("flash-back-sub"),
     flashBackBadges: document.getElementById("flash-back-badges"),
     flashPrevBtn: document.getElementById("flash-prev-btn"),
-    flashNextBtn: document.getElementById("flash-next-btn")
+    flashNextBtn: document.getElementById("flash-next-btn"),
+    flashArrowPrev: document.getElementById("flash-arrow-prev"),
+    flashArrowNext: document.getElementById("flash-arrow-next")
   };
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
@@ -1211,36 +1228,124 @@
   }
 
   // ================= flashcards =================
-  function buildFlashFilterChecks() {
-    el.flashTenseChecks.innerHTML = "";
-    FLASH_ALL_TENSES.forEach(function (t) {
-      var label = document.createElement("label");
-      label.className = "flash-check";
-      var input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = activeFlashTenses.has(t.key);
-      input.addEventListener("change", function () {
-        if (input.checked) activeFlashTenses.add(t.key); else activeFlashTenses.delete(t.key);
-      });
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(" " + t.label));
-      el.flashTenseChecks.appendChild(label);
+  // The tense/person picker is a clickable grid shaped like the conjugation
+  // table itself (persons as rows, tenses as columns, imperativo as a 6th
+  // column) rather than two long checkbox lists — a row/column header
+  // toggles everyone in that row/column in one click, and the corner button
+  // toggles the whole grid, so picking e.g. "just presente and pretérito"
+  // takes 2 clicks instead of unchecking 8 boxes one at a time.
+  function refreshFlashMatrixVisuals() {
+    var cellButtons = el.flashMatrix.querySelectorAll(".flash-matrix-cell");
+    cellButtons.forEach(function (btn) {
+      btn.classList.toggle("on", activeFlashCells.has(btn.getAttribute("data-cell")));
     });
+    var allKeys = flashAllCellKeys();
+    var allOn = allKeys.every(function (k) { return activeFlashCells.has(k); });
+    var toggleAllBtn = el.flashMatrix.querySelector(".flash-matrix-toggle-all");
+    if (toggleAllBtn) toggleAllBtn.textContent = allOn ? "Ninguno" : "Todo";
+  }
 
-    el.flashPersonChecks.innerHTML = "";
-    PERSONS.forEach(function (p) {
-      var label = document.createElement("label");
-      label.className = "flash-check";
-      var input = document.createElement("input");
-      input.type = "checkbox";
-      input.checked = activeFlashPersons.has(p.key);
-      input.addEventListener("change", function () {
-        if (input.checked) activeFlashPersons.add(p.key); else activeFlashPersons.delete(p.key);
-      });
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(" " + p.label));
-      el.flashPersonChecks.appendChild(label);
+  function buildFlashMatrix() {
+    var table = el.flashMatrix;
+    table.innerHTML = "";
+
+    var thead = document.createElement("thead");
+    var headRow = document.createElement("tr");
+    var cornerTh = document.createElement("th");
+    var cornerBtn = document.createElement("button");
+    cornerBtn.type = "button";
+    cornerBtn.className = "flash-matrix-toggle-all";
+    cornerBtn.addEventListener("click", function () {
+      var keys = flashAllCellKeys();
+      var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
+      if (allOn) activeFlashCells.clear(); else keys.forEach(function (k) { activeFlashCells.add(k); });
+      refreshFlashMatrixVisuals();
     });
+    cornerTh.appendChild(cornerBtn);
+    headRow.appendChild(cornerTh);
+
+    FLASH_MATRIX_COLUMNS.forEach(function (col) {
+      var th = document.createElement("th");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "flash-matrix-head";
+      btn.textContent = col.label;
+      btn.addEventListener("click", function () {
+        var keys = flashColumnCellKeys(col.key);
+        var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
+        keys.forEach(function (k) { if (allOn) activeFlashCells.delete(k); else activeFlashCells.add(k); });
+        refreshFlashMatrixVisuals();
+      });
+      th.appendChild(btn);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    PERSONS.forEach(function (p) {
+      var tr = document.createElement("tr");
+      var rowTh = document.createElement("th");
+      var rowBtn = document.createElement("button");
+      rowBtn.type = "button";
+      rowBtn.className = "flash-matrix-head flash-matrix-row-head";
+      rowBtn.textContent = p.label;
+      rowBtn.addEventListener("click", function () {
+        var keys = flashRowCellKeys(p.key);
+        var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
+        keys.forEach(function (k) { if (allOn) activeFlashCells.delete(k); else activeFlashCells.add(k); });
+        refreshFlashMatrixVisuals();
+      });
+      rowTh.appendChild(rowBtn);
+      tr.appendChild(rowTh);
+
+      FLASH_MATRIX_COLUMNS.forEach(function (col) {
+        var td = document.createElement("td");
+        if (!flashCellSelectable(col.key, p.key)) {
+          td.className = "flash-matrix-na";
+        } else {
+          var key = flashCellKey(col.key, p.key);
+          var cellBtn = document.createElement("button");
+          cellBtn.type = "button";
+          cellBtn.className = "flash-matrix-cell";
+          cellBtn.setAttribute("data-cell", key);
+          cellBtn.setAttribute("aria-label", p.label + " · " + col.label);
+          cellBtn.addEventListener("click", function () {
+            if (activeFlashCells.has(key)) activeFlashCells.delete(key); else activeFlashCells.add(key);
+            refreshFlashMatrixVisuals();
+          });
+          td.appendChild(cellBtn);
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    refreshFlashMatrixVisuals();
+  }
+
+  function buildFlashStandaloneToggles() {
+    el.flashStandaloneToggles.innerHTML = "";
+    [{ key: "gerundio", label: "Gerundio" }, { key: "participio", label: "Participio" }].forEach(function (item) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip";
+      btn.textContent = item.label;
+      btn.classList.toggle("active", activeFlashStandalone.has(item.key));
+      btn.addEventListener("click", function () {
+        if (activeFlashStandalone.has(item.key)) activeFlashStandalone.delete(item.key); else activeFlashStandalone.add(item.key);
+        btn.classList.toggle("active", activeFlashStandalone.has(item.key));
+      });
+      el.flashStandaloneToggles.appendChild(btn);
+    });
+  }
+
+  // A tense column counts as "in play" for an impersonal verb (llover,
+  // nevar, haber's "hay") if at least one person is selected for it —
+  // impersonal forms have no person of their own to check directly.
+  function flashTenseHasAnySelected(tenseKey) {
+    return flashColumnCellKeys(tenseKey).some(function (k) { return activeFlashCells.has(k); });
   }
 
   function renderFlashSetup() {
@@ -1267,9 +1372,8 @@
         var inf = data.infinitive || v.id;
 
         FLASH_PERSONAL_TENSES.forEach(function (t) {
-          if (!activeFlashTenses.has(t.key)) return;
           PERSONS.forEach(function (p) {
-            if (!activeFlashPersons.has(p.key)) return;
+            if (!activeFlashCells.has(flashCellKey(t.key, p.key))) return;
             var val = (forms[t.key] && forms[t.key][p.key]) || "";
             if (!val) return;
             deck.push({
@@ -1284,7 +1388,7 @@
         // same idea as the extra row the conjugation table shows for them.
         var imp = forms.impersonal || {};
         FLASH_PERSONAL_TENSES.forEach(function (t) {
-          if (!activeFlashTenses.has(t.key)) return;
+          if (!flashTenseHasAnySelected(t.key)) return;
           var val = imp[t.key] || "";
           if (!val) return;
           deck.push({
@@ -1294,9 +1398,9 @@
           });
         });
 
-        if (activeFlashTenses.has("imperativo") && forms.imperativo) {
+        if (forms.imperativo) {
           Object.keys(IMPERATIVO_FORM_KEY).forEach(function (personKey) {
-            if (!activeFlashPersons.has(personKey)) return;
+            if (!activeFlashCells.has(flashCellKey("imperativo", personKey))) return;
             var val = forms.imperativo[IMPERATIVO_FORM_KEY[personKey]] || "";
             if (!val) return;
             deck.push({
@@ -1308,7 +1412,7 @@
         }
 
         ["gerundio", "participio"].forEach(function (key) {
-          if (!activeFlashTenses.has(key)) return;
+          if (!activeFlashStandalone.has(key)) return;
           var val = forms[key] || "";
           if (!val) return;
           deck.push({
@@ -1363,6 +1467,11 @@
   function renderFlashCard() {
     if (flashIndex < 0 || flashIndex >= flashDeck.length) return;
     var card = flashDeck[flashIndex];
+    // Jump to the new card with the rotation snapped instantly back to 0 —
+    // no-anim suspends the CSS transition for one frame so a card that was
+    // showing its answer doesn't visibly spin through showing the NEW
+    // card's answer face before settling back on its front.
+    el.flashCard.classList.add("no-anim");
     el.flashCard.classList.remove("flipped");
     el.flashFrontMain.textContent = card.frontMain;
     el.flashFrontSub.textContent = card.frontSub || "";
@@ -1374,6 +1483,25 @@
     el.flashBackBadges.appendChild(flashBackBadges(card));
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
     el.flashPrevBtn.disabled = flashIndex === 0;
+    el.flashArrowPrev.disabled = flashIndex === 0;
+    // force layout so the un-flip above is actually painted before we
+    // re-enable the transition on the next frame
+    void el.flashCard.offsetWidth;
+    requestAnimationFrame(function () {
+      el.flashCard.classList.remove("no-anim");
+    });
+  }
+
+  // Flashcard mode deliberately runs in the OPPOSITE theme from the rest of
+  // the app, so it feels like a distinct "mode" rather than more of the same
+  // page. "Ambient" here means whatever the app is currently rendering in —
+  // either an explicit data-theme on <html>, or (with none set) whatever the
+  // OS/browser's prefers-color-scheme currently says.
+  function ambientIsDark() {
+    var attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "dark") return true;
+    if (attr === "light") return false;
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
   }
 
   function startFlashcards() {
@@ -1384,6 +1512,7 @@
     }
     el.flashSetupMsg.textContent = "";
     flashIndex = 0;
+    el.flashOverlay.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
     el.flashOverlay.hidden = false;
     renderFlashCard();
   }
@@ -1409,6 +1538,25 @@
 
   function toggleFlashFlip() {
     el.flashCard.classList.toggle("flipped");
+  }
+
+  // Vertical swipe on the card navigates (up = next, down = previous)
+  // without conflicting with the tap-to-flip click, which fires normally
+  // for anything that isn't a deliberate, mostly-vertical drag.
+  var flashTouchStartX = 0, flashTouchStartY = 0;
+  function handleFlashTouchStart(evt) {
+    var t = evt.touches[0];
+    flashTouchStartX = t.clientX;
+    flashTouchStartY = t.clientY;
+  }
+  function handleFlashTouchEnd(evt) {
+    var t = evt.changedTouches[0];
+    var dx = t.clientX - flashTouchStartX;
+    var dy = t.clientY - flashTouchStartY;
+    if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)) {
+      evt.preventDefault(); // swallow the click that would otherwise flip the card
+      if (dy < 0) nextFlashCard(); else prevFlashCard();
+    }
   }
 
   // ================= auth =================
@@ -1527,13 +1675,18 @@
   el.flashStartBtn.addEventListener("click", startFlashcards);
   el.flashCloseBtn.addEventListener("click", closeFlashcards);
   el.flashCard.addEventListener("click", toggleFlashFlip);
+  el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
+  el.flashCard.addEventListener("touchend", handleFlashTouchEnd);
   el.flashNextBtn.addEventListener("click", nextFlashCard);
   el.flashPrevBtn.addEventListener("click", prevFlashCard);
+  el.flashArrowNext.addEventListener("click", nextFlashCard);
+  el.flashArrowPrev.addEventListener("click", prevFlashCard);
 
   buildConjFormTable();
   buildImperativoFormRow();
   buildTenseHeader();
-  buildFlashFilterChecks();
+  buildFlashMatrix();
+  buildFlashStandaloneToggles();
 
   (function restoreMainTab() {
     var saved = null;

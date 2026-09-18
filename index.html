@@ -342,10 +342,12 @@
       </div>
 
       <div class="flash-verb-options" id="flash-verb-options">
-        <p class="flash-group-label">Tiempos y modos</p>
-        <div class="flash-check-grid" id="flash-tense-checks"></div>
-        <p class="flash-group-label">Personas</p>
-        <div class="flash-check-grid" id="flash-person-checks"></div>
+        <p class="flash-group-label">Tiempos, modos y personas</p>
+        <div class="flash-matrix-scroll">
+          <table class="flash-matrix" id="flash-matrix"></table>
+        </div>
+        <p class="flash-matrix-hint">Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.</p>
+        <div class="flash-check-row" id="flash-standalone-toggles"></div>
       </div>
 
       <div class="flash-word-options" id="flash-word-options">
@@ -370,6 +372,7 @@
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
+    <button type="button" class="flash-arrow flash-arrow-prev" id="flash-arrow-prev" aria-label="Anterior">&lsaquo;</button>
     <div class="flash-card" id="flash-card">
       <div class="flash-face flash-front">
         <div class="flash-prompt-main" id="flash-front-main"></div>
@@ -381,8 +384,9 @@
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
       </div>
     </div>
+    <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" aria-label="Siguiente">&rsaquo;</button>
   </div>
-  <p class="flash-hint">Tocá la tarjeta para dar vuelta</p>
+  <p class="flash-hint">Tocá la tarjeta para dar vuelta &middot; deslizá arriba/abajo para cambiar</p>
   <div class="flash-controls">
     <button type="button" class="btn-secondary" id="flash-prev-btn">&lsaquo; Anterior</button>
     <button type="button" class="btn-primary" id="flash-next-btn">Siguiente &rsaquo;</button>

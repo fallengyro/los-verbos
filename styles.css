@@ -478,9 +478,31 @@
     font-family: "JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--ink-soft); margin: 14px 0 6px;
   }
-  .flash-check-grid { display: flex; flex-wrap: wrap; gap: 10px 16px; }
-  .flash-check { display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer; }
-  .flash-check input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
+  .flash-check-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+  .flash-matrix-scroll { overflow-x: auto; margin: 0 0 6px; }
+  table.flash-matrix { border-collapse: collapse; font-family: "JetBrains Mono", monospace; font-size: 11px; }
+  table.flash-matrix th, table.flash-matrix td { padding: 2px; text-align: center; }
+  .flash-matrix-head {
+    background: none; border: none; cursor: pointer; font: inherit; font-weight: 700;
+    color: var(--ink-soft); padding: 4px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .flash-matrix-head:hover { background: var(--paper-sunken); color: var(--ink); }
+  .flash-matrix-row-head { text-align: left; }
+  .flash-matrix-toggle-all {
+    background: none; border: 1px solid var(--line); border-radius: 5px; cursor: pointer;
+    font: inherit; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--ink-soft); padding: 3px 6px;
+  }
+  .flash-matrix-toggle-all:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .flash-matrix-cell {
+    width: 26px; height: 22px; border: 1px solid var(--line); border-radius: 4px;
+    background: var(--paper); cursor: pointer; padding: 0;
+  }
+  .flash-matrix-cell:hover { border-color: var(--accent); }
+  .flash-matrix-cell.on { background: var(--accent); border-color: var(--accent-deep); }
+  .flash-matrix-na { background: none; }
+  .flash-matrix-hint { font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 0 0 10px; }
 
   .flash-verb-options, .flash-word-options { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 12px; }
   .flash-radio-row { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13.5px; }
@@ -495,15 +517,53 @@
     position: fixed; inset: 0; background: var(--paper); z-index: 100;
     display: flex; flex-direction: column; padding: 16px;
   }
+  /* Flashcard mode deliberately shows the OPPOSITE theme from the rest of
+     the app (set via a "data-theme" attribute placed on this element itself,
+     computed in JS from whatever theme is currently ambient) so it reads as
+     a distinct "mode," the way a lightbox or a game screen would. These two
+     blocks re-declare the same tokens :root uses, scoped to this element so
+     every descendant (card, buttons, badges) inherits the inverted palette. */
+  .flash-overlay[data-theme="dark"] {
+    --paper: #12141F; --paper-raised: #171A2C; --paper-sunken: #0D0E18;
+    --ink: #E7E9F5; --ink-soft: #A7ADC9; --line: #2C3049;
+    --accent: #8B95E8; --accent-deep: #B4BBF2; --accent-ink: #11132A;
+    --brick: #E19A6C; --brick-soft: #3A2A1D; --gold: #DDBE72; --gold-soft: #35301C;
+    --danger: #E28881; --shadow: rgba(0, 0, 0, 0.4);
+  }
+  .flash-overlay[data-theme="light"] {
+    --paper: #EDEFF5; --paper-raised: #E1E5F0; --paper-sunken: #D5DAEA;
+    --ink: #1C2333; --ink-soft: #565F7A; --line: #C2C9DE;
+    --accent: #3B4B9E; --accent-deep: #28336E; --accent-ink: #F5F6FC;
+    --brick: #B5622E; --brick-soft: #F0DCC8; --gold: #8A6D1E; --gold-soft: #F0E4C0;
+    --danger: #A23A3A; --shadow: rgba(28, 35, 51, 0.14);
+  }
   .flash-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .flash-progress { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-soft); }
 
-  .flash-stage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; perspective: 1200px; }
+  .flash-stage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; perspective: 1200px; position: relative; }
   .flash-card {
     position: relative; width: min(92vw, 420px); height: min(56vh, 320px);
     cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
+    touch-action: pan-y;
   }
   .flash-card.flipped { transform: rotateY(180deg); }
+  /* Used for one frame when jumping to a different card (next/prev), so the
+     rotation snaps back to 0 with no animation before the new content is
+     painted — otherwise the still-flipped card would briefly show the new
+     card's answer face mid-rotation. The tap-to-flip animation is unaffected
+     since this class is only ever added and removed by the JS navigation
+     functions, never present during a user's tap. */
+  .flash-card.no-anim { transition: none; }
+  .flash-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--paper-raised); color: var(--ink-soft); font-size: 20px; line-height: 1;
+    cursor: pointer; opacity: 0.45; transition: opacity 0.15s;
+  }
+  .flash-arrow:hover, .flash-arrow:focus-visible { opacity: 0.9; color: var(--accent-deep); border-color: var(--accent); }
+  .flash-arrow:disabled { opacity: 0.15; cursor: default; }
+  .flash-arrow-prev { left: 4px; }
+  .flash-arrow-next { right: 4px; }
   .flash-face {
     position: absolute; inset: 0; backface-visibility: hidden;
     border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised);
@@ -566,4 +626,7 @@
     .flash-setup { padding: 16px 14px; }
     .flash-card { width: min(94vw, 380px); height: min(48vh, 280px); }
     .flash-controls { gap: 10px; }
+    .flash-arrow { width: 32px; height: 32px; font-size: 17px; }
+    .flash-matrix-cell { width: 22px; height: 20px; }
+    .flash-matrix-head { padding: 3px 5px; font-size: 10px; }
   }
