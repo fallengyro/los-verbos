@@ -1972,9 +1972,14 @@
       : supabaseClient.auth.signUp({ email: email, password: password }).then(function (res) {
           if (res.error) throw res.error;
           if (res.data && !res.data.session) {
+            // setAuthMode() clears authMsg as part of switching tabs, so it
+            // has to run BEFORE we set the confirmation text below — doing
+            // it in the other order was wiping the message out the instant
+            // it appeared, which is why the card seemed to just silently
+            // flip to the login tab with no explanation.
+            setAuthMode("login");
             el.authMsg.textContent = "Te enviamos un email de confirmación a " + email + ". Confirmá tu cuenta y después iniciá sesión.";
             el.authMsg.style.color = "var(--accent-deep)";
-            setAuthMode("login");
           }
         });
 
