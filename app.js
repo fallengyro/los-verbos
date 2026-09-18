@@ -1512,7 +1512,9 @@
     }
     el.flashSetupMsg.textContent = "";
     flashIndex = 0;
-    el.flashOverlay.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
+    // only the card itself flips to the opposite theme — the overlay's
+    // background, topbar, and controls stay in the app's actual theme.
+    el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
     el.flashOverlay.hidden = false;
     renderFlashCard();
   }
@@ -1553,9 +1555,17 @@
     var t = evt.changedTouches[0];
     var dx = t.clientX - flashTouchStartX;
     var dy = t.clientY - flashTouchStartY;
-    if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)) {
-      evt.preventDefault(); // swallow the click that would otherwise flip the card
+    var absDx = Math.abs(dx), absDy = Math.abs(dy);
+    // Whichever axis moved further decides the gesture: up or left means
+    // "forward," down or right means "back" — a swipe in any of the four
+    // directions moves between cards, and anything too small to call a
+    // swipe is left alone so the normal tap-to-flip click still fires.
+    if (absDy > 40 && absDy > absDx) {
+      evt.preventDefault();
       if (dy < 0) nextFlashCard(); else prevFlashCard();
+    } else if (absDx > 40 && absDx > absDy) {
+      evt.preventDefault();
+      if (dx < 0) nextFlashCard(); else prevFlashCard();
     }
   }
 
