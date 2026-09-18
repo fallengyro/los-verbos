@@ -357,6 +357,14 @@
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
   table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
+  /* imperativo column: usted/ustedes don't share él/ella's or ellos/ellas's
+     form the way every other mood/tense in this table does, so those two
+     merged rows show "— / — / <real form>" instead of one clean value */
+  table.conj thead tr.mood-row th.imp-head { color: var(--brick); }
+  table.conj tbody td.imp-col { font-size: 0.9em; }
+  table.conj tbody td.imp-col .dash { color: var(--line); }
+  table.conj tbody td.imp-col .real { color: var(--brick); font-weight: 700; font-size: 1.1em; }
+
   /* the optional impersonal row (hay, llueve...) sits apart from the
      personal yo/vos/él/nosotros/ellos rows above it */
   table.conj tbody tr.impersonal-row th, table.conj tbody tr.impersonal-row td {
@@ -379,7 +387,6 @@
   .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
   .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
 
-  .imperativo-section { margin: 4px 0 20px; }
   .imperativo-heading {
     font-family: "JetBrains Mono", monospace;
     font-size: 10.5px;

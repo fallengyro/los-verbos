@@ -299,8 +299,6 @@
     dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
     dGerundio: document.getElementById("d-gerundio"),
     dParticipio: document.getElementById("d-participio"),
-    imperativoBlock: document.getElementById("imperativo-block"),
-    dImperativoTiles: document.getElementById("d-imperativo-tiles"),
     dEdit: document.getElementById("d-edit"),
     dDelete: document.getElementById("d-delete"),
     toggleAdd: document.getElementById("toggle-add"),
@@ -407,6 +405,9 @@
       th.textContent = t.label;
       frag.appendChild(th);
     });
+    var thImp = document.createElement("th");
+    thImp.textContent = "Afirm.";
+    frag.appendChild(thImp);
     el.dTenseRow.innerHTML = "";
     el.dTenseRow.appendChild(frag);
   }
@@ -510,6 +511,43 @@
     el.dPattern.textContent = data.pattern || "";
     el.dPattern.style.display = data.pattern ? "" : "none";
 
+    var imper = forms.imperativo || {};
+    var hasImperativo = IMPERATIVE_PERSONS.some(function (p) { return imper[p.key]; });
+
+    // The imperativo column: vos and nosotros already have their own
+    // unambiguous row, so they get a plain value there. yo has no command
+    // form at all. él/ella/ud. and ellos/ellas/uds. are rows merged from 3
+    // persons that agree in every OTHER mood/tense — but in the imperative
+    // only usted/ustedes actually have a command, so those two cells show
+    // "— / — / <real form>" rather than one clean value.
+    function imperativoCell(personKey) {
+      var td = document.createElement("td");
+      td.className = "imp-col";
+      if (!hasImperativo || personKey === "yo") {
+        td.textContent = "—";
+        return td;
+      }
+      if (personKey === "vos") {
+        td.textContent = imper.vos || "—";
+        return td;
+      }
+      if (personKey === "nosotros") {
+        td.textContent = imper.nosotros || "—";
+        return td;
+      }
+      var realVal = personKey === "el" ? imper.usted : imper.ustedes;
+      var dash = document.createElement("span");
+      dash.className = "dash";
+      dash.textContent = "— / —";
+      td.appendChild(dash);
+      td.appendChild(document.createTextNode(" / "));
+      var real = document.createElement("span");
+      real.className = "real";
+      real.textContent = realVal || "—";
+      td.appendChild(real);
+      return td;
+    }
+
     buildTenseHeader();
     el.dConjBody.innerHTML = "";
     el.dConjPronounBody.innerHTML = "";
@@ -535,6 +573,7 @@
         if (isCellIrregular(data, t.key, p.key, subjVal)) tdSubj.classList.add("irreg");
         tr.appendChild(tdSubj);
       });
+      tr.appendChild(imperativoCell(p.key));
       el.dConjBody.appendChild(tr);
     });
 
@@ -560,31 +599,16 @@
         impTdSubj.textContent = imp[t.key] || "—";
         impTr.appendChild(impTdSubj);
       });
+      // impersonal verbs (llover, nevar) have no imperativo at all
+      var impTdImp = document.createElement("td");
+      impTdImp.className = "imp-col";
+      impTdImp.textContent = "—";
+      impTr.appendChild(impTdImp);
       el.dConjBody.appendChild(impTr);
     }
 
     el.dGerundio.textContent = forms.gerundio || "—";
     el.dParticipio.textContent = forms.participio || "—";
-
-    var imper = forms.imperativo || {};
-    var hasImperativo = IMPERATIVE_PERSONS.some(function (p) { return imper[p.key]; });
-    el.imperativoBlock.hidden = !hasImperativo;
-    if (hasImperativo) {
-      el.dImperativoTiles.innerHTML = "";
-      IMPERATIVE_PERSONS.forEach(function (p) {
-        var tile = document.createElement("div");
-        tile.className = "tile";
-        var label = document.createElement("span");
-        label.className = "label";
-        label.textContent = p.label;
-        var val = document.createElement("span");
-        val.className = "val";
-        val.textContent = imper[p.key] || "—";
-        tile.appendChild(label);
-        tile.appendChild(val);
-        el.dImperativoTiles.appendChild(tile);
-      });
-    }
 
     el.detail.hidden = false;
     el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
