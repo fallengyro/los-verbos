@@ -1717,31 +1717,100 @@
     el.flashCard.classList.toggle("flipped");
   }
 
-  // Vertical swipe on the card navigates (up = next, down = previous)
-  // without conflicting with the tap-to-flip click, which fires normally
-  // for anything that isn't a deliberate, mostly-vertical drag.
+  // Swiping the card (any of the four directions — up/left = "forward",
+  // down/right = "back") follows the finger in real time, like sliding a
+  // physical tile, rather than just jumping to the next card once the
+  // gesture ends. A tap that never moves past FLASH_DRAG_START_PX is left
+  // completely alone here, so the normal tap-to-flip click still fires.
+  var FLASH_DRAG_START_PX = 8;
+  var FLASH_SWIPE_THRESHOLD_PX = 40;
   var flashTouchStartX = 0, flashTouchStartY = 0;
+  var flashDragging = false;
+  var flashDragDx = 0, flashDragDy = 0;
+
   function handleFlashTouchStart(evt) {
     var t = evt.touches[0];
     flashTouchStartX = t.clientX;
     flashTouchStartY = t.clientY;
+    flashDragging = false;
+    flashDragDx = 0;
+    flashDragDy = 0;
   }
-  function handleFlashTouchEnd(evt) {
-    var t = evt.changedTouches[0];
+
+  function handleFlashTouchMove(evt) {
+    var t = evt.touches[0];
     var dx = t.clientX - flashTouchStartX;
     var dy = t.clientY - flashTouchStartY;
-    var absDx = Math.abs(dx), absDy = Math.abs(dy);
-    // Whichever axis moved further decides the gesture: up or left means
-    // "forward," down or right means "back" — a swipe in any of the four
-    // directions moves between cards, and anything too small to call a
-    // swipe is left alone so the normal tap-to-flip click still fires.
-    if (absDy > 40 && absDy > absDx) {
-      evt.preventDefault();
-      if (dy < 0) nextFlashCard(); else prevFlashCard();
-    } else if (absDx > 40 && absDx > absDy) {
-      evt.preventDefault();
-      if (dx < 0) nextFlashCard(); else prevFlashCard();
+    if (!flashDragging) {
+      if (Math.abs(dx) < FLASH_DRAG_START_PX && Math.abs(dy) < FLASH_DRAG_START_PX) return;
+      flashDragging = true;
+      // suspend the flip transition so the tile tracks the finger 1:1
+      // instead of chasing it on a half-second easing curve.
+      el.flashCard.classList.add("no-anim");
     }
+    evt.preventDefault();
+    flashDragDx = dx;
+    flashDragDy = dy;
+    var flipped = el.flashCard.classList.contains("flipped");
+    var tilt = Math.max(-12, Math.min(12, dx * 0.06));
+    var fade = Math.max(0.35, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / 260);
+    el.flashCard.style.transform =
+      "translate(" + dx + "px, " + (dy * 0.4) + "px) rotate(" + tilt + "deg)" +
+      (flipped ? " rotateY(180deg)" : "");
+    el.flashCard.style.opacity = String(fade);
+  }
+
+  // Once the finger lifts, either let the tile finish flying off screen
+  // (a real swipe) or spring it back to center (a drag that didn't go far
+  // enough) — both as a quick, separate transition from the normal flip
+  // animation, cleaned up afterward so later flips go back to that one.
+  function settleFlashDrag(exit, isNext) {
+    el.flashCard.classList.remove("no-anim");
+    el.flashCard.style.transition = exit
+      ? "transform 0.22s ease-in, opacity 0.22s ease-in"
+      : "transform 0.25s ease-out, opacity 0.25s ease-out";
+    if (exit) {
+      var horizontal = Math.abs(flashDragDx) >= Math.abs(flashDragDy);
+      var flyX = horizontal ? (isNext ? -1 : 1) * window.innerWidth * 0.9 : flashDragDx * 0.5;
+      var flyY = horizontal ? flashDragDy * 0.5 : (isNext ? -1 : 1) * window.innerHeight * 0.6;
+      el.flashCard.style.transform = "translate(" + flyX + "px, " + flyY + "px) rotate(" + (isNext ? -14 : 14) + "deg)";
+      el.flashCard.style.opacity = "0";
+    } else {
+      el.flashCard.style.transform = "";
+      el.flashCard.style.opacity = "";
+    }
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      el.flashCard.removeEventListener("transitionend", finish);
+      el.flashCard.style.transition = "";
+      el.flashCard.style.transform = "";
+      el.flashCard.style.opacity = "";
+      if (exit) { if (isNext) nextFlashCard(); else prevFlashCard(); }
+    }
+    el.flashCard.addEventListener("transitionend", finish);
+    setTimeout(finish, 300); // safety net in case transitionend never fires
+  }
+
+  function handleFlashTouchEnd(evt) {
+    if (!flashDragging) return; // a plain tap — let the click handler flip it
+    flashDragging = false;
+    evt.preventDefault();
+    var absDx = Math.abs(flashDragDx), absDy = Math.abs(flashDragDy);
+    var vertical = absDy > absDx;
+    var swept = vertical ? absDy > FLASH_SWIPE_THRESHOLD_PX : absDx > FLASH_SWIPE_THRESHOLD_PX;
+    var isNext = vertical ? flashDragDy < 0 : flashDragDx < 0;
+    // there's no card before the first one, so a "back" swipe there just
+    // springs back instead of flying off into nothing.
+    if (swept && !isNext && flashIndex <= 0) swept = false;
+    settleFlashDrag(swept, isNext);
+  }
+
+  function handleFlashTouchCancel() {
+    if (!flashDragging) return;
+    flashDragging = false;
+    settleFlashDrag(false, false);
   }
 
   // ================= auth =================
@@ -1861,7 +1930,9 @@
   el.flashCloseBtn.addEventListener("click", closeFlashcards);
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
+  el.flashCard.addEventListener("touchmove", handleFlashTouchMove, { passive: false });
   el.flashCard.addEventListener("touchend", handleFlashTouchEnd);
+  el.flashCard.addEventListener("touchcancel", handleFlashTouchCancel);
   el.flashNextBtn.addEventListener("click", nextFlashCard);
   el.flashPrevBtn.addEventListener("click", prevFlashCard);
   el.flashArrowNext.addEventListener("click", nextFlashCard);
