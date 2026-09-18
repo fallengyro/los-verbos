@@ -1753,7 +1753,10 @@
     flashDragDy = dy;
     var flipped = el.flashCard.classList.contains("flipped");
     var tilt = Math.max(-12, Math.min(12, dx * 0.06));
-    var fade = Math.max(0.35, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / 260);
+    // Kept subtle on purpose — this is just a faint hint that you're
+    // approaching the release threshold, not a fade-out; the tile should
+    // stay clearly visible (and clearly "held") through an ordinary drag.
+    var fade = Math.max(0.75, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / 500);
     el.flashCard.style.transform =
       "translate(" + dx + "px, " + (dy * 0.4) + "px) rotate(" + tilt + "deg)" +
       (flipped ? " rotateY(180deg)" : "");
@@ -1767,13 +1770,15 @@
   function settleFlashDrag(exit, isNext) {
     el.flashCard.classList.remove("no-anim");
     el.flashCard.style.transition = exit
-      ? "transform 0.22s ease-in, opacity 0.22s ease-in"
+      ? "transform 0.32s ease-in, opacity 0.32s ease-in"
       : "transform 0.25s ease-out, opacity 0.25s ease-out";
     if (exit) {
       var horizontal = Math.abs(flashDragDx) >= Math.abs(flashDragDy);
       var flyX = horizontal ? (isNext ? -1 : 1) * window.innerWidth * 0.9 : flashDragDx * 0.5;
       var flyY = horizontal ? flashDragDy * 0.5 : (isNext ? -1 : 1) * window.innerHeight * 0.6;
-      el.flashCard.style.transform = "translate(" + flyX + "px, " + flyY + "px) rotate(" + (isNext ? -14 : 14) + "deg)";
+      // A gentler spin than the drag distance would suggest — enough to
+      // read as a toss, not enough to look like a flip or a spill.
+      el.flashCard.style.transform = "translate(" + flyX + "px, " + flyY + "px) rotate(" + (isNext ? -8 : 8) + "deg)";
       el.flashCard.style.opacity = "0";
     } else {
       el.flashCard.style.transform = "";
@@ -1790,7 +1795,7 @@
       if (exit) { if (isNext) nextFlashCard(); else prevFlashCard(); }
     }
     el.flashCard.addEventListener("transitionend", finish);
-    setTimeout(finish, 300); // safety net in case transitionend never fires
+    setTimeout(finish, 400); // safety net in case transitionend never fires
   }
 
   function handleFlashTouchEnd(evt) {

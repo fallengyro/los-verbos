@@ -547,6 +547,15 @@
     position: relative; width: min(92vw, 420px); height: min(56vh, 320px);
     cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
     touch-action: none; will-change: transform, opacity;
+    /* without these, holding a finger down on the card (or dragging it
+       slowly) lets the browser's own touch feedback take over — a gray
+       tap-highlight box, a text-selection tint, or iOS's press-and-hold
+       callout — any of which can make the card look like it's vanished
+       under an overlay while you're mid-drag. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   /* The card (only the card — not the overlay's background/topbar/arrows
      around it) deliberately shows the OPPOSITE theme from the rest of the
