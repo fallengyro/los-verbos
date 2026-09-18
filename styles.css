@@ -328,6 +328,10 @@
   .badge.gender { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
   .badge.transitivity { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
   .badge.auxiliar { background: var(--paper-sunken); color: var(--accent-deep); border: 1px solid var(--line); }
+  /* filled rather than outlined like the others, so this one stands out —
+     it's flagging a genuine usage quirk (see the "pattern" note), not just
+     another descriptive category. */
+  .badge.gustarLike { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent-deep); }
 
   .detail {
     border: 1px solid var(--line);

@@ -24,6 +24,7 @@ create table if not exists public.verbs (
   transitivity text not null default 'transitivo',
   preposicion text default '',
   auxiliar boolean not null default false,
+  gustar_like boolean not null default false,
   forms jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -185,6 +186,23 @@ update public.verbs set preposicion = 'por' where infinitive = 'pasar';
 
 update public.verbs set auxiliar = true
   where infinitive in ('ser', 'estar', 'tener', 'poder', 'ir', 'querer', 'haber', 'deber');
+
+-- ---------------------------------------------------------------------------
+-- gustar_like — a fourth tag for "gustar-type" verbs: grammatically regular
+-- (or ordinarily irregular) verbs that conjugate normally in every person,
+-- but that are typically USED with the liked/affected thing as the subject
+-- and the person as an indirect-object pronoun (me/te/le/nos/les) instead
+-- of as the subject — "Me gusta el café," not "Yo gusto el café." The
+-- conjugation table doesn't capture that, which is exactly why this is a
+-- separate filterable flag rather than a value inside "irregularity" or
+-- "transitivity".
+-- ---------------------------------------------------------------------------
+
+alter table public.verbs add column if not exists gustar_like boolean not null default false;
+
+update public.verbs set gustar_like = true
+  where infinitive in ('gustar', 'encantar', 'apasionar', 'interesar', 'molestar', 'fascinar',
+                        'faltar', 'doler', 'importar', 'parecer', 'aburrir', 'sorprender');
 
 -- ---------------------------------------------------------------------------
 -- Vocabulario — general words (nouns, adjectives, adverbs...), kept separate
