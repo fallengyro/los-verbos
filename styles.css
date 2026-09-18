@@ -55,6 +55,17 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; }
+
+  /* nicer, on-theme scrollbars instead of the browser's bulky default —
+     scrollbar-color/-width is inherited, so setting it on html covers the
+     page scrollbar and every internal scroll area (conj tables, the
+     flashcard matrix); the -webkit- pseudo-elements need their own rule
+     per element, so that one goes on the universal selector instead. */
+  html { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  *::-webkit-scrollbar { width: 9px; height: 9px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+  *::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }
   body {
     background: var(--paper);
     color: var(--ink);
@@ -517,26 +528,6 @@
     position: fixed; inset: 0; background: var(--paper); z-index: 100;
     display: flex; flex-direction: column; padding: 16px;
   }
-  /* Flashcard mode deliberately shows the OPPOSITE theme from the rest of
-     the app (set via a "data-theme" attribute placed on this element itself,
-     computed in JS from whatever theme is currently ambient) so it reads as
-     a distinct "mode," the way a lightbox or a game screen would. These two
-     blocks re-declare the same tokens :root uses, scoped to this element so
-     every descendant (card, buttons, badges) inherits the inverted palette. */
-  .flash-overlay[data-theme="dark"] {
-    --paper: #12141F; --paper-raised: #171A2C; --paper-sunken: #0D0E18;
-    --ink: #E7E9F5; --ink-soft: #A7ADC9; --line: #2C3049;
-    --accent: #8B95E8; --accent-deep: #B4BBF2; --accent-ink: #11132A;
-    --brick: #E19A6C; --brick-soft: #3A2A1D; --gold: #DDBE72; --gold-soft: #35301C;
-    --danger: #E28881; --shadow: rgba(0, 0, 0, 0.4);
-  }
-  .flash-overlay[data-theme="light"] {
-    --paper: #EDEFF5; --paper-raised: #E1E5F0; --paper-sunken: #D5DAEA;
-    --ink: #1C2333; --ink-soft: #565F7A; --line: #C2C9DE;
-    --accent: #3B4B9E; --accent-deep: #28336E; --accent-ink: #F5F6FC;
-    --brick: #B5622E; --brick-soft: #F0DCC8; --gold: #8A6D1E; --gold-soft: #F0E4C0;
-    --danger: #A23A3A; --shadow: rgba(28, 35, 51, 0.14);
-  }
   .flash-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .flash-progress { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-soft); }
 
@@ -544,7 +535,28 @@
   .flash-card {
     position: relative; width: min(92vw, 420px); height: min(56vh, 320px);
     cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
-    touch-action: pan-y;
+    touch-action: none;
+  }
+  /* The card (only the card — not the overlay's background/topbar/arrows
+     around it) deliberately shows the OPPOSITE theme from the rest of the
+     app, via a "data-theme" attribute placed on this element itself and
+     computed in JS from whatever theme is currently ambient. These two
+     blocks re-declare the same tokens :root uses, scoped here so every
+     descendant (front/back faces, badges) inherits the inverted palette
+     while the page around the card stays in your actual theme. */
+  .flash-card[data-theme="dark"] {
+    --paper: #12141F; --paper-raised: #171A2C; --paper-sunken: #0D0E18;
+    --ink: #E7E9F5; --ink-soft: #A7ADC9; --line: #2C3049;
+    --accent: #8B95E8; --accent-deep: #B4BBF2; --accent-ink: #11132A;
+    --brick: #E19A6C; --brick-soft: #3A2A1D; --gold: #DDBE72; --gold-soft: #35301C;
+    --danger: #E28881; --shadow: rgba(0, 0, 0, 0.4);
+  }
+  .flash-card[data-theme="light"] {
+    --paper: #EDEFF5; --paper-raised: #E1E5F0; --paper-sunken: #D5DAEA;
+    --ink: #1C2333; --ink-soft: #565F7A; --line: #C2C9DE;
+    --accent: #3B4B9E; --accent-deep: #28336E; --accent-ink: #F5F6FC;
+    --brick: #B5622E; --brick-soft: #F0DCC8; --gold: #8A6D1E; --gold-soft: #F0E4C0;
+    --danger: #A23A3A; --shadow: rgba(28, 35, 51, 0.14);
   }
   .flash-card.flipped { transform: rotateY(180deg); }
   /* Used for one frame when jumping to a different card (next/prev), so the
@@ -626,7 +638,9 @@
     .flash-setup { padding: 16px 14px; }
     .flash-card { width: min(94vw, 380px); height: min(48vh, 280px); }
     .flash-controls { gap: 10px; }
-    .flash-arrow { width: 32px; height: 32px; font-size: 17px; }
+    /* desktop-only: on mobile the arrows crowd a card that's already
+       nearly full-width, and swiping covers the same job better there. */
+    .flash-arrow { display: none; }
     .flash-matrix-cell { width: 22px; height: 20px; }
     .flash-matrix-head { padding: 3px 5px; font-size: 10px; }
   }
