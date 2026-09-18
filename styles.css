@@ -379,6 +379,16 @@
   .conj-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); margin: 4px 0 14px; }
   .conj-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--brick-soft); border: 1px solid var(--brick); }
 
+  .imperativo-section { margin: 4px 0 20px; }
+  .imperativo-heading {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
   .nonpersonal { display: flex; gap: 10px; margin: 18px 0 20px; flex-wrap: wrap; }
   .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
   .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }

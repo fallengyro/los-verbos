@@ -106,7 +106,7 @@
           <thead>
             <tr class="mood-row">
               <th colspan="5">Indicativo</th>
-              <th>Subjuntivo</th>
+              <th colspan="2">Subjuntivo</th>
             </tr>
             <tr class="tense-row" id="d-tense-row"></tr>
           </thead>
@@ -119,6 +119,11 @@
     <div class="nonpersonal">
       <div class="tile"><span class="label">Gerundio</span><span class="val" id="d-gerundio"></span></div>
       <div class="tile"><span class="label">Participio</span><span class="val" id="d-participio"></span></div>
+    </div>
+
+    <div class="imperativo-section" id="imperativo-block" hidden>
+      <p class="imperativo-heading">Imperativo (afirmativo)</p>
+      <div class="nonpersonal" id="d-imperativo-tiles"></div>
     </div>
 
     <div class="detail-actions-footer">
@@ -185,6 +190,9 @@
       </div>
     </div>
 
+    <p class="imperativo-heading">Imperativo afirmativo (opcional)</p>
+    <div class="nonpersonal-form" id="imperativo-form-row"></div>
+
     <div class="form-actions">
       <button type="submit" class="btn-primary" id="form-save">Guardar</button>
       <button type="button" class="btn-secondary" id="form-cancel">Cancelar</button>
@@ -240,6 +248,7 @@
 
   <div class="toolbar-row">
     <button class="add-toggle" id="toggle-add-word" type="button">+ Agregar palabra</button>
+    <button class="seed-btn" id="seed-words-toolbar-btn" type="button">Cargar palabras de ejemplo</button>
   </div>
 
   <form id="word-form" hidden>
