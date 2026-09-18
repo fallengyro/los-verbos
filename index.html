@@ -65,11 +65,16 @@
       <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
       <button type="button" class="chip" data-facet="type" data-value="-er">-er</button>
       <button type="button" class="chip" data-facet="type" data-value="-ir">-ir</button>
-      <button type="button" class="chip" data-facet="type" data-value="irregular">irregular</button>
+    </div>
+    <div class="chip-group">
+      <span class="chip-label">Irregularidad</span>
+      <button type="button" class="chip" data-facet="irregularity" data-value="regular">regular</button>
+      <button type="button" class="chip" data-facet="irregularity" data-value="cambio de raíz">cambio de raíz</button>
+      <button type="button" class="chip" data-facet="irregularity" data-value="irregular (yo)">irregular (yo)</button>
+      <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)">irregular (total)</button>
     </div>
     <div class="chip-group">
       <span class="chip-label">Marcas</span>
-      <button type="button" class="chip" data-facet="flag" data-value="irregular">irregular</button>
       <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
     </div>
     <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
@@ -144,16 +149,20 @@
           <option value="-ar">-ar</option>
           <option value="-er">-er</option>
           <option value="-ir">-ir</option>
-          <option value="irregular">irregular</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-irregularity">Irregularidad</label>
+        <select id="f-irregularity">
+          <option value="regular">regular</option>
+          <option value="cambio de raíz">cambio de raíz</option>
+          <option value="irregular (yo)">irregular (yo)</option>
+          <option value="irregular (total)">irregular (total)</option>
         </select>
       </div>
       <div class="field">
         <label for="f-pattern">Patrón / notas</label>
         <input type="text" id="f-pattern" />
-      </div>
-      <div class="field checks">
-        <input type="checkbox" id="f-irregular" />
-        <label for="f-irregular" style="margin:0;">¿Irregular?</label>
       </div>
       <div class="field checks">
         <input type="checkbox" id="f-reflexive" />
