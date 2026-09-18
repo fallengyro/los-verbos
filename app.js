@@ -34,6 +34,22 @@
   ];
   var REFLEXIVE_PRONOUNS = { yo: "me", vos: "te", el: "se", nosotros: "nos", ellos: "se" };
 
+  // "Tipo gustar" verbs (gustar, doler, encantar, ...) are grammatically
+  // regular but almost never used with the person as the grammatical
+  // subject ("yo gusto" is real but rare). In everyday use the thing
+  // liked/affected is the subject and the person is a dative object
+  // pronoun: "me gusta el café" / "me gustan los perros." So instead of
+  // showing each person's own (misleading) conjugated form, each row is
+  // relabeled with its dative pronoun/phrase and shows the SAME invariant
+  // singular/plural pair, taken from the stored él/ellos forms.
+  var GUSTAR_LIKE_PERSON = {
+    yo: { pronoun: "me", label: "a mí" },
+    vos: { pronoun: "te", label: "a vos" },
+    el: { pronoun: "le", label: "a él, ella, ud." },
+    nosotros: { pronoun: "nos", label: "a nosotros" },
+    ellos: { pronoun: "les", label: "a ellos, ellas, uds." }
+  };
+
   // ================= flashcards =================
   // "Personal" tenses/moods are the ones keyed by the 5-person PERSONS grid
   // (presente..subjPasado). imperativo is a 6th matrix column (it has no
@@ -492,6 +508,8 @@
     dTenseRow: document.getElementById("d-tense-row"),
     dConjBody: document.getElementById("d-conj-body"),
     dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
+    dConjLegend: document.getElementById("d-conj-legend"),
+    dGustarLegend: document.getElementById("d-gustar-legend"),
     dGerundio: document.getElementById("d-gerundio"),
     dParticipio: document.getElementById("d-participio"),
     dEdit: document.getElementById("d-edit"),
@@ -801,29 +819,54 @@
       return td;
     }
 
+    // Gustar-type verbs: every row shows the same invariant singular/plural
+    // pair (from the stored él/ellos forms) with just the dative pronoun
+    // changing, e.g. "me gusta / gustan," "le gusta / gustan" — instead of
+    // each person's own (misleading) conjugated form.
+    function gustarCellText(t, personKey) {
+      var sing = (forms[t.key] && forms[t.key].el) || "";
+      var plur = (forms[t.key] && forms[t.key].ellos) || "";
+      if (!sing && !plur) return "—";
+      var pronoun = GUSTAR_LIKE_PERSON[personKey].pronoun;
+      var parts = [];
+      if (sing) parts.push(pronoun + " " + sing);
+      if (plur) parts.push(pronoun + " " + plur);
+      return parts.join(" / ") || "—";
+    }
+
     buildTenseHeader();
     el.dConjBody.innerHTML = "";
     el.dConjPronounBody.innerHTML = "";
+    if (el.dConjLegend) el.dConjLegend.style.display = data.gustar_like ? "none" : "";
+    if (el.dGustarLegend) el.dGustarLegend.style.display = data.gustar_like ? "" : "none";
     PERSONS.forEach(function (p) {
       var prTr = document.createElement("tr");
       var prTh = document.createElement("th");
-      prTh.textContent = p.label;
+      prTh.textContent = data.gustar_like ? GUSTAR_LIKE_PERSON[p.key].label : p.label;
       prTr.appendChild(prTh);
       el.dConjPronounBody.appendChild(prTr);
 
       var tr = document.createElement("tr");
       TENSES.forEach(function (t) {
         var td = document.createElement("td");
-        var val = (forms[t.key] && forms[t.key][p.key]) || "";
-        td.textContent = val || "—";
-        if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
+        if (data.gustar_like) {
+          td.textContent = gustarCellText(t, p.key);
+        } else {
+          var val = (forms[t.key] && forms[t.key][p.key]) || "";
+          td.textContent = val || "—";
+          if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
+        }
         tr.appendChild(td);
       });
       SUBJ_TENSES.forEach(function (t) {
         var tdSubj = document.createElement("td");
-        var subjVal = (forms[t.key] && forms[t.key][p.key]) || "";
-        tdSubj.textContent = subjVal || "—";
-        if (isCellIrregular(data, t.key, p.key, subjVal)) tdSubj.classList.add("irreg");
+        if (data.gustar_like) {
+          tdSubj.textContent = gustarCellText(t, p.key);
+        } else {
+          var subjVal = (forms[t.key] && forms[t.key][p.key]) || "";
+          tdSubj.textContent = subjVal || "—";
+          if (isCellIrregular(data, t.key, p.key, subjVal)) tdSubj.classList.add("irreg");
+        }
         tr.appendChild(tdSubj);
       });
       tr.appendChild(imperativoCell(p.key));
