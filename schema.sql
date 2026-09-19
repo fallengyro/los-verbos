@@ -265,12 +265,19 @@ create table if not exists public.lists (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name text not null,
-  kind text not null default 'verbs' check (kind in ('verbs', 'words')),
   owner_label text default '',
   share_token text not null unique default encode(gen_random_bytes(16), 'hex'),
   share_enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+-- Lists originally had a "kind" column restricting a list to only verbs or
+-- only words. Dropped: a list is just a named bag of list_items, and each
+-- item already carries its own item_type ('verb'/'word'), so a single list
+-- (e.g. "Cocina") can hold both the verbs and the vocabulary that matter for
+-- that setting. Safe to run even on a fresh install, where the column was
+-- never created in the first place.
+alter table public.lists drop column if exists kind;
 
 alter table public.lists enable row level security;
 
@@ -336,11 +343,15 @@ create index if not exists list_items_list_id_idx on public.list_items (list_id)
 -- doesn't have that problem: it only ever returns the one list matching the
 -- exact token you pass in, so knowing the (long, random) token is genuinely
 -- required, the same way a link with a secret path segment would be.
-create or replace function public.get_shared_list(p_token text)
+-- Postgres won't let create-or-replace change a function's return columns,
+-- so the old (kind-including) signature is dropped first — safe to run
+-- whether or not that version was ever installed.
+drop function if exists public.get_shared_list(text);
+
+create function public.get_shared_list(p_token text)
 returns table (
   list_id uuid,
   list_name text,
-  kind text,
   owner_label text,
   item_type text,
   data jsonb
@@ -350,7 +361,7 @@ security definer
 set search_path = public
 stable
 as $$
-  select l.id, l.name, l.kind, l.owner_label, i.item_type, i.data
+  select l.id, l.name, l.owner_label, i.item_type, i.data
   from public.lists l
   join public.list_items i on i.list_id = l.id
   where l.share_token = p_token and l.share_enabled = true;

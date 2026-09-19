@@ -492,7 +492,7 @@
   var allLists = [];      // [{id, data}]
   var selectedListId = null;
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
-  var currentShareList = null; // { listId, listName, kind, ownerLabel, items } while previewing a ?share= link
+  var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
 
   // flashcards draw from whatever is currently filtered on the Verbos/
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
@@ -629,7 +629,6 @@
     toggleAddList: document.getElementById("toggle-add-list"),
     listForm: document.getElementById("list-form"),
     lfName: document.getElementById("lf-name"),
-    lfKind: document.getElementById("lf-kind"),
     listFormCancel: document.getElementById("list-form-cancel"),
     listFormMsg: document.getElementById("list-form-msg"),
     listDetail: document.getElementById("list-detail"),
@@ -1986,7 +1985,6 @@
       id: row.id,
       data: {
         name: row.name,
-        kind: row.kind || "verbs",
         ownerLabel: row.owner_label || "",
         shareToken: row.share_token,
         shareEnabled: !!row.share_enabled,
@@ -1995,10 +1993,18 @@
     };
   }
 
-  function listMetaText(data) {
-    var kindLabel = data.kind === "words" ? "Vocabulario" : "Verbos";
-    var count = data.itemCount || 0;
-    return kindLabel + " · " + count + (count === 1 ? " ítem" : " ítems");
+  // A list can hold both verbs and vocabulary together (e.g. everything
+  // useful for "la cocina"). Given a verb/word breakdown, show that split;
+  // otherwise (before a list's items have been individually loaded) fall
+  // back to the plain total.
+  function listMetaText(count, verbCount, wordCount) {
+    if (verbCount || wordCount) {
+      var parts = [];
+      if (verbCount) parts.push(verbCount + (verbCount === 1 ? " verbo" : " verbos"));
+      if (wordCount) parts.push(wordCount + (wordCount === 1 ? " palabra" : " palabras"));
+      return parts.join(" · ");
+    }
+    return count + (count === 1 ? " ítem" : " ítems");
   }
 
   function loadLists() {
@@ -2036,11 +2042,9 @@
       name.textContent = l.data.name;
       btn.appendChild(name);
 
-      btn.appendChild(badge("type", l.data.kind === "words" ? "vocabulario" : "verbos"));
-
       var count = document.createElement("span");
       count.className = "def";
-      count.textContent = (l.data.itemCount || 0) + ((l.data.itemCount || 0) === 1 ? " ítem" : " ítems");
+      count.textContent = listMetaText(l.data.itemCount || 0);
       btn.appendChild(count);
 
       btn.addEventListener("click", function () {
@@ -2088,13 +2092,17 @@
     var entry = allLists.find(function (l) { return l.id === id; });
     if (!entry) { el.listDetail.hidden = true; return; }
     el.ldName.textContent = entry.data.name;
-    el.ldMeta.textContent = listMetaText(entry.data);
+    el.ldMeta.textContent = listMetaText(entry.data.itemCount || 0);
     el.ldShareRow.hidden = true;
     el.ldShareMsg.textContent = "";
     el.ldItems.innerHTML = "";
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
       if (res.error) { el.ldShareMsg.textContent = "Error al cargar los ítems: " + res.error.message; return; }
-      (res.data || []).forEach(function (row) { el.ldItems.appendChild(listItemRow(row)); });
+      var rows = res.data || [];
+      var verbCount = rows.filter(function (r) { return r.item_type === "verb"; }).length;
+      var wordCount = rows.filter(function (r) { return r.item_type === "word"; }).length;
+      el.ldMeta.textContent = listMetaText(rows.length, verbCount, wordCount);
+      rows.forEach(function (row) { el.ldItems.appendChild(listItemRow(row)); });
     });
     el.listDetail.hidden = false;
     el.listDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -2104,7 +2112,6 @@
     el.listForm.hidden = false;
     el.toggleAddList.hidden = true;
     el.lfName.value = "";
-    el.lfKind.value = "verbs";
     el.listFormMsg.textContent = "";
     el.lfName.focus();
   }
@@ -2122,7 +2129,6 @@
     el.listFormMsg.textContent = "Creando…";
     supabaseClient.from("lists").insert({
       name: name,
-      kind: el.lfKind.value,
       owner_label: currentUser ? currentUser.email : ""
     }).select().single().then(function (res) {
       if (res.error) { el.listFormMsg.textContent = "Error al guardar: " + res.error.message; return; }
@@ -2184,20 +2190,21 @@
     el.listPickerCount.textContent = items.length === 1
       ? "Agregando 1 ítem."
       : "Agregando " + items.length + " ítems.";
-    var kind = itemType === "verb" ? "verbs" : "words";
-    var compatible = allLists.filter(function (l) { return l.data.kind === kind; });
+    // A list can hold verbs and words together, so every list is a valid
+    // target regardless of which kind of item this is — e.g. adding
+    // vocabulary to a "Cocina" list that already has verbs in it.
     el.listPickerList.innerHTML = "";
-    if (compatible.length === 0) {
+    if (allLists.length === 0) {
       var li = document.createElement("li");
       var note = document.createElement("div");
       note.className = "empty-note";
       var p = document.createElement("p");
-      p.textContent = "Todavía no tenés listas de este tipo — creá una nueva abajo.";
+      p.textContent = "Todavía no tenés ninguna lista — creá una nueva abajo.";
       note.appendChild(p);
       li.appendChild(note);
       el.listPickerList.appendChild(li);
     } else {
-      compatible.forEach(function (l) {
+      allLists.forEach(function (l) {
         var liEl = document.createElement("li");
         var btn = document.createElement("button");
         btn.type = "button";
@@ -2208,7 +2215,7 @@
         btn.appendChild(name);
         var count = document.createElement("span");
         count.className = "def";
-        count.textContent = (l.data.itemCount || 0) + ((l.data.itemCount || 0) === 1 ? " ítem" : " ítems");
+        count.textContent = listMetaText(l.data.itemCount || 0);
         btn.appendChild(count);
         btn.addEventListener("click", function () { addItemToList(l.id); });
         liEl.appendChild(btn);
@@ -2233,7 +2240,10 @@
     var itemType = listPickerTarget.itemType;
     var items = listPickerTarget.items;
     el.listPickerMsg.textContent = "Agregando…";
-    supabaseClient.from("list_items").select("data").eq("list_id", listId).then(function (res) {
+    // Only dedupe against the target list's existing items of the SAME
+    // type — a list mixing verbs and words could otherwise have a word
+    // wrongly skipped because its text happens to match an unrelated verb.
+    supabaseClient.from("list_items").select("data").eq("list_id", listId).eq("item_type", itemType).then(function (res) {
       if (res.error) { el.listPickerMsg.textContent = "Error: " + res.error.message; return; }
       var existing = {};
       (res.data || []).forEach(function (row) {
@@ -2269,11 +2279,9 @@
     if (!listPickerTarget) return;
     var name = el.listPickerNewName.value.trim();
     if (!name) { el.listPickerMsg.textContent = "Poné un nombre para la lista nueva."; return; }
-    var kind = listPickerTarget.itemType === "verb" ? "verbs" : "words";
     el.listPickerMsg.textContent = "Creando…";
     supabaseClient.from("lists").insert({
       name: name,
-      kind: kind,
       owner_label: currentUser ? currentUser.email : ""
     }).select().single().then(function (res) {
       if (res.error) { el.listPickerMsg.textContent = "Error al crear: " + res.error.message; return; }
@@ -2305,7 +2313,6 @@
       currentShareList = {
         listId: first.list_id,
         listName: first.list_name,
-        kind: first.kind,
         ownerLabel: first.owner_label || "",
         items: rows.map(function (r) { return { itemType: r.item_type, data: r.data }; })
       };
@@ -2317,8 +2324,10 @@
     if (!currentShareList) return;
     var s = currentShareList;
     el.shareName.textContent = s.listName;
-    el.shareMeta.textContent = (s.kind === "words" ? "Vocabulario" : "Verbos") + " · " + s.items.length +
-      (s.items.length === 1 ? " ítem" : " ítems") + (s.ownerLabel ? " · compartida por " + s.ownerLabel : "");
+    var verbCount = s.items.filter(function (it) { return it.itemType === "verb"; }).length;
+    var wordCount = s.items.filter(function (it) { return it.itemType === "word"; }).length;
+    el.shareMeta.textContent = listMetaText(s.items.length, verbCount, wordCount) +
+      (s.ownerLabel ? " · compartida por " + s.ownerLabel : "");
     el.shareItems.innerHTML = "";
     s.items.forEach(function (it) {
       var li = document.createElement("li");
@@ -2351,33 +2360,29 @@
     } catch (e) {}
   }
 
-  function finishShareImport(queryPromise, importedCount, skippedNames, reload) {
-    queryPromise.then(function (res) {
-      el.shareImportBtn.disabled = false;
-      if (res && res.error) { el.shareImportResult.textContent = "Error al importar: " + res.error.message; return; }
-      reload();
-      var msg = "Se importaron " + importedCount + (importedCount === 1 ? " ítem." : " ítems.");
-      if (skippedNames.length) {
-        msg += " " + skippedNames.length + (skippedNames.length === 1 ? " ya estaba" : " ya estaban") +
-          " en tu colección: " + skippedNames.join(", ") + ".";
-      }
-      el.shareImportResult.textContent = msg;
-    });
-  }
-
+  // A shared list can mix verbs and words, so importing has to sort the
+  // snapshot items by their own item_type and run each through the matching
+  // table's insert (with the same collision-skip rule as before, checked
+  // separately per type), then merge the two results into one summary.
   function handleShareImport() {
     if (!currentShareList || !currentUser) return;
     el.shareImportBtn.disabled = true;
     el.shareImportResult.textContent = "Importando…";
     var s = currentShareList;
-    if (s.kind === "words") {
-      var existingWord = {};
-      allWords.forEach(function (v) { existingWord[norm(v.data.word || "")] = true; });
-      var toInsertW = [];
-      var skippedW = [];
-      s.items.forEach(function (it) {
+
+    var existingInf = {};
+    allVerbs.forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = true; });
+    var existingWord = {};
+    allWords.forEach(function (w) { existingWord[norm(w.data.word || "")] = true; });
+
+    var toInsertV = [], skippedV = [];
+    var toInsertW = [], skippedW = [];
+
+    s.items.forEach(function (it) {
+      if (it.itemType === "word") {
         var w = it.data.word || "";
         if (existingWord[norm(w)]) { skippedW.push(w); return; }
+        existingWord[norm(w)] = true; // guard against dupes within the shared list itself
         toInsertW.push({
           word: it.data.word || "",
           definition: it.data.definition || "",
@@ -2386,26 +2391,32 @@
           notes: it.data.notes || "",
           example: it.data.example || ""
         });
-      });
-      finishShareImport(
-        toInsertW.length ? supabaseClient.from("words").insert(toInsertW) : Promise.resolve({ error: null }),
-        toInsertW.length, skippedW, loadWords
-      );
-    } else {
-      var existingInf = {};
-      allVerbs.forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = true; });
-      var toInsertV = [];
-      var skippedV = [];
-      s.items.forEach(function (it) {
+      } else {
         var inf = it.data.infinitive || "";
         if (existingInf[norm(inf)]) { skippedV.push(inf); return; }
+        existingInf[norm(inf)] = true;
         toInsertV.push(Object.assign({}, it.data)); // verb data keys already match column names 1:1
-      });
-      finishShareImport(
-        toInsertV.length ? supabaseClient.from("verbs").insert(toInsertV) : Promise.resolve({ error: null }),
-        toInsertV.length, skippedV, loadVerbs
-      );
-    }
+      }
+    });
+
+    var verbsPromise = toInsertV.length ? supabaseClient.from("verbs").insert(toInsertV) : Promise.resolve({ error: null });
+    var wordsPromise = toInsertW.length ? supabaseClient.from("words").insert(toInsertW) : Promise.resolve({ error: null });
+
+    Promise.all([verbsPromise, wordsPromise]).then(function (results) {
+      el.shareImportBtn.disabled = false;
+      var failed = results.filter(function (r) { return r && r.error; });
+      if (failed.length) { el.shareImportResult.textContent = "Error al importar: " + failed[0].error.message; return; }
+      if (toInsertV.length) loadVerbs();
+      if (toInsertW.length) loadWords();
+      var importedCount = toInsertV.length + toInsertW.length;
+      var skipped = skippedV.concat(skippedW);
+      var msg = "Se importaron " + importedCount + (importedCount === 1 ? " ítem." : " ítems.");
+      if (skipped.length) {
+        msg += " " + skipped.length + (skipped.length === 1 ? " ya estaba" : " ya estaban") +
+          " en tu colección: " + skipped.join(", ") + ".";
+      }
+      el.shareImportResult.textContent = msg;
+    });
   }
 
   // ================= auth =================
