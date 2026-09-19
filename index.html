@@ -51,6 +51,7 @@
     <button type="button" class="main-tab active" id="tab-verbs">Verbos</button>
     <button type="button" class="main-tab" id="tab-words">Vocabulario</button>
     <button type="button" class="main-tab" id="tab-flashcards">Tarjetas</button>
+    <button type="button" class="main-tab" id="tab-lists">Listas</button>
   </div>
 
   <section id="verbs-panel">
@@ -134,6 +135,7 @@
     </div>
 
     <div class="detail-actions-footer">
+      <button class="icon-btn" id="d-add-to-list" type="button">Agregar a lista</button>
       <button class="icon-btn" id="d-edit" type="button">Editar</button>
       <button class="icon-btn danger" id="d-delete" type="button">Eliminar</button>
     </div>
@@ -270,6 +272,7 @@
     <p class="example-note" id="wd-example"></p>
 
     <div class="detail-actions-footer">
+      <button class="icon-btn" id="wd-add-to-list" type="button">Agregar a lista</button>
       <button class="icon-btn" id="wd-edit" type="button">Editar</button>
       <button class="icon-btn danger" id="wd-delete" type="button">Eliminar</button>
     </div>
@@ -369,7 +372,95 @@
     </div>
   </section>
 
+  <section id="lists-panel" hidden>
+    <p class="flash-setup-note">Armá una lista con verbos o palabras de tu índice y compartila con un enlace — quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.</p>
+
+    <ul class="card-list lists-list" id="lists-list"></ul>
+    <p class="form-msg" id="lists-empty-msg" hidden>Todavía no creaste ninguna lista.</p>
+
+    <div class="toolbar-row">
+      <button class="add-toggle" id="toggle-add-list" type="button">+ Crear lista</button>
+    </div>
+
+    <form id="list-form" hidden>
+      <h3>Nueva lista</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label for="lf-name">Nombre</label>
+          <input type="text" id="lf-name" required placeholder="ej. Adjetivos de comida" />
+        </div>
+        <div class="field">
+          <label for="lf-kind">Contenido</label>
+          <select id="lf-kind">
+            <option value="verbs">Verbos</option>
+            <option value="words">Vocabulario</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" id="list-form-save">Crear</button>
+        <button type="button" class="btn-secondary" id="list-form-cancel">Cancelar</button>
+        <span class="form-msg" id="list-form-msg"></span>
+      </div>
+    </form>
+
+    <section class="detail" id="list-detail" hidden>
+      <div class="detail-head">
+        <div>
+          <h2 id="ld-name"></h2>
+          <p class="definition" id="ld-meta"></p>
+        </div>
+      </div>
+      <div class="share-link-row" id="ld-share-row" hidden>
+        <input type="text" id="ld-share-link" readonly />
+        <button type="button" class="icon-btn" id="ld-copy-link">Copiar enlace</button>
+      </div>
+      <p class="form-msg" id="ld-share-msg"></p>
+      <ul class="card-list" id="ld-items"></ul>
+      <div class="detail-actions-footer">
+        <button class="icon-btn" id="ld-share-btn" type="button">Compartir</button>
+        <button class="icon-btn danger" id="ld-delete" type="button">Eliminar lista</button>
+      </div>
+    </section>
+  </section>
+
   <footer class="note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
+</div>
+
+<div class="modal-overlay" id="list-picker-overlay" hidden>
+  <div class="modal-card">
+    <h3>Agregar a lista</h3>
+    <p class="form-msg" id="list-picker-msg"></p>
+    <ul class="card-list list-picker-list" id="list-picker-list"></ul>
+    <div class="field-grid">
+      <div class="field">
+        <label for="list-picker-new-name">O creá una lista nueva</label>
+        <input type="text" id="list-picker-new-name" placeholder="ej. Adjetivos de comida" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn-primary" id="list-picker-create-btn">Crear y agregar</button>
+      <button type="button" class="btn-secondary" id="list-picker-close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="flash-overlay" id="share-overlay" hidden>
+  <div class="flash-topbar">
+    <button type="button" class="icon-btn" id="share-close-btn">&times; Cerrar</button>
+    <span class="flash-progress">Lista compartida</span>
+  </div>
+  <div class="share-body">
+    <h2 id="share-name"></h2>
+    <p class="definition" id="share-meta"></p>
+    <p class="form-msg" id="share-msg"></p>
+    <ul class="card-list" id="share-items"></ul>
+    <div class="share-actions">
+      <p class="flash-setup-note" id="share-login-note" hidden>Iniciá sesión o creá una cuenta para importar esta lista a tu índice.</p>
+      <button type="button" class="btn-primary" id="share-import-btn" hidden>Importar a mi colección</button>
+      <p class="form-msg" id="share-import-result"></p>
+    </div>
+  </div>
 </div>
 
 <div class="flash-overlay" id="flash-overlay" hidden>

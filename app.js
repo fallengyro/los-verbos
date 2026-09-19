@@ -486,6 +486,14 @@
   var editingWordId = null;
   var activeWordFilters = { pos: new Set(), gender: new Set() };
 
+  // shared lists — see schema.sql for the lists/list_items tables. Each list
+  // is a named, curated subset of the user's own verbs or words; items are
+  // stored as denormalized snapshots (see rowToList/addItemToList below).
+  var allLists = [];      // [{id, data}]
+  var selectedListId = null;
+  var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
+  var currentShareList = null; // { listId, listName, kind, ownerLabel, items } while previewing a ?share= link
+
   // flashcards draw from whatever is currently filtered on the Verbos/
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
   // their own source toggle and tense/person filters below.
@@ -612,7 +620,48 @@
     flashPrevBtn: document.getElementById("flash-prev-btn"),
     flashNextBtn: document.getElementById("flash-next-btn"),
     flashArrowPrev: document.getElementById("flash-arrow-prev"),
-    flashArrowNext: document.getElementById("flash-arrow-next")
+    flashArrowNext: document.getElementById("flash-arrow-next"),
+
+    tabLists: document.getElementById("tab-lists"),
+    listsPanel: document.getElementById("lists-panel"),
+    listsList: document.getElementById("lists-list"),
+    listsEmptyMsg: document.getElementById("lists-empty-msg"),
+    toggleAddList: document.getElementById("toggle-add-list"),
+    listForm: document.getElementById("list-form"),
+    lfName: document.getElementById("lf-name"),
+    lfKind: document.getElementById("lf-kind"),
+    listFormCancel: document.getElementById("list-form-cancel"),
+    listFormMsg: document.getElementById("list-form-msg"),
+    listDetail: document.getElementById("list-detail"),
+    ldName: document.getElementById("ld-name"),
+    ldMeta: document.getElementById("ld-meta"),
+    ldShareRow: document.getElementById("ld-share-row"),
+    ldShareLink: document.getElementById("ld-share-link"),
+    ldCopyLink: document.getElementById("ld-copy-link"),
+    ldShareMsg: document.getElementById("ld-share-msg"),
+    ldItems: document.getElementById("ld-items"),
+    ldShareBtn: document.getElementById("ld-share-btn"),
+    ldDelete: document.getElementById("ld-delete"),
+
+    dAddToList: document.getElementById("d-add-to-list"),
+    wdAddToList: document.getElementById("wd-add-to-list"),
+
+    listPickerOverlay: document.getElementById("list-picker-overlay"),
+    listPickerMsg: document.getElementById("list-picker-msg"),
+    listPickerList: document.getElementById("list-picker-list"),
+    listPickerNewName: document.getElementById("list-picker-new-name"),
+    listPickerCreateBtn: document.getElementById("list-picker-create-btn"),
+    listPickerClose: document.getElementById("list-picker-close"),
+
+    shareOverlay: document.getElementById("share-overlay"),
+    shareCloseBtn: document.getElementById("share-close-btn"),
+    shareName: document.getElementById("share-name"),
+    shareMeta: document.getElementById("share-meta"),
+    shareMsg: document.getElementById("share-msg"),
+    shareItems: document.getElementById("share-items"),
+    shareLoginNote: document.getElementById("share-login-note"),
+    shareImportBtn: document.getElementById("share-import-btn"),
+    shareImportResult: document.getElementById("share-import-result")
   };
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
@@ -1261,10 +1310,13 @@
     el.tabVerbs.classList.toggle("active", tab === "verbs");
     el.tabWords.classList.toggle("active", tab === "words");
     el.tabFlashcards.classList.toggle("active", tab === "flashcards");
+    el.tabLists.classList.toggle("active", tab === "lists");
     el.verbsPanel.hidden = tab !== "verbs";
     el.wordsPanel.hidden = tab !== "words";
     el.flashcardsPanel.hidden = tab !== "flashcards";
+    el.listsPanel.hidden = tab !== "lists";
     if (tab === "flashcards") renderFlashSetup();
+    if (tab === "lists") loadLists();
     try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
   }
 
@@ -1917,6 +1969,408 @@
     settleFlashDrag(false, false);
   }
 
+  // ================= listas compartidas =================
+  // A list snapshot's `data` is stored in exactly the same shape as the
+  // in-memory verb/word `data` object it was copied from (verb columns
+  // untranslated, word fields in the camelCase used elsewhere in this file —
+  // see rowToVerb/rowToWord). That means the same badge/render helpers used
+  // for the real verb/word detail views can be reused here, and importing a
+  // verb snapshot is a straight insert; importing a word snapshot needs the
+  // same camelCase→snake_case mapping handleWordSubmit already does.
+
+  function rowToList(row) {
+    return {
+      id: row.id,
+      data: {
+        name: row.name,
+        kind: row.kind || "verbs",
+        ownerLabel: row.owner_label || "",
+        shareToken: row.share_token,
+        shareEnabled: !!row.share_enabled,
+        itemCount: 0
+      }
+    };
+  }
+
+  function listMetaText(data) {
+    var kindLabel = data.kind === "words" ? "Vocabulario" : "Verbos";
+    var count = data.itemCount || 0;
+    return kindLabel + " · " + count + (count === 1 ? " ítem" : " ítems");
+  }
+
+  function loadLists() {
+    return supabaseClient
+      .from("lists")
+      .select("*, list_items(count)")
+      .order("created_at", { ascending: false })
+      .then(function (res) {
+        if (res.error) { showBanner("Error al cargar tus listas: " + res.error.message); return; }
+        clearBanner();
+        allLists = (res.data || []).map(function (row) {
+          var entry = rowToList(row);
+          entry.data.itemCount = (row.list_items && row.list_items[0] && row.list_items[0].count) || 0;
+          return entry;
+        });
+        renderListsPanel();
+        if (selectedListId) {
+          var still = allLists.find(function (l) { return l.id === selectedListId; });
+          if (still) selectListRow(selectedListId); else { el.listDetail.hidden = true; selectedListId = null; }
+        }
+      });
+  }
+
+  function renderListsPanel() {
+    el.listsList.innerHTML = "";
+    el.listsEmptyMsg.hidden = allLists.length !== 0;
+    allLists.forEach(function (l) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "card-row";
+
+      var name = document.createElement("span");
+      name.className = "inf";
+      name.textContent = l.data.name;
+      btn.appendChild(name);
+
+      btn.appendChild(badge("type", l.data.kind === "words" ? "vocabulario" : "verbos"));
+
+      var count = document.createElement("span");
+      count.className = "def";
+      count.textContent = (l.data.itemCount || 0) + ((l.data.itemCount || 0) === 1 ? " ítem" : " ítems");
+      btn.appendChild(count);
+
+      btn.addEventListener("click", function () {
+        if (selectedListId === l.id) { selectedListId = null; el.listDetail.hidden = true; }
+        else selectListRow(l.id);
+      });
+      li.appendChild(btn);
+      el.listsList.appendChild(li);
+    });
+  }
+
+  function listItemRow(row) {
+    var li = document.createElement("li");
+    var wrap = document.createElement("div");
+    wrap.className = "card-row";
+
+    var main = document.createElement("span");
+    main.className = "inf";
+    main.textContent = row.item_type === "verb" ? (row.data.infinitive || "") : (row.data.word || "");
+    wrap.appendChild(main);
+
+    var def = document.createElement("span");
+    def.className = "def";
+    def.textContent = row.data.definition || "";
+    wrap.appendChild(def);
+
+    var removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "icon-btn danger";
+    removeBtn.textContent = "Quitar";
+    removeBtn.addEventListener("click", function () {
+      supabaseClient.from("list_items").delete().eq("id", row.id).then(function (res) {
+        if (res.error) { el.ldShareMsg.textContent = "Error: " + res.error.message; return; }
+        loadLists();
+      });
+    });
+    wrap.appendChild(removeBtn);
+
+    li.appendChild(wrap);
+    return li;
+  }
+
+  function selectListRow(id) {
+    selectedListId = id;
+    var entry = allLists.find(function (l) { return l.id === id; });
+    if (!entry) { el.listDetail.hidden = true; return; }
+    el.ldName.textContent = entry.data.name;
+    el.ldMeta.textContent = listMetaText(entry.data);
+    el.ldShareRow.hidden = true;
+    el.ldShareMsg.textContent = "";
+    el.ldItems.innerHTML = "";
+    supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
+      if (res.error) { el.ldShareMsg.textContent = "Error al cargar los ítems: " + res.error.message; return; }
+      (res.data || []).forEach(function (row) { el.ldItems.appendChild(listItemRow(row)); });
+    });
+    el.listDetail.hidden = false;
+    el.listDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function openListForm() {
+    el.listForm.hidden = false;
+    el.toggleAddList.hidden = true;
+    el.lfName.value = "";
+    el.lfKind.value = "verbs";
+    el.listFormMsg.textContent = "";
+    el.lfName.focus();
+  }
+
+  function closeListForm() {
+    el.listForm.hidden = true;
+    el.toggleAddList.hidden = false;
+    el.listFormMsg.textContent = "";
+  }
+
+  function handleListSubmit(evt) {
+    evt.preventDefault();
+    var name = el.lfName.value.trim();
+    if (!name) { el.listFormMsg.textContent = "Falta el nombre."; return; }
+    el.listFormMsg.textContent = "Creando…";
+    supabaseClient.from("lists").insert({
+      name: name,
+      kind: el.lfKind.value,
+      owner_label: currentUser ? currentUser.email : ""
+    }).select().single().then(function (res) {
+      if (res.error) { el.listFormMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      var savedId = res.data.id;
+      closeListForm();
+      loadLists().then(function () { selectListRow(savedId); });
+    });
+  }
+
+  function handleListDelete() {
+    if (!selectedListId) return;
+    if (!window.confirm("¿Eliminar esta lista? Esto no borra tus verbos ni palabras, solo la lista compartida.")) return;
+    supabaseClient.from("lists").delete().eq("id", selectedListId).then(function (res) {
+      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      el.listDetail.hidden = true;
+      selectedListId = null;
+      loadLists();
+    });
+  }
+
+  function handleShareClick() {
+    if (!selectedListId) return;
+    var entry = allLists.find(function (l) { return l.id === selectedListId; });
+    if (!entry) return;
+    var link = location.origin + location.pathname + "?share=" + entry.data.shareToken;
+    el.ldShareLink.value = link;
+    el.ldShareRow.hidden = false;
+    el.ldShareMsg.textContent = "";
+    el.ldShareLink.focus();
+    el.ldShareLink.select();
+  }
+
+  function handleCopyLink() {
+    var link = el.ldShareLink.value;
+    if (!link) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(function () {
+        el.ldShareMsg.textContent = "Enlace copiado.";
+      }).catch(function () {
+        el.ldShareLink.select();
+        el.ldShareMsg.textContent = "No se pudo copiar automáticamente — el enlace ya está seleccionado, copialo con Ctrl/Cmd+C.";
+      });
+    } else {
+      el.ldShareLink.select();
+      el.ldShareMsg.textContent = "El enlace ya está seleccionado, copialo con Ctrl/Cmd+C.";
+    }
+  }
+
+  // ---- "agregar a lista" desde el detalle de un verbo/palabra ----
+
+  function openListPicker(itemType, data) {
+    listPickerTarget = { itemType: itemType, data: data };
+    el.listPickerMsg.textContent = "";
+    el.listPickerNewName.value = "";
+    var kind = itemType === "verb" ? "verbs" : "words";
+    var compatible = allLists.filter(function (l) { return l.data.kind === kind; });
+    el.listPickerList.innerHTML = "";
+    if (compatible.length === 0) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "empty-note";
+      var p = document.createElement("p");
+      p.textContent = "Todavía no tenés listas de este tipo — creá una nueva abajo.";
+      note.appendChild(p);
+      li.appendChild(note);
+      el.listPickerList.appendChild(li);
+    } else {
+      compatible.forEach(function (l) {
+        var liEl = document.createElement("li");
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "card-row";
+        var name = document.createElement("span");
+        name.className = "inf";
+        name.textContent = l.data.name;
+        btn.appendChild(name);
+        var count = document.createElement("span");
+        count.className = "def";
+        count.textContent = (l.data.itemCount || 0) + ((l.data.itemCount || 0) === 1 ? " ítem" : " ítems");
+        btn.appendChild(count);
+        btn.addEventListener("click", function () { addItemToList(l.id); });
+        liEl.appendChild(btn);
+        el.listPickerList.appendChild(liEl);
+      });
+    }
+    el.listPickerOverlay.hidden = false;
+  }
+
+  function closeListPicker() {
+    el.listPickerOverlay.hidden = true;
+    listPickerTarget = null;
+  }
+
+  function addItemToList(listId) {
+    if (!listPickerTarget) return;
+    el.listPickerMsg.textContent = "Agregando…";
+    supabaseClient.from("list_items").insert({
+      list_id: listId,
+      item_type: listPickerTarget.itemType,
+      data: listPickerTarget.data
+    }).then(function (res) {
+      if (res.error) { el.listPickerMsg.textContent = "Error: " + res.error.message; return; }
+      closeListPicker();
+      showBanner("Se agregó a la lista.");
+      loadLists();
+    });
+  }
+
+  function handleListPickerCreate() {
+    if (!listPickerTarget) return;
+    var name = el.listPickerNewName.value.trim();
+    if (!name) { el.listPickerMsg.textContent = "Poné un nombre para la lista nueva."; return; }
+    var kind = listPickerTarget.itemType === "verb" ? "verbs" : "words";
+    el.listPickerMsg.textContent = "Creando…";
+    supabaseClient.from("lists").insert({
+      name: name,
+      kind: kind,
+      owner_label: currentUser ? currentUser.email : ""
+    }).select().single().then(function (res) {
+      if (res.error) { el.listPickerMsg.textContent = "Error al crear: " + res.error.message; return; }
+      addItemToList(res.data.id);
+    });
+  }
+
+  // ---- previsualización + importación de un enlace compartido ----
+
+  function openSharePreview(token) {
+    el.shareOverlay.hidden = false;
+    el.shareName.textContent = "Cargando…";
+    el.shareMeta.textContent = "";
+    el.shareMsg.textContent = "";
+    el.shareItems.innerHTML = "";
+    el.shareImportResult.textContent = "";
+    el.shareImportBtn.disabled = false;
+    supabaseClient.rpc("get_shared_list", { p_token: token }).then(function (res) {
+      if (res.error || !res.data || res.data.length === 0) {
+        currentShareList = null;
+        el.shareName.textContent = "Enlace no válido";
+        el.shareMsg.textContent = "Este enlace no existe o ya no está disponible.";
+        el.shareLoginNote.hidden = true;
+        el.shareImportBtn.hidden = true;
+        return;
+      }
+      var rows = res.data;
+      var first = rows[0];
+      currentShareList = {
+        listId: first.list_id,
+        listName: first.list_name,
+        kind: first.kind,
+        ownerLabel: first.owner_label || "",
+        items: rows.map(function (r) { return { itemType: r.item_type, data: r.data }; })
+      };
+      renderSharePreview();
+    });
+  }
+
+  function renderSharePreview() {
+    if (!currentShareList) return;
+    var s = currentShareList;
+    el.shareName.textContent = s.listName;
+    el.shareMeta.textContent = (s.kind === "words" ? "Vocabulario" : "Verbos") + " · " + s.items.length +
+      (s.items.length === 1 ? " ítem" : " ítems") + (s.ownerLabel ? " · compartida por " + s.ownerLabel : "");
+    el.shareItems.innerHTML = "";
+    s.items.forEach(function (it) {
+      var li = document.createElement("li");
+      var row = document.createElement("div");
+      row.className = "card-row";
+      var main = document.createElement("span");
+      main.className = "inf";
+      main.textContent = it.itemType === "verb" ? (it.data.infinitive || "") : (it.data.word || "");
+      row.appendChild(main);
+      if (it.itemType === "verb" && it.data.type) row.appendChild(badge("type", it.data.type));
+      if (it.itemType === "word" && it.data.partOfSpeech) row.appendChild(badge("type", it.data.partOfSpeech));
+      var def = document.createElement("span");
+      def.className = "def";
+      def.textContent = it.data.definition || "";
+      row.appendChild(def);
+      li.appendChild(row);
+      el.shareItems.appendChild(li);
+    });
+    el.shareLoginNote.hidden = !!currentUser;
+    el.shareImportBtn.hidden = !currentUser;
+  }
+
+  function closeSharePreview() {
+    el.shareOverlay.hidden = true;
+    currentShareList = null;
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.delete("share");
+      window.history.replaceState(null, "", url.pathname + (url.search || "") + url.hash);
+    } catch (e) {}
+  }
+
+  function finishShareImport(queryPromise, importedCount, skippedNames, reload) {
+    queryPromise.then(function (res) {
+      el.shareImportBtn.disabled = false;
+      if (res && res.error) { el.shareImportResult.textContent = "Error al importar: " + res.error.message; return; }
+      reload();
+      var msg = "Se importaron " + importedCount + (importedCount === 1 ? " ítem." : " ítems.");
+      if (skippedNames.length) {
+        msg += " " + skippedNames.length + (skippedNames.length === 1 ? " ya estaba" : " ya estaban") +
+          " en tu colección: " + skippedNames.join(", ") + ".";
+      }
+      el.shareImportResult.textContent = msg;
+    });
+  }
+
+  function handleShareImport() {
+    if (!currentShareList || !currentUser) return;
+    el.shareImportBtn.disabled = true;
+    el.shareImportResult.textContent = "Importando…";
+    var s = currentShareList;
+    if (s.kind === "words") {
+      var existingWord = {};
+      allWords.forEach(function (v) { existingWord[norm(v.data.word || "")] = true; });
+      var toInsertW = [];
+      var skippedW = [];
+      s.items.forEach(function (it) {
+        var w = it.data.word || "";
+        if (existingWord[norm(w)]) { skippedW.push(w); return; }
+        toInsertW.push({
+          word: it.data.word || "",
+          definition: it.data.definition || "",
+          part_of_speech: it.data.partOfSpeech || "sustantivo",
+          gender: it.data.gender || "",
+          notes: it.data.notes || "",
+          example: it.data.example || ""
+        });
+      });
+      finishShareImport(
+        toInsertW.length ? supabaseClient.from("words").insert(toInsertW) : Promise.resolve({ error: null }),
+        toInsertW.length, skippedW, loadWords
+      );
+    } else {
+      var existingInf = {};
+      allVerbs.forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = true; });
+      var toInsertV = [];
+      var skippedV = [];
+      s.items.forEach(function (it) {
+        var inf = it.data.infinitive || "";
+        if (existingInf[norm(inf)]) { skippedV.push(inf); return; }
+        toInsertV.push(Object.assign({}, it.data)); // verb data keys already match column names 1:1
+      });
+      finishShareImport(
+        toInsertV.length ? supabaseClient.from("verbs").insert(toInsertV) : Promise.resolve({ error: null }),
+        toInsertV.length, skippedV, loadVerbs
+      );
+    }
+  }
+
   // ================= auth =================
   var authMode = "login";
 
@@ -1935,6 +2389,8 @@
       el.userEmail.textContent = currentUser.email || "";
       loadVerbs();
       loadWords();
+      loadLists();
+      if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
       el.appScreen.hidden = true;
@@ -1955,6 +2411,14 @@
       el.seedWordsToolbarBtn.hidden = false;
       el.wordList.innerHTML = "";
       el.wordCount.textContent = "";
+
+      allLists = [];
+      selectedListId = null;
+      el.listDetail.hidden = true;
+      el.listForm.hidden = true;
+      el.toggleAddList.hidden = false;
+      el.listsList.innerHTML = "";
+      if (currentShareList) renderSharePreview();
     }
   }
 
@@ -2008,6 +2472,10 @@
     if (entry) openForm("edit", entry.data);
   });
   el.dDelete.addEventListener("click", handleDelete);
+  el.dAddToList.addEventListener("click", function () {
+    var entry = allVerbs.find(function (v) { return v.id === selectedId; });
+    if (entry) openListPicker("verb", entry.data);
+  });
 
   el.tabVerbs.addEventListener("click", function () { setMainTab("verbs"); });
   el.tabWords.addEventListener("click", function () { setMainTab("words"); });
@@ -2023,6 +2491,10 @@
     if (entry) openWordForm("edit", entry.data);
   });
   el.wdDelete.addEventListener("click", handleWordDelete);
+  el.wdAddToList.addEventListener("click", function () {
+    var entry = allWords.find(function (v) { return v.id === selectedWordId; });
+    if (entry) openListPicker("word", entry.data);
+  });
 
   el.tabFlashcards.addEventListener("click", function () { setMainTab("flashcards"); });
   el.flashSrcVerbs.addEventListener("change", function () {
@@ -2047,6 +2519,20 @@
   el.flashArrowNext.addEventListener("click", nextFlashCard);
   el.flashArrowPrev.addEventListener("click", prevFlashCard);
 
+  el.tabLists.addEventListener("click", function () { setMainTab("lists"); });
+  el.toggleAddList.addEventListener("click", openListForm);
+  el.listFormCancel.addEventListener("click", closeListForm);
+  el.listForm.addEventListener("submit", handleListSubmit);
+  el.ldShareBtn.addEventListener("click", handleShareClick);
+  el.ldCopyLink.addEventListener("click", handleCopyLink);
+  el.ldDelete.addEventListener("click", handleListDelete);
+
+  el.listPickerClose.addEventListener("click", closeListPicker);
+  el.listPickerCreateBtn.addEventListener("click", handleListPickerCreate);
+
+  el.shareCloseBtn.addEventListener("click", closeSharePreview);
+  el.shareImportBtn.addEventListener("click", handleShareImport);
+
   buildConjFormTable();
   buildImperativoFormRow();
   buildTenseHeader();
@@ -2058,6 +2544,16 @@
     try { saved = localStorage.getItem("iv-main-tab"); } catch (e) {}
     if (saved === "words") setMainTab("words");
     else if (saved === "flashcards") setMainTab("flashcards");
+    else if (saved === "lists") setMainTab("lists");
+  })();
+
+  // A ?share=TOKEN link opens the share preview via the public get_shared_list
+  // RPC (see schema.sql) regardless of login state — that's what lets a
+  // shared list be previewed by someone who doesn't have an account yet.
+  (function checkShareLink() {
+    var token = null;
+    try { token = new URLSearchParams(window.location.search).get("share"); } catch (e) {}
+    if (token) openSharePreview(token);
   })();
 
   supabaseClient.auth.onAuthStateChange(function (_event, session) {
