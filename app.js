@@ -847,7 +847,7 @@
     el.dBadges.appendChild(badge("transitivity", data.transitivity || "transitivo"));
     if (data.reflexive) el.dBadges.appendChild(badge("reflexive", "reflexivo"));
     if (data.auxiliar) el.dBadges.appendChild(badge("auxiliar", "auxiliar"));
-    if (data.gustar_like) el.dBadges.appendChild(badge("gustarLike", "tipo gustar"));
+    if (data.gustar_like) el.dBadges.appendChild(badge("gustarLike", "dativo"));
     el.dPattern.textContent = data.pattern || "";
     el.dPattern.style.display = data.pattern ? "" : "none";
     el.dPreposicion.textContent = data.preposicion ? "Se usa con la preposición “" + data.preposicion + "”." : "";
@@ -1779,7 +1779,7 @@
       frag.appendChild(badge("transitivity", data.transitivity || "transitivo"));
       if (data.reflexive) frag.appendChild(badge("reflexive", "reflexivo"));
       if (data.auxiliar) frag.appendChild(badge("auxiliar", "auxiliar"));
-      if (data.gustar_like) frag.appendChild(badge("gustarLike", "tipo gustar"));
+      if (data.gustar_like) frag.appendChild(badge("gustarLike", "dativo"));
     } else {
       if (data.partOfSpeech) frag.appendChild(badge("type", data.partOfSpeech));
       if (data.gender) frag.appendChild(badge("gender", data.gender));
