@@ -54,6 +54,14 @@
     <button type="button" class="main-tab" id="tab-lists">Listas</button>
   </div>
 
+  <!-- Visible above whichever tab is open (Verbos, Vocabulario or Tarjetas
+       all read from the same filtered/filteredWords arrays), since studying
+       a list is a cross-tab mode, not something scoped to one tab. -->
+  <div class="study-filter-banner" id="study-filter-banner" hidden>
+    <span id="study-filter-text"></span>
+    <button type="button" id="study-filter-clear">Salir del filtro</button>
+  </div>
+
   <section id="verbs-panel">
 
   <div class="search-card">
@@ -424,6 +432,7 @@
         <ul class="card-list" id="ld-words-items"></ul>
       </div>
       <div class="detail-actions-footer">
+        <button class="icon-btn" id="ld-study-btn" type="button">Estudiar esta lista</button>
         <button class="icon-btn" id="ld-share-btn" type="button">Compartir</button>
         <button class="icon-btn danger" id="ld-delete" type="button">Eliminar lista</button>
       </div>

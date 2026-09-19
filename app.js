@@ -494,6 +494,13 @@
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
   var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
 
+  // When set, narrows the Verbos/Vocabulario tabs (and therefore Tarjetas,
+  // which builds its deck from those same filtered/filteredWords arrays —
+  // see buildFlashDeck) down to just one saved list's items, so you can
+  // come back to a specific word set and study it. Cleared explicitly via
+  // the banner's "Salir del filtro" button, not by switching tabs.
+  var activeStudyList = null; // { id, name, verbSet: Set<normalized infinitive>, wordSet: Set<normalized word> }
+
   // flashcards draw from whatever is currently filtered on the Verbos/
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
   // their own source toggle and tense/person filters below.
@@ -521,6 +528,9 @@
     logoutBtn: document.getElementById("logout-btn"),
 
     banner: document.getElementById("status-banner"),
+    studyFilterBanner: document.getElementById("study-filter-banner"),
+    studyFilterText: document.getElementById("study-filter-text"),
+    studyFilterClear: document.getElementById("study-filter-clear"),
     search: document.getElementById("search"),
     count: document.getElementById("count"),
     list: document.getElementById("card-list"),
@@ -642,6 +652,7 @@
     ldVerbsItems: document.getElementById("ld-verbs-items"),
     ldWordsGroup: document.getElementById("ld-words-group"),
     ldWordsItems: document.getElementById("ld-words-items"),
+    ldStudyBtn: document.getElementById("ld-study-btn"),
     ldShareBtn: document.getElementById("ld-share-btn"),
     ldDelete: document.getElementById("ld-delete"),
 
@@ -781,6 +792,7 @@
       if (activeVerbFilters.flag.has("reflexive") && !v.data.reflexive) return false;
       if (activeVerbFilters.flag.has("auxiliar") && !v.data.auxiliar) return false;
       if (activeVerbFilters.flag.has("gustarLike") && !v.data.gustar_like) return false;
+      if (activeStudyList && !activeStudyList.verbSet.has(norm(v.data.infinitive || ""))) return false;
       return true;
     });
     filtered.sort(function (a, b) {
@@ -1357,6 +1369,7 @@
       if (q && norm(v.data.word || v.id).indexOf(q) === -1) return false;
       if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "")) return false;
       if (!facetOk(activeWordFilters, "gender", v.data.gender || "")) return false;
+      if (activeStudyList && !activeStudyList.wordSet.has(norm(v.data.word || ""))) return false;
       return true;
     });
     filteredWords.sort(function (a, b) {
@@ -2161,6 +2174,45 @@
     });
   }
 
+  // "Estudiar esta lista" — narrows Verbos/Vocabulario (and so Tarjetas too)
+  // down to just this list's items, so a saved word set becomes a place you
+  // can come back to and study, not just a static snapshot. Re-fetches the
+  // list's items fresh rather than reusing whatever selectListRow already
+  // loaded, since that's simpler than threading the fetched rows through.
+  function startStudyList(id) {
+    var entry = allLists.find(function (l) { return l.id === id; });
+    if (!entry) return;
+    el.ldShareMsg.textContent = "";
+    supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
+      if (res.error) { el.ldShareMsg.textContent = "Error al cargar la lista: " + res.error.message; return; }
+      var rows = res.data || [];
+      var verbSet = new Set();
+      var wordSet = new Set();
+      rows.forEach(function (row) {
+        if (row.item_type === "verb") verbSet.add(norm(row.data.infinitive || ""));
+        else wordSet.add(norm(row.data.word || ""));
+      });
+      activeStudyList = { id: id, name: entry.data.name, verbSet: verbSet, wordSet: wordSet };
+      renderStudyFilterBanner();
+      renderList();
+      renderWordList();
+      setMainTab(verbSet.size ? "verbs" : "words");
+    });
+  }
+
+  function clearStudyList() {
+    activeStudyList = null;
+    renderStudyFilterBanner();
+    renderList();
+    renderWordList();
+  }
+
+  function renderStudyFilterBanner() {
+    if (!activeStudyList) { el.studyFilterBanner.hidden = true; return; }
+    el.studyFilterText.textContent = "Estudiando la lista “" + activeStudyList.name + "”";
+    el.studyFilterBanner.hidden = false;
+  }
+
   function handleShareClick() {
     if (!selectedListId) return;
     var entry = allLists.find(function (l) { return l.id === selectedListId; });
@@ -2478,6 +2530,8 @@
       el.listForm.hidden = true;
       el.toggleAddList.hidden = false;
       el.listsList.innerHTML = "";
+      activeStudyList = null;
+      renderStudyFilterBanner();
       if (currentShareList) renderSharePreview();
     }
   }
@@ -2589,9 +2643,13 @@
   el.toggleAddList.addEventListener("click", openListForm);
   el.listFormCancel.addEventListener("click", closeListForm);
   el.listForm.addEventListener("submit", handleListSubmit);
+  el.ldStudyBtn.addEventListener("click", function () {
+    if (selectedListId) startStudyList(selectedListId);
+  });
   el.ldShareBtn.addEventListener("click", handleShareClick);
   el.ldCopyLink.addEventListener("click", handleCopyLink);
   el.ldDelete.addEventListener("click", handleListDelete);
+  el.studyFilterClear.addEventListener("click", clearStudyList);
 
   el.listPickerClose.addEventListener("click", closeListPicker);
   el.listPickerCreateBtn.addEventListener("click", handleListPickerCreate);

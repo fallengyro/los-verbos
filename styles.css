@@ -136,6 +136,39 @@
     margin-bottom: 18px;
   }
 
+  /* An active mode, not a warning, so it gets the accent color rather than
+     .status-banner's brick tone — and it sits above the tabs (not inside
+     one panel) since Verbos, Vocabulario and Tarjetas all read from the
+     same filtered arrays while a study list is active. */
+  .study-filter-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--paper-sunken);
+    border: 1px solid var(--accent);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  #study-filter-text { font-weight: 600; }
+  #study-filter-clear {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--accent-deep);
+    text-decoration: underline;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  #study-filter-clear:hover { color: var(--danger); }
+
   /* ---------- verbs / vocabulario tabs ---------- */
   .main-tabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink); }
   .main-tab {
