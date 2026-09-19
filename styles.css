@@ -768,9 +768,15 @@
   }
   form#list-form h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 14px; }
 
-  .share-link-row { display: flex; gap: 8px; margin: 4px 0 2px; }
+  /* wraps rather than overflowing now that it can hold the link input plus
+     two buttons (copy + native share) — the input keeps a sane minimum
+     width so it wraps onto its own line first on a narrow phone screen,
+     with the buttons dropping beneath it instead of squeezing everything
+     onto one row. */
+  .share-link-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 2px; }
   .share-link-row input[type="text"] {
-    flex: 1;
+    flex: 1 1 200px;
+    min-width: 160px;
     font-family: "JetBrains Mono", monospace;
     font-size: 13px;
     padding: 8px 10px;
