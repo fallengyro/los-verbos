@@ -368,3 +368,37 @@ as $$
 $$;
 
 grant execute on function public.get_shared_list(text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Per-user app settings. For now this is just the UI language — separate
+-- from the language of your verbs/vocabulary, which always stays Spanish
+-- (that's the material being studied). This only controls the app's own
+-- instructional text: labels, buttons, badges/tags, empty states, and so
+-- on, so a newer learner can read the interface itself in English while a
+-- more advanced one can keep it in Castellano.
+--
+-- One row per user, so user_id is the primary key here (not a separate id
+-- column with a user_id foreign key like the other tables) — there's only
+-- ever one settings row per person, upserted in place rather than inserted
+-- fresh each time.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.user_settings (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  lang text not null default 'es' check (lang in ('en', 'es')),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.user_settings enable row level security;
+
+drop policy if exists "select own settings" on public.user_settings;
+create policy "select own settings" on public.user_settings
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own settings" on public.user_settings;
+create policy "insert own settings" on public.user_settings
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "update own settings" on public.user_settings;
+create policy "update own settings" on public.user_settings
+  for update using (auth.uid() = user_id);

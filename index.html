@@ -30,21 +30,21 @@
 <section id="auth-screen" class="auth-wrap">
   <div class="auth-card">
     <h1>Índice Verbal</h1>
-    <p class="tag">rioplatense · voseo</p>
+    <p class="tag" data-i18n="app_tagline">rioplatense · voseo</p>
     <div class="auth-tabs">
-      <button type="button" class="auth-tab active" id="tab-login">Iniciar sesión</button>
-      <button type="button" class="auth-tab" id="tab-signup">Crear cuenta</button>
+      <button type="button" class="auth-tab active" id="tab-login" data-i18n="auth_login_tab">Iniciar sesión</button>
+      <button type="button" class="auth-tab" id="tab-signup" data-i18n="auth_signup_tab">Crear cuenta</button>
     </div>
     <form id="auth-form">
       <div class="field">
-        <label for="auth-email">Email</label>
+        <label for="auth-email" data-i18n="auth_email_label">Email</label>
         <input type="email" id="auth-email" required autocomplete="email" />
       </div>
       <div class="field">
-        <label for="auth-password">Contraseña</label>
+        <label for="auth-password" data-i18n="auth_password_label">Contraseña</label>
         <input type="password" id="auth-password" required minlength="6" autocomplete="current-password" />
       </div>
-      <button type="submit" class="btn-primary" id="auth-submit">Entrar</button>
+      <button type="submit" class="btn-primary" id="auth-submit" data-i18n="auth_submit_login">Entrar</button>
       <p class="form-msg" id="auth-msg"></p>
     </form>
   </div>
@@ -54,11 +54,12 @@
   <header class="masthead">
     <div>
       <h1>Índice&nbsp;Verbal</h1>
-      <span class="tag">rioplatense &middot; voseo</span>
+      <span class="tag" data-i18n="app_tagline">rioplatense &middot; voseo</span>
     </div>
     <div class="user-bar">
       <span id="user-email"></span>
-      <button class="icon-btn" id="logout-btn" type="button">Cerrar sesión</button>
+      <button class="icon-btn" id="settings-btn" type="button" data-i18n-aria-label="settings_btn_label" aria-label="Configuración">&#9881;</button>
+      <button class="icon-btn" id="logout-btn" type="button" data-i18n="logout_btn">Cerrar sesión</button>
     </div>
   </header>
 
@@ -73,10 +74,10 @@
   </div>
 
   <div class="main-tabs">
-    <button type="button" class="main-tab active" id="tab-verbs">Verbos</button>
-    <button type="button" class="main-tab" id="tab-words">Vocabulario</button>
-    <button type="button" class="main-tab" id="tab-flashcards">Tarjetas</button>
-    <button type="button" class="main-tab" id="tab-lists">Listas</button>
+    <button type="button" class="main-tab active" id="tab-verbs" data-i18n="nav_verbs">Verbos</button>
+    <button type="button" class="main-tab" id="tab-words" data-i18n="nav_words">Vocabulario</button>
+    <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
+    <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
   </div>
 
   <!-- Visible above whichever tab is open (Verbos, Vocabulario or Tarjetas
@@ -84,44 +85,44 @@
        a list is a cross-tab mode, not something scoped to one tab. -->
   <div class="study-filter-banner" id="study-filter-banner" hidden>
     <span id="study-filter-text"></span>
-    <button type="button" id="study-filter-clear">Salir del filtro</button>
+    <button type="button" id="study-filter-clear" data-i18n="study_filter_clear">Salir del filtro</button>
   </div>
 
   <section id="verbs-panel">
 
   <div class="search-card">
     <div class="search-box">
-      <input type="text" id="search" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
+      <input type="text" id="search" data-i18n-placeholder="verb_search_placeholder" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
       <span class="count" id="count"></span>
     </div>
 
     <div class="filter-chips" id="verb-filters">
       <div class="chip-group">
-        <span class="chip-label">Tipo</span>
+        <span class="chip-label" data-i18n="chip_group_type">Tipo</span>
         <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
         <button type="button" class="chip" data-facet="type" data-value="-er">-er</button>
         <button type="button" class="chip" data-facet="type" data-value="-ir">-ir</button>
       </div>
       <div class="chip-group">
-        <span class="chip-label">Irregularidad</span>
-        <button type="button" class="chip" data-facet="irregularity" data-value="regular">regular</button>
-        <button type="button" class="chip" data-facet="irregularity" data-value="cambio de raíz">cambio de raíz</button>
-        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (yo)">irregular (yo)</button>
-        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)">irregular (total)</button>
+        <span class="chip-label" data-i18n="chip_group_irregularity">Irregularidad</span>
+        <button type="button" class="chip" data-facet="irregularity" data-value="regular" data-i18n-tag="regular">regular</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="cambio de raíz" data-i18n-tag="cambio de raíz">cambio de raíz</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (yo)" data-i18n-tag="irregular (yo)">irregular (yo)</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)" data-i18n-tag="irregular (total)">irregular (total)</button>
       </div>
       <div class="chip-group">
-        <span class="chip-label">Transitividad</span>
-        <button type="button" class="chip" data-facet="transitivity" data-value="transitivo">transitivo</button>
-        <button type="button" class="chip" data-facet="transitivity" data-value="intransitivo">intransitivo</button>
-        <button type="button" class="chip" data-facet="transitivity" data-value="ambos">ambos</button>
+        <span class="chip-label" data-i18n="chip_group_transitivity">Transitividad</span>
+        <button type="button" class="chip" data-facet="transitivity" data-value="transitivo" data-i18n-tag="transitivo">transitivo</button>
+        <button type="button" class="chip" data-facet="transitivity" data-value="intransitivo" data-i18n-tag="intransitivo">intransitivo</button>
+        <button type="button" class="chip" data-facet="transitivity" data-value="ambos" data-i18n-tag="ambos">ambos</button>
       </div>
       <div class="chip-group">
-        <span class="chip-label">Marcas</span>
-        <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
-        <button type="button" class="chip" data-facet="flag" data-value="auxiliar">auxiliar</button>
-        <button type="button" class="chip" data-facet="flag" data-value="gustarLike">dativo</button>
+        <span class="chip-label" data-i18n="chip_group_flags">Marcas</span>
+        <button type="button" class="chip" data-facet="flag" data-value="reflexive" data-i18n-tag="reflexivo">reflexivo</button>
+        <button type="button" class="chip" data-facet="flag" data-value="auxiliar" data-i18n-tag="auxiliar">auxiliar</button>
+        <button type="button" class="chip" data-facet="flag" data-value="gustarLike" data-i18n-tag="dativo">dativo</button>
       </div>
-      <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
+      <button type="button" class="chip-clear" id="verb-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
     </div>
   </div>
 
@@ -138,7 +139,7 @@
     <p class="pattern-note" id="d-pattern"></p>
     <p class="pattern-note" id="d-preposicion"></p>
 
-    <p class="conj-hint">deslizá para ver todos los tiempos &rarr;</p>
+    <p class="conj-hint" data-i18n="conj_hint">deslizá para ver todos los tiempos &rarr;</p>
     <div class="conj-wrap">
       <table class="conj conj-pronouns">
         <thead>
@@ -151,9 +152,9 @@
         <table class="conj conj-tenses">
           <thead>
             <tr class="mood-row">
-              <th colspan="5">Indicativo</th>
-              <th colspan="2">Subjuntivo</th>
-              <th class="imp-head">Imperativo</th>
+              <th colspan="5" data-i18n="mood_indicativo">Indicativo</th>
+              <th colspan="2" data-i18n="mood_subjuntivo">Subjuntivo</th>
+              <th class="imp-head" data-i18n="mood_imperativo">Imperativo</th>
             </tr>
             <tr class="tense-row" id="d-tense-row"></tr>
           </thead>
@@ -161,40 +162,40 @@
         </table>
       </div>
     </div>
-    <p class="conj-legend" id="d-conj-legend"><span class="swatch"></span> se aparta del patrón regular</p>
-    <p class="conj-legend gustar-legend" id="d-gustar-legend"><span class="swatch gustar"></span> a quién le pasa (no quién actúa) — la forma cambia solo si lo que gusta/afecta es singular o plural</p>
+    <p class="conj-legend" id="d-conj-legend"><span class="swatch"></span> <span data-i18n="conj_legend_irregular">se aparta del patrón regular</span></p>
+    <p class="conj-legend gustar-legend" id="d-gustar-legend"><span class="swatch gustar"></span> <span data-i18n="conj_legend_gustar">a quién le pasa (no quién actúa) — la forma cambia solo si lo que gusta/afecta es singular o plural</span></p>
 
     <div class="nonpersonal">
-      <div class="tile"><span class="label">Gerundio</span><span class="val" id="d-gerundio"></span></div>
-      <div class="tile"><span class="label">Participio</span><span class="val" id="d-participio"></span></div>
+      <div class="tile"><span class="label" data-i18n="tile_gerundio">Gerundio</span><span class="val" id="d-gerundio"></span></div>
+      <div class="tile"><span class="label" data-i18n="tile_participio">Participio</span><span class="val" id="d-participio"></span></div>
     </div>
 
     <div class="detail-actions-footer">
-      <button class="icon-btn" id="d-add-to-list" type="button">Agregar a lista</button>
-      <button class="icon-btn" id="d-edit" type="button">Editar</button>
-      <button class="icon-btn danger" id="d-delete" type="button">Eliminar</button>
+      <button class="icon-btn" id="d-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
+      <button class="icon-btn" id="d-edit" type="button" data-i18n="btn_edit">Editar</button>
+      <button class="icon-btn danger" id="d-delete" type="button" data-i18n="btn_delete">Eliminar</button>
     </div>
   </section>
 
   <div class="toolbar-row">
-    <button class="add-toggle" id="toggle-add" type="button">+ Agregar verbo</button>
+    <button class="add-toggle" id="toggle-add" type="button" data-i18n="btn_add_verb_toggle">+ Agregar verbo</button>
     <button class="seed-btn" id="seed-toolbar-btn" type="button">Cargar verbos de ejemplo</button>
-    <button class="seed-btn" id="add-filtered-to-list" type="button">Agregar filtrados a una lista</button>
+    <button class="seed-btn" id="add-filtered-to-list" type="button" data-i18n="btn_add_filtered_to_list">Agregar filtrados a una lista</button>
   </div>
 
   <form id="verb-form" hidden>
-    <h3 id="form-title">Agregar verbo</h3>
+    <h3 id="form-title" data-i18n="form_title_add_verb">Agregar verbo</h3>
     <div class="field-grid">
       <div class="field">
-        <label for="f-infinitive">Infinitivo</label>
+        <label for="f-infinitive" data-i18n="label_infinitivo">Infinitivo</label>
         <input type="text" id="f-infinitive" required />
       </div>
       <div class="field">
-        <label for="f-definition">Definición</label>
+        <label for="f-definition" data-i18n="label_definicion">Definición</label>
         <input type="text" id="f-definition" />
       </div>
       <div class="field">
-        <label for="f-type">Tipo</label>
+        <label for="f-type" data-i18n="chip_group_type">Tipo</label>
         <select id="f-type">
           <option value="-ar">-ar</option>
           <option value="-er">-er</option>
@@ -202,41 +203,41 @@
         </select>
       </div>
       <div class="field">
-        <label for="f-irregularity">Irregularidad</label>
+        <label for="f-irregularity" data-i18n="chip_group_irregularity">Irregularidad</label>
         <select id="f-irregularity">
-          <option value="regular">regular</option>
-          <option value="cambio de raíz">cambio de raíz</option>
-          <option value="irregular (yo)">irregular (yo)</option>
-          <option value="irregular (total)">irregular (total)</option>
+          <option value="regular" data-i18n-tag="regular">regular</option>
+          <option value="cambio de raíz" data-i18n-tag="cambio de raíz">cambio de raíz</option>
+          <option value="irregular (yo)" data-i18n-tag="irregular (yo)">irregular (yo)</option>
+          <option value="irregular (total)" data-i18n-tag="irregular (total)">irregular (total)</option>
         </select>
       </div>
       <div class="field">
-        <label for="f-transitivity">Transitividad</label>
+        <label for="f-transitivity" data-i18n="chip_group_transitivity">Transitividad</label>
         <select id="f-transitivity">
-          <option value="transitivo">transitivo</option>
-          <option value="intransitivo">intransitivo</option>
-          <option value="ambos">ambos</option>
+          <option value="transitivo" data-i18n-tag="transitivo">transitivo</option>
+          <option value="intransitivo" data-i18n-tag="intransitivo">intransitivo</option>
+          <option value="ambos" data-i18n-tag="ambos">ambos</option>
         </select>
       </div>
       <div class="field">
-        <label for="f-pattern">Patrón / notas</label>
+        <label for="f-pattern" data-i18n="label_patron">Patrón / notas</label>
         <input type="text" id="f-pattern" />
       </div>
       <div class="field">
-        <label for="f-preposicion">Preposición fija</label>
-        <input type="text" id="f-preposicion" placeholder="ej. en, de, a" />
+        <label for="f-preposicion" data-i18n="label_preposicion">Preposición fija</label>
+        <input type="text" id="f-preposicion" data-i18n-placeholder="placeholder_preposicion" placeholder="ej. en, de, a" />
       </div>
       <div class="field checks">
         <input type="checkbox" id="f-reflexive" />
-        <label for="f-reflexive" style="margin:0;">¿Reflexivo?</label>
+        <label for="f-reflexive" style="margin:0;" data-i18n="check_reflexivo">¿Reflexivo?</label>
       </div>
       <div class="field checks">
         <input type="checkbox" id="f-auxiliar" />
-        <label for="f-auxiliar" style="margin:0;">¿Auxiliar / modal?</label>
+        <label for="f-auxiliar" style="margin:0;" data-i18n="check_auxiliar">¿Auxiliar / modal?</label>
       </div>
       <div class="field checks">
         <input type="checkbox" id="f-gustar-like" />
-        <label for="f-gustar-like" style="margin:0;">¿Tipo gustar?</label>
+        <label for="f-gustar-like" style="margin:0;" data-i18n="check_gustar">¿Tipo gustar?</label>
       </div>
     </div>
 
@@ -255,12 +256,12 @@
       </div>
     </div>
 
-    <p class="imperativo-heading">Imperativo afirmativo (opcional)</p>
+    <p class="imperativo-heading" data-i18n="imperativo_afirmativo">Imperativo afirmativo (opcional)</p>
     <div class="nonpersonal-form" id="imperativo-form-row"></div>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary" id="form-save">Guardar</button>
-      <button type="button" class="btn-secondary" id="form-cancel">Cancelar</button>
+      <button type="submit" class="btn-primary" id="form-save" data-i18n="btn_save">Guardar</button>
+      <button type="button" class="btn-secondary" id="form-cancel" data-i18n="btn_cancel">Cancelar</button>
       <span class="form-msg" id="form-msg"></span>
     </div>
   </form>
@@ -271,28 +272,28 @@
 
   <div class="search-card">
     <div class="search-box">
-      <input type="text" id="word-search" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
+      <input type="text" id="word-search" data-i18n-placeholder="word_search_placeholder" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
       <span class="count" id="word-count"></span>
     </div>
 
     <div class="filter-chips" id="word-filters">
       <div class="chip-group">
-        <span class="chip-label">Categoría</span>
-        <button type="button" class="chip" data-facet="pos" data-value="sustantivo">sustantivo</button>
-        <button type="button" class="chip" data-facet="pos" data-value="adjetivo">adjetivo</button>
-        <button type="button" class="chip" data-facet="pos" data-value="adverbio">adverbio</button>
-        <button type="button" class="chip" data-facet="pos" data-value="pronombre">pronombre</button>
-        <button type="button" class="chip" data-facet="pos" data-value="preposición">preposición</button>
-        <button type="button" class="chip" data-facet="pos" data-value="conjunción">conjunción</button>
-        <button type="button" class="chip" data-facet="pos" data-value="interjección">interjección</button>
+        <span class="chip-label" data-i18n="chip_group_category">Categoría</span>
+        <button type="button" class="chip" data-facet="pos" data-value="sustantivo" data-i18n-tag="sustantivo">sustantivo</button>
+        <button type="button" class="chip" data-facet="pos" data-value="adjetivo" data-i18n-tag="adjetivo">adjetivo</button>
+        <button type="button" class="chip" data-facet="pos" data-value="adverbio" data-i18n-tag="adverbio">adverbio</button>
+        <button type="button" class="chip" data-facet="pos" data-value="pronombre" data-i18n-tag="pronombre">pronombre</button>
+        <button type="button" class="chip" data-facet="pos" data-value="preposición" data-i18n-tag="preposición">preposición</button>
+        <button type="button" class="chip" data-facet="pos" data-value="conjunción" data-i18n-tag="conjunción">conjunción</button>
+        <button type="button" class="chip" data-facet="pos" data-value="interjección" data-i18n-tag="interjección">interjección</button>
       </div>
       <div class="chip-group">
-        <span class="chip-label">Género</span>
-        <button type="button" class="chip" data-facet="gender" data-value="masculino">masculino</button>
-        <button type="button" class="chip" data-facet="gender" data-value="femenino">femenino</button>
-        <button type="button" class="chip" data-facet="gender" data-value="neutro">neutro</button>
+        <span class="chip-label" data-i18n="chip_group_gender">Género</span>
+        <button type="button" class="chip" data-facet="gender" data-value="masculino" data-i18n-tag="masculino">masculino</button>
+        <button type="button" class="chip" data-facet="gender" data-value="femenino" data-i18n-tag="femenino">femenino</button>
+        <button type="button" class="chip" data-facet="gender" data-value="neutro" data-i18n-tag="neutro">neutro</button>
       </div>
-      <button type="button" class="chip-clear" id="word-filters-clear" hidden>Limpiar filtros</button>
+      <button type="button" class="chip-clear" id="word-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
     </div>
   </div>
 
@@ -310,63 +311,63 @@
     <p class="example-note" id="wd-example"></p>
 
     <div class="detail-actions-footer">
-      <button class="icon-btn" id="wd-add-to-list" type="button">Agregar a lista</button>
-      <button class="icon-btn" id="wd-edit" type="button">Editar</button>
-      <button class="icon-btn danger" id="wd-delete" type="button">Eliminar</button>
+      <button class="icon-btn" id="wd-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
+      <button class="icon-btn" id="wd-edit" type="button" data-i18n="btn_edit">Editar</button>
+      <button class="icon-btn danger" id="wd-delete" type="button" data-i18n="btn_delete">Eliminar</button>
     </div>
   </section>
 
   <div class="toolbar-row">
-    <button class="add-toggle" id="toggle-add-word" type="button">+ Agregar palabra</button>
+    <button class="add-toggle" id="toggle-add-word" type="button" data-i18n="btn_add_word_toggle">+ Agregar palabra</button>
     <button class="seed-btn" id="seed-words-toolbar-btn" type="button">Cargar palabras de ejemplo</button>
-    <button class="seed-btn" id="add-filtered-words-to-list" type="button">Agregar filtrados a una lista</button>
+    <button class="seed-btn" id="add-filtered-words-to-list" type="button" data-i18n="btn_add_filtered_to_list">Agregar filtrados a una lista</button>
   </div>
 
   <form id="word-form" hidden>
-    <h3 id="word-form-title">Agregar palabra</h3>
+    <h3 id="word-form-title" data-i18n="form_title_add_word">Agregar palabra</h3>
     <div class="field-grid">
       <div class="field">
-        <label for="wf-word">Palabra</label>
+        <label for="wf-word" data-i18n="label_palabra">Palabra</label>
         <input type="text" id="wf-word" required />
       </div>
       <div class="field">
-        <label for="wf-definition">Definición</label>
+        <label for="wf-definition" data-i18n="label_definicion">Definición</label>
         <input type="text" id="wf-definition" />
       </div>
       <div class="field">
-        <label for="wf-pos">Categoría gramatical</label>
+        <label for="wf-pos" data-i18n="label_categoria_gramatical">Categoría gramatical</label>
         <select id="wf-pos">
-          <option value="sustantivo">sustantivo</option>
-          <option value="adjetivo">adjetivo</option>
-          <option value="adverbio">adverbio</option>
-          <option value="pronombre">pronombre</option>
-          <option value="preposición">preposición</option>
-          <option value="conjunción">conjunción</option>
-          <option value="interjección">interjección</option>
+          <option value="sustantivo" data-i18n-tag="sustantivo">sustantivo</option>
+          <option value="adjetivo" data-i18n-tag="adjetivo">adjetivo</option>
+          <option value="adverbio" data-i18n-tag="adverbio">adverbio</option>
+          <option value="pronombre" data-i18n-tag="pronombre">pronombre</option>
+          <option value="preposición" data-i18n-tag="preposición">preposición</option>
+          <option value="conjunción" data-i18n-tag="conjunción">conjunción</option>
+          <option value="interjección" data-i18n-tag="interjección">interjección</option>
         </select>
       </div>
       <div class="field">
-        <label for="wf-gender">Género</label>
+        <label for="wf-gender" data-i18n="chip_group_gender">Género</label>
         <select id="wf-gender">
           <option value="">N/A</option>
-          <option value="masculino">masculino</option>
-          <option value="femenino">femenino</option>
-          <option value="neutro">neutro</option>
+          <option value="masculino" data-i18n-tag="masculino">masculino</option>
+          <option value="femenino" data-i18n-tag="femenino">femenino</option>
+          <option value="neutro" data-i18n-tag="neutro">neutro</option>
         </select>
       </div>
       <div class="field">
-        <label for="wf-notes">Notas / excepciones</label>
-        <input type="text" id="wf-notes" placeholder="ej. femenino, pero usa &quot;el&quot;: el agua" />
+        <label for="wf-notes" data-i18n="label_notas">Notas / excepciones</label>
+        <input type="text" id="wf-notes" data-i18n-placeholder="placeholder_notas" placeholder="ej. femenino, pero usa &quot;el&quot;: el agua" />
       </div>
       <div class="field">
-        <label for="wf-example">Oración de ejemplo</label>
-        <input type="text" id="wf-example" placeholder="ej. Tomo mucha agua todos los días." />
+        <label for="wf-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
+        <input type="text" id="wf-example" data-i18n-placeholder="placeholder_ejemplo" placeholder="ej. Tomo mucha agua todos los días." />
       </div>
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary" id="word-form-save">Guardar</button>
-      <button type="button" class="btn-secondary" id="word-form-cancel">Cancelar</button>
+      <button type="submit" class="btn-primary" id="word-form-save" data-i18n="btn_save">Guardar</button>
+      <button type="button" class="btn-secondary" id="word-form-cancel" data-i18n="btn_cancel">Cancelar</button>
       <span class="form-msg" id="word-form-msg"></span>
     </div>
   </form>
@@ -375,63 +376,63 @@
 
   <section id="flashcards-panel" hidden>
     <div class="flash-setup">
-      <h2>Modo tarjetas</h2>
-      <p class="flash-setup-note">Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.</p>
+      <h2 data-i18n="flash_title">Modo tarjetas</h2>
+      <p class="flash-setup-note" data-i18n="flash_setup_note">Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.</p>
 
       <div class="flash-source-toggle">
         <label class="switch-row">
           <input type="checkbox" id="flash-src-verbs" checked />
-          <span>Verbos <span class="flash-count" id="flash-verb-count"></span></span>
+          <span><span data-i18n="nav_verbs">Verbos</span> <span class="flash-count" id="flash-verb-count"></span></span>
         </label>
         <label class="switch-row">
           <input type="checkbox" id="flash-src-words" checked />
-          <span>Vocabulario <span class="flash-count" id="flash-word-count"></span></span>
+          <span><span data-i18n="nav_words">Vocabulario</span> <span class="flash-count" id="flash-word-count"></span></span>
         </label>
       </div>
 
       <div class="flash-verb-options" id="flash-verb-options">
-        <p class="flash-group-label">Tiempos, modos y personas</p>
+        <p class="flash-group-label" data-i18n="flash_group_times">Tiempos, modos y personas</p>
         <div class="flash-matrix-scroll">
           <table class="flash-matrix" id="flash-matrix"></table>
         </div>
-        <p class="flash-matrix-hint">Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.</p>
+        <p class="flash-matrix-hint" data-i18n="flash_matrix_hint">Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.</p>
         <div class="flash-check-row" id="flash-standalone-toggles"></div>
       </div>
 
       <div class="flash-word-options" id="flash-word-options">
-        <p class="flash-group-label">Dirección de la tarjeta</p>
+        <p class="flash-group-label" data-i18n="flash_group_direction">Dirección de la tarjeta</p>
         <div class="flash-radio-row">
-          <label><input type="radio" name="flash-direction" id="flash-dir-def" value="def2word" checked /> Definición &rarr; palabra</label>
-          <label><input type="radio" name="flash-direction" id="flash-dir-word" value="word2def" /> Palabra &rarr; definición</label>
+          <label><input type="radio" name="flash-direction" id="flash-dir-def" value="def2word" checked /> <span data-i18n="flash_dir_def2word">Definición &rarr; palabra</span></label>
+          <label><input type="radio" name="flash-direction" id="flash-dir-word" value="word2def" /> <span data-i18n="flash_dir_word2def">Palabra &rarr; definición</span></label>
         </div>
       </div>
 
       <p class="form-msg" id="flash-setup-msg"></p>
-      <button type="button" class="btn-primary" id="flash-start-btn">Empezar</button>
+      <button type="button" class="btn-primary" id="flash-start-btn" data-i18n="flash_start_btn">Empezar</button>
     </div>
   </section>
 
   <section id="lists-panel" hidden>
-    <p class="flash-setup-note">Armá una lista con los verbos y las palabras que quieras de tu índice — podés mezclar los dos, por ejemplo todo lo útil para "la cocina" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.</p>
+    <p class="flash-setup-note" data-i18n="lists_intro">Armá una lista con los verbos y las palabras que quieras de tu índice — podés mezclar los dos, por ejemplo todo lo útil para "la cocina" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.</p>
 
     <ul class="card-list lists-list" id="lists-list"></ul>
-    <p class="form-msg" id="lists-empty-msg" hidden>Todavía no creaste ninguna lista.</p>
+    <p class="form-msg" id="lists-empty-msg" hidden data-i18n="lists_empty">Todavía no creaste ninguna lista.</p>
 
     <div class="toolbar-row">
-      <button class="add-toggle" id="toggle-add-list" type="button">+ Crear lista</button>
+      <button class="add-toggle" id="toggle-add-list" type="button" data-i18n="btn_create_list_toggle">+ Crear lista</button>
     </div>
 
     <form id="list-form" hidden>
-      <h3>Nueva lista</h3>
+      <h3 data-i18n="list_form_title">Nueva lista</h3>
       <div class="field-grid">
         <div class="field">
-          <label for="lf-name">Nombre</label>
-          <input type="text" id="lf-name" required placeholder="ej. La cocina" />
+          <label for="lf-name" data-i18n="label_nombre">Nombre</label>
+          <input type="text" id="lf-name" required data-i18n-placeholder="placeholder_list_name" placeholder="ej. La cocina" />
         </div>
       </div>
       <div class="form-actions">
-        <button type="submit" class="btn-primary" id="list-form-save">Crear</button>
-        <button type="button" class="btn-secondary" id="list-form-cancel">Cancelar</button>
+        <button type="submit" class="btn-primary" id="list-form-save" data-i18n="btn_create">Crear</button>
+        <button type="button" class="btn-secondary" id="list-form-cancel" data-i18n="btn_cancel">Cancelar</button>
         <span class="form-msg" id="list-form-msg"></span>
       </div>
     </form>
@@ -445,52 +446,70 @@
       </div>
       <div class="share-link-row" id="ld-share-row" hidden>
         <input type="text" id="ld-share-link" readonly />
-        <button type="button" class="icon-btn" id="ld-copy-link">Copiar enlace</button>
-        <button type="button" class="icon-btn" id="ld-native-share" hidden>Compartir…</button>
+        <button type="button" class="icon-btn" id="ld-copy-link" data-i18n="btn_copy_link">Copiar enlace</button>
+        <button type="button" class="icon-btn" id="ld-native-share" hidden data-i18n="btn_native_share">Compartir…</button>
       </div>
       <p class="form-msg" id="ld-share-msg"></p>
       <div class="list-detail-group" id="ld-verbs-group" hidden>
-        <h4>Verbos</h4>
+        <h4 data-i18n="nav_verbs">Verbos</h4>
         <ul class="card-list" id="ld-verbs-items"></ul>
       </div>
       <div class="list-detail-group" id="ld-words-group" hidden>
-        <h4>Vocabulario</h4>
+        <h4 data-i18n="nav_words">Vocabulario</h4>
         <ul class="card-list" id="ld-words-items"></ul>
       </div>
       <div class="detail-actions-footer">
-        <button class="icon-btn" id="ld-study-btn" type="button">Estudiar esta lista</button>
-        <button class="icon-btn" id="ld-share-btn" type="button">Compartir</button>
-        <button class="icon-btn danger" id="ld-delete" type="button">Eliminar lista</button>
+        <button class="icon-btn" id="ld-study-btn" type="button" data-i18n="btn_study_list">Estudiar esta lista</button>
+        <button class="icon-btn" id="ld-share-btn" type="button" data-i18n="btn_share">Compartir</button>
+        <button class="icon-btn danger" id="ld-delete" type="button" data-i18n="btn_delete_list">Eliminar lista</button>
       </div>
     </section>
   </section>
 
-  <footer class="note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
+  <footer class="note" data-i18n="footer_note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
 </div>
 
 <div class="modal-overlay" id="list-picker-overlay" hidden>
   <div class="modal-card">
-    <h3>Agregar a lista</h3>
+    <h3 data-i18n="btn_add_to_list">Agregar a lista</h3>
     <p class="flash-setup-note" id="list-picker-count"></p>
     <p class="form-msg" id="list-picker-msg"></p>
     <ul class="card-list list-picker-list" id="list-picker-list"></ul>
     <div class="field-grid">
       <div class="field">
-        <label for="list-picker-new-name">O creá una lista nueva</label>
-        <input type="text" id="list-picker-new-name" placeholder="ej. Adjetivos de comida" />
+        <label for="list-picker-new-name" data-i18n="list_picker_new_label">O creá una lista nueva</label>
+        <input type="text" id="list-picker-new-name" data-i18n-placeholder="placeholder_new_list_name" placeholder="ej. Adjetivos de comida" />
       </div>
     </div>
     <div class="form-actions">
-      <button type="button" class="btn-primary" id="list-picker-create-btn">Crear y agregar</button>
-      <button type="button" class="btn-secondary" id="list-picker-close">Cerrar</button>
+      <button type="button" class="btn-primary" id="list-picker-create-btn" data-i18n="btn_create_and_add">Crear y agregar</button>
+      <button type="button" class="btn-secondary" id="list-picker-close" data-i18n="close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settings-overlay" hidden>
+  <div class="modal-card">
+    <h3 data-i18n="settings_title">Configuración</h3>
+    <div class="field">
+      <label data-i18n="settings_lang_label">Idioma de la app</label>
+      <div class="lang-toggle">
+        <button type="button" class="lang-option" id="lang-es" data-lang="es">Castellano</button>
+        <button type="button" class="lang-option" id="lang-en" data-lang="en">English</button>
+      </div>
+    </div>
+    <p class="flash-setup-note" data-i18n="settings_lang_note">Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.</p>
+    <p class="form-msg" id="settings-msg"></p>
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" id="settings-close" data-i18n="close">Cerrar</button>
     </div>
   </div>
 </div>
 
 <div class="flash-overlay" id="share-overlay" hidden>
   <div class="flash-topbar">
-    <button type="button" class="icon-btn" id="share-close-btn">&times; Cerrar</button>
-    <span class="flash-progress">Lista compartida</span>
+    <button type="button" class="icon-btn" id="share-close-btn"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
+    <span class="flash-progress" data-i18n="share_label_shared_list">Lista compartida</span>
   </div>
   <div class="share-body">
     <h2 id="share-name"></h2>
@@ -498,8 +517,8 @@
     <p class="form-msg" id="share-msg"></p>
     <ul class="card-list" id="share-items"></ul>
     <div class="share-actions">
-      <p class="flash-setup-note" id="share-login-note" hidden>Iniciá sesión o creá una cuenta para importar esta lista a tu índice.</p>
-      <button type="button" class="btn-primary" id="share-import-btn" hidden>Importar a mi colección</button>
+      <p class="flash-setup-note" id="share-login-note" hidden data-i18n="share_login_note">Iniciá sesión o creá una cuenta para importar esta lista a tu índice.</p>
+      <button type="button" class="btn-primary" id="share-import-btn" hidden data-i18n="btn_import">Importar a mi colección</button>
       <p class="form-msg" id="share-import-result"></p>
     </div>
   </div>
@@ -507,11 +526,11 @@
 
 <div class="flash-overlay" id="flash-overlay" hidden>
   <div class="flash-topbar">
-    <button type="button" class="icon-btn" id="flash-close-btn">&times; Cerrar</button>
+    <button type="button" class="icon-btn" id="flash-close-btn"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
-    <button type="button" class="flash-arrow flash-arrow-prev" id="flash-arrow-prev" aria-label="Anterior">&lsaquo;</button>
+    <button type="button" class="flash-arrow flash-arrow-prev" id="flash-arrow-prev" data-i18n-aria-label="flash_arrow_prev_aria" aria-label="Anterior">&lsaquo;</button>
     <div class="flash-card" id="flash-card">
       <div class="flash-face flash-front">
         <div class="flash-prompt-main" id="flash-front-main"></div>
@@ -523,12 +542,12 @@
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
       </div>
     </div>
-    <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" aria-label="Siguiente">&rsaquo;</button>
+    <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" data-i18n-aria-label="flash_arrow_next_aria" aria-label="Siguiente">&rsaquo;</button>
   </div>
-  <p class="flash-hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
+  <p class="flash-hint" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
   <div class="flash-controls">
-    <button type="button" class="btn-secondary" id="flash-prev-btn">&lsaquo; Anterior</button>
-    <button type="button" class="btn-primary" id="flash-next-btn">Siguiente &rsaquo;</button>
+    <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>
+    <button type="button" class="btn-primary" id="flash-next-btn" data-i18n="flash_next">Siguiente &rsaquo;</button>
   </div>
 </div>
 

@@ -437,6 +437,8 @@
   }
   .icon-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
   .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  /* the gear glyph reads small at the plain .icon-btn text size */
+  #settings-btn { font-size: 15px; line-height: 1; }
 
   .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
@@ -826,6 +828,20 @@
   }
   .modal-card h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 12px; }
   .list-picker-list { max-height: 180px; }
+
+  /* settings panel — the app-language toggle is a simple two-button
+     segmented control, in keeping with the app's flat bordered-chip look
+     rather than a native <select>. */
+  #settings-overlay .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); margin-bottom: 6px; }
+  .lang-toggle { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .lang-option {
+    flex: 1; background: var(--paper-raised); border: none; padding: 9px 10px;
+    font-family: "Public Sans", sans-serif; font-size: 13.5px; font-weight: 600;
+    color: var(--ink-soft); cursor: pointer;
+  }
+  .lang-option + .lang-option { border-left: 1px solid var(--line); }
+  .lang-option.active { background: var(--accent-deep); color: var(--accent-ink); }
+  .lang-option:hover:not(.active) { color: var(--accent-deep); }
 
   /* the shared-list preview reuses .flash-overlay's full-screen chrome
      (same topbar, same close button) but its own scrollable body, since a

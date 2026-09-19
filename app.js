@@ -5,6 +5,535 @@
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var currentUser = null;
 
+  // ================= i18n (app chrome only — see note below) =================
+  // This app draws a hard line between two different "languages":
+  //   - The CONTENT being studied (verb infinitives, word entries,
+  //     definitions, examples, notes) is always Spanish — that's the whole
+  //     point of the app, and translating it would defeat the purpose.
+  //   - The app's own CHROME (labels, buttons, headings, hints, empty
+  //     states, badges/tags, status messages) is what this setting
+  //     controls, so a newer learner can navigate the interface in
+  //     English while what they're studying stays in Spanish.
+  //
+  // One deliberate exception inside "chrome": the person/pronoun labels in
+  // the conjugation tables (yo, vos, él/ella/ud., nosotros, ellos/ellas/
+  // uds., usted, ustedes) are left in Spanish in BOTH languages. Those
+  // pronouns — vos especially — are themselves the thing this app exists
+  // to teach (rioplatense voseo), so translating them away would remove
+  // exactly the information a learner most needs to see. Tense/mood names
+  // (Presente, Pretérito, Subjuntivo...) are translated, though, since
+  // those function as organizing labels rather than content to memorize.
+  //
+  // LANG_LOCAL_KEY is a fast, device-level guess used only to avoid a
+  // flash of the wrong language before the account's real (Supabase-
+  // synced) preference loads — see loadUserSettings().
+  var LANG_LOCAL_KEY = "iv-lang";
+  var currentLang = (function () {
+    try {
+      var saved = localStorage.getItem(LANG_LOCAL_KEY);
+      return (saved === "en" || saved === "es") ? saved : "es";
+    } catch (e) {
+      return "es";
+    }
+  })();
+
+  var I18N = {
+    es: {
+      app_tagline: "rioplatense · voseo",
+      auth_login_tab: "Iniciar sesión",
+      auth_signup_tab: "Crear cuenta",
+      auth_email_label: "Email",
+      auth_password_label: "Contraseña",
+      auth_submit_login: "Entrar",
+      logout_btn: "Cerrar sesión",
+      settings_btn_label: "Configuración",
+      nav_verbs: "Verbos",
+      nav_words: "Vocabulario",
+      nav_flashcards: "Tarjetas",
+      nav_lists: "Listas",
+      study_filter_clear: "Salir del filtro",
+      study_filter_studying: "Estudiando la lista “{name}”",
+      offline_banner: "Sin conexión — mostrando lo último guardado ({age}).",
+      cache_age_moment: "hace un momento",
+      cache_age_minutes: "hace {n} minuto",
+      cache_age_minutes_pl: "hace {n} minutos",
+      cache_age_hours: "hace {n} hora",
+      cache_age_hours_pl: "hace {n} horas",
+      cache_age_days: "hace {n} día",
+      cache_age_days_pl: "hace {n} días",
+      verb_search_placeholder: "Escribí un infinitivo… (ej. querer)",
+      chip_group_type: "Tipo",
+      chip_group_irregularity: "Irregularidad",
+      chip_group_transitivity: "Transitividad",
+      chip_group_flags: "Marcas",
+      chip_group_category: "Categoría",
+      chip_group_gender: "Género",
+      filters_clear: "Limpiar filtros",
+      conj_hint: "deslizá para ver todos los tiempos →",
+      mood_indicativo: "Indicativo",
+      mood_subjuntivo: "Subjuntivo",
+      mood_imperativo: "Imperativo",
+      conj_legend_irregular: "se aparta del patrón regular",
+      conj_legend_gustar: "a quién le pasa (no quién actúa) — la forma cambia solo si lo que gusta/afecta es singular o plural",
+      tile_gerundio: "Gerundio",
+      tile_participio: "Participio",
+      btn_add_to_list: "Agregar a lista",
+      btn_edit: "Editar",
+      btn_delete: "Eliminar",
+      btn_add_verb_toggle: "+ Agregar verbo",
+      seed_verbs_btn: "Cargar {n} verbos de ejemplo",
+      btn_add_filtered_to_list: "Agregar filtrados a una lista",
+      form_title_add_verb: "Agregar verbo",
+      label_infinitivo: "Infinitivo",
+      label_definicion: "Definición",
+      label_patron: "Patrón / notas",
+      label_preposicion: "Preposición fija",
+      placeholder_preposicion: "ej. en, de, a",
+      check_reflexivo: "¿Reflexivo?",
+      check_auxiliar: "¿Auxiliar / modal?",
+      check_gustar: "¿Tipo gustar?",
+      impersonal_optional: "impersonal (opcional)",
+      imperativo_afirmativo: "Imperativo afirmativo (opcional)",
+      btn_save: "Guardar",
+      btn_cancel: "Cancelar",
+      word_search_placeholder: "Escribí una palabra… (ej. mesa)",
+      btn_add_word_toggle: "+ Agregar palabra",
+      seed_words_btn: "Cargar {n} palabras de ejemplo",
+      form_title_add_word: "Agregar palabra",
+      label_palabra: "Palabra",
+      label_categoria_gramatical: "Categoría gramatical",
+      label_notas: "Notas / excepciones",
+      placeholder_notas: "ej. femenino, pero usa “el”: el agua",
+      label_ejemplo: "Oración de ejemplo",
+      placeholder_ejemplo: "ej. Tomo mucha agua todos los días.",
+      flash_title: "Modo tarjetas",
+      flash_setup_note: "Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.",
+      flash_group_times: "Tiempos, modos y personas",
+      flash_matrix_hint: "Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.",
+      flash_group_direction: "Dirección de la tarjeta",
+      flash_dir_def2word: "Definición → palabra",
+      flash_dir_word2def: "Palabra → definición",
+      flash_start_btn: "Empezar",
+      flash_no_cards: "No hay tarjetas para esta combinación de filtros — probá activar más tiempos, personas o fuentes.",
+      close: "Cerrar",
+      share_label_shared_list: "Lista compartida",
+      flash_hint: "Tocá la tarjeta para dar vuelta · deslizá para cambiar",
+      flash_prev: "‹ Anterior",
+      flash_next: "Siguiente ›",
+      flash_arrow_prev_aria: "Anterior",
+      flash_arrow_next_aria: "Siguiente",
+      lists_intro: "Armá una lista con los verbos y las palabras que quieras de tu índice — podés mezclar los dos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
+      lists_empty: "Todavía no creaste ninguna lista.",
+      btn_create_list_toggle: "+ Crear lista",
+      list_form_title: "Nueva lista",
+      label_nombre: "Nombre",
+      placeholder_list_name: "ej. La cocina",
+      btn_create: "Crear",
+      btn_copy_link: "Copiar enlace",
+      btn_native_share: "Compartir…",
+      btn_study_list: "Estudiar esta lista",
+      btn_share: "Compartir",
+      btn_delete_list: "Eliminar lista",
+      footer_note: "Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos",
+      list_picker_new_label: "O creá una lista nueva",
+      placeholder_new_list_name: "ej. Adjetivos de comida",
+      btn_create_and_add: "Crear y agregar",
+      share_login_note: "Iniciá sesión o creá una cuenta para importar esta lista a tu índice.",
+      btn_import: "Importar a mi colección",
+      settings_title: "Configuración",
+      settings_lang_label: "Idioma de la app",
+      settings_lang_note: "Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.",
+      remove_btn: "Quitar",
+      empty_no_verbs: "Todavía no hay verbos en tu cuenta.",
+      empty_no_verb_match: "Ningún infinitivo coincide con “{q}”.",
+      empty_no_words: "Todavía no hay palabras en tu vocabulario.",
+      empty_no_word_match: "Ninguna palabra coincide con “{q}”.",
+      empty_no_lists: "Todavía no tenés ninguna lista — creá una nueva abajo.",
+      msg_falta_infinitivo: "Falta el infinitivo.",
+      msg_guardando: "Guardando…",
+      msg_error_guardar: "Error al guardar: {msg}",
+      confirm_delete_verb: "¿Eliminar este verbo de tu índice?",
+      msg_no_pudo_eliminar: "No se pudo eliminar: {msg}",
+      msg_ya_tenes_verbos_ejemplo: "Ya tenés todos los verbos de ejemplo en tu cuenta.",
+      msg_no_pudieron_cargar_verbos: "No se pudieron cargar los verbos de ejemplo: {msg}",
+      msg_error_cargar_verbos: "Error al cargar tus verbos: {msg}",
+      msg_falta_palabra: "Falta la palabra.",
+      msg_error_cargar_vocab: "Error al cargar tu vocabulario: {msg}",
+      confirm_delete_word: "¿Eliminar esta palabra de tu vocabulario?",
+      msg_ya_tenes_palabras_ejemplo: "Ya tenés todas las palabras de ejemplo en tu vocabulario.",
+      msg_no_pudieron_cargar_palabras: "No se pudieron cargar las palabras de ejemplo: {msg}",
+      msg_error_cargar_listas: "Error al cargar tus listas: {msg}",
+      msg_error_generic: "Error: {msg}",
+      msg_error_cargar_items: "Error al cargar los ítems: {msg}",
+      msg_falta_nombre: "Falta el nombre.",
+      msg_creando: "Creando…",
+      confirm_delete_list: "¿Eliminar esta lista? Esto no borra tus verbos ni palabras, solo la lista compartida.",
+      msg_error_cargar_lista: "Error al cargar la lista: {msg}",
+      msg_enlace_copiado: "Enlace copiado.",
+      msg_no_pudo_copiar: "No se pudo copiar automáticamente — el enlace ya está seleccionado, copialo con Ctrl/Cmd+C.",
+      msg_enlace_seleccionado: "El enlace ya está seleccionado, copialo con Ctrl/Cmd+C.",
+      msg_no_pudo_compartir: "No se pudo compartir: {msg}",
+      msg_no_items_filtro: "No hay ítems para agregar con el filtro actual.",
+      msg_agregando: "Agregando…",
+      msg_ya_estaban_todos: "Ya estaban todos en esa lista ({n}).",
+      msg_nada_para_agregar: "No hay nada para agregar.",
+      msg_agrego_1: "Se agregó 1 ítem a la lista.",
+      msg_agregaron_n: "Se agregaron {n} ítems a la lista.",
+      msg_ya_estaban_paren: " ({n} ya estaban.)",
+      msg_poner_nombre: "Poné un nombre para la lista nueva.",
+      msg_error_crear: "Error al crear: {msg}",
+      msg_cargando: "Cargando…",
+      msg_enlace_invalido: "Enlace no válido",
+      msg_enlace_no_existe: "Este enlace no existe o ya no está disponible.",
+      msg_importando: "Importando…",
+      msg_error_importar: "Error al importar: {msg}",
+      msg_imported_prefix: "Se importaron {n}",
+      unit_item_singular: " ítem.",
+      unit_item_plural: " ítems.",
+      msg_ya_estaba_singular: " ya estaba",
+      msg_ya_estaban_plural: " ya estaban",
+      msg_en_tu_coleccion: " en tu colección: {list}.",
+      msg_no_pudo_crear_lista_cuenta: " No se pudo crear la lista en tu cuenta: {msg}",
+      msg_lista_creada_sin_items: " La lista se creó pero no se pudieron agregar sus ítems: {msg}",
+      msg_se_creo_lista: " Se creó la lista “{name}” en tu cuenta.",
+      msg_email_confirmacion: "Te enviamos un email de confirmación a {email}. Confirmá tu cuenta y después iniciá sesión.",
+      preposicion_note: "Se usa con la preposición “{prep}”.",
+      th_imp_abbrev: "Afirm.",
+      unit_verbo_s: " verbo",
+      unit_verbo_pl: " verbos",
+      unit_palabra_s: " palabra",
+      unit_palabra_pl: " palabras",
+      unit_item_bare_s: " ítem",
+      unit_item_bare_pl: " ítems",
+      share_fallback_name: "lista compartida",
+      share_native_text: "Te comparto la lista “{name}” de Índice Verbal.",
+      share_shared_by: " · compartida por {label}"
+    },
+    en: {
+      app_tagline: "Rioplatense Spanish · voseo",
+      auth_login_tab: "Log in",
+      auth_signup_tab: "Create account",
+      auth_email_label: "Email",
+      auth_password_label: "Password",
+      auth_submit_login: "Log in",
+      logout_btn: "Log out",
+      settings_btn_label: "Settings",
+      nav_verbs: "Verbs",
+      nav_words: "Vocabulary",
+      nav_flashcards: "Flashcards",
+      nav_lists: "Lists",
+      study_filter_clear: "Exit filter",
+      study_filter_studying: "Studying the list “{name}”",
+      offline_banner: "Offline — showing what was last saved ({age}).",
+      cache_age_moment: "just now",
+      cache_age_minutes: "{n} minute ago",
+      cache_age_minutes_pl: "{n} minutes ago",
+      cache_age_hours: "{n} hour ago",
+      cache_age_hours_pl: "{n} hours ago",
+      cache_age_days: "{n} day ago",
+      cache_age_days_pl: "{n} days ago",
+      verb_search_placeholder: "Type an infinitive… (e.g. querer)",
+      chip_group_type: "Type",
+      chip_group_irregularity: "Irregularity",
+      chip_group_transitivity: "Transitivity",
+      chip_group_flags: "Flags",
+      chip_group_category: "Category",
+      chip_group_gender: "Gender",
+      filters_clear: "Clear filters",
+      conj_hint: "swipe to see all tenses →",
+      mood_indicativo: "Indicative",
+      mood_subjuntivo: "Subjunctive",
+      mood_imperativo: "Imperative",
+      conj_legend_irregular: "differs from the regular pattern",
+      conj_legend_gustar: "who it happens to (not who acts) — the form only changes if the thing liked/affecting is singular or plural",
+      tile_gerundio: "Gerund",
+      tile_participio: "Participle",
+      btn_add_to_list: "Add to list",
+      btn_edit: "Edit",
+      btn_delete: "Delete",
+      btn_add_verb_toggle: "+ Add verb",
+      seed_verbs_btn: "Load {n} example verbs",
+      btn_add_filtered_to_list: "Add filtered to a list",
+      form_title_add_verb: "Add verb",
+      label_infinitivo: "Infinitive",
+      label_definicion: "Definition",
+      label_patron: "Pattern / notes",
+      label_preposicion: "Fixed preposition",
+      placeholder_preposicion: "e.g. en, de, a",
+      check_reflexivo: "Reflexive?",
+      check_auxiliar: "Auxiliary / modal?",
+      check_gustar: "Gustar-type?",
+      impersonal_optional: "impersonal (optional)",
+      imperativo_afirmativo: "Affirmative imperative (optional)",
+      btn_save: "Save",
+      btn_cancel: "Cancel",
+      word_search_placeholder: "Type a word… (e.g. mesa)",
+      btn_add_word_toggle: "+ Add word",
+      seed_words_btn: "Load {n} example words",
+      form_title_add_word: "Add word",
+      label_palabra: "Word",
+      label_categoria_gramatical: "Part of speech",
+      label_notas: "Notes / exceptions",
+      placeholder_notas: "e.g. feminine, but uses “el”: el agua",
+      label_ejemplo: "Example sentence",
+      placeholder_ejemplo: "e.g. Tomo mucha agua todos los días.",
+      flash_title: "Flashcard mode",
+      flash_setup_note: "Flashcards are built from whatever is currently filtered in the Verbs and Vocabulary tabs.",
+      flash_group_times: "Tenses, moods and persons",
+      flash_matrix_hint: "Tap a cell for that combination, or a header for the whole row or column.",
+      flash_group_direction: "Card direction",
+      flash_dir_def2word: "Definition → word",
+      flash_dir_word2def: "Word → definition",
+      flash_start_btn: "Start",
+      flash_no_cards: "There are no cards for this filter combination — try enabling more tenses, persons or sources.",
+      close: "Close",
+      share_label_shared_list: "Shared list",
+      flash_hint: "Tap the card to flip · swipe to change",
+      flash_prev: "‹ Previous",
+      flash_next: "Next ›",
+      flash_arrow_prev_aria: "Previous",
+      flash_arrow_next_aria: "Next",
+      lists_intro: "Build a list out of any verbs and words from your index — you can mix the two, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
+      lists_empty: "You haven't created any lists yet.",
+      btn_create_list_toggle: "+ Create list",
+      list_form_title: "New list",
+      label_nombre: "Name",
+      placeholder_list_name: "e.g. The kitchen",
+      btn_create: "Create",
+      btn_copy_link: "Copy link",
+      btn_native_share: "Share…",
+      btn_study_list: "Study this list",
+      btn_share: "Share",
+      btn_delete_list: "Delete list",
+      footer_note: "Your data is saved to your account — only you can see and edit it",
+      list_picker_new_label: "Or create a new list",
+      placeholder_new_list_name: "e.g. Food adjectives",
+      btn_create_and_add: "Create and add",
+      share_login_note: "Log in or create an account to import this list into your index.",
+      btn_import: "Import to my collection",
+      settings_title: "Settings",
+      settings_lang_label: "App language",
+      settings_lang_note: "This only changes the app's own text — your verbs and vocabulary always stay in Spanish.",
+      remove_btn: "Remove",
+      empty_no_verbs: "You don't have any verbs yet.",
+      empty_no_verb_match: "No infinitive matches “{q}”.",
+      empty_no_words: "You don't have any words yet.",
+      empty_no_word_match: "No word matches “{q}”.",
+      empty_no_lists: "You don't have any lists yet — create one below.",
+      msg_falta_infinitivo: "The infinitive is required.",
+      msg_guardando: "Saving…",
+      msg_error_guardar: "Error saving: {msg}",
+      confirm_delete_verb: "Delete this verb from your index?",
+      msg_no_pudo_eliminar: "Couldn't delete: {msg}",
+      msg_ya_tenes_verbos_ejemplo: "You already have all the example verbs in your account.",
+      msg_no_pudieron_cargar_verbos: "Couldn't load the example verbs: {msg}",
+      msg_error_cargar_verbos: "Error loading your verbs: {msg}",
+      msg_falta_palabra: "The word is required.",
+      msg_error_cargar_vocab: "Error loading your vocabulary: {msg}",
+      confirm_delete_word: "Delete this word from your vocabulary?",
+      msg_ya_tenes_palabras_ejemplo: "You already have all the example words in your vocabulary.",
+      msg_no_pudieron_cargar_palabras: "Couldn't load the example words: {msg}",
+      msg_error_cargar_listas: "Error loading your lists: {msg}",
+      msg_error_generic: "Error: {msg}",
+      msg_error_cargar_items: "Error loading the items: {msg}",
+      msg_falta_nombre: "The name is required.",
+      msg_creando: "Creating…",
+      confirm_delete_list: "Delete this list? This doesn't delete your verbs or words, only the shared list.",
+      msg_error_cargar_lista: "Error loading the list: {msg}",
+      msg_enlace_copiado: "Link copied.",
+      msg_no_pudo_copiar: "Couldn't copy automatically — the link is already selected, copy it with Ctrl/Cmd+C.",
+      msg_enlace_seleccionado: "The link is already selected, copy it with Ctrl/Cmd+C.",
+      msg_no_pudo_compartir: "Couldn't share: {msg}",
+      msg_no_items_filtro: "There are no items to add with the current filter.",
+      msg_agregando: "Adding…",
+      msg_ya_estaban_todos: "They were all already in that list ({n}).",
+      msg_nada_para_agregar: "There's nothing to add.",
+      msg_agrego_1: "1 item was added to the list.",
+      msg_agregaron_n: "{n} items were added to the list.",
+      msg_ya_estaban_paren: " ({n} already there.)",
+      msg_poner_nombre: "Enter a name for the new list.",
+      msg_error_crear: "Error creating: {msg}",
+      msg_cargando: "Loading…",
+      msg_enlace_invalido: "Invalid link",
+      msg_enlace_no_existe: "This link doesn't exist or is no longer available.",
+      msg_importando: "Importing…",
+      msg_error_importar: "Error importing: {msg}",
+      msg_imported_prefix: "Imported {n}",
+      unit_item_singular: " item.",
+      unit_item_plural: " items.",
+      msg_ya_estaba_singular: " was already",
+      msg_ya_estaban_plural: " were already",
+      msg_en_tu_coleccion: " in your collection: {list}.",
+      msg_no_pudo_crear_lista_cuenta: " Couldn't create the list in your account: {msg}",
+      msg_lista_creada_sin_items: " The list was created but its items couldn't be added: {msg}",
+      msg_se_creo_lista: " Created the list “{name}” in your account.",
+      msg_email_confirmacion: "We sent a confirmation email to {email}. Confirm your account and then log in.",
+      preposicion_note: "Used with the preposition “{prep}”.",
+      th_imp_abbrev: "Aff.",
+      unit_verbo_s: " verb",
+      unit_verbo_pl: " verbs",
+      unit_palabra_s: " word",
+      unit_palabra_pl: " words",
+      unit_item_bare_s: " item",
+      unit_item_bare_pl: " items",
+      share_fallback_name: "shared list",
+      share_native_text: "Sharing the list “{name}” from Índice Verbal.",
+      share_shared_by: " · shared by {label}"
+    }
+  };
+
+  // Grammatical category "tags" — the values actually stored on a verb/word
+  // (irregularity, transitivity, part of speech, gender, and the
+  // reflexive/auxiliar/gustar-like flags) are canonical Spanish strings in
+  // the database no matter what — only their on-screen label changes here.
+  var TAG_LABELS = {
+    "regular": { es: "regular", en: "regular" },
+    "cambio de raíz": { es: "cambio de raíz", en: "stem-changing" },
+    "irregular (yo)": { es: "irregular (yo)", en: "irregular (yo only)" },
+    "irregular (total)": { es: "irregular (total)", en: "fully irregular" },
+    "transitivo": { es: "transitivo", en: "transitive" },
+    "intransitivo": { es: "intransitivo", en: "intransitive" },
+    "ambos": { es: "ambos", en: "both" },
+    "reflexivo": { es: "reflexivo", en: "reflexive" },
+    "auxiliar": { es: "auxiliar", en: "auxiliary" },
+    "dativo": { es: "dativo", en: "dative" },
+    "sustantivo": { es: "sustantivo", en: "noun" },
+    "adjetivo": { es: "adjetivo", en: "adjective" },
+    "adverbio": { es: "adverbio", en: "adverb" },
+    "pronombre": { es: "pronombre", en: "pronoun" },
+    "preposición": { es: "preposición", en: "preposition" },
+    "conjunción": { es: "conjunción", en: "conjunction" },
+    "interjección": { es: "interjección", en: "interjection" },
+    "masculino": { es: "masculino", en: "masculine" },
+    "femenino": { es: "femenino", en: "feminine" },
+    "neutro": { es: "neutro", en: "neuter" }
+  };
+
+  // Tense/mood names (NOT person/pronoun labels — see the big comment
+  // above). Keyed by the same .key values TENSES/SUBJ_TENSES/
+  // FLASH_MATRIX_COLUMNS already use, so applyGrammarLabels() can mutate
+  // those shared objects' .label in place and every table/flashcard that
+  // reads .label picks up the change with no further code changes.
+  var TENSE_LABELS = {
+    es: { presente: "Presente", preterito: "Pretérito", imperfecto: "Imperfecto", futuro: "Futuro", condicional: "Condicional", subjPresente: "Presente", subjPasado: "Pasado", imperativo: "Imperativo" },
+    en: { presente: "Present", preterito: "Preterite", imperfecto: "Imperfect", futuro: "Future", condicional: "Conditional", subjPresente: "Present", subjPasado: "Past", imperativo: "Imperative" }
+  };
+
+  function t(key, vars) {
+    var s = (I18N[currentLang] && I18N[currentLang][key]);
+    if (s === undefined) s = (I18N.es[key] !== undefined ? I18N.es[key] : key);
+    if (vars) {
+      Object.keys(vars).forEach(function (k) {
+        s = s.split("{" + k + "}").join(vars[k]);
+      });
+    }
+    return s;
+  }
+
+  function tagLabel(value) {
+    var entry = TAG_LABELS[value];
+    return entry ? entry[currentLang] : value;
+  }
+
+  // Walks the DOM applying data-i18n / data-i18n-placeholder / data-i18n-tag
+  // attributes. Called once at startup and again whenever the language
+  // changes, so static markup never needs its own per-language branches.
+  function applyI18n(root) {
+    var scope = root || document;
+    scope.querySelectorAll("[data-i18n]").forEach(function (elx) {
+      elx.textContent = t(elx.getAttribute("data-i18n"));
+    });
+    scope.querySelectorAll("[data-i18n-placeholder]").forEach(function (elx) {
+      elx.placeholder = t(elx.getAttribute("data-i18n-placeholder"));
+    });
+    scope.querySelectorAll("[data-i18n-aria-label]").forEach(function (elx) {
+      elx.setAttribute("aria-label", t(elx.getAttribute("data-i18n-aria-label")));
+    });
+    scope.querySelectorAll("[data-i18n-tag]").forEach(function (elx) {
+      elx.textContent = tagLabel(elx.getAttribute("data-i18n-tag"));
+    });
+    document.documentElement.lang = currentLang;
+    // The two toolbar "load example X" buttons include a count, so unlike
+    // everything else with a data-i18n attribute they need a variable —
+    // set directly here rather than through the attribute walk above.
+    if (el.seedToolbarBtn) el.seedToolbarBtn.textContent = t("seed_verbs_btn", { n: STARTER_VERBS.length });
+    if (el.seedWordsToolbarBtn) el.seedWordsToolbarBtn.textContent = t("seed_words_btn", { n: STARTER_WORDS.length });
+  }
+
+  // ================= settings (app language) =================
+  function renderLangButtons() {
+    el.langEs.classList.toggle("active", currentLang === "es");
+    el.langEn.classList.toggle("active", currentLang === "en");
+  }
+
+  function openSettings() {
+    el.settingsMsg.textContent = "";
+    renderLangButtons();
+    el.settingsOverlay.hidden = false;
+  }
+
+  function closeSettings() {
+    el.settingsOverlay.hidden = true;
+  }
+
+  // Re-paints everything that was already rendered before the language
+  // changed. applyI18n() covers static markup on its own, but anything
+  // built dynamically in JS (badges, empty states, the flashcard setup
+  // screen, whichever detail view is open) has its old-language text
+  // baked into already-created DOM nodes and has to be rebuilt.
+  function refreshAllTranslatedViews() {
+    applyGrammarLabels();
+    applyI18n();
+    renderList();
+    renderWordList();
+    renderListsPanel();
+    renderStudyFilterBanner();
+    renderOfflineBanner();
+    if (selectedId) selectVerb(selectedId);
+    if (selectedWordId) selectWord(selectedWordId);
+    if (selectedListId && !el.listDetail.hidden) selectListRow(selectedListId);
+    if (currentShareList) renderSharePreview();
+    if (!el.flashcardsPanel.hidden) renderFlashSetup();
+    if (!el.flashOverlay.hidden) renderFlashCard();
+    renderLangButtons();
+  }
+
+  function setLang(lang) {
+    if ((lang !== "en" && lang !== "es") || lang === currentLang) return;
+    currentLang = lang;
+    try { localStorage.setItem(LANG_LOCAL_KEY, lang); } catch (e) {}
+    refreshAllTranslatedViews();
+    if (currentUser) {
+      supabaseClient.from("user_settings")
+        .upsert({ user_id: currentUser.id, lang: lang, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+        .then(function (res) {
+          if (res.error) el.settingsMsg.textContent = t("msg_error_guardar", { msg: res.error.message });
+        });
+    }
+  }
+
+  // Called right after login. The device-level localStorage guess (already
+  // applied at startup, before we know who's logged in) avoids a flash of
+  // the wrong language; this corrects it to the account's real, synced
+  // preference once it's back from Supabase. A first-ever login has no row
+  // yet (maybeSingle() returns null rather than erroring), which just
+  // means the default ('es') stands until the person picks something in
+  // settings.
+  function loadUserSettings() {
+    if (!currentUser) return;
+    supabaseClient.from("user_settings").select("lang").eq("user_id", currentUser.id).maybeSingle().then(function (res) {
+      if (res.error) return;
+      var lang = (res.data && res.data.lang) || "es";
+      if (lang !== currentLang) {
+        currentLang = lang;
+        try { localStorage.setItem(LANG_LOCAL_KEY, lang); } catch (e) {}
+        refreshAllTranslatedViews();
+      } else {
+        renderLangButtons();
+      }
+    });
+  }
+
   // ================= conjugation model (unchanged from the original tool) =================
   var PERSONS = [
     { key: "yo", label: "yo" },
@@ -62,6 +591,20 @@
   // is really usted's command, ellos's is really ustedes's.
   var IMPERATIVO_FORM_KEY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
   var IMPERATIVO_DISPLAY = { vos: "vos", el: "usted", nosotros: "nosotros", ellos: "ustedes" };
+
+  // Mutates the shared TENSES/SUBJ_TENSES/FLASH_MATRIX_COLUMNS objects'
+  // .label in place (their .key never changes, so every lookup/data
+  // access that depends on .key is unaffected). Because FLASH_MATRIX_
+  // COLUMNS was built with .concat() — which copies array slots, not the
+  // objects themselves — the TENSES/SUBJ_TENSES entries inside it are the
+  // very same objects, so one pass over each array is enough for every
+  // table, flashcard prompt, etc. that reads .label to pick up the change.
+  function applyGrammarLabels() {
+    var dict = TENSE_LABELS[currentLang] || TENSE_LABELS.es;
+    TENSES.forEach(function (x) { if (dict[x.key]) x.label = dict[x.key]; });
+    SUBJ_TENSES.forEach(function (x) { if (dict[x.key]) x.label = dict[x.key]; });
+    FLASH_MATRIX_COLUMNS.forEach(function (x) { if (dict[x.key]) x.label = dict[x.key]; });
+  }
 
   function flashCellKey(tenseKey, personKey) { return tenseKey + "|" + personKey; }
   function flashCellSelectable(tenseKey, personKey) { return !(tenseKey === "imperativo" && personKey === "yo"); }
@@ -526,6 +1069,12 @@
     authMsg: document.getElementById("auth-msg"),
     userEmail: document.getElementById("user-email"),
     logoutBtn: document.getElementById("logout-btn"),
+    settingsBtn: document.getElementById("settings-btn"),
+    settingsOverlay: document.getElementById("settings-overlay"),
+    settingsMsg: document.getElementById("settings-msg"),
+    settingsClose: document.getElementById("settings-close"),
+    langEs: document.getElementById("lang-es"),
+    langEn: document.getElementById("lang-en"),
 
     banner: document.getElementById("status-banner"),
     offlineBanner: document.getElementById("offline-banner"),
@@ -721,12 +1270,12 @@
 
   function formatCacheAge(savedAt) {
     var mins = Math.max(0, Math.round((Date.now() - savedAt) / 60000));
-    if (mins < 1) return "hace un momento";
-    if (mins < 60) return "hace " + mins + (mins === 1 ? " minuto" : " minutos");
+    if (mins < 1) return t("cache_age_moment");
+    if (mins < 60) return t(mins === 1 ? "cache_age_minutes" : "cache_age_minutes_pl", { n: mins });
     var hours = Math.round(mins / 60);
-    if (hours < 24) return "hace " + hours + (hours === 1 ? " hora" : " horas");
+    if (hours < 24) return t(hours === 1 ? "cache_age_hours" : "cache_age_hours_pl", { n: hours });
     var days = Math.round(hours / 24);
-    return "hace " + days + (days === 1 ? " día" : " días");
+    return t(days === 1 ? "cache_age_days" : "cache_age_days_pl", { n: days });
   }
 
   function markOffline(kind, savedAt) {
@@ -743,7 +1292,7 @@
     var kinds = Object.keys(offlineKinds);
     if (kinds.length === 0) { el.offlineBanner.hidden = true; return; }
     var oldest = Math.min.apply(null, kinds.map(function (k) { return offlineKinds[k]; }));
-    el.offlineBannerText.textContent = "Sin conexión — mostrando lo último guardado (" + formatCacheAge(oldest) + ").";
+    el.offlineBannerText.textContent = t("offline_banner", { age: formatCacheAge(oldest) });
     el.offlineBanner.hidden = false;
   }
 
@@ -802,7 +1351,7 @@
       frag.appendChild(th);
     });
     var thImp = document.createElement("th");
-    thImp.textContent = "Afirm.";
+    thImp.textContent = t("th_imp_abbrev");
     frag.appendChild(thImp);
     el.dTenseRow.innerHTML = "";
     el.dTenseRow.appendChild(frag);
@@ -823,13 +1372,13 @@
     if (data.type) {
       var tb = document.createElement("span");
       tb.className = "badge type";
-      tb.textContent = data.type;
+      tb.textContent = tagLabel(data.type);
       btn.appendChild(tb);
     }
     if (data.irregularity && data.irregularity !== "regular") {
       var ib = document.createElement("span");
       ib.className = "badge irregular";
-      ib.textContent = data.irregularity;
+      ib.textContent = tagLabel(data.irregularity);
       btn.appendChild(ib);
     }
 
@@ -870,14 +1419,14 @@
       note.className = "empty-note";
       var p = document.createElement("p");
       p.textContent = allVerbs.length === 0
-        ? "Todavía no hay verbos en tu cuenta."
-        : "Ningún infinitivo coincide con “" + el.search.value + "”.";
+        ? t("empty_no_verbs")
+        : t("empty_no_verb_match", { q: el.search.value });
       note.appendChild(p);
       if (allVerbs.length === 0) {
         var seedBtn = document.createElement("button");
         seedBtn.type = "button";
         seedBtn.className = "seed-btn";
-        seedBtn.textContent = "Cargar 42 verbos de ejemplo";
+        seedBtn.textContent = t("seed_verbs_btn", { n: STARTER_VERBS.length });
         seedBtn.addEventListener("click", seedStarterVerbs);
         note.appendChild(seedBtn);
       }
@@ -918,15 +1467,15 @@
     el.dInfinitive.textContent = data.infinitive || id;
     el.dDefinition.textContent = data.definition || "";
     el.dBadges.innerHTML = "";
-    if (data.type) el.dBadges.appendChild(badge("type", data.type));
-    el.dBadges.appendChild(badge("irregular", data.irregularity || "regular"));
-    el.dBadges.appendChild(badge("transitivity", data.transitivity || "transitivo"));
-    if (data.reflexive) el.dBadges.appendChild(badge("reflexive", "reflexivo"));
-    if (data.auxiliar) el.dBadges.appendChild(badge("auxiliar", "auxiliar"));
-    if (data.gustar_like) el.dBadges.appendChild(badge("gustarLike", "dativo"));
+    if (data.type) el.dBadges.appendChild(badge("type", tagLabel(data.type)));
+    el.dBadges.appendChild(badge("irregular", tagLabel(data.irregularity || "regular")));
+    el.dBadges.appendChild(badge("transitivity", tagLabel(data.transitivity || "transitivo")));
+    if (data.reflexive) el.dBadges.appendChild(badge("reflexive", tagLabel("reflexivo")));
+    if (data.auxiliar) el.dBadges.appendChild(badge("auxiliar", tagLabel("auxiliar")));
+    if (data.gustar_like) el.dBadges.appendChild(badge("gustarLike", tagLabel("dativo")));
     el.dPattern.textContent = data.pattern || "";
     el.dPattern.style.display = data.pattern ? "" : "none";
-    el.dPreposicion.textContent = data.preposicion ? "Se usa con la preposición “" + data.preposicion + "”." : "";
+    el.dPreposicion.textContent = data.preposicion ? t("preposicion_note", { prep: data.preposicion }) : "";
     el.dPreposicion.style.display = data.preposicion ? "" : "none";
 
     var imper = forms.imperativo || {};
@@ -1131,7 +1680,7 @@
     impTr.className = "impersonal-row";
     var impTh = document.createElement("th");
     impTh.className = "person-col";
-    impTh.textContent = "impersonal (opcional)";
+    impTh.textContent = t("impersonal_optional");
     impTr.appendChild(impTh);
     TENSES.forEach(function (t) {
       var td = document.createElement("td");
@@ -1345,7 +1894,7 @@
       })
       .catch(function (err) {
         var cached = readCache("verbs");
-        if (!cached) { showBanner("Error al cargar tus verbos: " + ((err && err.message) || err)); return; }
+        if (!cached) { showBanner(t("msg_error_cargar_verbos", { msg: (err && err.message) || err })); return; }
         allVerbs = cached.rows.map(rowToVerb);
         markOffline("verbs", cached.savedAt);
         renderList();
@@ -1355,15 +1904,15 @@
   function handleSubmit(evt) {
     evt.preventDefault();
     var data = collectFormData();
-    if (!data.infinitive) { el.formMsg.textContent = "Falta el infinitivo."; return; }
-    el.formMsg.textContent = "Guardando…";
+    if (!data.infinitive) { el.formMsg.textContent = t("msg_falta_infinitivo"); return; }
+    el.formMsg.textContent = t("msg_guardando");
 
     var query = editingId
       ? supabaseClient.from("verbs").update(data).eq("id", editingId).select().single()
       : supabaseClient.from("verbs").insert(data).select().single();
 
     query.then(function (res) {
-      if (res.error) { el.formMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      if (res.error) { el.formMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
       var savedId = res.data.id;
       closeForm();
       loadVerbs().then(function () { selectVerb(savedId); });
@@ -1372,9 +1921,9 @@
 
   function handleDelete() {
     if (!selectedId) return;
-    if (!window.confirm("¿Eliminar este verbo de tu índice?")) return;
+    if (!window.confirm(t("confirm_delete_verb"))) return;
     supabaseClient.from("verbs").delete().eq("id", selectedId).then(function (res) {
-      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      if (res.error) { showBanner(t("msg_no_pudo_eliminar", { msg: res.error.message })); return; }
       el.detail.hidden = true;
       selectedId = null;
       loadVerbs();
@@ -1386,11 +1935,11 @@
     allVerbs.forEach(function (v) { existing[norm(v.data.infinitive || "")] = true; });
     var toInsert = STARTER_VERBS.filter(function (sv) { return !existing[norm(sv.infinitive)]; });
     if (toInsert.length === 0) {
-      showBanner("Ya tenés todos los verbos de ejemplo en tu cuenta.");
+      showBanner(t("msg_ya_tenes_verbos_ejemplo"));
       return;
     }
     supabaseClient.from("verbs").insert(toInsert).then(function (res) {
-      if (res.error) { showBanner("No se pudieron cargar los verbos de ejemplo: " + res.error.message); return; }
+      if (res.error) { showBanner(t("msg_no_pudieron_cargar_verbos", { msg: res.error.message })); return; }
       loadVerbs();
     });
   }
@@ -1421,8 +1970,8 @@
     w.textContent = data.word || id;
     btn.appendChild(w);
 
-    if (data.partOfSpeech) btn.appendChild(badge("type", data.partOfSpeech));
-    if (data.gender) btn.appendChild(badge("gender", data.gender));
+    if (data.partOfSpeech) btn.appendChild(badge("type", tagLabel(data.partOfSpeech)));
+    if (data.gender) btn.appendChild(badge("gender", tagLabel(data.gender)));
 
     var def = document.createElement("span");
     def.className = "def";
@@ -1456,14 +2005,14 @@
       note.className = "empty-note";
       var p = document.createElement("p");
       p.textContent = allWords.length === 0
-        ? "Todavía no hay palabras en tu vocabulario."
-        : "Ninguna palabra coincide con “" + el.wordSearch.value + "”.";
+        ? t("empty_no_words")
+        : t("empty_no_word_match", { q: el.wordSearch.value });
       note.appendChild(p);
       if (allWords.length === 0) {
         var seedWordsBtn = document.createElement("button");
         seedWordsBtn.type = "button";
         seedWordsBtn.className = "seed-btn";
-        seedWordsBtn.textContent = "Cargar " + STARTER_WORDS.length + " palabras de ejemplo";
+        seedWordsBtn.textContent = t("seed_words_btn", { n: STARTER_WORDS.length });
         seedWordsBtn.addEventListener("click", seedStarterWords);
         note.appendChild(seedWordsBtn);
       }
@@ -1492,8 +2041,8 @@
     el.wdWord.textContent = data.word || id;
     el.wdDefinition.textContent = data.definition || "";
     el.wdBadges.innerHTML = "";
-    if (data.partOfSpeech) el.wdBadges.appendChild(badge("type", data.partOfSpeech));
-    if (data.gender) el.wdBadges.appendChild(badge("gender", data.gender));
+    if (data.partOfSpeech) el.wdBadges.appendChild(badge("type", tagLabel(data.partOfSpeech)));
+    if (data.gender) el.wdBadges.appendChild(badge("gender", tagLabel(data.gender)));
     el.wdNotes.textContent = data.notes || "";
     el.wdNotes.style.display = data.notes ? "" : "none";
     el.wdExample.textContent = data.example || "";
@@ -1585,7 +2134,7 @@
       })
       .catch(function (err) {
         var cached = readCache("words");
-        if (!cached) { showBanner("Error al cargar tu vocabulario: " + ((err && err.message) || err)); return; }
+        if (!cached) { showBanner(t("msg_error_cargar_vocab", { msg: (err && err.message) || err })); return; }
         allWords = cached.rows.map(rowToWord);
         markOffline("words", cached.savedAt);
         renderWordList();
@@ -1595,8 +2144,8 @@
   function handleWordSubmit(evt) {
     evt.preventDefault();
     var data = collectWordFormData();
-    if (!data.word) { el.wordFormMsg.textContent = "Falta la palabra."; return; }
-    el.wordFormMsg.textContent = "Guardando…";
+    if (!data.word) { el.wordFormMsg.textContent = t("msg_falta_palabra"); return; }
+    el.wordFormMsg.textContent = t("msg_guardando");
 
     var row = {
       word: data.word,
@@ -1612,7 +2161,7 @@
       : supabaseClient.from("words").insert(row).select().single();
 
     query.then(function (res) {
-      if (res.error) { el.wordFormMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      if (res.error) { el.wordFormMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
       var savedId = res.data.id;
       closeWordForm();
       loadWords().then(function () { selectWord(savedId); });
@@ -1621,9 +2170,9 @@
 
   function handleWordDelete() {
     if (!selectedWordId) return;
-    if (!window.confirm("¿Eliminar esta palabra de tu vocabulario?")) return;
+    if (!window.confirm(t("confirm_delete_word"))) return;
     supabaseClient.from("words").delete().eq("id", selectedWordId).then(function (res) {
-      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      if (res.error) { showBanner(t("msg_no_pudo_eliminar", { msg: res.error.message })); return; }
       el.wordDetail.hidden = true;
       selectedWordId = null;
       loadWords();
@@ -1635,11 +2184,11 @@
     allWords.forEach(function (v) { existing[norm(v.data.word || "")] = true; });
     var toInsert = STARTER_WORDS.filter(function (sw) { return !existing[norm(sw.word)]; });
     if (toInsert.length === 0) {
-      showBanner("Ya tenés todas las palabras de ejemplo en tu vocabulario.");
+      showBanner(t("msg_ya_tenes_palabras_ejemplo"));
       return;
     }
     supabaseClient.from("words").insert(toInsert).then(function (res) {
-      if (res.error) { showBanner("No se pudieron cargar las palabras de ejemplo: " + res.error.message); return; }
+      if (res.error) { showBanner(t("msg_no_pudieron_cargar_palabras", { msg: res.error.message })); return; }
       loadWords();
     });
   }
@@ -1744,11 +2293,11 @@
 
   function buildFlashStandaloneToggles() {
     el.flashStandaloneToggles.innerHTML = "";
-    [{ key: "gerundio", label: "Gerundio" }, { key: "participio", label: "Participio" }].forEach(function (item) {
+    [{ key: "gerundio", i18nKey: "tile_gerundio" }, { key: "participio", i18nKey: "tile_participio" }].forEach(function (item) {
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "chip";
-      btn.textContent = item.label;
+      btn.textContent = t(item.i18nKey);
       btn.classList.toggle("active", activeFlashStandalone.has(item.key));
       btn.addEventListener("click", function () {
         if (activeFlashStandalone.has(item.key)) activeFlashStandalone.delete(item.key); else activeFlashStandalone.add(item.key);
@@ -1830,19 +2379,19 @@
             if (!val) return;
             deck.push({
               kind: "verb", data: data,
-              frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · imperativo",
+              frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · " + t("mood_imperativo").toLowerCase(),
               backMain: val, backSub: def ? "(" + def + ")" : ""
             });
           });
         }
 
-        ["gerundio", "participio"].forEach(function (key) {
-          if (!activeFlashStandalone.has(key)) return;
-          var val = forms[key] || "";
+        [{ key: "gerundio", i18nKey: "tile_gerundio" }, { key: "participio", i18nKey: "tile_participio" }].forEach(function (item) {
+          if (!activeFlashStandalone.has(item.key)) return;
+          var val = forms[item.key] || "";
           if (!val) return;
           deck.push({
             kind: "verb", data: data,
-            frontMain: inf, frontSub: key,
+            frontMain: inf, frontSub: t(item.i18nKey),
             backMain: val, backSub: def ? "(" + def + ")" : ""
           });
         });
@@ -1869,15 +2418,15 @@
     var frag = document.createDocumentFragment();
     var data = card.data;
     if (card.kind === "verb") {
-      if (data.type) frag.appendChild(badge("type", data.type));
-      frag.appendChild(badge("irregular", data.irregularity || "regular"));
-      frag.appendChild(badge("transitivity", data.transitivity || "transitivo"));
-      if (data.reflexive) frag.appendChild(badge("reflexive", "reflexivo"));
-      if (data.auxiliar) frag.appendChild(badge("auxiliar", "auxiliar"));
-      if (data.gustar_like) frag.appendChild(badge("gustarLike", "dativo"));
+      if (data.type) frag.appendChild(badge("type", tagLabel(data.type)));
+      frag.appendChild(badge("irregular", tagLabel(data.irregularity || "regular")));
+      frag.appendChild(badge("transitivity", tagLabel(data.transitivity || "transitivo")));
+      if (data.reflexive) frag.appendChild(badge("reflexive", tagLabel("reflexivo")));
+      if (data.auxiliar) frag.appendChild(badge("auxiliar", tagLabel("auxiliar")));
+      if (data.gustar_like) frag.appendChild(badge("gustarLike", tagLabel("dativo")));
     } else {
-      if (data.partOfSpeech) frag.appendChild(badge("type", data.partOfSpeech));
-      if (data.gender) frag.appendChild(badge("gender", data.gender));
+      if (data.partOfSpeech) frag.appendChild(badge("type", tagLabel(data.partOfSpeech)));
+      if (data.gender) frag.appendChild(badge("gender", tagLabel(data.gender)));
     }
     return frag;
   }
@@ -1933,7 +2482,7 @@
   function startFlashcards() {
     flashDeck = shuffleArray(buildFlashDeck());
     if (flashDeck.length === 0) {
-      el.flashSetupMsg.textContent = "No hay tarjetas para esta combinación de filtros — probá activar más tiempos, personas o fuentes.";
+      el.flashSetupMsg.textContent = t("flash_no_cards");
       return;
     }
     el.flashSetupMsg.textContent = "";
@@ -2098,11 +2647,11 @@
   function listMetaText(count, verbCount, wordCount) {
     if (verbCount || wordCount) {
       var parts = [];
-      if (verbCount) parts.push(verbCount + (verbCount === 1 ? " verbo" : " verbos"));
-      if (wordCount) parts.push(wordCount + (wordCount === 1 ? " palabra" : " palabras"));
+      if (verbCount) parts.push(verbCount + t(verbCount === 1 ? "unit_verbo_s" : "unit_verbo_pl"));
+      if (wordCount) parts.push(wordCount + t(wordCount === 1 ? "unit_palabra_s" : "unit_palabra_pl"));
       return parts.join(" · ");
     }
-    return count + (count === 1 ? " ítem" : " ítems");
+    return count + t(count === 1 ? "unit_item_bare_s" : "unit_item_bare_pl");
   }
 
   function rowsToLists(rows) {
@@ -2132,7 +2681,7 @@
       })
       .catch(function (err) {
         var cached = readCache("lists");
-        if (!cached) { showBanner("Error al cargar tus listas: " + ((err && err.message) || err)); return; }
+        if (!cached) { showBanner(t("msg_error_cargar_listas", { msg: (err && err.message) || err })); return; }
         allLists = rowsToLists(cached.rows);
         markOffline("lists", cached.savedAt);
         renderListsPanel();
@@ -2185,10 +2734,10 @@
     var removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "icon-btn danger";
-    removeBtn.textContent = "Quitar";
+    removeBtn.textContent = t("remove_btn");
     removeBtn.addEventListener("click", function () {
       supabaseClient.from("list_items").delete().eq("id", row.id).then(function (res) {
-        if (res.error) { el.ldShareMsg.textContent = "Error: " + res.error.message; return; }
+        if (res.error) { el.ldShareMsg.textContent = t("msg_error_generic", { msg: res.error.message }); return; }
         loadLists();
       });
     });
@@ -2211,7 +2760,7 @@
     el.ldVerbsGroup.hidden = true;
     el.ldWordsGroup.hidden = true;
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
-      if (res.error) { el.ldShareMsg.textContent = "Error al cargar los ítems: " + res.error.message; return; }
+      if (res.error) { el.ldShareMsg.textContent = t("msg_error_cargar_items", { msg: res.error.message }); return; }
       var rows = res.data || [];
       var verbRows = rows.filter(function (r) { return r.item_type === "verb"; });
       var wordRows = rows.filter(function (r) { return r.item_type === "word"; });
@@ -2245,13 +2794,13 @@
   function handleListSubmit(evt) {
     evt.preventDefault();
     var name = el.lfName.value.trim();
-    if (!name) { el.listFormMsg.textContent = "Falta el nombre."; return; }
-    el.listFormMsg.textContent = "Creando…";
+    if (!name) { el.listFormMsg.textContent = t("msg_falta_nombre"); return; }
+    el.listFormMsg.textContent = t("msg_creando");
     supabaseClient.from("lists").insert({
       name: name,
       owner_label: currentUser ? currentUser.email : ""
     }).select().single().then(function (res) {
-      if (res.error) { el.listFormMsg.textContent = "Error al guardar: " + res.error.message; return; }
+      if (res.error) { el.listFormMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
       var savedId = res.data.id;
       closeListForm();
       loadLists().then(function () { selectListRow(savedId); });
@@ -2260,9 +2809,9 @@
 
   function handleListDelete() {
     if (!selectedListId) return;
-    if (!window.confirm("¿Eliminar esta lista? Esto no borra tus verbos ni palabras, solo la lista compartida.")) return;
+    if (!window.confirm(t("confirm_delete_list"))) return;
     supabaseClient.from("lists").delete().eq("id", selectedListId).then(function (res) {
-      if (res.error) { showBanner("No se pudo eliminar: " + res.error.message); return; }
+      if (res.error) { showBanner(t("msg_no_pudo_eliminar", { msg: res.error.message })); return; }
       el.listDetail.hidden = true;
       selectedListId = null;
       loadLists();
@@ -2279,7 +2828,7 @@
     if (!entry) return;
     el.ldShareMsg.textContent = "";
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
-      if (res.error) { el.ldShareMsg.textContent = "Error al cargar la lista: " + res.error.message; return; }
+      if (res.error) { el.ldShareMsg.textContent = t("msg_error_cargar_lista", { msg: res.error.message }); return; }
       var rows = res.data || [];
       var verbSet = new Set();
       var wordSet = new Set();
@@ -2304,7 +2853,7 @@
 
   function renderStudyFilterBanner() {
     if (!activeStudyList) { el.studyFilterBanner.hidden = true; return; }
-    el.studyFilterText.textContent = "Estudiando la lista “" + activeStudyList.name + "”";
+    el.studyFilterText.textContent = t("study_filter_studying", { name: activeStudyList.name });
     el.studyFilterBanner.hidden = false;
   }
 
@@ -2330,14 +2879,14 @@
     if (!link) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(link).then(function () {
-        el.ldShareMsg.textContent = "Enlace copiado.";
+        el.ldShareMsg.textContent = t("msg_enlace_copiado");
       }).catch(function () {
         el.ldShareLink.select();
-        el.ldShareMsg.textContent = "No se pudo copiar automáticamente — el enlace ya está seleccionado, copialo con Ctrl/Cmd+C.";
+        el.ldShareMsg.textContent = t("msg_no_pudo_copiar");
       });
     } else {
       el.ldShareLink.select();
-      el.ldShareMsg.textContent = "El enlace ya está seleccionado, copialo con Ctrl/Cmd+C.";
+      el.ldShareMsg.textContent = t("msg_enlace_seleccionado");
     }
   }
 
@@ -2345,17 +2894,17 @@
     var link = el.ldShareLink.value;
     if (!link || !navigator.share) return;
     var entry = allLists.find(function (l) { return l.id === selectedListId; });
-    var name = entry ? entry.data.name : "lista compartida";
+    var name = entry ? entry.data.name : t("share_fallback_name");
     el.ldShareMsg.textContent = "";
     navigator.share({
       title: "Índice Verbal — " + name,
-      text: "Te comparto la lista “" + name + "” de Índice Verbal.",
+      text: t("share_native_text", { name: name }),
       url: link
     }).catch(function (err) {
       // AbortError just means the person closed the share sheet without
       // picking anything — not worth surfacing as an error.
       if (err && err.name === "AbortError") return;
-      el.ldShareMsg.textContent = "No se pudo compartir: " + ((err && err.message) || err);
+      el.ldShareMsg.textContent = t("msg_no_pudo_compartir", { msg: (err && err.message) || err });
     });
   }
 
@@ -2363,7 +2912,7 @@
 
   function openListPicker(itemType, items) {
     if (!items || items.length === 0) {
-      showBanner("No hay ítems para agregar con el filtro actual.");
+      showBanner(t("msg_no_items_filtro"));
       return;
     }
     listPickerTarget = { itemType: itemType, items: items };
@@ -2381,7 +2930,7 @@
       var note = document.createElement("div");
       note.className = "empty-note";
       var p = document.createElement("p");
-      p.textContent = "Todavía no tenés ninguna lista — creá una nueva abajo.";
+      p.textContent = t("empty_no_lists");
       note.appendChild(p);
       li.appendChild(note);
       el.listPickerList.appendChild(li);
@@ -2421,12 +2970,12 @@
     if (!listPickerTarget) return;
     var itemType = listPickerTarget.itemType;
     var items = listPickerTarget.items;
-    el.listPickerMsg.textContent = "Agregando…";
+    el.listPickerMsg.textContent = t("msg_agregando");
     // Only dedupe against the target list's existing items of the SAME
     // type — a list mixing verbs and words could otherwise have a word
     // wrongly skipped because its text happens to match an unrelated verb.
     supabaseClient.from("list_items").select("data").eq("list_id", listId).eq("item_type", itemType).then(function (res) {
-      if (res.error) { el.listPickerMsg.textContent = "Error: " + res.error.message; return; }
+      if (res.error) { el.listPickerMsg.textContent = t("msg_error_generic", { msg: res.error.message }); return; }
       var existing = {};
       (res.data || []).forEach(function (row) {
         var d = row.data || {};
@@ -2442,15 +2991,15 @@
       });
       if (toInsert.length === 0) {
         el.listPickerMsg.textContent = skipped
-          ? "Ya estaban todos en esa lista (" + skipped + ")."
-          : "No hay nada para agregar.";
+          ? t("msg_ya_estaban_todos", { n: skipped })
+          : t("msg_nada_para_agregar");
         return;
       }
       supabaseClient.from("list_items").insert(toInsert).then(function (res2) {
-        if (res2.error) { el.listPickerMsg.textContent = "Error: " + res2.error.message; return; }
+        if (res2.error) { el.listPickerMsg.textContent = t("msg_error_generic", { msg: res2.error.message }); return; }
         closeListPicker();
-        var msg = toInsert.length === 1 ? "Se agregó 1 ítem a la lista." : "Se agregaron " + toInsert.length + " ítems a la lista.";
-        if (skipped) msg += " (" + skipped + " ya estaban.)";
+        var msg = toInsert.length === 1 ? t("msg_agrego_1") : t("msg_agregaron_n", { n: toInsert.length });
+        if (skipped) msg += t("msg_ya_estaban_paren", { n: skipped });
         showBanner(msg);
         loadLists();
       });
@@ -2460,13 +3009,13 @@
   function handleListPickerCreate() {
     if (!listPickerTarget) return;
     var name = el.listPickerNewName.value.trim();
-    if (!name) { el.listPickerMsg.textContent = "Poné un nombre para la lista nueva."; return; }
-    el.listPickerMsg.textContent = "Creando…";
+    if (!name) { el.listPickerMsg.textContent = t("msg_poner_nombre"); return; }
+    el.listPickerMsg.textContent = t("msg_creando");
     supabaseClient.from("lists").insert({
       name: name,
       owner_label: currentUser ? currentUser.email : ""
     }).select().single().then(function (res) {
-      if (res.error) { el.listPickerMsg.textContent = "Error al crear: " + res.error.message; return; }
+      if (res.error) { el.listPickerMsg.textContent = t("msg_error_crear", { msg: res.error.message }); return; }
       addItemToList(res.data.id);
     });
   }
@@ -2475,7 +3024,7 @@
 
   function openSharePreview(token) {
     el.shareOverlay.hidden = false;
-    el.shareName.textContent = "Cargando…";
+    el.shareName.textContent = t("msg_cargando");
     el.shareMeta.textContent = "";
     el.shareMsg.textContent = "";
     el.shareItems.innerHTML = "";
@@ -2484,8 +3033,8 @@
     supabaseClient.rpc("get_shared_list", { p_token: token }).then(function (res) {
       if (res.error || !res.data || res.data.length === 0) {
         currentShareList = null;
-        el.shareName.textContent = "Enlace no válido";
-        el.shareMsg.textContent = "Este enlace no existe o ya no está disponible.";
+        el.shareName.textContent = t("msg_enlace_invalido");
+        el.shareMsg.textContent = t("msg_enlace_no_existe");
         el.shareLoginNote.hidden = true;
         el.shareImportBtn.hidden = true;
         return;
@@ -2509,7 +3058,7 @@
     var verbCount = s.items.filter(function (it) { return it.itemType === "verb"; }).length;
     var wordCount = s.items.filter(function (it) { return it.itemType === "word"; }).length;
     el.shareMeta.textContent = listMetaText(s.items.length, verbCount, wordCount) +
-      (s.ownerLabel ? " · compartida por " + s.ownerLabel : "");
+      (s.ownerLabel ? t("share_shared_by", { label: s.ownerLabel }) : "");
     el.shareItems.innerHTML = "";
     s.items.forEach(function (it) {
       var li = document.createElement("li");
@@ -2519,8 +3068,8 @@
       main.className = "inf";
       main.textContent = it.itemType === "verb" ? (it.data.infinitive || "") : (it.data.word || "");
       row.appendChild(main);
-      if (it.itemType === "verb" && it.data.type) row.appendChild(badge("type", it.data.type));
-      if (it.itemType === "word" && it.data.partOfSpeech) row.appendChild(badge("type", it.data.partOfSpeech));
+      if (it.itemType === "verb" && it.data.type) row.appendChild(badge("type", tagLabel(it.data.type)));
+      if (it.itemType === "word" && it.data.partOfSpeech) row.appendChild(badge("type", tagLabel(it.data.partOfSpeech)));
       var def = document.createElement("span");
       def.className = "def";
       def.textContent = it.data.definition || "";
@@ -2559,7 +3108,7 @@
   function handleShareImport() {
     if (!currentShareList || !currentUser) return;
     el.shareImportBtn.disabled = true;
-    el.shareImportResult.textContent = "Importando…";
+    el.shareImportResult.textContent = t("msg_importando");
     var s = currentShareList;
 
     var existingInf = {};
@@ -2598,7 +3147,7 @@
       var failed = results.filter(function (r) { return r && r.error; });
       if (failed.length) {
         el.shareImportBtn.disabled = false;
-        el.shareImportResult.textContent = "Error al importar: " + failed[0].error.message;
+        el.shareImportResult.textContent = t("msg_error_importar", { msg: failed[0].error.message });
         return;
       }
       if (toInsertV.length) loadVerbs();
@@ -2606,10 +3155,10 @@
 
       var importedCount = toInsertV.length + toInsertW.length;
       var skipped = skippedV.concat(skippedW);
-      var msg = "Se importaron " + importedCount + (importedCount === 1 ? " ítem." : " ítems.");
+      var msg = t("msg_imported_prefix", { n: importedCount }) + t(importedCount === 1 ? "unit_item_singular" : "unit_item_plural");
       if (skipped.length) {
-        msg += " " + skipped.length + (skipped.length === 1 ? " ya estaba" : " ya estaban") +
-          " en tu colección: " + skipped.join(", ") + ".";
+        msg += " " + skipped.length + t(skipped.length === 1 ? "msg_ya_estaba_singular" : "msg_ya_estaban_plural") +
+          t("msg_en_tu_coleccion", { list: skipped.join(", ") });
       }
 
       // Now build the recipient's own copy of the list itself, so it shows
@@ -2622,7 +3171,7 @@
         owner_label: currentUser.email || ""
       }).select().single().then(function (listRes) {
         if (listRes.error) {
-          msg += " No se pudo crear la lista en tu cuenta: " + listRes.error.message;
+          msg += t("msg_no_pudo_crear_lista_cuenta", { msg: listRes.error.message });
           el.shareImportResult.textContent = msg;
           return;
         }
@@ -2631,9 +3180,9 @@
         });
         supabaseClient.from("list_items").insert(listItemRows).then(function (itemsRes) {
           if (itemsRes.error) {
-            msg += " La lista se creó pero no se pudieron agregar sus ítems: " + itemsRes.error.message;
+            msg += t("msg_lista_creada_sin_items", { msg: itemsRes.error.message });
           } else {
-            msg += " Se creó la lista “" + s.listName + "” en tu cuenta.";
+            msg += t("msg_se_creo_lista", { name: s.listName });
           }
           el.shareImportResult.textContent = msg;
           loadLists();
@@ -2649,7 +3198,7 @@
     authMode = mode;
     el.tabLogin.classList.toggle("active", mode === "login");
     el.tabSignup.classList.toggle("active", mode === "signup");
-    el.authSubmit.textContent = mode === "login" ? "Entrar" : "Crear cuenta";
+    el.authSubmit.textContent = mode === "login" ? t("auth_submit_login") : t("auth_signup_tab");
     el.authMsg.textContent = "";
   }
 
@@ -2658,6 +3207,7 @@
       el.authScreen.hidden = true;
       el.appScreen.hidden = false;
       el.userEmail.textContent = currentUser.email || "";
+      loadUserSettings();
       loadVerbs();
       loadWords();
       loadLists();
@@ -2717,7 +3267,7 @@
             // it appeared, which is why the card seemed to just silently
             // flip to the login tab with no explanation.
             setAuthMode("login");
-            el.authMsg.textContent = "Te enviamos un email de confirmación a " + email + ". Confirmá tu cuenta y después iniciá sesión.";
+            el.authMsg.textContent = t("msg_email_confirmacion", { email: email });
             el.authMsg.style.color = "var(--accent-deep)";
           }
         });
@@ -2735,6 +3285,10 @@
   el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
   el.authForm.addEventListener("submit", handleAuthSubmit);
   el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
+  el.settingsBtn.addEventListener("click", openSettings);
+  el.settingsClose.addEventListener("click", closeSettings);
+  el.langEs.addEventListener("click", function () { setLang("es"); });
+  el.langEn.addEventListener("click", function () { setLang("en"); });
 
   el.search.addEventListener("input", renderList);
   wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, renderList);
@@ -2818,6 +3372,13 @@
 
   el.shareCloseBtn.addEventListener("click", closeSharePreview);
   el.shareImportBtn.addEventListener("click", handleShareImport);
+
+  // Apply the current language (the localStorage guess at this point,
+  // since we don't know who's logged in yet — see loadUserSettings())
+  // before anything gets built, so the very first paint is already in the
+  // right language instead of flashing Spanish and then switching.
+  applyGrammarLabels();
+  applyI18n();
 
   buildConjFormTable();
   buildImperativoFormRow();
