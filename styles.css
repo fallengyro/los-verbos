@@ -216,24 +216,35 @@
   #auth-submit { margin-top: 4px; }
 
   /* ---------- search / list ---------- */
-  .search-box { position: relative; margin-bottom: 6px; }
+  /* Search + its filter chips are grouped as their own card, set off from
+     the tab bar above and the results list below — search is a way to get
+     into your índice, not the main event, so it shouldn't visually compete
+     with the verb/word content itself. */
+  .search-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    padding: 14px 16px 12px;
+    margin-bottom: 20px;
+  }
+  .search-box { position: relative; margin-bottom: 4px; }
   .search-box input {
     width: 100%;
-    font-family: "Fraunces", Georgia, serif;
-    font-size: 20px;
+    font-family: "Public Sans", sans-serif;
+    font-size: 15px;
     font-weight: 500;
     background: transparent;
     border: none;
     border-bottom: 2px solid var(--ink);
     color: var(--ink);
-    padding: 8px 2px 10px;
+    padding: 6px 2px 7px;
     outline: none;
   }
-  .search-box input::placeholder { color: var(--ink-soft); font-style: italic; }
+  .search-box input::placeholder { color: var(--ink-soft); font-style: italic; font-size: 13.5px; }
   .search-box .count {
     position: absolute;
     right: 2px;
-    bottom: 12px;
+    bottom: 10px;
     font-family: "JetBrains Mono", monospace;
     font-size: 12px;
     color: var(--ink-soft);
@@ -244,7 +255,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px 10px;
-    margin-top: 12px;
+    margin-top: 10px;
   }
   .chip-group {
     display: flex;
@@ -261,7 +272,11 @@
     margin-right: 2px;
   }
   .chip {
-    background: var(--paper-raised);
+    /* one shade darker than the .search-card it now sits inside (which is
+       itself --paper-raised), the same raised-card/sunken-content contrast
+       .detail already uses for its .tile elements — otherwise the chips
+       would blend into the card behind them. */
+    background: var(--paper-sunken);
     border: 1px solid var(--line);
     border-radius: 20px;
     padding: 4px 12px;
@@ -629,7 +644,14 @@
   .flash-arrow:disabled { opacity: 0.15; cursor: default; }
   .flash-face {
     position: absolute; inset: 0; backface-visibility: hidden;
-    border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised);
+    border: 1px solid var(--line); border-radius: 16px;
+    background-color: var(--paper-raised);
+    /* A faint fractal-noise grain, tiled, so the card reads as cardstock
+       rather than a flat digital rectangle. Kept to a hint on purpose: the
+       noise's own alpha is tuned low in the color matrix below rather than
+       relying on a visible repeating pattern, so it doesn't compete with
+       the text sitting on top of it. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix in='t' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     box-shadow: 0 6px 24px var(--shadow);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 28px; text-align: center; gap: 10px;
@@ -702,6 +724,15 @@
 
   /* ================= listas compartidas ================= */
   #lists-list { max-height: 260px; }
+  .list-detail-group { margin-top: 14px; }
+  .list-detail-group h4 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
   form#list-form h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 14px; }
 
   .share-link-row { display: flex; gap: 8px; margin: 4px 0 2px; }

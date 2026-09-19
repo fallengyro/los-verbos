@@ -56,38 +56,40 @@
 
   <section id="verbs-panel">
 
-  <div class="search-box">
-    <input type="text" id="search" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
-    <span class="count" id="count"></span>
-  </div>
+  <div class="search-card">
+    <div class="search-box">
+      <input type="text" id="search" placeholder="Escribí un infinitivo… (ej. querer)" autocomplete="off" />
+      <span class="count" id="count"></span>
+    </div>
 
-  <div class="filter-chips" id="verb-filters">
-    <div class="chip-group">
-      <span class="chip-label">Tipo</span>
-      <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
-      <button type="button" class="chip" data-facet="type" data-value="-er">-er</button>
-      <button type="button" class="chip" data-facet="type" data-value="-ir">-ir</button>
+    <div class="filter-chips" id="verb-filters">
+      <div class="chip-group">
+        <span class="chip-label">Tipo</span>
+        <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
+        <button type="button" class="chip" data-facet="type" data-value="-er">-er</button>
+        <button type="button" class="chip" data-facet="type" data-value="-ir">-ir</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label">Irregularidad</span>
+        <button type="button" class="chip" data-facet="irregularity" data-value="regular">regular</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="cambio de raíz">cambio de raíz</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (yo)">irregular (yo)</button>
+        <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)">irregular (total)</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label">Transitividad</span>
+        <button type="button" class="chip" data-facet="transitivity" data-value="transitivo">transitivo</button>
+        <button type="button" class="chip" data-facet="transitivity" data-value="intransitivo">intransitivo</button>
+        <button type="button" class="chip" data-facet="transitivity" data-value="ambos">ambos</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label">Marcas</span>
+        <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
+        <button type="button" class="chip" data-facet="flag" data-value="auxiliar">auxiliar</button>
+        <button type="button" class="chip" data-facet="flag" data-value="gustarLike">tipo gustar</button>
+      </div>
+      <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
     </div>
-    <div class="chip-group">
-      <span class="chip-label">Irregularidad</span>
-      <button type="button" class="chip" data-facet="irregularity" data-value="regular">regular</button>
-      <button type="button" class="chip" data-facet="irregularity" data-value="cambio de raíz">cambio de raíz</button>
-      <button type="button" class="chip" data-facet="irregularity" data-value="irregular (yo)">irregular (yo)</button>
-      <button type="button" class="chip" data-facet="irregularity" data-value="irregular (total)">irregular (total)</button>
-    </div>
-    <div class="chip-group">
-      <span class="chip-label">Transitividad</span>
-      <button type="button" class="chip" data-facet="transitivity" data-value="transitivo">transitivo</button>
-      <button type="button" class="chip" data-facet="transitivity" data-value="intransitivo">intransitivo</button>
-      <button type="button" class="chip" data-facet="transitivity" data-value="ambos">ambos</button>
-    </div>
-    <div class="chip-group">
-      <span class="chip-label">Marcas</span>
-      <button type="button" class="chip" data-facet="flag" data-value="reflexive">reflexivo</button>
-      <button type="button" class="chip" data-facet="flag" data-value="auxiliar">auxiliar</button>
-      <button type="button" class="chip" data-facet="flag" data-value="gustarLike">tipo gustar</button>
-    </div>
-    <button type="button" class="chip-clear" id="verb-filters-clear" hidden>Limpiar filtros</button>
   </div>
 
   <ul class="card-list" id="card-list"></ul>
@@ -234,29 +236,31 @@
 
   <section id="words-panel" hidden>
 
-  <div class="search-box">
-    <input type="text" id="word-search" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
-    <span class="count" id="word-count"></span>
-  </div>
+  <div class="search-card">
+    <div class="search-box">
+      <input type="text" id="word-search" placeholder="Escribí una palabra… (ej. mesa)" autocomplete="off" />
+      <span class="count" id="word-count"></span>
+    </div>
 
-  <div class="filter-chips" id="word-filters">
-    <div class="chip-group">
-      <span class="chip-label">Categoría</span>
-      <button type="button" class="chip" data-facet="pos" data-value="sustantivo">sustantivo</button>
-      <button type="button" class="chip" data-facet="pos" data-value="adjetivo">adjetivo</button>
-      <button type="button" class="chip" data-facet="pos" data-value="adverbio">adverbio</button>
-      <button type="button" class="chip" data-facet="pos" data-value="pronombre">pronombre</button>
-      <button type="button" class="chip" data-facet="pos" data-value="preposición">preposición</button>
-      <button type="button" class="chip" data-facet="pos" data-value="conjunción">conjunción</button>
-      <button type="button" class="chip" data-facet="pos" data-value="interjección">interjección</button>
+    <div class="filter-chips" id="word-filters">
+      <div class="chip-group">
+        <span class="chip-label">Categoría</span>
+        <button type="button" class="chip" data-facet="pos" data-value="sustantivo">sustantivo</button>
+        <button type="button" class="chip" data-facet="pos" data-value="adjetivo">adjetivo</button>
+        <button type="button" class="chip" data-facet="pos" data-value="adverbio">adverbio</button>
+        <button type="button" class="chip" data-facet="pos" data-value="pronombre">pronombre</button>
+        <button type="button" class="chip" data-facet="pos" data-value="preposición">preposición</button>
+        <button type="button" class="chip" data-facet="pos" data-value="conjunción">conjunción</button>
+        <button type="button" class="chip" data-facet="pos" data-value="interjección">interjección</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label">Género</span>
+        <button type="button" class="chip" data-facet="gender" data-value="masculino">masculino</button>
+        <button type="button" class="chip" data-facet="gender" data-value="femenino">femenino</button>
+        <button type="button" class="chip" data-facet="gender" data-value="neutro">neutro</button>
+      </div>
+      <button type="button" class="chip-clear" id="word-filters-clear" hidden>Limpiar filtros</button>
     </div>
-    <div class="chip-group">
-      <span class="chip-label">Género</span>
-      <button type="button" class="chip" data-facet="gender" data-value="masculino">masculino</button>
-      <button type="button" class="chip" data-facet="gender" data-value="femenino">femenino</button>
-      <button type="button" class="chip" data-facet="gender" data-value="neutro">neutro</button>
-    </div>
-    <button type="button" class="chip-clear" id="word-filters-clear" hidden>Limpiar filtros</button>
   </div>
 
   <ul class="card-list" id="word-list"></ul>
@@ -411,7 +415,14 @@
         <button type="button" class="icon-btn" id="ld-copy-link">Copiar enlace</button>
       </div>
       <p class="form-msg" id="ld-share-msg"></p>
-      <ul class="card-list" id="ld-items"></ul>
+      <div class="list-detail-group" id="ld-verbs-group" hidden>
+        <h4>Verbos</h4>
+        <ul class="card-list" id="ld-verbs-items"></ul>
+      </div>
+      <div class="list-detail-group" id="ld-words-group" hidden>
+        <h4>Vocabulario</h4>
+        <ul class="card-list" id="ld-words-items"></ul>
+      </div>
       <div class="detail-actions-footer">
         <button class="icon-btn" id="ld-share-btn" type="button">Compartir</button>
         <button class="icon-btn danger" id="ld-delete" type="button">Eliminar lista</button>

@@ -638,7 +638,10 @@
     ldShareLink: document.getElementById("ld-share-link"),
     ldCopyLink: document.getElementById("ld-copy-link"),
     ldShareMsg: document.getElementById("ld-share-msg"),
-    ldItems: document.getElementById("ld-items"),
+    ldVerbsGroup: document.getElementById("ld-verbs-group"),
+    ldVerbsItems: document.getElementById("ld-verbs-items"),
+    ldWordsGroup: document.getElementById("ld-words-group"),
+    ldWordsItems: document.getElementById("ld-words-items"),
     ldShareBtn: document.getElementById("ld-share-btn"),
     ldDelete: document.getElementById("ld-delete"),
 
@@ -2095,14 +2098,23 @@
     el.ldMeta.textContent = listMetaText(entry.data.itemCount || 0);
     el.ldShareRow.hidden = true;
     el.ldShareMsg.textContent = "";
-    el.ldItems.innerHTML = "";
+    el.ldVerbsItems.innerHTML = "";
+    el.ldWordsItems.innerHTML = "";
+    el.ldVerbsGroup.hidden = true;
+    el.ldWordsGroup.hidden = true;
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
       if (res.error) { el.ldShareMsg.textContent = "Error al cargar los ítems: " + res.error.message; return; }
       var rows = res.data || [];
-      var verbCount = rows.filter(function (r) { return r.item_type === "verb"; }).length;
-      var wordCount = rows.filter(function (r) { return r.item_type === "word"; }).length;
-      el.ldMeta.textContent = listMetaText(rows.length, verbCount, wordCount);
-      rows.forEach(function (row) { el.ldItems.appendChild(listItemRow(row)); });
+      var verbRows = rows.filter(function (r) { return r.item_type === "verb"; });
+      var wordRows = rows.filter(function (r) { return r.item_type === "word"; });
+      el.ldMeta.textContent = listMetaText(rows.length, verbRows.length, wordRows.length);
+      // Shown as two separate groups (rather than one flat list) now that a
+      // single list can hold both — e.g. a "La cocina" list mixing kitchen
+      // verbs and kitchen nouns reads much more clearly split apart.
+      el.ldVerbsGroup.hidden = verbRows.length === 0;
+      el.ldWordsGroup.hidden = wordRows.length === 0;
+      verbRows.forEach(function (row) { el.ldVerbsItems.appendChild(listItemRow(row)); });
+      wordRows.forEach(function (row) { el.ldWordsItems.appendChild(listItemRow(row)); });
     });
     el.listDetail.hidden = false;
     el.listDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
