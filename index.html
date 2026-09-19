@@ -64,6 +64,14 @@
 
   <div class="status-banner" id="status-banner" hidden></div>
 
+  <!-- Shown whenever a verb/word/list load couldn't reach Supabase and
+       fell back to the last locally-saved copy instead (see the offline
+       cache helpers in app.js). Adding, editing and importing still need
+       a live connection — this only covers browsing/studying. -->
+  <div class="offline-banner" id="offline-banner" hidden>
+    <span id="offline-banner-text"></span>
+  </div>
+
   <div class="main-tabs">
     <button type="button" class="main-tab active" id="tab-verbs">Verbos</button>
     <button type="button" class="main-tab" id="tab-words">Vocabulario</button>
