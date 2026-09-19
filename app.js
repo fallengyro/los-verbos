@@ -2732,4 +2732,14 @@
       if (selectedId && !el.detail.hidden) syncConjRowHeights();
     }, 150);
   });
+
+  // PWA: register the service worker (app-shell caching for offline/
+  // fast-load use). Feature-detected — no-ops in browsers without support.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function (err) {
+        console.warn("No se pudo registrar el service worker:", err);
+      });
+    });
+  }
 })();
