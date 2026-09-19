@@ -647,6 +647,7 @@
     ldShareRow: document.getElementById("ld-share-row"),
     ldShareLink: document.getElementById("ld-share-link"),
     ldCopyLink: document.getElementById("ld-copy-link"),
+    ldNativeShare: document.getElementById("ld-native-share"),
     ldShareMsg: document.getElementById("ld-share-msg"),
     ldVerbsGroup: document.getElementById("ld-verbs-group"),
     ldVerbsItems: document.getElementById("ld-verbs-items"),
@@ -2221,6 +2222,11 @@
     el.ldShareLink.value = link;
     el.ldShareRow.hidden = false;
     el.ldShareMsg.textContent = "";
+    // The native share sheet (Messages, Mail, WhatsApp, AirDrop, whatever
+    // the OS offers) is only there to offer when the browser actually
+    // supports it — mostly phones, not desktop — so it stays hidden
+    // otherwise rather than showing a button that would just fail on click.
+    el.ldNativeShare.hidden = !navigator.share;
     el.ldShareLink.focus();
     el.ldShareLink.select();
   }
@@ -2239,6 +2245,24 @@
       el.ldShareLink.select();
       el.ldShareMsg.textContent = "El enlace ya está seleccionado, copialo con Ctrl/Cmd+C.";
     }
+  }
+
+  function handleNativeShare() {
+    var link = el.ldShareLink.value;
+    if (!link || !navigator.share) return;
+    var entry = allLists.find(function (l) { return l.id === selectedListId; });
+    var name = entry ? entry.data.name : "lista compartida";
+    el.ldShareMsg.textContent = "";
+    navigator.share({
+      title: "Índice Verbal — " + name,
+      text: "Te comparto la lista “" + name + "” de Índice Verbal.",
+      url: link
+    }).catch(function (err) {
+      // AbortError just means the person closed the share sheet without
+      // picking anything — not worth surfacing as an error.
+      if (err && err.name === "AbortError") return;
+      el.ldShareMsg.textContent = "No se pudo compartir: " + ((err && err.message) || err);
+    });
   }
 
   // ---- "agregar a lista" desde el detalle de un verbo/palabra ----
@@ -2648,6 +2672,7 @@
   });
   el.ldShareBtn.addEventListener("click", handleShareClick);
   el.ldCopyLink.addEventListener("click", handleCopyLink);
+  el.ldNativeShare.addEventListener("click", handleNativeShare);
   el.ldDelete.addEventListener("click", handleListDelete);
   el.studyFilterClear.addEventListener("click", clearStudyList);
 
