@@ -645,8 +645,11 @@
 
     dAddToList: document.getElementById("d-add-to-list"),
     wdAddToList: document.getElementById("wd-add-to-list"),
+    addFilteredToList: document.getElementById("add-filtered-to-list"),
+    addFilteredWordsToList: document.getElementById("add-filtered-words-to-list"),
 
     listPickerOverlay: document.getElementById("list-picker-overlay"),
+    listPickerCount: document.getElementById("list-picker-count"),
     listPickerMsg: document.getElementById("list-picker-msg"),
     listPickerList: document.getElementById("list-picker-list"),
     listPickerNewName: document.getElementById("list-picker-new-name"),
@@ -2170,10 +2173,17 @@
 
   // ---- "agregar a lista" desde el detalle de un verbo/palabra ----
 
-  function openListPicker(itemType, data) {
-    listPickerTarget = { itemType: itemType, data: data };
+  function openListPicker(itemType, items) {
+    if (!items || items.length === 0) {
+      showBanner("No hay ítems para agregar con el filtro actual.");
+      return;
+    }
+    listPickerTarget = { itemType: itemType, items: items };
     el.listPickerMsg.textContent = "";
     el.listPickerNewName.value = "";
+    el.listPickerCount.textContent = items.length === 1
+      ? "Agregando 1 ítem."
+      : "Agregando " + items.length + " ítems.";
     var kind = itemType === "verb" ? "verbs" : "words";
     var compatible = allLists.filter(function (l) { return l.data.kind === kind; });
     el.listPickerList.innerHTML = "";
@@ -2213,18 +2223,45 @@
     listPickerTarget = null;
   }
 
+  // Adds every item currently in listPickerTarget.items to listId, skipping
+  // any that are already in that list (matched the same normalized way the
+  // shared-list import does) — this is what lets the "agregar filtrados a
+  // una lista" toolbar buttons be clicked again after the filter changes
+  // without piling up duplicate rows for words already added.
   function addItemToList(listId) {
     if (!listPickerTarget) return;
+    var itemType = listPickerTarget.itemType;
+    var items = listPickerTarget.items;
     el.listPickerMsg.textContent = "Agregando…";
-    supabaseClient.from("list_items").insert({
-      list_id: listId,
-      item_type: listPickerTarget.itemType,
-      data: listPickerTarget.data
-    }).then(function (res) {
+    supabaseClient.from("list_items").select("data").eq("list_id", listId).then(function (res) {
       if (res.error) { el.listPickerMsg.textContent = "Error: " + res.error.message; return; }
-      closeListPicker();
-      showBanner("Se agregó a la lista.");
-      loadLists();
+      var existing = {};
+      (res.data || []).forEach(function (row) {
+        var d = row.data || {};
+        existing[norm(d.infinitive || d.word || "")] = true;
+      });
+      var toInsert = [];
+      var skipped = 0;
+      items.forEach(function (data) {
+        var key = norm(data.infinitive || data.word || "");
+        if (existing[key]) { skipped++; return; }
+        existing[key] = true; // also guards against dupes within this same batch
+        toInsert.push({ list_id: listId, item_type: itemType, data: data });
+      });
+      if (toInsert.length === 0) {
+        el.listPickerMsg.textContent = skipped
+          ? "Ya estaban todos en esa lista (" + skipped + ")."
+          : "No hay nada para agregar.";
+        return;
+      }
+      supabaseClient.from("list_items").insert(toInsert).then(function (res2) {
+        if (res2.error) { el.listPickerMsg.textContent = "Error: " + res2.error.message; return; }
+        closeListPicker();
+        var msg = toInsert.length === 1 ? "Se agregó 1 ítem a la lista." : "Se agregaron " + toInsert.length + " ítems a la lista.";
+        if (skipped) msg += " (" + skipped + " ya estaban.)";
+        showBanner(msg);
+        loadLists();
+      });
     });
   }
 
@@ -2474,7 +2511,10 @@
   el.dDelete.addEventListener("click", handleDelete);
   el.dAddToList.addEventListener("click", function () {
     var entry = allVerbs.find(function (v) { return v.id === selectedId; });
-    if (entry) openListPicker("verb", entry.data);
+    if (entry) openListPicker("verb", [entry.data]);
+  });
+  el.addFilteredToList.addEventListener("click", function () {
+    openListPicker("verb", filtered.map(function (v) { return v.data; }));
   });
 
   el.tabVerbs.addEventListener("click", function () { setMainTab("verbs"); });
@@ -2493,7 +2533,10 @@
   el.wdDelete.addEventListener("click", handleWordDelete);
   el.wdAddToList.addEventListener("click", function () {
     var entry = allWords.find(function (v) { return v.id === selectedWordId; });
-    if (entry) openListPicker("word", entry.data);
+    if (entry) openListPicker("word", [entry.data]);
+  });
+  el.addFilteredWordsToList.addEventListener("click", function () {
+    openListPicker("word", filteredWords.map(function (w) { return w.data; }));
   });
 
   el.tabFlashcards.addEventListener("click", function () { setMainTab("flashcards"); });

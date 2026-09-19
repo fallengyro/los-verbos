@@ -144,6 +144,7 @@
   <div class="toolbar-row">
     <button class="add-toggle" id="toggle-add" type="button">+ Agregar verbo</button>
     <button class="seed-btn" id="seed-toolbar-btn" type="button">Cargar verbos de ejemplo</button>
+    <button class="seed-btn" id="add-filtered-to-list" type="button">Agregar filtrados a una lista</button>
   </div>
 
   <form id="verb-form" hidden>
@@ -281,6 +282,7 @@
   <div class="toolbar-row">
     <button class="add-toggle" id="toggle-add-word" type="button">+ Agregar palabra</button>
     <button class="seed-btn" id="seed-words-toolbar-btn" type="button">Cargar palabras de ejemplo</button>
+    <button class="seed-btn" id="add-filtered-words-to-list" type="button">Agregar filtrados a una lista</button>
   </div>
 
   <form id="word-form" hidden>
@@ -430,6 +432,7 @@
 <div class="modal-overlay" id="list-picker-overlay" hidden>
   <div class="modal-card">
     <h3>Agregar a lista</h3>
+    <p class="flash-setup-note" id="list-picker-count"></p>
     <p class="form-msg" id="list-picker-msg"></p>
     <ul class="card-list list-picker-list" id="list-picker-list"></ul>
     <div class="field-grid">
