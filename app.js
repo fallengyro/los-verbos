@@ -528,6 +528,8 @@
     logoutBtn: document.getElementById("logout-btn"),
 
     banner: document.getElementById("status-banner"),
+    offlineBanner: document.getElementById("offline-banner"),
+    offlineBannerText: document.getElementById("offline-banner-text"),
     studyFilterBanner: document.getElementById("study-filter-banner"),
     studyFilterText: document.getElementById("study-filter-text"),
     studyFilterClear: document.getElementById("study-filter-clear"),
@@ -683,6 +685,67 @@
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
   function clearBanner() { el.banner.hidden = true; }
+
+  // ================= offline cache (Tier A: read-only) =================
+  // After every successful load of verbs/words/lists, the raw rows are
+  // stashed in localStorage. If a later load fails — no network, or a
+  // session that can't refresh while offline — the app falls back to that
+  // last-saved copy instead of showing an empty/error screen. This is
+  // deliberately read-only: adding, editing, sharing and importing still
+  // require a live connection, and just show their normal error message
+  // if they don't have one.
+  var CACHE_PREFIX = "iv-cache-";
+  var offlineKinds = {}; // kind ("verbs"/"words"/"lists") -> savedAt, present only while that kind is showing cached data
+
+  function cacheKey(kind) {
+    return CACHE_PREFIX + kind + "-" + (currentUser ? currentUser.id : "anon");
+  }
+
+  function saveCache(kind, rows) {
+    try {
+      localStorage.setItem(cacheKey(kind), JSON.stringify({ savedAt: Date.now(), rows: rows }));
+    } catch (e) {
+      // Storage full, disabled, or private browsing — offline fallback
+      // just won't have anything to fall back to later; not fatal now.
+    }
+  }
+
+  function readCache(kind) {
+    try {
+      var raw = localStorage.getItem(cacheKey(kind));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function formatCacheAge(savedAt) {
+    var mins = Math.max(0, Math.round((Date.now() - savedAt) / 60000));
+    if (mins < 1) return "hace un momento";
+    if (mins < 60) return "hace " + mins + (mins === 1 ? " minuto" : " minutos");
+    var hours = Math.round(mins / 60);
+    if (hours < 24) return "hace " + hours + (hours === 1 ? " hora" : " horas");
+    var days = Math.round(hours / 24);
+    return "hace " + days + (days === 1 ? " día" : " días");
+  }
+
+  function markOffline(kind, savedAt) {
+    offlineKinds[kind] = savedAt;
+    renderOfflineBanner();
+  }
+
+  function markOnline(kind) {
+    delete offlineKinds[kind];
+    renderOfflineBanner();
+  }
+
+  function renderOfflineBanner() {
+    var kinds = Object.keys(offlineKinds);
+    if (kinds.length === 0) { el.offlineBanner.hidden = true; return; }
+    var oldest = Math.min.apply(null, kinds.map(function (k) { return offlineKinds[k]; }));
+    el.offlineBannerText.textContent = "Sin conexión — mostrando lo último guardado (" + formatCacheAge(oldest) + ").";
+    el.offlineBanner.hidden = false;
+  }
 
   function stripAccents(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   function norm(s) { return stripAccents(s).toLowerCase().trim(); }
@@ -1269,7 +1332,9 @@
       .select("*")
       .order("infinitive", { ascending: true })
       .then(function (res) {
-        if (res.error) { showBanner("Error al cargar tus verbos: " + res.error.message); return; }
+        if (res.error) throw res.error;
+        saveCache("verbs", res.data || []);
+        markOnline("verbs");
         clearBanner();
         allVerbs = (res.data || []).map(rowToVerb);
         renderList();
@@ -1277,6 +1342,13 @@
           var still = allVerbs.find(function (v) { return v.id === selectedId; });
           if (still) selectVerb(selectedId); else { el.detail.hidden = true; selectedId = null; }
         }
+      })
+      .catch(function (err) {
+        var cached = readCache("verbs");
+        if (!cached) { showBanner("Error al cargar tus verbos: " + ((err && err.message) || err)); return; }
+        allVerbs = cached.rows.map(rowToVerb);
+        markOffline("verbs", cached.savedAt);
+        renderList();
       });
   }
 
@@ -1500,7 +1572,9 @@
       .select("*")
       .order("word", { ascending: true })
       .then(function (res) {
-        if (res.error) { showBanner("Error al cargar tu vocabulario: " + res.error.message); return; }
+        if (res.error) throw res.error;
+        saveCache("words", res.data || []);
+        markOnline("words");
         clearBanner();
         allWords = (res.data || []).map(rowToWord);
         renderWordList();
@@ -1508,6 +1582,13 @@
           var still = allWords.find(function (v) { return v.id === selectedWordId; });
           if (still) selectWord(selectedWordId); else { el.wordDetail.hidden = true; selectedWordId = null; }
         }
+      })
+      .catch(function (err) {
+        var cached = readCache("words");
+        if (!cached) { showBanner("Error al cargar tu vocabulario: " + ((err && err.message) || err)); return; }
+        allWords = cached.rows.map(rowToWord);
+        markOffline("words", cached.savedAt);
+        renderWordList();
       });
   }
 
@@ -2024,24 +2105,37 @@
     return count + (count === 1 ? " ítem" : " ítems");
   }
 
+  function rowsToLists(rows) {
+    return (rows || []).map(function (row) {
+      var entry = rowToList(row);
+      entry.data.itemCount = (row.list_items && row.list_items[0] && row.list_items[0].count) || 0;
+      return entry;
+    });
+  }
+
   function loadLists() {
     return supabaseClient
       .from("lists")
       .select("*, list_items(count)")
       .order("created_at", { ascending: false })
       .then(function (res) {
-        if (res.error) { showBanner("Error al cargar tus listas: " + res.error.message); return; }
+        if (res.error) throw res.error;
+        saveCache("lists", res.data || []);
+        markOnline("lists");
         clearBanner();
-        allLists = (res.data || []).map(function (row) {
-          var entry = rowToList(row);
-          entry.data.itemCount = (row.list_items && row.list_items[0] && row.list_items[0].count) || 0;
-          return entry;
-        });
+        allLists = rowsToLists(res.data);
         renderListsPanel();
         if (selectedListId) {
           var still = allLists.find(function (l) { return l.id === selectedListId; });
           if (still) selectListRow(selectedListId); else { el.listDetail.hidden = true; selectedListId = null; }
         }
+      })
+      .catch(function (err) {
+        var cached = readCache("lists");
+        if (!cached) { showBanner("Error al cargar tus listas: " + ((err && err.message) || err)); return; }
+        allLists = rowsToLists(cached.rows);
+        markOffline("lists", cached.savedAt);
+        renderListsPanel();
       });
   }
 
@@ -2452,6 +2546,16 @@
   // snapshot items by their own item_type and run each through the matching
   // table's insert (with the same collision-skip rule as before, checked
   // separately per type), then merge the two results into one summary.
+  //
+  // Beyond adding the underlying verbs/words to the recipient's own
+  // collection, importing also creates a list of their own with the same
+  // name and the same items. That's the actual point of a themed list
+  // (e.g. "la cocina") — the person it's shared with should end up with
+  // the same grouped/filterable set to study, not just those words
+  // scattered into their general index with no grouping left. The new
+  // list's items are a snapshot of everything that was shared, including
+  // anything skipped as a duplicate — a word she already had should still
+  // land in the new list, same as it did for the sender.
   function handleShareImport() {
     if (!currentShareList || !currentUser) return;
     el.shareImportBtn.disabled = true;
@@ -2491,11 +2595,15 @@
     var wordsPromise = toInsertW.length ? supabaseClient.from("words").insert(toInsertW) : Promise.resolve({ error: null });
 
     Promise.all([verbsPromise, wordsPromise]).then(function (results) {
-      el.shareImportBtn.disabled = false;
       var failed = results.filter(function (r) { return r && r.error; });
-      if (failed.length) { el.shareImportResult.textContent = "Error al importar: " + failed[0].error.message; return; }
+      if (failed.length) {
+        el.shareImportBtn.disabled = false;
+        el.shareImportResult.textContent = "Error al importar: " + failed[0].error.message;
+        return;
+      }
       if (toInsertV.length) loadVerbs();
       if (toInsertW.length) loadWords();
+
       var importedCount = toInsertV.length + toInsertW.length;
       var skipped = skippedV.concat(skippedW);
       var msg = "Se importaron " + importedCount + (importedCount === 1 ? " ítem." : " ítems.");
@@ -2503,7 +2611,34 @@
         msg += " " + skipped.length + (skipped.length === 1 ? " ya estaba" : " ya estaban") +
           " en tu colección: " + skipped.join(", ") + ".";
       }
-      el.shareImportResult.textContent = msg;
+
+      // Now build the recipient's own copy of the list itself, so it shows
+      // up in her Lists panel with the same items grouped together — the
+      // button stays disabled either way (success or failure here) so a
+      // second click on the same open share preview can't create a
+      // second, duplicate list.
+      supabaseClient.from("lists").insert({
+        name: s.listName,
+        owner_label: currentUser.email || ""
+      }).select().single().then(function (listRes) {
+        if (listRes.error) {
+          msg += " No se pudo crear la lista en tu cuenta: " + listRes.error.message;
+          el.shareImportResult.textContent = msg;
+          return;
+        }
+        var listItemRows = s.items.map(function (it) {
+          return { list_id: listRes.data.id, item_type: it.itemType, data: it.data };
+        });
+        supabaseClient.from("list_items").insert(listItemRows).then(function (itemsRes) {
+          if (itemsRes.error) {
+            msg += " La lista se creó pero no se pudieron agregar sus ítems: " + itemsRes.error.message;
+          } else {
+            msg += " Se creó la lista “" + s.listName + "” en tu cuenta.";
+          }
+          el.shareImportResult.textContent = msg;
+          loadLists();
+        });
+      });
     });
   }
 
@@ -2556,6 +2691,8 @@
       el.listsList.innerHTML = "";
       activeStudyList = null;
       renderStudyFilterBanner();
+      offlineKinds = {};
+      renderOfflineBanner();
       if (currentShareList) renderSharePreview();
     }
   }
