@@ -12,7 +12,7 @@
 // from cache immediately if we have it (fast, works offline), and in the
 // background fetch a fresh copy to store for next time.
 
-var CACHE_NAME = "iv-shell-v2";
+var CACHE_NAME = "iv-shell-v3";
 
 var SHELL_FILES = [
   "./",
@@ -28,7 +28,18 @@ var SHELL_FILES = [
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(SHELL_FILES);
+      // cache.addAll() is all-or-nothing — if a single file 404s (e.g. an
+      // icon that didn't get deployed), the whole install silently fails
+      // and NO offline caching works, not just for that one file. Caching
+      // each file independently means one missing/broken file is just
+      // skipped instead of taking the rest of the app shell down with it.
+      return Promise.all(
+        SHELL_FILES.map(function (url) {
+          return cache.add(url).catch(function (err) {
+            console.warn("No se pudo precachear " + url + ":", err);
+          });
+        })
+      );
     }).then(function () {
       return self.skipWaiting();
     })
