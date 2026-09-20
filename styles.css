@@ -1,3 +1,12 @@
+  /* --accent/--accent-deep moved off blue (was #3B4B9E / #28336E) to a
+     plum/berry hue, chosen after reviewing several directions side by side —
+     the old indigo-blue read as generic "corporate SaaS" (too close to
+     Facebook's brand blue) and, worse, its dark-mode periwinkle counterpart
+     (#8B95E8) looked washed out/muddy against the near-black background.
+     Plum keeps the same warm-cool crossover feel as the rest of the palette
+     (brick/gold warm, teal cool) without colliding with any of them, and
+     the dark-mode value (#D191CE) carries more chroma than the old one so
+     it doesn't go flat next to --paper. Every other token is unchanged. */
   :root {
     color-scheme: light;
     --paper: #EDEFF5;
@@ -6,8 +15,8 @@
     --ink: #1C2333;
     --ink-soft: #565F7A;
     --line: #C2C9DE;
-    --accent: #3B4B9E;
-    --accent-deep: #28336E;
+    --accent: #6E3B72;
+    --accent-deep: #4B2350;
     --accent-ink: #F5F6FC;
     --brick: #8C4A20;
     --brick-soft: #F0DCC8;
@@ -26,8 +35,8 @@
       --ink: #E7E9F5;
       --ink-soft: #A7ADC9;
       --line: #2C3049;
-      --accent: #8B95E8;
-      --accent-deep: #B4BBF2;
+      --accent: #D191CE;
+      --accent-deep: #E6AEE0;
       --accent-ink: #11132A;
       --brick: #E19A6C;
       --brick-soft: #3A2A1D;
@@ -46,8 +55,8 @@
     --ink: #E7E9F5;
     --ink-soft: #A7ADC9;
     --line: #2C3049;
-    --accent: #8B95E8;
-    --accent-deep: #B4BBF2;
+    --accent: #D191CE;
+    --accent-deep: #E6AEE0;
     --accent-ink: #11132A;
     --brick: #E19A6C;
     --brick-soft: #3A2A1D;
@@ -731,7 +740,7 @@
   .flash-card[data-theme="dark"] {
     --paper: #12141F; --paper-raised: #171A2C; --paper-sunken: #0D0E18;
     --ink: #E7E9F5; --ink-soft: #A7ADC9; --line: #2C3049;
-    --accent: #8B95E8; --accent-deep: #B4BBF2; --accent-ink: #11132A;
+    --accent: #D191CE; --accent-deep: #E6AEE0; --accent-ink: #11132A;
     --brick: #E19A6C; --brick-soft: #3A2A1D; --gold: #DDBE72; --gold-soft: #35301C;
     --teal: #6FE0D0; --teal-soft: #12302C;
     --danger: #E28881; --shadow: rgba(0, 0, 0, 0.4);
@@ -739,7 +748,7 @@
   .flash-card[data-theme="light"] {
     --paper: #EDEFF5; --paper-raised: #E1E5F0; --paper-sunken: #D5DAEA;
     --ink: #1C2333; --ink-soft: #565F7A; --line: #C2C9DE;
-    --accent: #3B4B9E; --accent-deep: #28336E; --accent-ink: #F5F6FC;
+    --accent: #6E3B72; --accent-deep: #4B2350; --accent-ink: #F5F6FC;
     --brick: #8C4A20; --brick-soft: #F0DCC8; --gold: #6B5316; --gold-soft: #F0E4C0;
     --teal: #146B63; --teal-soft: #D2EEEA;
     --danger: #A23A3A; --shadow: rgba(28, 35, 51, 0.14);

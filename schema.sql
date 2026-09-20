@@ -1,4 +1,4 @@
--- Índice Verbal — Supabase schema
+-- voseá — Supabase schema
 --
 -- In your Supabase project: Database → SQL Editor → New query, paste this
 -- whole file, and click Run. It creates the "verbs" and "words" tables and

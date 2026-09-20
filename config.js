@@ -1,4 +1,4 @@
-// Índice Verbal — connection settings
+// voseá — connection settings
 //
 // Fill these in from your Supabase project: Project Settings → API.
 //   SUPABASE_URL looks like  https://xxxxxxxxxxxxxxxx.supabase.co
@@ -9,5 +9,5 @@
 // the row-level security policies in schema.sql; run that in the Supabase
 // SQL editor before this will work.
 
-const SUPABASE_URL = "https://gxbylqrszrsvpjnrscsk.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable__WWlxgNLQ3i-IzEbYqT5ZA_e9L25Ltw";
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";

@@ -1,4 +1,4 @@
-// Índice Verbal — service worker
+// voseá — service worker
 //
 // Tier 0 PWA: just enough offline caching to make the app-shell (the HTML,
 // CSS, JS, manifest, and icons) load instantly and work without a network
