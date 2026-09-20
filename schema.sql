@@ -205,20 +205,41 @@ update public.verbs set gustar_like = true
                         'faltar', 'doler', 'importar', 'parecer', 'aburrir', 'sorprender');
 
 -- ---------------------------------------------------------------------------
--- also_normal_use — only meaningful when gustar_like is also true. Some
+-- also_personal_use — only meaningful when gustar_like is also true. Some
 -- gustar-type verbs (parecer being the clearest example: "Me parece
 -- interesante" is dative, but "Vos parecés cansado" is an equally common
--- normal personal-subject use of the exact same stored forms) genuinely
--- have both readings in everyday use, unlike gustar/doler/etc. which are
--- dative-only in practice. This flag lets the detail card offer a normal-
--- use/dative-use tab for just those verbs, without touching the stored
--- forms or gustar_like itself. Defaults to false for every verb, gustar-
--- type or not — an explicit per-verb opt-in, not a blanket change.
+-- use of the exact same stored forms, with the experiencer as the
+-- grammatical SUBJECT rather than a dative object) genuinely have both
+-- readings in everyday use, unlike gustar/doler/etc. which are dative-only
+-- in practice. This flag lets the detail card offer a personal-use/dative-
+-- use tab for just those verbs, without touching the stored forms or
+-- gustar_like itself. Defaults to false for every verb, gustar-type or
+-- not — an explicit per-verb opt-in, not a blanket change.
+--
+-- Named "personal" rather than "normal": both constructions are equally
+-- grammatical, so calling one of them "normal" wrongly implies the other
+-- (dative) is somehow deficient. "Personal" names the actual grammatical
+-- distinction — the experiencer surfaces as a personal subject instead of
+-- a dative object — without ranking one use over the other.
 -- ---------------------------------------------------------------------------
 
-alter table public.verbs add column if not exists also_normal_use boolean not null default false;
+alter table public.verbs add column if not exists also_personal_use boolean not null default false;
 
-update public.verbs set also_normal_use = true where infinitive = 'parecer';
+-- One-time rename from an earlier column called also_normal_use, for
+-- accounts that already ran that version of this file. Safe to run
+-- whether or not that column ever existed.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'verbs' and column_name = 'also_normal_use'
+  ) then
+    execute 'update public.verbs set also_personal_use = also_normal_use';
+    execute 'alter table public.verbs drop column also_normal_use';
+  end if;
+end $$;
+
+update public.verbs set also_personal_use = true where infinitive = 'parecer';
 
 -- ---------------------------------------------------------------------------
 -- Vocabulario — general words (nouns, adjectives, adverbs...), kept separate

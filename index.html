@@ -139,13 +139,13 @@
     <p class="pattern-note" id="d-pattern"></p>
     <p class="pattern-note" id="d-preposicion"></p>
 
-    <!-- Only shown for a verb that is gustar_like AND also_normal_use (e.g.
+    <!-- Only shown for a verb that is gustar_like AND also_personal_use (e.g.
          "parecer") — lets the same stored forms be reinterpreted either
          way, since the two readings share identical conjugation data (see
          the gustar-tab handling around selectVerb() in app.js). Reuses the
          settings screen's .lang-toggle segmented-button look. -->
     <div class="lang-toggle gustar-mode-toggle" id="d-gustar-tabs" hidden>
-      <button type="button" class="lang-option" id="d-gustar-tab-normal" data-i18n="gustar_tab_normal">Uso normal</button>
+      <button type="button" class="lang-option" id="d-gustar-tab-personal" data-i18n="gustar_tab_personal">Uso personal</button>
       <button type="button" class="lang-option" id="d-gustar-tab-dativo" data-i18n="gustar_tab_dativo">Uso dativo</button>
     </div>
 
@@ -249,9 +249,9 @@
         <input type="checkbox" id="f-gustar-like" />
         <label for="f-gustar-like" style="margin:0;" data-i18n="check_gustar">¿Tipo gustar?</label>
       </div>
-      <div class="field checks" id="f-also-normal-use-wrap" hidden>
-        <input type="checkbox" id="f-also-normal-use" />
-        <label for="f-also-normal-use" style="margin:0;" data-i18n="check_also_normal_use">¿También uso normal (no dativo)?</label>
+      <div class="field checks" id="f-also-personal-use-wrap" hidden>
+        <input type="checkbox" id="f-also-personal-use" />
+        <label for="f-also-personal-use" style="margin:0;" data-i18n="check_also_personal_use">¿También tiene uso personal (no dativo)?</label>
       </div>
     </div>
 
@@ -487,7 +487,6 @@
     </section>
   </section>
 
-  <footer class="note" data-i18n="footer_note">Tus datos se guardan en tu cuenta — solo vos podés verlos y editarlos</footer>
 </div>
 
 <div class="modal-overlay" id="list-picker-overlay" hidden>
@@ -530,7 +529,7 @@
 <div class="modal-overlay" id="import-json-overlay" hidden>
   <div class="modal-card modal-card-wide">
     <h3 data-i18n="import_json_title">Importar contenido (JSON)</h3>
-    <p class="flash-setup-note" data-i18n="import_json_intro">Pegá o subí un archivo JSON con verbos y/o palabras generado por tu propio LLM a partir del formato de Índice Verbal. Nada se guarda hasta que confirmes la importación.</p>
+    <p class="flash-setup-note" data-i18n="import_json_intro">Pegá o subí un archivo JSON con verbos y/o palabras que sigan el formato de Índice Verbal. Nada se guarda hasta que confirmes la importación.</p>
 
     <details class="import-spec-details" id="import-spec-details">
       <summary data-i18n="import_spec_summary">Ver / copiar la especificación del formato</summary>
