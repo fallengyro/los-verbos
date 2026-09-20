@@ -472,7 +472,18 @@
   table.conj tbody th { font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); white-space: normal; }
   table.conj tbody tr + tr th, table.conj tbody tr + tr td { border-top: 1px solid var(--line); }
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
-  table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
+  /* display: table-cell here isn't cosmetic — it's overriding the plain
+     .irreg rule below, which sets display: inline-block for its OWN use
+     case (a standalone <span> chip). That class is reused unmodified on
+     real <td> elements for irregular cells (see app.js isCellIrregular
+     call sites), and without this override the inline-block wins (no
+     other rule touches display on td.irreg), which rips the cell out of
+     the table's row/column layout entirely — it stops occupying its
+     column and just flows in document order instead, so a row with
+     several irregular cells (e.g. "yo" in a heavily-irregular verb like
+     "superponer") renders as pills bunched together off to one side with
+     empty gaps left in their real columns, especially at mobile widths. */
+  table.conj tbody td.irreg { display: table-cell; background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
   /* .irreg is also reused standalone (not inside table.conj) by the JSON
      import preview, to flag individual mismatching cells with the exact
