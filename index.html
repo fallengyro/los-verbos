@@ -420,6 +420,7 @@
 
     <div class="toolbar-row">
       <button class="add-toggle" id="toggle-add-list" type="button" data-i18n="btn_create_list_toggle">+ Crear lista</button>
+      <button class="seed-btn" id="toggle-import-json" type="button" data-i18n="btn_import_json_toggle">Importar contenido (JSON)</button>
     </div>
 
     <form id="list-form" hidden>
@@ -502,6 +503,53 @@
     <p class="form-msg" id="settings-msg"></p>
     <div class="form-actions">
       <button type="button" class="btn-secondary" id="settings-close" data-i18n="close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="import-json-overlay" hidden>
+  <div class="modal-card modal-card-wide">
+    <h3 data-i18n="import_json_title">Importar contenido (JSON)</h3>
+    <p class="flash-setup-note" data-i18n="import_json_intro">Pegá o subí un archivo JSON con verbos y/o palabras generado por tu propio LLM a partir del formato de Índice Verbal. Nada se guarda hasta que confirmes la importación.</p>
+
+    <div class="field">
+      <label for="import-json-file" data-i18n="import_json_file_label">Elegir archivo .json</label>
+      <input type="file" id="import-json-file" accept=".json,application/json" />
+    </div>
+    <div class="field">
+      <label for="import-json-textarea" data-i18n="import_json_textarea_label">O pegá el JSON acá</label>
+      <textarea id="import-json-textarea" rows="10" data-i18n-placeholder="import_json_placeholder" placeholder="Pegá acá el JSON con tus verbos y palabras…"></textarea>
+    </div>
+    <p class="form-msg" id="import-json-parse-msg"></p>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" id="import-json-validate-btn" data-i18n="btn_validate_import">Validar</button>
+    </div>
+
+    <div id="import-json-preview" hidden>
+      <p class="flash-setup-note" id="import-json-summary"></p>
+
+      <div id="import-json-errors-wrap" hidden>
+        <h4 data-i18n="import_json_errors_heading">Errores bloqueantes</h4>
+        <ul class="import-issue-list" id="import-json-errors"></ul>
+      </div>
+
+      <div id="import-json-warnings-wrap" hidden>
+        <h4 data-i18n="import_json_warnings_heading">Avisos</h4>
+        <ul class="import-issue-list" id="import-json-warnings"></ul>
+      </div>
+
+      <div id="import-json-preview-list-wrap" hidden>
+        <h4 data-i18n="import_json_preview_heading">Se importarán</h4>
+        <ul class="card-list" id="import-json-preview-list"></ul>
+      </div>
+    </div>
+
+    <p class="form-msg" id="import-json-result-msg"></p>
+
+    <div class="form-actions">
+      <button type="button" class="btn-primary" id="import-json-confirm-btn" hidden data-i18n="btn_confirm_import">Confirmar importación</button>
+      <button type="button" class="btn-secondary" id="import-json-cancel-btn" data-i18n="btn_cancel">Cancelar</button>
     </div>
   </div>
 </div>

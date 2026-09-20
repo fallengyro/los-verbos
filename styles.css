@@ -465,6 +465,21 @@
   table.conj tbody td { color: var(--accent-deep); font-weight: 500; border-radius: 5px; }
   table.conj tbody td.irreg { background: var(--brick-soft); color: var(--brick); font-weight: 700; }
 
+  /* .irreg is also reused standalone (not inside table.conj) by the JSON
+     import preview, to flag individual mismatching cells with the exact
+     same visual treatment as the real conjugation table, just as an inline
+     chip instead of a table cell. */
+  .irreg {
+    display: inline-block;
+    background: var(--brick-soft);
+    color: var(--brick);
+    font-weight: 700;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    border-radius: 5px;
+    padding: 2px 7px;
+  }
+
   /* imperativo column: usted/ustedes don't share él/ella's or ellos/ellas's
      form the way every other mood/tense in this table does, so those two
      merged rows show "— / — / <real form>" instead of one clean value */
@@ -534,6 +549,12 @@
     border-radius: 6px; background: var(--paper); color: var(--ink);
   }
   .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .field textarea {
+    font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 8px 9px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--paper); color: var(--ink); resize: vertical; min-height: 160px;
+  }
+  .field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .field input[type="file"] { font-family: "Public Sans", sans-serif; font-size: 13px; color: var(--ink-soft); }
 
   .conj-form-scroll { overflow-x: auto; margin-bottom: 6px; }
   table.conj-form { border-collapse: collapse; min-width: 560px; }
@@ -828,6 +849,22 @@
   }
   .modal-card h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 12px; }
   .list-picker-list { max-height: 180px; }
+
+  /* the JSON-import panel needs more room than the small "add to list"
+     picker (a textarea, per-row errors/warnings, a preview list), so it
+     gets a wider variant of the same overlay/card rather than its own
+     dialog treatment. */
+  .modal-card.modal-card-wide { max-width: 640px; }
+  #import-json-preview h4 {
+    font-family: "Public Sans", sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--ink-soft); margin: 16px 0 8px;
+  }
+  .import-issue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .import-issue-list li { font-size: 13px; background: var(--paper-sunken); border-radius: 8px; padding: 8px 10px; line-height: 1.4; }
+  #import-json-errors li { color: var(--danger); }
+  #import-json-warnings li { color: var(--ink-soft); }
+  .import-cell-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  #import-json-preview-list-wrap .card-list { max-height: 220px; }
 
   /* settings panel — the app-language toggle is a simple two-button
      segmented control, in keeping with the app's flat bordered-chip look
