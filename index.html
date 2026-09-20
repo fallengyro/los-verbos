@@ -139,6 +139,16 @@
     <p class="pattern-note" id="d-pattern"></p>
     <p class="pattern-note" id="d-preposicion"></p>
 
+    <!-- Only shown for a verb that is gustar_like AND also_normal_use (e.g.
+         "parecer") — lets the same stored forms be reinterpreted either
+         way, since the two readings share identical conjugation data (see
+         the gustar-tab handling around selectVerb() in app.js). Reuses the
+         settings screen's .lang-toggle segmented-button look. -->
+    <div class="lang-toggle gustar-mode-toggle" id="d-gustar-tabs" hidden>
+      <button type="button" class="lang-option" id="d-gustar-tab-normal" data-i18n="gustar_tab_normal">Uso normal</button>
+      <button type="button" class="lang-option" id="d-gustar-tab-dativo" data-i18n="gustar_tab_dativo">Uso dativo</button>
+    </div>
+
     <p class="conj-hint" data-i18n="conj_hint">deslizá para ver todos los tiempos &rarr;</p>
     <div class="conj-wrap">
       <table class="conj conj-pronouns">
@@ -238,6 +248,10 @@
       <div class="field checks">
         <input type="checkbox" id="f-gustar-like" />
         <label for="f-gustar-like" style="margin:0;" data-i18n="check_gustar">¿Tipo gustar?</label>
+      </div>
+      <div class="field checks" id="f-also-normal-use-wrap" hidden>
+        <input type="checkbox" id="f-also-normal-use" />
+        <label for="f-also-normal-use" style="margin:0;" data-i18n="check_also_normal_use">¿También uso normal (no dativo)?</label>
       </div>
     </div>
 
@@ -381,11 +395,17 @@
 
       <div class="flash-source-toggle">
         <label class="switch-row">
-          <input type="checkbox" id="flash-src-verbs" checked />
+          <span class="switch">
+            <input type="checkbox" id="flash-src-verbs" checked />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </span>
           <span><span data-i18n="nav_verbs">Verbos</span> <span class="flash-count" id="flash-verb-count"></span></span>
         </label>
         <label class="switch-row">
-          <input type="checkbox" id="flash-src-words" checked />
+          <span class="switch">
+            <input type="checkbox" id="flash-src-words" checked />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </span>
           <span><span data-i18n="nav_words">Vocabulario</span> <span class="flash-count" id="flash-word-count"></span></span>
         </label>
       </div>
@@ -511,6 +531,15 @@
   <div class="modal-card modal-card-wide">
     <h3 data-i18n="import_json_title">Importar contenido (JSON)</h3>
     <p class="flash-setup-note" data-i18n="import_json_intro">Pegá o subí un archivo JSON con verbos y/o palabras generado por tu propio LLM a partir del formato de Índice Verbal. Nada se guarda hasta que confirmes la importación.</p>
+
+    <details class="import-spec-details" id="import-spec-details">
+      <summary data-i18n="import_spec_summary">Ver / copiar la especificación del formato</summary>
+      <pre class="import-spec-pre" id="import-spec-pre"></pre>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" id="import-spec-copy-btn" data-i18n="btn_copy_spec">Copiar especificación</button>
+        <span class="form-msg" id="import-spec-copy-msg"></span>
+      </div>
+    </details>
 
     <div class="field">
       <label for="import-json-file" data-i18n="import_json_file_label">Elegir archivo .json</label>

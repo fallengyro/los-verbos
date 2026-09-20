@@ -205,6 +205,22 @@ update public.verbs set gustar_like = true
                         'faltar', 'doler', 'importar', 'parecer', 'aburrir', 'sorprender');
 
 -- ---------------------------------------------------------------------------
+-- also_normal_use — only meaningful when gustar_like is also true. Some
+-- gustar-type verbs (parecer being the clearest example: "Me parece
+-- interesante" is dative, but "Vos parecés cansado" is an equally common
+-- normal personal-subject use of the exact same stored forms) genuinely
+-- have both readings in everyday use, unlike gustar/doler/etc. which are
+-- dative-only in practice. This flag lets the detail card offer a normal-
+-- use/dative-use tab for just those verbs, without touching the stored
+-- forms or gustar_like itself. Defaults to false for every verb, gustar-
+-- type or not — an explicit per-verb opt-in, not a blanket change.
+-- ---------------------------------------------------------------------------
+
+alter table public.verbs add column if not exists also_normal_use boolean not null default false;
+
+update public.verbs set also_normal_use = true where infinitive = 'parecer';
+
+-- ---------------------------------------------------------------------------
 -- Vocabulario — general words (nouns, adjectives, adverbs...), kept separate
 -- from verb conjugations. Same private-per-user pattern as "verbs" above.
 -- ---------------------------------------------------------------------------

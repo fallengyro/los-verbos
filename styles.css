@@ -595,8 +595,33 @@
   .flash-setup-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 0 0 18px; }
 
   .flash-source-toggle { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 6px; }
-  .switch-row { display: flex; align-items: center; gap: 8px; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; }
-  .switch-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+  .switch-row { display: flex; align-items: center; gap: 10px; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; }
+  /* Standard "real checkbox, visually hidden" toggle-switch technique: the
+     <input> stays in the DOM, sized and positioned to exactly cover the
+     track (so it stays keyboard-focusable and is what el.flashSrcVerbs/
+     el.flashSrcWords actually read — this is a pure visual restyle, no
+     change to that behavior), just made invisible via opacity rather than
+     display:none/visibility:hidden, which would drop it from the tab order. */
+  .switch { position: relative; display: inline-flex; flex: none; width: 40px; height: 23px; }
+  .switch input[type="checkbox"] {
+    position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+    opacity: 0; cursor: pointer; z-index: 1;
+  }
+  .switch-track {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: var(--paper-sunken); border: 1px solid var(--line);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .switch-thumb {
+    position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%;
+    background: var(--paper); box-shadow: 0 1px 3px var(--shadow);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .switch input:checked + .switch-track { background: var(--accent); border-color: var(--accent-deep); }
+  .switch input:checked + .switch-track .switch-thumb { transform: translateX(17px); background: var(--accent-ink); }
+  /* replaces (rather than removes) the outline the invisible input would
+     otherwise lose visually, so tab-focus is still clearly visible */
+  .switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
   .flash-count { color: var(--ink-soft); font-weight: 500; font-size: 13px; font-family: "JetBrains Mono", monospace; }
 
   .flash-group-label {
@@ -605,28 +630,59 @@
   }
   .flash-check-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
-  .flash-matrix-scroll { overflow-x: auto; margin: 0 0 6px; }
-  table.flash-matrix { border-collapse: collapse; font-family: "JetBrains Mono", monospace; font-size: 11px; }
-  table.flash-matrix th, table.flash-matrix td { padding: 2px; text-align: center; }
-  .flash-matrix-head {
-    background: none; border: none; cursor: pointer; font: inherit; font-weight: 700;
-    color: var(--ink-soft); padding: 4px 7px; border-radius: 5px; white-space: nowrap;
+  .flash-matrix-scroll { overflow-x: auto; margin: 0 0 6px; padding-bottom: 2px; }
+  table.flash-matrix { border-collapse: collapse; font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  table.flash-matrix th, table.flash-matrix td { padding: 3px; text-align: center; }
+  /* Two-row header mirroring #detail table.conj-tenses' own mood-row/
+     tense-row split (see table.conj thead tr.mood-row above) — adapted to
+     this grid's smaller monospace sizing — so indicative "Presente" and
+     subjunctive "Presente" (etc.) read as different groups instead of
+     looking like duplicate columns. */
+  table.flash-matrix thead tr.mood-row th {
+    font-family: "Public Sans", sans-serif; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--accent-deep); padding-bottom: 4px; border-bottom: none;
   }
-  .flash-matrix-head:hover { background: var(--paper-sunken); color: var(--ink); }
+  table.flash-matrix thead tr.mood-row th.imp-head { color: var(--brick); }
+  table.flash-matrix thead tr.tense-row th { padding-top: 2px; padding-bottom: 5px; }
+  table.flash-matrix thead th.flash-matrix-corner { vertical-align: bottom; }
+  .flash-matrix-head {
+    background: var(--paper-sunken); border: 1px solid var(--line); cursor: pointer; font: inherit; font-weight: 700;
+    color: var(--ink-soft); padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  }
+  .flash-matrix-head:hover { background: var(--accent); border-color: var(--accent-deep); color: var(--paper); }
   .flash-matrix-row-head { text-align: left; }
   .flash-matrix-toggle-all {
-    background: none; border: 1px solid var(--line); border-radius: 5px; cursor: pointer;
-    font: inherit; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em;
-    color: var(--ink-soft); padding: 3px 6px;
+    background: var(--paper-sunken); border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+    font: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+    color: var(--ink-soft); padding: 6px 9px;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
   }
-  .flash-matrix-toggle-all:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .flash-matrix-toggle-all:hover { background: var(--accent); border-color: var(--accent-deep); color: var(--paper); }
+  /* More breathing room + rounded corners consistent with .chip, and an
+     on-state that doesn't rely on a background swap alone (a checkmark),
+     so a selected cell reads clearly in both themes even where the accent
+     background's contrast against the border is lower. */
   .flash-matrix-cell {
-    width: 26px; height: 22px; border: 1px solid var(--line); border-radius: 4px;
-    background: var(--paper); cursor: pointer; padding: 0;
+    width: 34px; height: 30px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--paper); cursor: pointer; padding: 0; position: relative;
+    transition: background 0.12s ease, border-color 0.12s ease;
   }
-  .flash-matrix-cell:hover { border-color: var(--accent); }
+  .flash-matrix-cell:hover { border-color: var(--accent); background: var(--paper-sunken); }
   .flash-matrix-cell.on { background: var(--accent); border-color: var(--accent-deep); }
+  .flash-matrix-cell.on::after {
+    content: "\2713";
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: "Public Sans", sans-serif; font-size: 15px; font-weight: 700; color: var(--accent-ink);
+  }
   .flash-matrix-na { background: none; }
+  /* subtle zebra shading across the 5 person rows for scannability — only
+     visible where a button doesn't already cover the cell (the row-head
+     label and any n/a cell), since the cell buttons keep their own opaque
+     background either way. */
+  table.flash-matrix tbody tr:nth-child(even) > th,
+  table.flash-matrix tbody tr:nth-child(even) > td { background: var(--paper-sunken); }
   .flash-matrix-hint { font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 0 0 10px; }
 
   .flash-verb-options, .flash-word-options { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 12px; }
@@ -789,8 +845,12 @@
        feedback is enough to navigate by swipe alone on a phone, so the
        buttons would just be redundant chrome underneath the card. */
     .flash-controls { display: none; }
-    .flash-matrix-cell { width: 22px; height: 20px; }
-    .flash-matrix-head { padding: 3px 5px; font-size: 10px; }
+    table.flash-matrix { font-size: 10.5px; }
+    table.flash-matrix thead tr.mood-row th { font-size: 8.5px; }
+    .flash-matrix-cell { width: 28px; height: 26px; border-radius: 6px; }
+    .flash-matrix-cell.on::after { font-size: 13px; }
+    .flash-matrix-head { padding: 4px 6px; font-size: 10px; border-radius: 6px; }
+    .flash-matrix-toggle-all { padding: 4px 6px; font-size: 9px; border-radius: 6px; }
   }
 
   /* ================= listas compartidas ================= */
@@ -855,6 +915,25 @@
      gets a wider variant of the same overlay/card rather than its own
      dialog treatment. */
   .modal-card.modal-card-wide { max-width: 640px; }
+
+  /* collapsible "view/copy the import format spec" section — a native
+     <details>/<summary> disclosure, the simplest option and this app has
+     no other disclosure widget to match instead. */
+  .import-spec-details {
+    border: 1px solid var(--line); border-radius: 8px; background: var(--paper-sunken);
+    padding: 10px 12px; margin: 0 0 16px;
+  }
+  .import-spec-details summary {
+    cursor: pointer; font-family: "Public Sans", sans-serif; font-weight: 600; font-size: 13px;
+    color: var(--accent-deep);
+  }
+  .import-spec-details[open] summary { margin-bottom: 10px; }
+  .import-spec-pre {
+    max-height: 260px; overflow: auto; margin: 0 0 10px;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; color: var(--ink);
+  }
+  .import-spec-details .form-actions { margin-top: 0; }
   #import-json-preview h4 {
     font-family: "Public Sans", sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.05em; color: var(--ink-soft); margin: 16px 0 8px;
@@ -879,6 +958,12 @@
   .lang-option + .lang-option { border-left: 1px solid var(--line); }
   .lang-option.active { background: var(--accent-deep); color: var(--accent-ink); }
   .lang-option:hover:not(.active) { color: var(--accent-deep); }
+
+  /* the detail card's normal-use/dative-use tabs for a dual-mode gustar-type
+     verb (see the #d-gustar-tabs handling in selectVerb()) reuse .lang-toggle/
+     .lang-option's segmented-button look verbatim, just narrower than the
+     full-width settings-panel version and with room below before the table. */
+  .gustar-mode-toggle { max-width: 300px; margin: 2px 0 16px; }
 
   /* the shared-list preview reuses .flash-overlay's full-screen chrome
      (same topbar, same close button) but its own scrollable body, since a
