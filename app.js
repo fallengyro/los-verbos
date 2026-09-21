@@ -1825,10 +1825,37 @@
     });
   }
 
+  // Supabase's bulk insert sends one INSERT statement for the whole array,
+  // with its column list derived from whichever keys appear across ALL the
+  // rows put together. A key that's only set on SOME rows (e.g. gustar_like
+  // is only ever written on the handful of gustar-type verbs in
+  // STARTER_VERBS) still becomes a real column in that statement, and every
+  // OTHER row silently gets an explicit NULL for it — not the column's own
+  // default — which then trips its "not null" constraint. Explicitly
+  // filling in every optional field here, on every row, keeps the batch
+  // uniform so this can't happen again no matter which verbs
+  // STARTER_VERBS ends up with in the future.
+  function normalizeStarterVerb(sv) {
+    return {
+      infinitive: sv.infinitive,
+      definition: sv.definition || "",
+      type: sv.type || "-ar",
+      irregularity: sv.irregularity || "regular",
+      pattern: sv.pattern || "",
+      reflexive: !!sv.reflexive,
+      transitivity: sv.transitivity || "transitivo",
+      preposicion: sv.preposicion || "",
+      auxiliar: !!sv.auxiliar,
+      gustar_like: !!sv.gustar_like,
+      also_personal_use: !!sv.also_personal_use,
+      forms: sv.forms || {}
+    };
+  }
+
   function seedStarterVerbs() {
     var existing = {};
     allVerbs.forEach(function (v) { existing[norm(v.data.infinitive || "")] = true; });
-    var toInsert = STARTER_VERBS.filter(function (sv) { return !existing[norm(sv.infinitive)]; });
+    var toInsert = STARTER_VERBS.filter(function (sv) { return !existing[norm(sv.infinitive)]; }).map(normalizeStarterVerb);
     if (toInsert.length === 0) {
       showBanner(t("msg_ya_tenes_verbos_ejemplo"));
       return;
@@ -2074,10 +2101,24 @@
     });
   }
 
+  // Same reasoning as normalizeStarterVerb above — keeps every row in the
+  // batch insert carrying the same explicit set of keys, regardless of
+  // which optional fields any individual STARTER_WORDS entry happens to set.
+  function normalizeStarterWord(sw) {
+    return {
+      word: sw.word,
+      definition: sw.definition || "",
+      part_of_speech: sw.part_of_speech || "sustantivo",
+      gender: sw.gender || "",
+      notes: sw.notes || "",
+      example: sw.example || ""
+    };
+  }
+
   function seedStarterWords() {
     var existing = {};
     allWords.forEach(function (v) { existing[norm(v.data.word || "")] = true; });
-    var toInsert = STARTER_WORDS.filter(function (sw) { return !existing[norm(sw.word)]; });
+    var toInsert = STARTER_WORDS.filter(function (sw) { return !existing[norm(sw.word)]; }).map(normalizeStarterWord);
     if (toInsert.length === 0) {
       showBanner(t("msg_ya_tenes_palabras_ejemplo"));
       return;
