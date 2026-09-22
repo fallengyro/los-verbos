@@ -64,7 +64,7 @@ Field notes:
 - `preposicion` — a fixed preposition the verb idiomatically takes (`"a"`, `"de"`, `"en"`...), or `""`.
 - `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.
 - Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `"forms": { "impersonal": { "presente": "llueve", "subjPasado": "lloviera", ... } }` instead — there's no "yo llueve."
-- Reflexive verbs (e.g. `levantarse`) still write `forms` WITHOUT the reflexive pronoun baked in (`"yo": "levanto"`, not `"me levanto"`) — the app adds the pronoun at display time based on the `reflexive: true` flag. Exception: `imperativo` DOES include the pronoun where it attaches (`"vos": "levantate"`), since that's genuinely part of the command form.
+- Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`"yo": "me levanto"`, NOT just `"levanto"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`"vos": "levantate"`), proclitic on the other three (`"usted": "se levante"`, `"nosotros": "nos levantemos"`, `"ustedes": "se levanten"`).
 
 ## Word object shape
 
