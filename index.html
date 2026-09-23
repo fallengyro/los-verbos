@@ -76,6 +76,7 @@
   <div class="main-tabs">
     <button type="button" class="main-tab active" id="tab-verbs" data-i18n="nav_verbs">Verbos</button>
     <button type="button" class="main-tab" id="tab-words" data-i18n="nav_words">Vocabulario</button>
+    <button type="button" class="main-tab" id="tab-phrases" data-i18n="nav_phrases">Frases</button>
     <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
     <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
   </div>
@@ -388,6 +389,124 @@
 
   </section>
 
+  <section id="phrases-panel" hidden>
+
+  <div class="search-card">
+    <div class="search-box">
+      <input type="text" id="phrase-search" data-i18n-placeholder="phrase_search_placeholder" placeholder="Escribí una frase… (ej. dale)" autocomplete="off" />
+      <span class="count" id="phrase-count"></span>
+    </div>
+
+    <div class="filter-chips" id="phrase-filters">
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_function">Función</span>
+        <button type="button" class="chip" data-facet="function" data-value="saludo" data-i18n-tag="saludo">saludo</button>
+        <button type="button" class="chip" data-facet="function" data-value="despedida" data-i18n-tag="despedida">despedida</button>
+        <button type="button" class="chip" data-facet="function" data-value="cortesía" data-i18n-tag="cortesía">cortesía</button>
+        <button type="button" class="chip" data-facet="function" data-value="acuerdo" data-i18n-tag="acuerdo">acuerdo</button>
+        <button type="button" class="chip" data-facet="function" data-value="desacuerdo" data-i18n-tag="desacuerdo">desacuerdo</button>
+        <button type="button" class="chip" data-facet="function" data-value="sorpresa" data-i18n-tag="sorpresa">sorpresa</button>
+        <button type="button" class="chip" data-facet="function" data-value="pregunta" data-i18n-tag="pregunta">pregunta</button>
+        <button type="button" class="chip" data-facet="function" data-value="muletilla" data-i18n-tag="muletilla">muletilla</button>
+        <button type="button" class="chip" data-facet="function" data-value="otro" data-i18n-tag="otro">otro</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_register">Registro</span>
+        <button type="button" class="chip" data-facet="register" data-value="neutro" data-i18n="register_neutro">neutro</button>
+        <button type="button" class="chip" data-facet="register" data-value="coloquial" data-i18n="register_coloquial">coloquial</button>
+        <button type="button" class="chip" data-facet="register" data-value="lunfardo" data-i18n="register_lunfardo">lunfardo</button>
+      </div>
+      <button type="button" class="chip-clear" id="phrase-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
+    </div>
+  </div>
+
+  <ul class="card-list" id="phrase-list"></ul>
+
+  <section class="detail" id="phrase-detail" hidden>
+    <div class="detail-head">
+      <div>
+        <h2 id="pd-phrase"></h2>
+        <p class="definition" id="pd-definition"></p>
+      </div>
+    </div>
+    <div class="badges" id="pd-badges"></div>
+    <p class="pattern-note" id="pd-literal"></p>
+    <p class="pattern-note" id="pd-notes"></p>
+    <p class="example-note" id="pd-example"></p>
+
+    <div class="detail-actions-footer">
+      <button class="icon-btn" id="pd-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
+      <button class="icon-btn" id="pd-edit" type="button" data-i18n="btn_edit">Editar</button>
+      <button class="icon-btn danger" id="pd-delete" type="button" data-i18n="btn_delete">Eliminar</button>
+    </div>
+  </section>
+
+  <div class="toolbar-row">
+    <button class="add-toggle" id="toggle-add-phrase" type="button" data-i18n="btn_add_phrase_toggle">+ Agregar frase</button>
+    <button class="seed-btn" id="seed-phrases-toolbar-btn" type="button">Cargar frases de ejemplo</button>
+    <button class="seed-btn" id="add-filtered-phrases-to-list" type="button" data-i18n="btn_add_filtered_to_list">Agregar filtrados a una lista</button>
+  </div>
+
+  <form id="phrase-form" hidden>
+    <h3 id="phrase-form-title" data-i18n="form_title_add_phrase">Agregar frase</h3>
+    <div class="field-grid">
+      <div class="field">
+        <label for="pf-phrase" data-i18n="label_frase">Frase</label>
+        <input type="text" id="pf-phrase" required />
+      </div>
+      <div class="field">
+        <label for="pf-definition" data-i18n="label_definicion">Definición</label>
+        <input type="text" id="pf-definition" />
+      </div>
+      <div class="field">
+        <label for="pf-function" data-i18n="label_funcion">Función</label>
+        <select id="pf-function">
+          <option value="saludo" data-i18n-tag="saludo">saludo</option>
+          <option value="despedida" data-i18n-tag="despedida">despedida</option>
+          <option value="cortesía" data-i18n-tag="cortesía">cortesía</option>
+          <option value="acuerdo" data-i18n-tag="acuerdo">acuerdo</option>
+          <option value="desacuerdo" data-i18n-tag="desacuerdo">desacuerdo</option>
+          <option value="sorpresa" data-i18n-tag="sorpresa">sorpresa</option>
+          <option value="pregunta" data-i18n-tag="pregunta">pregunta</option>
+          <option value="muletilla" data-i18n-tag="muletilla">muletilla</option>
+          <option value="otro" data-i18n-tag="otro">otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pf-register" data-i18n="label_registro">Registro</label>
+        <select id="pf-register">
+          <option value="neutro" data-i18n="register_neutro">neutro</option>
+          <option value="coloquial" data-i18n="register_coloquial">coloquial</option>
+          <option value="lunfardo" data-i18n="register_lunfardo">lunfardo</option>
+        </select>
+      </div>
+      <div class="field checks">
+        <input type="checkbox" id="pf-idiomatic" />
+        <label for="pf-idiomatic" style="margin:0;" data-i18n="check_idiomatic">¿Es idiomática (no se traduce palabra por palabra)?</label>
+      </div>
+      <div class="field" id="pf-literal-wrap" hidden>
+        <label for="pf-literal" data-i18n="label_literal">Traducción literal</label>
+        <input type="text" id="pf-literal" data-i18n-placeholder="placeholder_literal" placeholder="ej. “ni siquiera borracho/a” (uso real: de ninguna manera)" />
+      </div>
+      <div class="field">
+        <label for="pf-notes" data-i18n="label_notas">Notas / excepciones</label>
+        <input type="text" id="pf-notes" />
+      </div>
+      <div class="field">
+        <label for="pf-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
+        <input type="text" id="pf-example" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" id="phrase-form-save" data-i18n="btn_save">Guardar</button>
+      <button type="button" class="btn-secondary" id="phrase-form-cancel" data-i18n="btn_cancel">Cancelar</button>
+      <span class="form-msg" id="phrase-form-msg"></span>
+    </div>
+  </form>
+
+  </section>
+
   <section id="flashcards-panel" hidden>
     <div class="flash-setup">
       <h2 data-i18n="flash_title">Modo tarjetas</h2>
@@ -407,6 +526,13 @@
             <span class="switch-track"><span class="switch-thumb"></span></span>
           </span>
           <span><span data-i18n="nav_words">Vocabulario</span> <span class="flash-count" id="flash-word-count"></span></span>
+        </label>
+        <label class="switch-row">
+          <span class="switch">
+            <input type="checkbox" id="flash-src-phrases" checked />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </span>
+          <span><span data-i18n="nav_phrases">Frases</span> <span class="flash-count" id="flash-phrase-count"></span></span>
         </label>
       </div>
 
@@ -478,6 +604,10 @@
       <div class="list-detail-group" id="ld-words-group" hidden>
         <h4 data-i18n="nav_words">Vocabulario</h4>
         <ul class="card-list" id="ld-words-items"></ul>
+      </div>
+      <div class="list-detail-group" id="ld-phrases-group" hidden>
+        <h4 data-i18n="nav_phrases">Frases</h4>
+        <ul class="card-list" id="ld-phrases-items"></ul>
       </div>
       <div class="detail-actions-footer">
         <button class="icon-btn" id="ld-study-btn" type="button" data-i18n="btn_study_list">Estudiar esta lista</button>

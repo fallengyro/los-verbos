@@ -421,6 +421,13 @@
      a selected filter chip — it's flagging a genuine usage quirk (see the
      "pattern" note / the gustar legend), not a selection state. */
   .badge.gustarLike { background: var(--teal-soft); color: var(--teal); border: 1px solid var(--teal); }
+  /* register (coloquial/lunfardo) — same "flagging a quirk" brick tone as
+     irregular, since it's calling out that this phrase isn't textbook-
+     neutral; register:neutro never renders a badge at all (see app.js). */
+  .badge.register { background: var(--brick-soft); color: var(--brick); }
+  /* idiomatic — same teal treatment as gustarLike, for the same reason:
+     it's a usage-shape flag, not a selection state. */
+  .badge.idiomatic { background: var(--teal-soft); color: var(--teal); border: 1px solid var(--teal); }
 
   .detail {
     border: 1px solid var(--line);

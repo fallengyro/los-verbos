@@ -283,6 +283,63 @@ create policy "delete own words" on public.words
 create index if not exists words_user_id_idx on public.words (user_id);
 
 -- ---------------------------------------------------------------------------
+-- Frases — short common phrases/expressions, kept separate from single-word
+-- vocabulary. Verbs get grammatical tags (irregularity, transitivity...);
+-- words get part_of_speech/gender; a phrase doesn't have a single part of
+-- speech or grammatical gender, so instead of stretching "words" to cover
+-- it, phrases get their own facets — the ones actually useful for filtering
+-- a phrase collection:
+--   function  — its communicative role: saludo / despedida / cortesía /
+--               acuerdo / desacuerdo / sorpresa / pregunta / muletilla /
+--               otro. This is the phrase equivalent of a word's
+--               part_of_speech — the one facet that organizes the content.
+--   register  — neutro / coloquial / lunfardo. Genuinely useful in Buenos
+--               Aires specifically, where textbook Spanish and everyday
+--               street Spanish diverge a lot.
+--   idiomatic + literal — mirrors the also_personal_use pattern above
+--               (a boolean flag, plus a field only meaningful when it's
+--               true): idiomatic marks a phrase whose meaning isn't
+--               guessable word-by-word (e.g. "ni en pedo"), and literal
+--               holds the word-by-word gloss for just those, blank
+--               otherwise.
+-- Same private-per-user RLS pattern as verbs/words above.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.phrases (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  phrase text not null,
+  definition text default '',
+  function text not null default 'otro',
+  register text not null default 'neutro',
+  idiomatic boolean not null default false,
+  literal text default '',
+  notes text default '',
+  example text default '',
+  created_at timestamptz not null default now()
+);
+
+alter table public.phrases enable row level security;
+
+drop policy if exists "select own phrases" on public.phrases;
+create policy "select own phrases" on public.phrases
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own phrases" on public.phrases;
+create policy "insert own phrases" on public.phrases
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "update own phrases" on public.phrases;
+create policy "update own phrases" on public.phrases
+  for update using (auth.uid() = user_id);
+
+drop policy if exists "delete own phrases" on public.phrases;
+create policy "delete own phrases" on public.phrases
+  for delete using (auth.uid() = user_id);
+
+create index if not exists phrases_user_id_idx on public.phrases (user_id);
+
+-- ---------------------------------------------------------------------------
 -- Shared lists — a named, curated subset of your own verbs/words that you can
 -- hand to someone else (your wife, a friend) via a link, without giving them
 -- any access to the rest of your account.
@@ -345,6 +402,18 @@ create table if not exists public.list_items (
   data jsonb not null,
   created_at timestamptz not null default now()
 );
+
+-- Widen the item_type check to allow 'phrase' too, for accounts whose
+-- list_items table was created before phrases existed. Postgres won't let
+-- an existing check constraint be altered in place, so the old one is
+-- dropped and recreated with the extra value — safe to run whether or not
+-- the table was just created fresh above (which already gets the wider
+-- constraint some Postgres versions don't accept as identical, hence
+-- re-stating it explicitly rather than assuming the inline check already
+-- matches).
+alter table public.list_items drop constraint if exists list_items_item_type_check;
+alter table public.list_items add constraint list_items_item_type_check
+  check (item_type in ('verb', 'word', 'phrase'));
 
 alter table public.list_items enable row level security;
 

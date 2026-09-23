@@ -49,6 +49,7 @@
       settings_btn_label: "Configuración",
       nav_verbs: "Verbos",
       nav_words: "Vocabulario",
+      nav_phrases: "Frases",
       nav_flashcards: "Tarjetas",
       nav_lists: "Listas",
       study_filter_clear: "Salir del filtro",
@@ -68,6 +69,8 @@
       chip_group_flags: "Marcas",
       chip_group_category: "Categoría",
       chip_group_gender: "Género",
+      chip_group_function: "Función",
+      chip_group_register: "Registro",
       filters_clear: "Limpiar filtros",
       conj_hint: "deslizá para ver todos los tiempos →",
       mood_indicativo: "Indicativo",
@@ -109,14 +112,29 @@
       placeholder_notas: "ej. femenino, pero usa “el”: el agua",
       label_ejemplo: "Oración de ejemplo",
       placeholder_ejemplo: "ej. Tomo mucha agua todos los días.",
+      phrase_search_placeholder: "Escribí una frase… (ej. dale)",
+      btn_add_phrase_toggle: "+ Agregar frase",
+      seed_phrases_btn: "Cargar {n} frases de ejemplo",
+      form_title_add_phrase: "Agregar frase",
+      form_title_edit_phrase: "Editar frase",
+      label_frase: "Frase",
+      label_funcion: "Función",
+      label_registro: "Registro",
+      register_neutro: "neutro",
+      register_coloquial: "coloquial",
+      register_lunfardo: "lunfardo",
+      check_idiomatic: "¿Es idiomática (no se traduce palabra por palabra)?",
+      label_literal: "Traducción literal",
+      placeholder_literal: "ej. “ni siquiera borracho/a” (uso real: de ninguna manera)",
       flash_title: "Modo tarjetas",
-      flash_setup_note: "Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.",
+      flash_setup_note: "Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos, Vocabulario y Frases.",
       flash_group_times: "Tiempos, modos y personas",
       flash_matrix_hint: "Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.",
       flash_group_direction: "Dirección de la tarjeta",
       flash_dir_def2word: "Definición → palabra",
       flash_dir_word2def: "Palabra → definición",
       flash_start_btn: "Empezar",
+      flash_no_source: "Activá al menos una fuente (verbos, vocabulario o frases).",
       flash_no_cards: "No hay tarjetas para esta combinación de filtros — probá activar más tiempos, personas o fuentes.",
       close: "Cerrar",
       share_label_shared_list: "Lista compartida",
@@ -125,7 +143,7 @@
       flash_next: "Siguiente ›",
       flash_arrow_prev_aria: "Anterior",
       flash_arrow_next_aria: "Siguiente",
-      lists_intro: "Armá una lista con los verbos y las palabras que quieras de tu índice — podés mezclar los dos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
+      lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
       list_form_title: "Nueva lista",
@@ -150,6 +168,8 @@
       empty_no_verb_match: "Ningún infinitivo coincide con “{q}”.",
       empty_no_words: "Todavía no hay palabras en tu vocabulario.",
       empty_no_word_match: "Ninguna palabra coincide con “{q}”.",
+      empty_no_phrases: "Todavía no hay frases en tu colección.",
+      empty_no_phrase_match: "Ninguna frase coincide con “{q}”.",
       empty_no_lists: "Todavía no tenés ninguna lista — creá una nueva abajo.",
       msg_falta_infinitivo: "Falta el infinitivo.",
       msg_guardando: "Guardando…",
@@ -164,6 +184,11 @@
       confirm_delete_word: "¿Eliminar esta palabra de tu vocabulario?",
       msg_ya_tenes_palabras_ejemplo: "Ya tenés todas las palabras de ejemplo en tu vocabulario.",
       msg_no_pudieron_cargar_palabras: "No se pudieron cargar las palabras de ejemplo: {msg}",
+      msg_falta_frase: "Falta la frase.",
+      msg_error_cargar_frases: "Error al cargar tus frases: {msg}",
+      confirm_delete_phrase: "¿Eliminar esta frase de tu colección?",
+      msg_ya_tenes_frases_ejemplo: "Ya tenés todas las frases de ejemplo en tu colección.",
+      msg_no_pudieron_cargar_frases: "No se pudieron cargar las frases de ejemplo: {msg}",
       msg_error_cargar_listas: "Error al cargar tus listas: {msg}",
       msg_error_generic: "Error: {msg}",
       msg_error_cargar_items: "Error al cargar los ítems: {msg}",
@@ -205,6 +230,8 @@
       unit_verbo_pl: " verbos",
       unit_palabra_s: " palabra",
       unit_palabra_pl: " palabras",
+      unit_frase_s: " frase",
+      unit_frase_pl: " frases",
       unit_item_bare_s: " ítem",
       unit_item_bare_pl: " ítems",
       share_fallback_name: "lista compartida",
@@ -229,8 +256,9 @@
       import_err_bad_version: "Versión de formato no admitida (se esperaba version: 1). Se rechazó todo el archivo.",
       import_err_verbs_not_array: "\"verbs\" debe ser un array.",
       import_err_words_not_array: "\"words\" debe ser un array.",
-      import_json_summary_line: "Se analizaron {v} verbo(s) y {w} palabra(s); {e} error(es) bloqueante(s); {warn} aviso(s).",
-      import_json_nothing: "No hay verbos ni palabras válidos para importar.",
+      import_err_phrases_not_array: "\"phrases\" debe ser un array.",
+      import_json_summary_line: "Se analizaron {v} verbo(s), {w} palabra(s) y {p} frase(s); {e} error(es) bloqueante(s); {warn} aviso(s).",
+      import_json_nothing: "No hay verbos, palabras ni frases válidos para importar.",
       import_err_verb_missing_infinitive: "verbo #{n}: falta el infinitivo.",
       import_err_verb_bad_type: "verbo #{n} ({inf}): \"type\" debe ser -ar, -er o -ir.",
       import_err_verb_type_mismatch: "verbo #{n} ({inf}): el tipo \"{type}\" no coincide con la terminación del infinitivo.",
@@ -242,7 +270,10 @@
       import_err_word_missing: "palabra #{n}: falta \"word\" o \"definition\".",
       import_err_word_bad_pos: "palabra #{n} ({word}): valor de \"part_of_speech\" no válido.",
       import_err_word_bad_gender: "palabra #{n} ({word}): valor de \"gender\" no válido.",
-      import_json_result_summary: "Se importaron {vIns} verbo(s) y {wIns} palabra(s) nueva(s); se omitieron {vSkip} verbo(s) y {wSkip} palabra(s) que ya tenías.",
+      import_err_phrase_missing: "frase #{n}: falta \"phrase\" o \"definition\".",
+      import_err_phrase_bad_function: "frase #{n} ({phrase}): valor de \"function\" no válido.",
+      import_err_phrase_bad_register: "frase #{n} ({phrase}): valor de \"register\" no válido.",
+      import_json_result_summary: "Se importaron {vIns} verbo(s), {wIns} palabra(s) y {pIns} frase(s) nueva(s); se omitieron {vSkip} verbo(s), {wSkip} palabra(s) y {pSkip} frase(s) que ya tenías.",
       import_json_result_list_created: " Se creó la lista “{name}”.",
       import_json_result_list_added: " Se agregaron a la lista “{name}”: {added} ítem(s) ({already} ya estaban).",
       import_json_result_list_error: " No se pudo procesar la lista: {msg}"
@@ -258,6 +289,7 @@
       settings_btn_label: "Settings",
       nav_verbs: "Verbs",
       nav_words: "Vocabulary",
+      nav_phrases: "Phrases",
       nav_flashcards: "Flashcards",
       nav_lists: "Lists",
       study_filter_clear: "Exit filter",
@@ -277,6 +309,8 @@
       chip_group_flags: "Flags",
       chip_group_category: "Category",
       chip_group_gender: "Gender",
+      chip_group_function: "Function",
+      chip_group_register: "Register",
       filters_clear: "Clear filters",
       conj_hint: "swipe to see all tenses →",
       mood_indicativo: "Indicative",
@@ -318,14 +352,29 @@
       placeholder_notas: "e.g. feminine, but uses “el”: el agua",
       label_ejemplo: "Example sentence",
       placeholder_ejemplo: "e.g. Tomo mucha agua todos los días.",
+      phrase_search_placeholder: "Type a phrase… (e.g. dale)",
+      btn_add_phrase_toggle: "+ Add phrase",
+      seed_phrases_btn: "Load {n} example phrases",
+      form_title_add_phrase: "Add phrase",
+      form_title_edit_phrase: "Edit phrase",
+      label_frase: "Phrase",
+      label_funcion: "Function",
+      label_registro: "Register",
+      register_neutro: "neutral",
+      register_coloquial: "colloquial",
+      register_lunfardo: "lunfardo (BA slang)",
+      check_idiomatic: "Is it idiomatic (doesn't translate word-for-word)?",
+      label_literal: "Literal translation",
+      placeholder_literal: "e.g. “not even drunk” (actual meaning: no way)",
       flash_title: "Flashcard mode",
-      flash_setup_note: "Flashcards are built from whatever is currently filtered in the Verbs and Vocabulary tabs.",
+      flash_setup_note: "Flashcards are built from whatever is currently filtered in the Verbs, Vocabulary and Phrases tabs.",
       flash_group_times: "Tenses, moods and persons",
       flash_matrix_hint: "Tap a cell for that combination, or a header for the whole row or column.",
       flash_group_direction: "Card direction",
       flash_dir_def2word: "Definition → word",
       flash_dir_word2def: "Word → definition",
       flash_start_btn: "Start",
+      flash_no_source: "Turn on at least one source (verbs, vocabulary or phrases).",
       flash_no_cards: "There are no cards for this filter combination — try enabling more tenses, persons or sources.",
       close: "Close",
       share_label_shared_list: "Shared list",
@@ -334,7 +383,7 @@
       flash_next: "Next ›",
       flash_arrow_prev_aria: "Previous",
       flash_arrow_next_aria: "Next",
-      lists_intro: "Build a list out of any verbs and words from your index — you can mix the two, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
+      lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
       list_form_title: "New list",
@@ -359,6 +408,8 @@
       empty_no_verb_match: "No infinitive matches “{q}”.",
       empty_no_words: "You don't have any words yet.",
       empty_no_word_match: "No word matches “{q}”.",
+      empty_no_phrases: "You don't have any phrases yet.",
+      empty_no_phrase_match: "No phrase matches “{q}”.",
       empty_no_lists: "You don't have any lists yet — create one below.",
       msg_falta_infinitivo: "The infinitive is required.",
       msg_guardando: "Saving…",
@@ -373,6 +424,11 @@
       confirm_delete_word: "Delete this word from your vocabulary?",
       msg_ya_tenes_palabras_ejemplo: "You already have all the example words in your vocabulary.",
       msg_no_pudieron_cargar_palabras: "Couldn't load the example words: {msg}",
+      msg_falta_frase: "The phrase is required.",
+      msg_error_cargar_frases: "Error loading your phrases: {msg}",
+      confirm_delete_phrase: "Delete this phrase from your collection?",
+      msg_ya_tenes_frases_ejemplo: "You already have all the example phrases in your collection.",
+      msg_no_pudieron_cargar_frases: "Couldn't load the example phrases: {msg}",
       msg_error_cargar_listas: "Error loading your lists: {msg}",
       msg_error_generic: "Error: {msg}",
       msg_error_cargar_items: "Error loading the items: {msg}",
@@ -414,6 +470,8 @@
       unit_verbo_pl: " verbs",
       unit_palabra_s: " word",
       unit_palabra_pl: " words",
+      unit_frase_s: " phrase",
+      unit_frase_pl: " phrases",
       unit_item_bare_s: " item",
       unit_item_bare_pl: " items",
       share_fallback_name: "shared list",
@@ -438,8 +496,9 @@
       import_err_bad_version: "Unsupported format version (expected version: 1). The whole file was rejected.",
       import_err_verbs_not_array: "\"verbs\" must be an array.",
       import_err_words_not_array: "\"words\" must be an array.",
-      import_json_summary_line: "Parsed {v} verb(s) and {w} word(s); {e} blocking error(s); {warn} warning(s).",
-      import_json_nothing: "There are no valid verbs or words to import.",
+      import_err_phrases_not_array: "\"phrases\" must be an array.",
+      import_json_summary_line: "Parsed {v} verb(s), {w} word(s) and {p} phrase(s); {e} blocking error(s); {warn} warning(s).",
+      import_json_nothing: "There are no valid verbs, words or phrases to import.",
       import_err_verb_missing_infinitive: "verb #{n}: missing infinitive.",
       import_err_verb_bad_type: "verb #{n} ({inf}): \"type\" must be -ar, -er or -ir.",
       import_err_verb_type_mismatch: "verb #{n} ({inf}): type \"{type}\" doesn't match the infinitive's ending.",
@@ -451,7 +510,10 @@
       import_err_word_missing: "word #{n}: missing \"word\" or \"definition\".",
       import_err_word_bad_pos: "word #{n} ({word}): invalid \"part_of_speech\" value.",
       import_err_word_bad_gender: "word #{n} ({word}): invalid \"gender\" value.",
-      import_json_result_summary: "Imported {vIns} new verb(s) and {wIns} new word(s); skipped {vSkip} verb(s) and {wSkip} word(s) you already had.",
+      import_err_phrase_missing: "phrase #{n}: missing \"phrase\" or \"definition\".",
+      import_err_phrase_bad_function: "phrase #{n} ({phrase}): invalid \"function\" value.",
+      import_err_phrase_bad_register: "phrase #{n} ({phrase}): invalid \"register\" value.",
+      import_json_result_summary: "Imported {vIns} new verb(s), {wIns} new word(s) and {pIns} new phrase(s); skipped {vSkip} verb(s), {wSkip} word(s) and {pSkip} phrase(s) you already had.",
       import_json_result_list_created: " Created the list “{name}”.",
       import_json_result_list_added: " Added to the list “{name}”: {added} item(s) ({already} already there).",
       import_json_result_list_error: " Couldn't process the list: {msg}"
@@ -482,8 +544,33 @@
     "interjección": { es: "interjección", en: "interjection" },
     "masculino": { es: "masculino", en: "masculine" },
     "femenino": { es: "femenino", en: "feminine" },
-    "neutro": { es: "neutro", en: "neuter" }
+    "neutro": { es: "neutro", en: "neuter" },
+    // Phrase facets. "function" values below never collide with anything
+    // above, so they go through the same tagLabel() lookup as verb/word
+    // tags. Register's "neutro" would collide with the word-gender "neutro"
+    // entry right above (same stored string, different English translation
+    // needed — "neutral register" vs "neuter gender") — so register labels
+    // are handled separately via the register_* I18N keys instead of this
+    // dictionary; see registerLabel() below.
+    "saludo": { es: "saludo", en: "greeting" },
+    "despedida": { es: "despedida", en: "farewell" },
+    "cortesía": { es: "cortesía", en: "courtesy" },
+    "acuerdo": { es: "acuerdo", en: "agreement" },
+    "desacuerdo": { es: "desacuerdo", en: "disagreement" },
+    "sorpresa": { es: "sorpresa", en: "surprise" },
+    "pregunta": { es: "pregunta", en: "question" },
+    "muletilla": { es: "muletilla", en: "filler word" },
+    "otro": { es: "otro", en: "other" },
+    "idiomática": { es: "idiomática", en: "idiomatic" }
   };
+
+  // Register labels can't live in TAG_LABELS above (its "neutro" key is
+  // already taken by word gender, with a different English translation) —
+  // this is the phrase-register equivalent, keyed off the I18N dictionaries
+  // instead via a "register_" prefix.
+  function registerLabel(value) {
+    return t("register_" + (value || "neutro"));
+  }
 
   // Tense/mood names (NOT person/pronoun labels — see the big comment
   // above). Keyed by the same .key values TENSES/SUBJ_TENSES/
@@ -534,6 +621,7 @@
     // set directly here rather than through the attribute walk above.
     if (el.seedToolbarBtn) el.seedToolbarBtn.textContent = t("seed_verbs_btn", { n: STARTER_VERBS.length });
     if (el.seedWordsToolbarBtn) el.seedWordsToolbarBtn.textContent = t("seed_words_btn", { n: STARTER_WORDS.length });
+    if (el.seedPhrasesToolbarBtn) el.seedPhrasesToolbarBtn.textContent = t("seed_phrases_btn", { n: STARTER_PHRASES.length });
   }
 
   // ================= settings (app language) =================
@@ -855,6 +943,30 @@
     { word: "chau", definition: "bye", part_of_speech: "interjección", gender: "" }
   ];
 
+  // ================= starter phrases (15 phrases, offered to a brand-new account) =================
+  // Selection mirrors STARTER_VERBS/STARTER_WORDS above: at least one
+  // example of every "function" value (the phrase equivalent of
+  // part_of_speech) and every "register" value, plus a healthy mix of
+  // idiomatic vs. literal so the idiomatic/literal fields aren't only ever
+  // seen empty.
+  var STARTER_PHRASES = [
+    { phrase: "¿Qué onda?", definition: "what's up? / how's it going?", function: "saludo", register: "coloquial", idiomatic: true, literal: "what wave/vibe?" },
+    { phrase: "¿Cómo andás?", definition: "how are you doing?", function: "saludo", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "Nos vemos", definition: "see you later", function: "despedida", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "Que la pases bien", definition: "take care / have a good one", function: "despedida", register: "coloquial", idiomatic: true, literal: "that you pass it well" },
+    { phrase: "Por favor", definition: "please", function: "cortesía", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "De nada", definition: "you're welcome", function: "cortesía", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "Con permiso", definition: "excuse me (to pass by or enter)", function: "cortesía", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "Dale", definition: "okay / sure / sounds good", function: "acuerdo", register: "coloquial", idiomatic: true, literal: "give it / go" },
+    { phrase: "Ni loco", definition: "no way / not a chance", function: "desacuerdo", register: "coloquial", idiomatic: true, literal: "not even crazy" },
+    { phrase: "¡No puede ser!", definition: "no way! / I can't believe it!", function: "sorpresa", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "¡Qué quilombo!", definition: "what a mess!", function: "sorpresa", register: "lunfardo", idiomatic: true, literal: "\"quilombo\" = mess/chaos (originally \"brothel\")" },
+    { phrase: "¿Viste?", definition: "you know? / see what I mean?", function: "muletilla", register: "coloquial", idiomatic: true, literal: "did you see?" },
+    { phrase: "¿Me podés ayudar?", definition: "can you help me?", function: "pregunta", register: "neutro", idiomatic: false, literal: "" },
+    { phrase: "¿Cuánto sale?", definition: "how much does it cost?", function: "pregunta", register: "coloquial", idiomatic: true, literal: "how much does it come out?" },
+    { phrase: "Todo bien", definition: "all good / no worries / it's fine", function: "otro", register: "coloquial", idiomatic: true, literal: "all good" }
+  ];
+
   // ================= state =================
   var allVerbs = [];      // [{id, data}]
   var filtered = [];
@@ -875,6 +987,12 @@
   var editingWordId = null;
   var activeWordFilters = { pos: new Set(), gender: new Set() };
 
+  var allPhrases = [];    // [{id, data}] — short common phrases/expressions
+  var filteredPhrases = [];
+  var selectedPhraseId = null;
+  var editingPhraseId = null;
+  var activePhraseFilters = { function: new Set(), register: new Set() };
+
   // shared lists — see schema.sql for the lists/list_items tables. Each list
   // is a named, curated subset of the user's own verbs or words; items are
   // stored as denormalized snapshots (see rowToList/addItemToList below).
@@ -888,12 +1006,12 @@
   // see buildFlashDeck) down to just one saved list's items, so you can
   // come back to a specific word set and study it. Cleared explicitly via
   // the banner's "Salir del filtro" button, not by switching tabs.
-  var activeStudyList = null; // { id, name, verbSet: Set<normalized infinitive>, wordSet: Set<normalized word> }
+  var activeStudyList = null; // { id, name, verbSet: Set<normalized infinitive>, wordSet: Set<normalized word>, phraseSet: Set<normalized phrase> }
 
   // flashcards draw from whatever is currently filtered on the Verbos/
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
   // their own source toggle and tense/person filters below.
-  var activeFlashSources = { verbs: true, words: true };
+  var activeFlashSources = { verbs: true, words: true, phrases: true };
   // activeFlashCells holds every selected "tenseKey|personKey" grid cell
   // (see FLASH_MATRIX_COLUMNS/flashCellKey above) — starts with everything on.
   var activeFlashCells = new Set(flashAllCellKeys());
@@ -976,9 +1094,11 @@
 
     tabVerbs: document.getElementById("tab-verbs"),
     tabWords: document.getElementById("tab-words"),
+    tabPhrases: document.getElementById("tab-phrases"),
     tabFlashcards: document.getElementById("tab-flashcards"),
     verbsPanel: document.getElementById("verbs-panel"),
     wordsPanel: document.getElementById("words-panel"),
+    phrasesPanel: document.getElementById("phrases-panel"),
     flashcardsPanel: document.getElementById("flashcards-panel"),
 
     wordSearch: document.getElementById("word-search"),
@@ -1007,10 +1127,42 @@
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
 
+    phraseSearch: document.getElementById("phrase-search"),
+    phraseCount: document.getElementById("phrase-count"),
+    phraseList: document.getElementById("phrase-list"),
+    phraseDetail: document.getElementById("phrase-detail"),
+    pdPhrase: document.getElementById("pd-phrase"),
+    pdDefinition: document.getElementById("pd-definition"),
+    pdBadges: document.getElementById("pd-badges"),
+    pdLiteral: document.getElementById("pd-literal"),
+    pdNotes: document.getElementById("pd-notes"),
+    pdExample: document.getElementById("pd-example"),
+    pdEdit: document.getElementById("pd-edit"),
+    pdDelete: document.getElementById("pd-delete"),
+    toggleAddPhrase: document.getElementById("toggle-add-phrase"),
+    seedPhrasesToolbarBtn: document.getElementById("seed-phrases-toolbar-btn"),
+    phraseForm: document.getElementById("phrase-form"),
+    phraseFormTitle: document.getElementById("phrase-form-title"),
+    phraseFormMsg: document.getElementById("phrase-form-msg"),
+    phraseFormCancel: document.getElementById("phrase-form-cancel"),
+    pfPhrase: document.getElementById("pf-phrase"),
+    pfDefinition: document.getElementById("pf-definition"),
+    pfFunction: document.getElementById("pf-function"),
+    pfRegister: document.getElementById("pf-register"),
+    pfIdiomatic: document.getElementById("pf-idiomatic"),
+    pfLiteralWrap: document.getElementById("pf-literal-wrap"),
+    pfLiteral: document.getElementById("pf-literal"),
+    pfNotes: document.getElementById("pf-notes"),
+    pfExample: document.getElementById("pf-example"),
+    phraseFilters: document.getElementById("phrase-filters"),
+    phraseFiltersClear: document.getElementById("phrase-filters-clear"),
+
     flashSrcVerbs: document.getElementById("flash-src-verbs"),
     flashSrcWords: document.getElementById("flash-src-words"),
+    flashSrcPhrases: document.getElementById("flash-src-phrases"),
     flashVerbCount: document.getElementById("flash-verb-count"),
     flashWordCount: document.getElementById("flash-word-count"),
+    flashPhraseCount: document.getElementById("flash-phrase-count"),
     flashVerbOptions: document.getElementById("flash-verb-options"),
     flashWordOptions: document.getElementById("flash-word-options"),
     flashMatrix: document.getElementById("flash-matrix"),
@@ -1055,14 +1207,18 @@
     ldVerbsItems: document.getElementById("ld-verbs-items"),
     ldWordsGroup: document.getElementById("ld-words-group"),
     ldWordsItems: document.getElementById("ld-words-items"),
+    ldPhrasesGroup: document.getElementById("ld-phrases-group"),
+    ldPhrasesItems: document.getElementById("ld-phrases-items"),
     ldStudyBtn: document.getElementById("ld-study-btn"),
     ldShareBtn: document.getElementById("ld-share-btn"),
     ldDelete: document.getElementById("ld-delete"),
 
     dAddToList: document.getElementById("d-add-to-list"),
     wdAddToList: document.getElementById("wd-add-to-list"),
+    pdAddToList: document.getElementById("pd-add-to-list"),
     addFilteredToList: document.getElementById("add-filtered-to-list"),
     addFilteredWordsToList: document.getElementById("add-filtered-words-to-list"),
+    addFilteredPhrasesToList: document.getElementById("add-filtered-phrases-to-list"),
 
     listPickerOverlay: document.getElementById("list-picker-overlay"),
     listPickerCount: document.getElementById("list-picker-count"),
@@ -1870,10 +2026,12 @@
   function setMainTab(tab) {
     el.tabVerbs.classList.toggle("active", tab === "verbs");
     el.tabWords.classList.toggle("active", tab === "words");
+    el.tabPhrases.classList.toggle("active", tab === "phrases");
     el.tabFlashcards.classList.toggle("active", tab === "flashcards");
     el.tabLists.classList.toggle("active", tab === "lists");
     el.verbsPanel.hidden = tab !== "verbs";
     el.wordsPanel.hidden = tab !== "words";
+    el.phrasesPanel.hidden = tab !== "phrases";
     el.flashcardsPanel.hidden = tab !== "flashcards";
     el.listsPanel.hidden = tab !== "lists";
     if (tab === "flashcards") renderFlashSetup();
@@ -2129,6 +2287,275 @@
     });
   }
 
+  // ================= phrases =================
+  // Short common phrases/expressions — structurally a near-mirror of the
+  // words CRUD block above, but with its own facets (function/register/
+  // idiomatic+literal) instead of part_of_speech/gender. See schema.sql's
+  // "Frases" section for why phrases got their own table rather than a
+  // part_of_speech: "frase" tag inside words.
+
+  function phraseCardRow(id, data) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "card-row";
+
+    var p = document.createElement("span");
+    p.className = "inf";
+    p.textContent = data.phrase || id;
+    btn.appendChild(p);
+
+    if (data.function) btn.appendChild(badge("type", tagLabel(data.function)));
+    if (data.register && data.register !== "neutro") btn.appendChild(badge("register", registerLabel(data.register)));
+    if (data.idiomatic) btn.appendChild(badge("idiomatic", tagLabel("idiomática")));
+
+    var def = document.createElement("span");
+    def.className = "def";
+    def.textContent = data.definition || "";
+    btn.appendChild(def);
+
+    btn.addEventListener("click", function () {
+      if (selectedPhraseId === id) deselectPhrase(); else selectPhrase(id);
+    });
+    li.appendChild(btn);
+    return li;
+  }
+
+  function renderPhraseList() {
+    var q = norm(el.phraseSearch.value);
+    filteredPhrases = allPhrases.filter(function (v) {
+      if (q && norm(v.data.phrase || v.id).indexOf(q) === -1) return false;
+      if (!facetOk(activePhraseFilters, "function", v.data.function || "")) return false;
+      if (!facetOk(activePhraseFilters, "register", v.data.register || "")) return false;
+      if (activeStudyList && !activeStudyList.phraseSet.has(norm(v.data.phrase || ""))) return false;
+      return true;
+    });
+    filteredPhrases.sort(function (a, b) {
+      return (a.data.phrase || a.id).localeCompare(b.data.phrase || b.id, "es");
+    });
+
+    el.phraseList.innerHTML = "";
+    if (filteredPhrases.length === 0) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "empty-note";
+      var p = document.createElement("p");
+      p.textContent = allPhrases.length === 0
+        ? t("empty_no_phrases")
+        : t("empty_no_phrase_match", { q: el.phraseSearch.value });
+      note.appendChild(p);
+      if (allPhrases.length === 0) {
+        var seedPhrasesBtn = document.createElement("button");
+        seedPhrasesBtn.type = "button";
+        seedPhrasesBtn.className = "seed-btn";
+        seedPhrasesBtn.textContent = t("seed_phrases_btn", { n: STARTER_PHRASES.length });
+        seedPhrasesBtn.addEventListener("click", seedStarterPhrases);
+        note.appendChild(seedPhrasesBtn);
+      }
+      li.appendChild(note);
+      el.phraseList.appendChild(li);
+    } else {
+      filteredPhrases.forEach(function (v) { el.phraseList.appendChild(phraseCardRow(v.id, v.data)); });
+    }
+    el.phraseList.scrollTop = 0;
+    el.phraseCount.textContent = allPhrases.length ? (filteredPhrases.length + " / " + allPhrases.length) : "";
+  }
+
+  function deselectPhrase() {
+    selectedPhraseId = null;
+    el.phraseDetail.hidden = true;
+  }
+
+  function selectPhrase(id) {
+    selectedPhraseId = id;
+    var entry = allPhrases.find(function (v) { return v.id === id; });
+    if (!entry) { el.phraseDetail.hidden = true; return; }
+    var data = entry.data;
+
+    el.pdPhrase.textContent = data.phrase || id;
+    el.pdDefinition.textContent = data.definition || "";
+    el.pdBadges.innerHTML = "";
+    if (data.function) el.pdBadges.appendChild(badge("type", tagLabel(data.function)));
+    if (data.register && data.register !== "neutro") el.pdBadges.appendChild(badge("register", registerLabel(data.register)));
+    if (data.idiomatic) el.pdBadges.appendChild(badge("idiomatic", tagLabel("idiomática")));
+    el.pdLiteral.textContent = data.literal || "";
+    el.pdLiteral.style.display = (data.idiomatic && data.literal) ? "" : "none";
+    el.pdNotes.textContent = data.notes || "";
+    el.pdNotes.style.display = data.notes ? "" : "none";
+    el.pdExample.textContent = data.example || "";
+    el.pdExample.style.display = data.example ? "" : "none";
+
+    el.phraseDetail.hidden = false;
+    el.phraseDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function clearPhraseForm() {
+    el.pfPhrase.value = "";
+    el.pfDefinition.value = "";
+    el.pfFunction.value = "otro";
+    el.pfRegister.value = "neutro";
+    el.pfIdiomatic.checked = false;
+    el.pfLiteralWrap.hidden = true;
+    el.pfLiteral.value = "";
+    el.pfNotes.value = "";
+    el.pfExample.value = "";
+  }
+
+  function fillPhraseForm(data) {
+    el.pfPhrase.value = data.phrase || "";
+    el.pfDefinition.value = data.definition || "";
+    el.pfFunction.value = data.function || "otro";
+    el.pfRegister.value = data.register || "neutro";
+    el.pfIdiomatic.checked = !!data.idiomatic;
+    el.pfLiteralWrap.hidden = !data.idiomatic;
+    el.pfLiteral.value = data.literal || "";
+    el.pfNotes.value = data.notes || "";
+    el.pfExample.value = data.example || "";
+  }
+
+  function openPhraseForm(mode, data) {
+    editingPhraseId = mode === "edit" ? selectedPhraseId : null;
+    el.phraseFormTitle.textContent = mode === "edit" ? t("form_title_edit_phrase") : t("form_title_add_phrase");
+    el.phraseFormMsg.textContent = "";
+    if (mode === "edit" && data) fillPhraseForm(data); else clearPhraseForm();
+    el.phraseForm.hidden = false;
+    el.toggleAddPhrase.hidden = true;
+    el.seedPhrasesToolbarBtn.hidden = true;
+    el.pfPhrase.focus();
+    el.phraseForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function closePhraseForm() {
+    el.phraseForm.hidden = true;
+    el.toggleAddPhrase.hidden = false;
+    el.seedPhrasesToolbarBtn.hidden = false;
+    editingPhraseId = null;
+    el.phraseFormMsg.textContent = "";
+  }
+
+  function collectPhraseFormData() {
+    return {
+      phrase: el.pfPhrase.value.trim(),
+      definition: el.pfDefinition.value.trim(),
+      function: el.pfFunction.value,
+      register: el.pfRegister.value,
+      idiomatic: el.pfIdiomatic.checked,
+      literal: el.pfLiteral.value.trim(),
+      notes: el.pfNotes.value.trim(),
+      example: el.pfExample.value.trim()
+    };
+  }
+
+  function rowToPhrase(row) {
+    return {
+      id: row.id,
+      data: {
+        phrase: row.phrase,
+        definition: row.definition || "",
+        function: row.function || "otro",
+        register: row.register || "neutro",
+        idiomatic: !!row.idiomatic,
+        literal: row.literal || "",
+        notes: row.notes || "",
+        example: row.example || ""
+      }
+    };
+  }
+
+  function loadPhrases() {
+    return supabaseClient
+      .from("phrases")
+      .select("*")
+      .order("phrase", { ascending: true })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        saveCache("phrases", res.data || []);
+        markOnline("phrases");
+        clearBanner();
+        allPhrases = (res.data || []).map(rowToPhrase);
+        renderPhraseList();
+        if (selectedPhraseId) {
+          var still = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
+          if (still) selectPhrase(selectedPhraseId); else { el.phraseDetail.hidden = true; selectedPhraseId = null; }
+        }
+      })
+      .catch(function (err) {
+        var cached = readCache("phrases");
+        if (!cached) { showBanner(t("msg_error_cargar_frases", { msg: (err && err.message) || err })); return; }
+        allPhrases = cached.rows.map(rowToPhrase);
+        markOffline("phrases", cached.savedAt);
+        renderPhraseList();
+      });
+  }
+
+  function handlePhraseSubmit(evt) {
+    evt.preventDefault();
+    var data = collectPhraseFormData();
+    if (!data.phrase) { el.phraseFormMsg.textContent = t("msg_falta_frase"); return; }
+    el.phraseFormMsg.textContent = t("msg_guardando");
+
+    var row = {
+      phrase: data.phrase,
+      definition: data.definition,
+      function: data.function,
+      register: data.register,
+      idiomatic: data.idiomatic,
+      literal: data.literal,
+      notes: data.notes,
+      example: data.example
+    };
+
+    var query = editingPhraseId
+      ? supabaseClient.from("phrases").update(row).eq("id", editingPhraseId).select().single()
+      : supabaseClient.from("phrases").insert(row).select().single();
+
+    query.then(function (res) {
+      if (res.error) { el.phraseFormMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
+      var savedId = res.data.id;
+      closePhraseForm();
+      loadPhrases().then(function () { selectPhrase(savedId); });
+    });
+  }
+
+  function handlePhraseDelete() {
+    if (!selectedPhraseId) return;
+    if (!window.confirm(t("confirm_delete_phrase"))) return;
+    supabaseClient.from("phrases").delete().eq("id", selectedPhraseId).then(function (res) {
+      if (res.error) { showBanner(t("msg_no_pudo_eliminar", { msg: res.error.message })); return; }
+      el.phraseDetail.hidden = true;
+      selectedPhraseId = null;
+      loadPhrases();
+    });
+  }
+
+  // Same reasoning as normalizeStarterVerb/normalizeStarterWord above.
+  function normalizeStarterPhrase(sp) {
+    return {
+      phrase: sp.phrase,
+      definition: sp.definition || "",
+      function: sp.function || "otro",
+      register: sp.register || "neutro",
+      idiomatic: !!sp.idiomatic,
+      literal: sp.literal || "",
+      notes: sp.notes || "",
+      example: sp.example || ""
+    };
+  }
+
+  function seedStarterPhrases() {
+    var existing = {};
+    allPhrases.forEach(function (v) { existing[norm(v.data.phrase || "")] = true; });
+    var toInsert = STARTER_PHRASES.filter(function (sp) { return !existing[norm(sp.phrase)]; }).map(normalizeStarterPhrase);
+    if (toInsert.length === 0) {
+      showBanner(t("msg_ya_tenes_frases_ejemplo"));
+      return;
+    }
+    supabaseClient.from("phrases").insert(toInsert).then(function (res) {
+      if (res.error) { showBanner(t("msg_no_pudieron_cargar_frases", { msg: res.error.message })); return; }
+      loadPhrases();
+    });
+  }
+
   // ================= flashcards =================
   // The tense/person picker is a clickable grid shaped like the conjugation
   // table itself (persons as rows, tenses as columns, imperativo as a 6th
@@ -2284,15 +2711,20 @@
   function renderFlashSetup() {
     el.flashVerbCount.textContent = "(" + filtered.length + ")";
     el.flashWordCount.textContent = "(" + filteredWords.length + ")";
+    el.flashPhraseCount.textContent = "(" + filteredPhrases.length + ")";
     el.flashVerbOptions.hidden = !activeFlashSources.verbs;
-    el.flashWordOptions.hidden = !activeFlashSources.words;
+    // The "card direction" panel is shared by words AND phrases — both are
+    // plain front/back cards (no tense/person matrix), so one direction
+    // toggle covers both rather than duplicating the same two radio buttons
+    // a second time for phrases.
+    el.flashWordOptions.hidden = !activeFlashSources.words && !activeFlashSources.phrases;
 
-    var noSource = !activeFlashSources.verbs && !activeFlashSources.words;
+    var noSource = !activeFlashSources.verbs && !activeFlashSources.words && !activeFlashSources.phrases;
     el.flashStartBtn.disabled = noSource;
-    el.flashSetupMsg.textContent = noSource ? "Activá al menos una fuente (verbos o vocabulario)." : "";
+    el.flashSetupMsg.textContent = noSource ? t("flash_no_source") : "";
   }
 
-  // A flashcard is { kind: "verb"|"word", data, frontMain, frontSub, backMain, backSub }.
+  // A flashcard is { kind: "verb"|"word"|"phrase", data, frontMain, frontSub, backMain, backSub }.
   // frontMain/backMain are the big headline text; the *Sub lines and badges are secondary.
   function buildFlashDeck() {
     var deck = [];
@@ -2378,6 +2810,21 @@
       });
     }
 
+    if (activeFlashSources.phrases) {
+      filteredPhrases.forEach(function (ph) {
+        var data = ph.data;
+        var phrase = data.phrase || ph.id;
+        var def = data.definition || "";
+        // Same shared flashDirection as words above (see renderFlashSetup's
+        // comment) — "word2def" here reads as "phrase → definition".
+        if (flashDirection === "word2def") {
+          deck.push({ kind: "phrase", data: data, frontMain: phrase, frontSub: "", backMain: def || "—", backSub: "" });
+        } else {
+          deck.push({ kind: "phrase", data: data, frontMain: def || phrase, frontSub: "", backMain: phrase, backSub: "" });
+        }
+      });
+    }
+
     return deck;
   }
 
@@ -2391,9 +2838,13 @@
       if (data.reflexive) frag.appendChild(badge("reflexive", tagLabel("reflexivo")));
       if (data.auxiliar) frag.appendChild(badge("auxiliar", tagLabel("auxiliar")));
       if (data.gustar_like) frag.appendChild(badge("gustarLike", tagLabel("dativo")));
-    } else {
+    } else if (card.kind === "word") {
       if (data.partOfSpeech) frag.appendChild(badge("type", tagLabel(data.partOfSpeech)));
       if (data.gender) frag.appendChild(badge("gender", tagLabel(data.gender)));
+    } else {
+      if (data.function) frag.appendChild(badge("type", tagLabel(data.function)));
+      if (data.register && data.register !== "neutro") frag.appendChild(badge("register", registerLabel(data.register)));
+      if (data.idiomatic) frag.appendChild(badge("idiomatic", tagLabel("idiomática")));
     }
     return frag;
   }
@@ -2607,15 +3058,16 @@
     };
   }
 
-  // A list can hold both verbs and vocabulary together (e.g. everything
-  // useful for "la cocina"). Given a verb/word breakdown, show that split;
-  // otherwise (before a list's items have been individually loaded) fall
-  // back to the plain total.
-  function listMetaText(count, verbCount, wordCount) {
-    if (verbCount || wordCount) {
+  // A list can hold verbs, vocabulary and phrases together (e.g. everything
+  // useful for "la cocina"). Given a breakdown, show that split; otherwise
+  // (before a list's items have been individually loaded) fall back to the
+  // plain total.
+  function listMetaText(count, verbCount, wordCount, phraseCount) {
+    if (verbCount || wordCount || phraseCount) {
       var parts = [];
       if (verbCount) parts.push(verbCount + t(verbCount === 1 ? "unit_verbo_s" : "unit_verbo_pl"));
       if (wordCount) parts.push(wordCount + t(wordCount === 1 ? "unit_palabra_s" : "unit_palabra_pl"));
+      if (phraseCount) parts.push(phraseCount + t(phraseCount === 1 ? "unit_frase_s" : "unit_frase_pl"));
       return parts.join(" · ");
     }
     return count + t(count === 1 ? "unit_item_bare_s" : "unit_item_bare_pl");
@@ -2690,7 +3142,9 @@
 
     var main = document.createElement("span");
     main.className = "inf";
-    main.textContent = row.item_type === "verb" ? (row.data.infinitive || "") : (row.data.word || "");
+    main.textContent = row.item_type === "verb" ? (row.data.infinitive || "")
+      : row.item_type === "word" ? (row.data.word || "")
+      : (row.data.phrase || "");
     wrap.appendChild(main);
 
     var def = document.createElement("span");
@@ -2724,21 +3178,26 @@
     el.ldShareMsg.textContent = "";
     el.ldVerbsItems.innerHTML = "";
     el.ldWordsItems.innerHTML = "";
+    el.ldPhrasesItems.innerHTML = "";
     el.ldVerbsGroup.hidden = true;
     el.ldWordsGroup.hidden = true;
+    el.ldPhrasesGroup.hidden = true;
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
       if (res.error) { el.ldShareMsg.textContent = t("msg_error_cargar_items", { msg: res.error.message }); return; }
       var rows = res.data || [];
       var verbRows = rows.filter(function (r) { return r.item_type === "verb"; });
       var wordRows = rows.filter(function (r) { return r.item_type === "word"; });
-      el.ldMeta.textContent = listMetaText(rows.length, verbRows.length, wordRows.length);
-      // Shown as two separate groups (rather than one flat list) now that a
-      // single list can hold both — e.g. a "La cocina" list mixing kitchen
-      // verbs and kitchen nouns reads much more clearly split apart.
+      var phraseRows = rows.filter(function (r) { return r.item_type === "phrase"; });
+      el.ldMeta.textContent = listMetaText(rows.length, verbRows.length, wordRows.length, phraseRows.length);
+      // Shown as separate groups (rather than one flat list) now that a
+      // single list can hold all three — e.g. a "La cocina" list mixing
+      // kitchen verbs, nouns and phrases reads much more clearly split apart.
       el.ldVerbsGroup.hidden = verbRows.length === 0;
       el.ldWordsGroup.hidden = wordRows.length === 0;
+      el.ldPhrasesGroup.hidden = phraseRows.length === 0;
       verbRows.forEach(function (row) { el.ldVerbsItems.appendChild(listItemRow(row)); });
       wordRows.forEach(function (row) { el.ldWordsItems.appendChild(listItemRow(row)); });
+      phraseRows.forEach(function (row) { el.ldPhrasesItems.appendChild(listItemRow(row)); });
     });
     el.listDetail.hidden = false;
     el.listDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -2799,15 +3258,18 @@
       var rows = res.data || [];
       var verbSet = new Set();
       var wordSet = new Set();
+      var phraseSet = new Set();
       rows.forEach(function (row) {
         if (row.item_type === "verb") verbSet.add(norm(row.data.infinitive || ""));
-        else wordSet.add(norm(row.data.word || ""));
+        else if (row.item_type === "word") wordSet.add(norm(row.data.word || ""));
+        else phraseSet.add(norm(row.data.phrase || ""));
       });
-      activeStudyList = { id: id, name: entry.data.name, verbSet: verbSet, wordSet: wordSet };
+      activeStudyList = { id: id, name: entry.data.name, verbSet: verbSet, wordSet: wordSet, phraseSet: phraseSet };
       renderStudyFilterBanner();
       renderList();
       renderWordList();
-      setMainTab(verbSet.size ? "verbs" : "words");
+      renderPhraseList();
+      setMainTab(verbSet.size ? "verbs" : (wordSet.size ? "words" : "phrases"));
     });
   }
 
@@ -2816,6 +3278,7 @@
     renderStudyFilterBanner();
     renderList();
     renderWordList();
+    renderPhraseList();
   }
 
   function renderStudyFilterBanner() {
@@ -2946,12 +3409,12 @@
       var existing = {};
       (res.data || []).forEach(function (row) {
         var d = row.data || {};
-        existing[norm(d.infinitive || d.word || "")] = true;
+        existing[norm(d.infinitive || d.word || d.phrase || "")] = true;
       });
       var toInsert = [];
       var skipped = 0;
       items.forEach(function (data) {
-        var key = norm(data.infinitive || data.word || "");
+        var key = norm(data.infinitive || data.word || data.phrase || "");
         if (existing[key]) { skipped++; return; }
         existing[key] = true; // also guards against dupes within this same batch
         toInsert.push({ list_id: listId, item_type: itemType, data: data });
@@ -3024,7 +3487,8 @@
     el.shareName.textContent = s.listName;
     var verbCount = s.items.filter(function (it) { return it.itemType === "verb"; }).length;
     var wordCount = s.items.filter(function (it) { return it.itemType === "word"; }).length;
-    el.shareMeta.textContent = listMetaText(s.items.length, verbCount, wordCount) +
+    var phraseCount = s.items.filter(function (it) { return it.itemType === "phrase"; }).length;
+    el.shareMeta.textContent = listMetaText(s.items.length, verbCount, wordCount, phraseCount) +
       (s.ownerLabel ? t("share_shared_by", { label: s.ownerLabel }) : "");
     el.shareItems.innerHTML = "";
     s.items.forEach(function (it) {
@@ -3033,10 +3497,13 @@
       row.className = "card-row";
       var main = document.createElement("span");
       main.className = "inf";
-      main.textContent = it.itemType === "verb" ? (it.data.infinitive || "") : (it.data.word || "");
+      main.textContent = it.itemType === "verb" ? (it.data.infinitive || "")
+        : it.itemType === "word" ? (it.data.word || "")
+        : (it.data.phrase || "");
       row.appendChild(main);
       if (it.itemType === "verb" && it.data.type) row.appendChild(badge("type", tagLabel(it.data.type)));
       if (it.itemType === "word" && it.data.partOfSpeech) row.appendChild(badge("type", tagLabel(it.data.partOfSpeech)));
+      if (it.itemType === "phrase" && it.data.function) row.appendChild(badge("type", tagLabel(it.data.function)));
       var def = document.createElement("span");
       def.className = "def";
       def.textContent = it.data.definition || "";
@@ -3082,9 +3549,12 @@
     allVerbs.forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = true; });
     var existingWord = {};
     allWords.forEach(function (w) { existingWord[norm(w.data.word || "")] = true; });
+    var existingPhrase = {};
+    allPhrases.forEach(function (p) { existingPhrase[norm(p.data.phrase || "")] = true; });
 
     var toInsertV = [], skippedV = [];
     var toInsertW = [], skippedW = [];
+    var toInsertP = [], skippedP = [];
 
     s.items.forEach(function (it) {
       if (it.itemType === "word") {
@@ -3099,6 +3569,20 @@
           notes: it.data.notes || "",
           example: it.data.example || ""
         });
+      } else if (it.itemType === "phrase") {
+        var ph = it.data.phrase || "";
+        if (existingPhrase[norm(ph)]) { skippedP.push(ph); return; }
+        existingPhrase[norm(ph)] = true;
+        toInsertP.push({
+          phrase: it.data.phrase || "",
+          definition: it.data.definition || "",
+          function: it.data.function || "otro",
+          register: it.data.register || "neutro",
+          idiomatic: !!it.data.idiomatic,
+          literal: it.data.literal || "",
+          notes: it.data.notes || "",
+          example: it.data.example || ""
+        });
       } else {
         var inf = it.data.infinitive || "";
         if (existingInf[norm(inf)]) { skippedV.push(inf); return; }
@@ -3109,8 +3593,9 @@
 
     var verbsPromise = toInsertV.length ? supabaseClient.from("verbs").insert(toInsertV) : Promise.resolve({ error: null });
     var wordsPromise = toInsertW.length ? supabaseClient.from("words").insert(toInsertW) : Promise.resolve({ error: null });
+    var phrasesPromise = toInsertP.length ? supabaseClient.from("phrases").insert(toInsertP) : Promise.resolve({ error: null });
 
-    Promise.all([verbsPromise, wordsPromise]).then(function (results) {
+    Promise.all([verbsPromise, wordsPromise, phrasesPromise]).then(function (results) {
       var failed = results.filter(function (r) { return r && r.error; });
       if (failed.length) {
         el.shareImportBtn.disabled = false;
@@ -3119,9 +3604,10 @@
       }
       if (toInsertV.length) loadVerbs();
       if (toInsertW.length) loadWords();
+      if (toInsertP.length) loadPhrases();
 
-      var importedCount = toInsertV.length + toInsertW.length;
-      var skipped = skippedV.concat(skippedW);
+      var importedCount = toInsertV.length + toInsertW.length + toInsertP.length;
+      var skipped = skippedV.concat(skippedW).concat(skippedP);
       var msg = t("msg_imported_prefix", { n: importedCount }) + t(importedCount === 1 ? "unit_item_singular" : "unit_item_plural");
       if (skipped.length) {
         msg += " " + skipped.length + t(skipped.length === 1 ? "msg_ya_estaba_singular" : "msg_ya_estaban_plural") +
@@ -3176,13 +3662,15 @@
   // live reference — if that source document changes, this copy needs to
   // be updated by hand too, since there is no build step tying them
   // together.
-  var IMPORT_FORMAT_SPEC = "# voseá — Custom Content Import Format (v1)\n\nPaste this whole document into your preferred LLM, along with the source\nmaterial you want turned into study content (a webpage, a PDF, your own\nlist of words), and ask it to produce one JSON file matching the shape\nbelow. Then point voseá's import screen at that file.\n\nEverything imported lands in **your own** verbs/words — never the app's\nshared starter content — the same as adding an item by hand.\n\n## Top-level shape\n\n```json\n{\n  \"version\": 1,\n  \"list_name\": \"Petrofísica y Perfilaje de Pozos\",\n  \"verbs\": [ /* verb objects, see below */ ],\n  \"words\": [ /* word objects, see below */ ]\n}\n```\n\n- `version` — always `1` for this format. Lets the app detect and reject a\n  future incompatible format instead of silently importing garbage.\n- `list_name` — optional. If present, every verb/word below is also added\n  to a list with this exact name (a new list is created if none matches;\n  an existing one with the same name is added to instead of duplicated).\n  Omit this to just add items to your verbs/words without creating a list.\n- `verbs` and `words` are both optional arrays — include whichever you have.\n\n## Verb object shape\n\n```json\n{\n  \"infinitive\": \"escalar\",\n  \"definition\": \"to scale (a log curve)\",\n  \"type\": \"-ar\",\n  \"reflexive\": false,\n  \"irregularity\": \"regular\",\n  \"pattern\": \"\",\n  \"transitivity\": \"transitivo\",\n  \"preposicion\": \"\",\n  \"auxiliar\": false,\n  \"gustar_like\": false,\n  \"forms\": {\n    \"presente\":     { \"yo\": \"escalo\",    \"vos\": \"escalás\",   \"el\": \"escala\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalan\" },\n    \"preterito\":    { \"yo\": \"escalé\",    \"vos\": \"escalaste\", \"el\": \"escaló\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalaron\" },\n    \"imperfecto\":   { \"yo\": \"escalaba\",  \"vos\": \"escalabas\", \"el\": \"escalaba\",  \"nosotros\": \"escalábamos\",  \"ellos\": \"escalaban\" },\n    \"futuro\":       { \"yo\": \"escalaré\",  \"vos\": \"escalarás\", \"el\": \"escalará\",  \"nosotros\": \"escalaremos\",  \"ellos\": \"escalarán\" },\n    \"condicional\":  { \"yo\": \"escalaría\", \"vos\": \"escalarías\",\"el\": \"escalaría\", \"nosotros\": \"escalaríamos\", \"ellos\": \"escalarían\" },\n    \"subjPresente\": { \"yo\": \"escale\",    \"vos\": \"escales\",   \"el\": \"escale\",    \"nosotros\": \"escalemos\",    \"ellos\": \"escalen\" },\n    \"subjPasado\":   { \"yo\": \"escalara\",  \"vos\": \"escalaras\", \"el\": \"escalara\",  \"nosotros\": \"escaláramos\",  \"ellos\": \"escalaran\" },\n    \"imperativo\":   { \"vos\": \"escalá\", \"usted\": \"escale\", \"nosotros\": \"escalemos\", \"ustedes\": \"escalen\" },\n    \"gerundio\": \"escalando\",\n    \"participio\": \"escalado\"\n  }\n}\n```\n\nField notes:\n- `type` — one of `-ar` / `-er` / `-ir`, must match the infinitive's ending.\n- `irregularity` — one of `regular` / `cambio de raíz` / `irregular (yo)` / `irregular (total)`.\n- `pattern` — a short free-text note on what's irregular (e.g. `\"e→i en formas acentuadas\"`), blank if fully regular.\n- `transitivity` — one of `transitivo` / `intransitivo` / `ambos`.\n- `preposicion` — a fixed preposition the verb idiomatically takes (`\"a\"`, `\"de\"`, `\"en\"`...), or `\"\"`.\n- `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.\n- Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `\"forms\": { \"impersonal\": { \"presente\": \"llueve\", \"subjPasado\": \"lloviera\", ... } }` instead — there's no \"yo llueve.\"\n- Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`\"yo\": \"me levanto\"`, NOT just `\"levanto\"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`\"vos\": \"levantate\"`), proclitic on the other three (`\"usted\": \"se levante\"`, `\"nosotros\": \"nos levantemos\"`, `\"ustedes\": \"se levanten\"`).\n\n## Word object shape\n\n```json\n{\n  \"word\": \"porosidad\",\n  \"definition\": \"porosity\",\n  \"part_of_speech\": \"sustantivo\",\n  \"gender\": \"femenino\",\n  \"notes\": \"petrofísica — measured via density or sonic logs\",\n  \"example\": \"\"\n}\n```\n\n- `part_of_speech` — one of `sustantivo` / `adjetivo` / `adverbio` / `pronombre` / `preposición` / `conjunción` / `interjección`.\n- `gender` — one of `masculino` / `femenino` / `neutro` / `\"\"` (blank for anything ungendered, e.g. most adverbs).\n- `notes` and `example` are both optional free text; `example` is a Spanish sentence using the word, if you want one.\n\n## ⚠️ Dialect requirement — this app uses Rioplatense Spanish (voseo)\n\nEvery verb form below MUST use **vos**, never tú. This is the single\nmost common mistake a general-purpose LLM makes here, so check it\ncarefully — a wrong-but-fluent \"tú\" conjugation will look completely\nplausible and still be wrong for this app:\n\n- Present tense **does not diphthongize** for vos, even for stem-changing\n  verbs: **vos podés** (not \"puedés\"), **vos mostrás** (not \"muestrás\"),\n  **vos pedís** (not \"pidís\"), **vos medís** (not \"midís\"). Stress falls\n  on the ending, not the stem — so vos present tense is always the\n  \"regular-looking\" stem plus `-ás`/`-és`/`-ís`.\n- Affirmative vos imperative = the infinitive's stem + its final accented\n  vowel, no `-s`: **hablá, comé, viví, tené, poné, vení, decí** — never\n  the tú-form (habla, ven, di).\n- Preterite, imperfecto, futuro, condicional, and both subjunctives all\n  use the vos-shaped ending shown in the example above (which mirrors\n  \"tú\" minus the final `-s` for most tenses, except present and imperative\n  where the difference is larger).\n- Compounds of irregular verbs keep the irregularity: **obtener → obtengo,\n  obtuve, obtendré** (not a regular pattern), because it's built on\n  \"tener.\" Same logic for any verb built on **poner**, **venir**,\n  **decir**, etc.\n\n## What the app checks before saving anything\n\n- The file must be valid JSON matching this shape, or the whole import is\n  rejected with an error — nothing partial gets written.\n- Every verb's `forms` must have all required tense/person cells filled in.\n- Before you confirm the import, you'll see a preview of every parsed\n  verb/word. For verbs, any cell that doesn't match the app's own\n  built-in *regular* conjugation pattern is highlighted — same highlight\n  used everywhere else in the app for irregular verbs. If you marked\n  something `\"irregularity\": \"regular\"` and cells still light up, that's\n  the LLM having made a mistake; fix it before confirming.\n- Duplicates are matched by infinitive/word (case- and accent-insensitive),\n  same as the existing \"add to list\" flow — importing the same file twice\n  won't create duplicate rows.\n";
+  var IMPORT_FORMAT_SPEC = "# voseá — Custom Content Import Format (v1)\n\nPaste this whole document into your preferred LLM, along with the source\nmaterial you want turned into study content (a webpage, a PDF, your own\nlist of words), and ask it to produce one JSON file matching the shape\nbelow. Then point voseá's import screen at that file.\n\nEverything imported lands in **your own** verbs/words/phrases — never the\napp's shared starter content — the same as adding an item by hand.\n\n## Top-level shape\n\n```json\n{\n  \"version\": 1,\n  \"list_name\": \"Petrofísica y Perfilaje de Pozos\",\n  \"verbs\": [ /* verb objects, see below */ ],\n  \"words\": [ /* word objects, see below */ ],\n  \"phrases\": [ /* phrase objects, see below */ ]\n}\n```\n\n- `version` — always `1` for this format. Lets the app detect and reject a\n  future incompatible format instead of silently importing garbage.\n- `list_name` — optional. If present, every verb/word/phrase below is also\n  added to a list with this exact name (a new list is created if none\n  matches; an existing one with the same name is added to instead of\n  duplicated). Omit this to just add items to your collection without\n  creating a list.\n- `verbs`, `words` and `phrases` are all optional arrays — include\n  whichever you have.\n\n## Verb object shape\n\n```json\n{\n  \"infinitive\": \"escalar\",\n  \"definition\": \"to scale (a log curve)\",\n  \"type\": \"-ar\",\n  \"reflexive\": false,\n  \"irregularity\": \"regular\",\n  \"pattern\": \"\",\n  \"transitivity\": \"transitivo\",\n  \"preposicion\": \"\",\n  \"auxiliar\": false,\n  \"gustar_like\": false,\n  \"forms\": {\n    \"presente\":     { \"yo\": \"escalo\",    \"vos\": \"escalás\",   \"el\": \"escala\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalan\" },\n    \"preterito\":    { \"yo\": \"escalé\",    \"vos\": \"escalaste\", \"el\": \"escaló\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalaron\" },\n    \"imperfecto\":   { \"yo\": \"escalaba\",  \"vos\": \"escalabas\", \"el\": \"escalaba\",  \"nosotros\": \"escalábamos\",  \"ellos\": \"escalaban\" },\n    \"futuro\":       { \"yo\": \"escalaré\",  \"vos\": \"escalarás\", \"el\": \"escalará\",  \"nosotros\": \"escalaremos\",  \"ellos\": \"escalarán\" },\n    \"condicional\":  { \"yo\": \"escalaría\", \"vos\": \"escalarías\",\"el\": \"escalaría\", \"nosotros\": \"escalaríamos\", \"ellos\": \"escalarían\" },\n    \"subjPresente\": { \"yo\": \"escale\",    \"vos\": \"escales\",   \"el\": \"escale\",    \"nosotros\": \"escalemos\",    \"ellos\": \"escalen\" },\n    \"subjPasado\":   { \"yo\": \"escalara\",  \"vos\": \"escalaras\", \"el\": \"escalara\",  \"nosotros\": \"escaláramos\",  \"ellos\": \"escalaran\" },\n    \"imperativo\":   { \"vos\": \"escalá\", \"usted\": \"escale\", \"nosotros\": \"escalemos\", \"ustedes\": \"escalen\" },\n    \"gerundio\": \"escalando\",\n    \"participio\": \"escalado\"\n  }\n}\n```\n\nField notes:\n- `type` — one of `-ar` / `-er` / `-ir`, must match the infinitive's ending.\n- `irregularity` — one of `regular` / `cambio de raíz` / `irregular (yo)` / `irregular (total)`.\n- `pattern` — a short free-text note on what's irregular (e.g. `\"e→i en formas acentuadas\"`), blank if fully regular.\n- `transitivity` — one of `transitivo` / `intransitivo` / `ambos`.\n- `preposicion` — a fixed preposition the verb idiomatically takes (`\"a\"`, `\"de\"`, `\"en\"`...), or `\"\"`.\n- `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.\n- Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `\"forms\": { \"impersonal\": { \"presente\": \"llueve\", \"subjPasado\": \"lloviera\", ... } }` instead — there's no \"yo llueve.\"\n- Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`\"yo\": \"me levanto\"`, NOT just `\"levanto\"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`\"vos\": \"levantate\"`), proclitic on the other three (`\"usted\": \"se levante\"`, `\"nosotros\": \"nos levantemos\"`, `\"ustedes\": \"se levanten\"`).\n\n## Word object shape\n\n```json\n{\n  \"word\": \"porosidad\",\n  \"definition\": \"porosity\",\n  \"part_of_speech\": \"sustantivo\",\n  \"gender\": \"femenino\",\n  \"notes\": \"petrofísica — measured via density or sonic logs\",\n  \"example\": \"\"\n}\n```\n\n- `part_of_speech` — one of `sustantivo` / `adjetivo` / `adverbio` / `pronombre` / `preposición` / `conjunción` / `interjección`.\n- `gender` — one of `masculino` / `femenino` / `neutro` / `\"\"` (blank for anything ungendered, e.g. most adverbs).\n- `notes` and `example` are both optional free text; `example` is a Spanish sentence using the word, if you want one.\n\n## Phrase object shape\n\nShort common phrases/expressions — kept separate from single-word\nvocabulary because a phrase doesn't have one part of speech or gender.\nInstead it has its own two facets: what it's *for* (`function`) and how\nformal/slangy it is (`register`).\n\n```json\n{\n  \"phrase\": \"Dale\",\n  \"definition\": \"okay / sure / sounds good\",\n  \"function\": \"acuerdo\",\n  \"register\": \"coloquial\",\n  \"idiomatic\": true,\n  \"literal\": \"give it / go\",\n  \"notes\": \"\",\n  \"example\": \"\"\n}\n```\n\n- `function` — the phrase's communicative role, one of `saludo` (greeting) / `despedida` (farewell) / `cortesía` (courtesy — please, thanks, excuse me) / `acuerdo` (agreement) / `desacuerdo` (disagreement) / `sorpresa` (surprise/reaction) / `pregunta` (question) / `muletilla` (filler/discourse marker) / `otro` (other).\n- `register` — one of `neutro` (standard, textbook-safe) / `coloquial` (everyday informal) / `lunfardo` (Buenos Aires-specific slang).\n- `idiomatic` — `true` if the meaning isn't guessable word-by-word (e.g. \"ni en pedo\" doesn't mean anything about being drunk), `false` if it's a plain, literal combination of words.\n- `literal` — only meaningful when `idiomatic` is `true`: a short word-by-word gloss, so both the real meaning and the literal words are visible. Leave `\"\"` when `idiomatic` is `false`.\n- `notes` and `example` are both optional free text, same as for words.\n\n## ⚠️ Dialect requirement — this app uses Rioplatense Spanish (voseo)\n\nEvery verb form below MUST use **vos**, never tú. This is the single\nmost common mistake a general-purpose LLM makes here, so check it\ncarefully — a wrong-but-fluent \"tú\" conjugation will look completely\nplausible and still be wrong for this app:\n\n- Present tense **does not diphthongize** for vos, even for stem-changing\n  verbs: **vos podés** (not \"puedés\"), **vos mostrás** (not \"muestrás\"),\n  **vos pedís** (not \"pidís\"), **vos medís** (not \"midís\"). Stress falls\n  on the ending, not the stem — so vos present tense is always the\n  \"regular-looking\" stem plus `-ás`/`-és`/`-ís`.\n- Affirmative vos imperative = the infinitive's stem + its final accented\n  vowel, no `-s`: **hablá, comé, viví, tené, poné, vení, decí** — never\n  the tú-form (habla, ven, di).\n- Preterite, imperfecto, futuro, condicional, and both subjunctives all\n  use the vos-shaped ending shown in the example above (which mirrors\n  \"tú\" minus the final `-s` for most tenses, except present and imperative\n  where the difference is larger).\n- Compounds of irregular verbs keep the irregularity: **obtener → obtengo,\n  obtuve, obtendré** (not a regular pattern), because it's built on\n  \"tener.\" Same logic for any verb built on **poner**, **venir**,\n  **decir**, etc.\n- Phrases should also reflect real rioplatense usage (e.g. \"¿Vos querés\n  algo?\" not \"¿Tú quieres algo?\") — a phrase generated by an LLM defaulting\n  to Spain/Mexico Spanish will read as noticeably foreign here.\n\n## What the app checks before saving anything\n\n- The file must be valid JSON matching this shape, or the whole import is\n  rejected with an error — nothing partial gets written.\n- Every verb's `forms` must have all required tense/person cells filled in.\n- Before you confirm the import, you'll see a preview of every parsed\n  verb/word/phrase. For verbs, any cell that doesn't match the app's own\n  built-in *regular* conjugation pattern is highlighted — same highlight\n  used everywhere else in the app for irregular verbs. If you marked\n  something `\"irregularity\": \"regular\"` and cells still light up, that's\n  the LLM having made a mistake; fix it before confirming.\n- Duplicates are matched by infinitive/word/phrase (case- and\n  accent-insensitive), same as the existing \"add to list\" flow — importing\n  the same file twice won't create duplicate rows.\n";
 
   var IMPORT_VALID_TYPES = ["-ar", "-er", "-ir"];
   var IMPORT_VALID_IRREGULARITY = ["regular", "cambio de raíz", "irregular (yo)", "irregular (total)"];
   var IMPORT_VALID_TRANSITIVITY = ["transitivo", "intransitivo", "ambos"];
   var IMPORT_VALID_POS = ["sustantivo", "adjetivo", "adverbio", "pronombre", "preposición", "conjunción", "interjección"];
   var IMPORT_VALID_GENDER = ["masculino", "femenino", "neutro", ""];
+  var IMPORT_VALID_FUNCTION = ["saludo", "despedida", "cortesía", "acuerdo", "desacuerdo", "sorpresa", "pregunta", "muletilla", "otro"];
+  var IMPORT_VALID_REGISTER = ["neutro", "coloquial", "lunfardo"];
   var IMPORT_TYPE_ENDING = { "-ar": "ar", "-er": "er", "-ir": "ir" };
 
   // Set by handleImportJsonValidate once a pass comes back clean (zero
@@ -3411,9 +3899,36 @@
     };
   }
 
-  function renderImportJsonPreview(errors, warnings, previewRows, verbCount, wordCount) {
+  function validateImportPhrase(p, idx, errorsOut) {
+    var n = idx + 1;
+    var phrase = (p && typeof p.phrase === "string") ? p.phrase.trim() : "";
+    var definition = (p && typeof p.definition === "string") ? p.definition.trim() : "";
+    if (!phrase || !definition) { errorsOut.push(t("import_err_phrase_missing", { n: n })); return null; }
+
+    var rowErrors = [];
+    var func = p.function;
+    if (IMPORT_VALID_FUNCTION.indexOf(func) === -1) rowErrors.push(t("import_err_phrase_bad_function", { n: n, phrase: phrase }));
+    var register = (p.register === undefined || p.register === null || p.register === "") ? "neutro" : p.register;
+    if (IMPORT_VALID_REGISTER.indexOf(register) === -1) rowErrors.push(t("import_err_phrase_bad_register", { n: n, phrase: phrase }));
+
+    if (rowErrors.length) { errorsOut.push.apply(errorsOut, rowErrors); return null; }
+
+    var idiomatic = !!p.idiomatic;
+    return {
+      phrase: phrase,
+      definition: definition,
+      function: func,
+      register: register,
+      idiomatic: idiomatic,
+      literal: idiomatic && typeof p.literal === "string" ? p.literal.trim() : "",
+      notes: (typeof p.notes === "string") ? p.notes.trim() : "",
+      example: (typeof p.example === "string") ? p.example.trim() : ""
+    };
+  }
+
+  function renderImportJsonPreview(errors, warnings, previewRows, verbCount, wordCount, phraseCount) {
     el.importJsonPreview.hidden = false;
-    el.importJsonSummary.textContent = t("import_json_summary_line", { v: verbCount, w: wordCount, e: errors.length, warn: warnings.length });
+    el.importJsonSummary.textContent = t("import_json_summary_line", { v: verbCount, w: wordCount, p: phraseCount, e: errors.length, warn: warnings.length });
 
     el.importJsonErrors.innerHTML = "";
     el.importJsonErrorsWrap.hidden = errors.length === 0;
@@ -3489,9 +4004,11 @@
     var previewRows = [];
     var verbsToImport = [];
     var wordsToImport = [];
+    var phrasesToImport = [];
     var listName = null;
     var rawVerbCount = 0;
     var rawWordCount = 0;
+    var rawPhraseCount = 0;
 
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       errors.push(t("import_err_not_object"));
@@ -3501,6 +4018,7 @@
       errors.push(t("import_err_bad_version"));
       rawVerbCount = Array.isArray(parsed.verbs) ? parsed.verbs.length : 0;
       rawWordCount = Array.isArray(parsed.words) ? parsed.words.length : 0;
+      rawPhraseCount = Array.isArray(parsed.phrases) ? parsed.phrases.length : 0;
     } else {
       if (typeof parsed.list_name === "string" && parsed.list_name.trim()) {
         listName = parsed.list_name.trim();
@@ -3522,6 +4040,14 @@
       wordsArr = wordsArr || [];
       rawWordCount = wordsArr.length;
 
+      var phrasesArr = parsed.phrases;
+      if (phrasesArr !== undefined && phrasesArr !== null && !Array.isArray(phrasesArr)) {
+        errors.push(t("import_err_phrases_not_array"));
+        phrasesArr = [];
+      }
+      phrasesArr = phrasesArr || [];
+      rawPhraseCount = phrasesArr.length;
+
       verbsArr.forEach(function (v, idx) {
         var result = validateImportVerb(v, idx, errors, warnings);
         if (result) {
@@ -3537,12 +4063,20 @@
           previewRows.push({ label: result.word, definition: result.definition });
         }
       });
+
+      phrasesArr.forEach(function (p, idx) {
+        var result = validateImportPhrase(p, idx, errors);
+        if (result) {
+          phrasesToImport.push(result);
+          previewRows.push({ label: result.phrase, definition: result.definition });
+        }
+      });
     }
 
-    renderImportJsonPreview(errors, warnings, previewRows, rawVerbCount, rawWordCount);
+    renderImportJsonPreview(errors, warnings, previewRows, rawVerbCount, rawWordCount, rawPhraseCount);
 
     if (errors.length === 0) {
-      importParsed = { verbs: verbsToImport, words: wordsToImport, listName: listName };
+      importParsed = { verbs: verbsToImport, words: wordsToImport, phrases: phrasesToImport, listName: listName };
       el.importJsonConfirmBtn.hidden = false;
       el.importJsonConfirmBtn.disabled = false;
     }
@@ -3578,12 +4112,12 @@
       var existing = {};
       (res.data || []).forEach(function (row) {
         var d = row.data || {};
-        existing[norm(d.infinitive || d.word || "")] = true;
+        existing[norm(d.infinitive || d.word || d.phrase || "")] = true;
       });
       var toInsert = [];
       var already = 0;
       snapshots.forEach(function (data) {
-        var key = norm(data.infinitive || data.word || "");
+        var key = norm(data.infinitive || data.word || data.phrase || "");
         if (existing[key]) { already++; return; }
         existing[key] = true;
         toInsert.push({ list_id: listId, item_type: itemType, data: data });
@@ -3607,11 +4141,12 @@
     // reloaded recently.
     Promise.all([
       supabaseClient.from("verbs").select("*"),
-      supabaseClient.from("words").select("*")
+      supabaseClient.from("words").select("*"),
+      supabaseClient.from("phrases").select("*")
     ]).then(function (fetchResults) {
-      var vFetch = fetchResults[0], wFetch = fetchResults[1];
-      if (vFetch.error || wFetch.error) {
-        var ferr = vFetch.error || wFetch.error;
+      var vFetch = fetchResults[0], wFetch = fetchResults[1], pFetch = fetchResults[2];
+      if (vFetch.error || wFetch.error || pFetch.error) {
+        var ferr = vFetch.error || wFetch.error || pFetch.error;
         el.importJsonResultMsg.textContent = t("msg_error_importar", { msg: ferr.message });
         el.importJsonConfirmBtn.disabled = false;
         return;
@@ -3620,6 +4155,8 @@
       (vFetch.data || []).map(rowToVerb).forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = v.data; });
       var existingWordMap = {};
       (wFetch.data || []).map(rowToWord).forEach(function (w) { existingWordMap[norm(w.data.word || "")] = w.data; });
+      var existingPhraseMap = {};
+      (pFetch.data || []).map(rowToPhrase).forEach(function (p) { existingPhraseMap[norm(p.data.phrase || "")] = p.data; });
 
       var toInsertV = [], alreadyHaveV = [];
       importParsed.verbs.forEach(function (v) {
@@ -3644,26 +4181,46 @@
         });
       });
 
+      var toInsertP = [], alreadyHaveP = [];
+      importParsed.phrases.forEach(function (p) {
+        var key = norm(p.phrase);
+        if (existingPhraseMap[key]) { alreadyHaveP.push(existingPhraseMap[key]); return; }
+        existingPhraseMap[key] = p;
+        toInsertP.push({
+          phrase: p.phrase,
+          definition: p.definition,
+          function: p.function,
+          register: p.register,
+          idiomatic: p.idiomatic,
+          literal: p.literal,
+          notes: p.notes,
+          example: p.example
+        });
+      });
+
       var verbsPromise = toInsertV.length ? supabaseClient.from("verbs").insert(toInsertV).select() : Promise.resolve({ data: [], error: null });
       var wordsPromise = toInsertW.length ? supabaseClient.from("words").insert(toInsertW).select() : Promise.resolve({ data: [], error: null });
+      var phrasesPromise = toInsertP.length ? supabaseClient.from("phrases").insert(toInsertP).select() : Promise.resolve({ data: [], error: null });
 
-      Promise.all([verbsPromise, wordsPromise]).then(function (results) {
-        var vRes = results[0], wRes = results[1];
-        if (vRes.error || wRes.error) {
-          var err = vRes.error || wRes.error;
+      Promise.all([verbsPromise, wordsPromise, phrasesPromise]).then(function (results) {
+        var vRes = results[0], wRes = results[1], pRes = results[2];
+        if (vRes.error || wRes.error || pRes.error) {
+          var err = vRes.error || wRes.error || pRes.error;
           el.importJsonResultMsg.textContent = t("msg_error_importar", { msg: err.message });
           el.importJsonConfirmBtn.disabled = false;
           return;
         }
         if (toInsertV.length) loadVerbs();
         if (toInsertW.length) loadWords();
+        if (toInsertP.length) loadPhrases();
 
         var insertedVerbData = (vRes.data || []).map(rowToVerb).map(function (x) { return x.data; });
         var insertedWordData = (wRes.data || []).map(rowToWord).map(function (x) { return x.data; });
+        var insertedPhraseData = (pRes.data || []).map(rowToPhrase).map(function (x) { return x.data; });
 
         var summaryMsg = t("import_json_result_summary", {
-          vIns: toInsertV.length, wIns: toInsertW.length,
-          vSkip: alreadyHaveV.length, wSkip: alreadyHaveW.length
+          vIns: toInsertV.length, wIns: toInsertW.length, pIns: toInsertP.length,
+          vSkip: alreadyHaveV.length, wSkip: alreadyHaveW.length, pSkip: alreadyHaveP.length
         });
 
         if (!importParsed.listName) {
@@ -3673,6 +4230,7 @@
 
         var allVerbSnapshots = insertedVerbData.concat(alreadyHaveV);
         var allWordSnapshots = insertedWordData.concat(alreadyHaveW);
+        var allPhraseSnapshots = insertedPhraseData.concat(alreadyHaveP);
 
         findOrCreateListByName(importParsed.listName).then(function (listResult) {
           if (listResult.error) {
@@ -3683,16 +4241,17 @@
 
           Promise.all([
             addImportSnapshotsToList(listResult.id, "verb", allVerbSnapshots),
-            addImportSnapshotsToList(listResult.id, "word", allWordSnapshots)
+            addImportSnapshotsToList(listResult.id, "word", allWordSnapshots),
+            addImportSnapshotsToList(listResult.id, "phrase", allPhraseSnapshots)
           ]).then(function (addResults) {
-            var vAdd = addResults[0], wAdd = addResults[1];
-            var listErr = vAdd.error || wAdd.error;
+            var vAdd = addResults[0], wAdd = addResults[1], pAdd = addResults[2];
+            var listErr = vAdd.error || wAdd.error || pAdd.error;
             var msg = summaryMsg + createdNote;
             if (listErr) {
               msg += t("import_json_result_list_error", { msg: listErr.message });
             } else {
-              var addedTotal = (vAdd.added || 0) + (wAdd.added || 0);
-              var alreadyTotal = (vAdd.already || 0) + (wAdd.already || 0);
+              var addedTotal = (vAdd.added || 0) + (wAdd.added || 0) + (pAdd.added || 0);
+              var alreadyTotal = (vAdd.already || 0) + (wAdd.already || 0) + (pAdd.already || 0);
               msg += t("import_json_result_list_added", { name: importParsed.listName, added: addedTotal, already: alreadyTotal });
             }
             el.importJsonResultMsg.textContent = msg;
@@ -3722,6 +4281,7 @@
       loadUserSettings();
       loadVerbs();
       loadWords();
+      loadPhrases();
       loadLists();
       if (currentShareList) renderSharePreview();
     } else {
@@ -3744,6 +4304,17 @@
       el.seedWordsToolbarBtn.hidden = false;
       el.wordList.innerHTML = "";
       el.wordCount.textContent = "";
+
+      allPhrases = [];
+      filteredPhrases = [];
+      selectedPhraseId = null;
+      editingPhraseId = null;
+      el.phraseDetail.hidden = true;
+      el.phraseForm.hidden = true;
+      el.toggleAddPhrase.hidden = false;
+      el.seedPhrasesToolbarBtn.hidden = false;
+      el.phraseList.innerHTML = "";
+      el.phraseCount.textContent = "";
 
       allLists = [];
       selectedListId = null;
@@ -3857,6 +4428,29 @@
     openListPicker("word", filteredWords.map(function (w) { return w.data; }));
   });
 
+  el.tabPhrases.addEventListener("click", function () { setMainTab("phrases"); });
+  el.phraseSearch.addEventListener("input", renderPhraseList);
+  wireFilterChips(el.phraseFilters, el.phraseFiltersClear, activePhraseFilters, renderPhraseList);
+  el.toggleAddPhrase.addEventListener("click", function () { openPhraseForm("add"); });
+  el.seedPhrasesToolbarBtn.addEventListener("click", seedStarterPhrases);
+  el.phraseFormCancel.addEventListener("click", closePhraseForm);
+  el.phraseForm.addEventListener("submit", handlePhraseSubmit);
+  el.pfIdiomatic.addEventListener("change", function () {
+    el.pfLiteralWrap.hidden = !el.pfIdiomatic.checked;
+  });
+  el.pdEdit.addEventListener("click", function () {
+    var entry = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
+    if (entry) openPhraseForm("edit", entry.data);
+  });
+  el.pdDelete.addEventListener("click", handlePhraseDelete);
+  el.pdAddToList.addEventListener("click", function () {
+    var entry = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
+    if (entry) openListPicker("phrase", [entry.data]);
+  });
+  el.addFilteredPhrasesToList.addEventListener("click", function () {
+    openListPicker("phrase", filteredPhrases.map(function (p) { return p.data; }));
+  });
+
   el.tabFlashcards.addEventListener("click", function () { setMainTab("flashcards"); });
   el.flashSrcVerbs.addEventListener("change", function () {
     activeFlashSources.verbs = el.flashSrcVerbs.checked;
@@ -3864,6 +4458,10 @@
   });
   el.flashSrcWords.addEventListener("change", function () {
     activeFlashSources.words = el.flashSrcWords.checked;
+    renderFlashSetup();
+  });
+  el.flashSrcPhrases.addEventListener("change", function () {
+    activeFlashSources.phrases = el.flashSrcPhrases.checked;
     renderFlashSetup();
   });
   el.flashDirDef.addEventListener("change", function () { if (el.flashDirDef.checked) flashDirection = "def2word"; });
@@ -3924,6 +4522,7 @@
     var saved = null;
     try { saved = localStorage.getItem("iv-main-tab"); } catch (e) {}
     if (saved === "words") setMainTab("words");
+    else if (saved === "phrases") setMainTab("phrases");
     else if (saved === "flashcards") setMainTab("flashcards");
     else if (saved === "lists") setMainTab("lists");
   })();
