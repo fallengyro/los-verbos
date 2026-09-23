@@ -194,11 +194,23 @@
   #study-filter-clear:hover { color: var(--danger); }
 
   /* ---------- verbs / vocabulario tabs ---------- */
-  .main-tabs { display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink); }
+  /* More tabs than reliably fit a phone width (5 as of the phrases tab,
+     more later maybe) — same edge-to-edge horizontal-scroll trick as
+     .conj-scroll below rather than wrapping or shrinking text: the row
+     scrolls, tabs keep their natural width, and the row bleeds off the
+     right edge of the screen so a partially-visible tab hints there's
+     more to scroll to. Left edge stays flush with the page's own
+     padding, matching where content normally starts. */
+  .main-tabs {
+    display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    margin-right: -16px; padding-right: 16px;
+  }
   .main-tab {
     background: none; border: none; padding: 9px 18px 11px; cursor: pointer;
     font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 17px;
     color: var(--ink-soft); border-bottom: 3px solid transparent; margin-bottom: -2px;
+    flex-shrink: 0; white-space: nowrap;
   }
   .main-tab:hover { color: var(--ink); }
   .main-tab.active { color: var(--accent-deep); border-bottom-color: var(--accent); }
@@ -829,6 +841,7 @@
 
     header.masthead h1 { font-size: 24px; }
     .main-tab { font-size: 15px; padding: 8px 12px 10px; }
+    .main-tabs { margin-right: -10px; padding-right: 10px; }
 
     .auth-wrap { margin: 6vh auto 0; }
     .auth-card { padding: 20px 16px; }
