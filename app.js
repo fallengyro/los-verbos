@@ -1470,6 +1470,7 @@
     // manually scrolled back up — resetting it here avoids that.
     el.list.scrollTop = 0;
     el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
+    updateFlashCounts();
   }
 
   // ================= detail =================
@@ -2105,6 +2106,7 @@
     // filter that shrinks the list can't leave it scrolled past its own end.
     el.wordList.scrollTop = 0;
     el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
+    updateFlashCounts();
   }
 
   function deselectWord() {
@@ -2359,6 +2361,7 @@
     }
     el.phraseList.scrollTop = 0;
     el.phraseCount.textContent = allPhrases.length ? (filteredPhrases.length + " / " + allPhrases.length) : "";
+    updateFlashCounts();
   }
 
   function deselectPhrase() {
@@ -2708,10 +2711,28 @@
     return flashColumnCellKeys(tenseKey).some(function (k) { return activeFlashCells.has(k); });
   }
 
-  function renderFlashSetup() {
+  // Split out from renderFlashSetup() so verb/word/phrase list renders can
+  // keep the flashcards tab's source counts current on their own, even
+  // when that tab isn't the one currently open. Without this, the counts
+  // only ever refreshed when renderFlashSetup() itself ran (i.e. on
+  // setMainTab("flashcards")) — fine while browsing normally, but if the
+  // Tarjetas tab is the one restored on load (restoreMainTab() runs
+  // synchronously, before the async loadVerbs/loadWords/loadPhrases have
+  // resolved) it renders once against still-empty filtered/filteredWords/
+  // filteredPhrases arrays and shows "(0)" for everything, then never
+  // updates again since nothing re-opens that tab to re-run
+  // renderFlashSetup(). Switching tabs and back "fixed" it only because
+  // that re-triggers renderFlashSetup() against the by-then-populated
+  // arrays. Calling this at the end of every list render closes that gap
+  // at the source instead of relying on a tab revisit to paper over it.
+  function updateFlashCounts() {
     el.flashVerbCount.textContent = "(" + filtered.length + ")";
     el.flashWordCount.textContent = "(" + filteredWords.length + ")";
     el.flashPhraseCount.textContent = "(" + filteredPhrases.length + ")";
+  }
+
+  function renderFlashSetup() {
+    updateFlashCounts();
     el.flashVerbOptions.hidden = !activeFlashSources.verbs;
     // The "card direction" panel is shared by words AND phrases — both are
     // plain front/back cards (no tense/person matrix), so one direction
