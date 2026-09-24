@@ -394,12 +394,13 @@
     background: var(--paper-raised);
   }
   .card-list li + li { border-top: 1px solid var(--line); }
-  /* the verb and word selection lists get their own taller heights (rather
-     than the shared 110px above) so more of the filtered list is visible
-     before you have to scroll — verbs about twice as tall, and words about
-     three times as tall since a word row is simpler to skim. */
-  #card-list { max-height: 220px; }
+  /* the verb, word and phrase selection lists get their own taller height
+     (rather than the shared 110px above) so more of the filtered list is
+     visible before you have to scroll — all three matched to the same
+     330px (the word list's height, confirmed as the right feel). */
+  #card-list { max-height: 330px; }
   #word-list { max-height: 330px; }
+  #phrase-list { max-height: 330px; }
   .card-row {
     width: 100%;
     display: flex;
