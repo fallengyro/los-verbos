@@ -410,18 +410,28 @@
   }
   .card-list li + li { border-top: 1px solid var(--line); }
   /* the verb, word and phrase selection lists get their own taller box
-     (rather than the shared 110px above) so more of the filtered list is
-     visible before you have to scroll — all three matched to the same
-     330px (the word list's height, confirmed as the right feel). A fixed
-     height rather than max-height, deliberately: with max-height, a list
-     with fewer rows than would fill 330px (phrases, being a newer, less
+     (rather than the shared 110px above) so a consistent slice of the
+     filtered list is visible before you have to scroll. A fixed height
+     rather than max-height, deliberately: with max-height, a list with
+     fewer rows than would fill the box (phrases, being a newer, less
      populated collection than years-accumulated vocabulary) just renders
      shorter — same cap, visibly smaller box. A fixed height keeps all
      three the same size regardless of how many rows are actually in
-     them, which is what "same height as vocabulary" actually means here. */
-  #card-list { height: 330px; }
-  #word-list { height: 330px; }
-  #phrase-list { height: 330px; }
+     them.
+     208px measured (via a real render of the starter content at desktop
+     width) to show exactly 5 rows — every row is a single line at this
+     width, so 5 rows costs the same ~41px each for verbs, words and
+     phrases alike; the scrollbar (already styled globally, see the
+     *::-webkit-scrollbar rules near the top of this file) handles the
+     rest of a longer list. See the mobile override below for why phones
+     get their own, larger, per-list values instead of reusing this one.
+     max-height: none is required here, not cosmetic — .card-list above
+     sets max-height: 110px for the plain/shared case (list pickers,
+     import preview), and max-height always wins over height when both
+     apply, so without this override every fixed height on this line was
+     silently being capped back down to 110px regardless of its value.
+     That's what actually caused the "card is short again" reports. */
+  #card-list, #word-list, #phrase-list { height: 208px; max-height: none; }
   .card-row {
     width: 100%;
     display: flex;
@@ -902,16 +912,28 @@
     .card-row .inf { min-width: 0; flex: 1 1 100%; font-size: 16px; }
     .card-row .def { font-size: 12.5px; }
 
-    /* On a touch screen, a short fixed-height box with its own internal
-       scroll (the desktop compromise, so the list doesn't push everything
-       else far down the page) just fights the page scroll instead — your
-       thumb lands on the list and only the list moves, not the page. Let
-       these three grow to their full content height on mobile so the
-       whole page scrolls as one, the way touch scrolling is expected to
-       work. Modal-embedded lists (list picker, import preview) keep their
-       bounded scroll — those sit inside an already-bounded dialog, a
-       different context from the main tab content flow. */
-    #card-list, #word-list, #phrase-list { height: auto; max-height: none; overflow-y: visible; }
+    /* Earlier this had these three growing to full content height on
+       mobile (no internal scroll), on the theory that a boxed scroll area
+       fights touch scrolling — your thumb lands on the list and only the
+       list moves, not the page. Turned out the actual complaint driving
+       that change was the TABS row being vertically draggable (see
+       .main-tabs-scroll's overflow-y: hidden above), not these lists —
+       once that got fixed, the real ask for these lists was a normal
+       bounded, scrollable box (same as desktop), just sized generously
+       enough to show ~5 rows without feeling cramped. Touch scrolling
+       inside a bounded box works fine here in practice (it's the same
+       list-inside-a-scrollable-area pattern as the modal-embedded lists
+       below, which never had this override).
+       Each gets its own height rather than sharing one value, because
+       mobile rows wrap to 2 (sometimes 3) lines — .card-row goes
+       flex-wrap above — and how much they wrap depends on how much text
+       badges + definition carry per type: phrases run longer (up to 3
+       badges plus a fuller definition) than verbs or words. Measured via
+       a real render of each list's starter content at a 375px viewport,
+       ceil'd to the exact pixel where the 5th row's bottom edge lands. */
+    #card-list { height: 308px; }
+    #word-list { height: 318px; }
+    #phrase-list { height: 428px; }
 
     .chip { padding: 4px 10px; font-size: 12px; }
     .chip-clear { flex-basis: 100%; margin-left: 0; }
