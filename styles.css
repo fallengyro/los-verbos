@@ -203,7 +203,12 @@
      padding, matching where content normally starts. */
   .main-tabs {
     display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink);
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    /* overflow-x: auto on its own makes the browser implicitly treat
+       overflow-y as auto too (a CSS quirk: one axis non-"visible" forces
+       the other out of "visible" as well) — which is what let the row be
+       dragged up/down as if it had vertical content. Pin overflow-y to
+       hidden explicitly so only the intended horizontal swipe works. */
+    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
     margin-right: -16px; padding-right: 16px;
     /* The row itself is the scroll affordance (tabs bleeding off the right
        edge) — a scrollbar underneath just doubles up on that same signal
