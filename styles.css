@@ -200,9 +200,19 @@
      scrolls, tabs keep their natural width, and the row bleeds off the
      right edge of the screen so a partially-visible tab hints there's
      more to scroll to. Left edge stays flush with the page's own
-     padding, matching where content normally starts. */
-  .main-tabs {
-    display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink);
+     padding, matching where content normally starts.
+
+     Split into two elements on purpose: .main-tabs holds the border-bottom
+     line at the page's normal content width (matching the header's line
+     above it), and .main-tabs-scroll — the actual overflow-x:auto flex
+     row — is what bleeds past that edge. Putting the bleed AND the border
+     on the same element made the border-bottom bleed right along with it,
+     so it visibly ran longer than the header's line above — this keeps
+     the two lines the same length while the tab row itself still scrolls
+     edge-to-edge underneath. */
+  .main-tabs { margin-bottom: 22px; border-bottom: 2px solid var(--ink); }
+  .main-tabs-scroll {
+    display: flex; gap: 4px;
     /* overflow-x: auto on its own makes the browser implicitly treat
        overflow-y as auto too (a CSS quirk: one axis non-"visible" forces
        the other out of "visible" as well) — which is what let the row be
@@ -212,12 +222,12 @@
     margin-right: -16px; padding-right: 16px;
     /* The row itself is the scroll affordance (tabs bleeding off the right
        edge) — a scrollbar underneath just doubles up on that same signal
-       and looks out of place sitting right on the border-bottom divider.
+       and looks out of place sitting right below the header's line.
        Scrolling still works via swipe/wheel; only the bar is hidden. */
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  .main-tabs::-webkit-scrollbar { display: none; }
+  .main-tabs-scroll::-webkit-scrollbar { display: none; }
   .main-tab {
     background: none; border: none; padding: 9px 18px 11px; cursor: pointer;
     font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 17px;
@@ -860,7 +870,7 @@
 
     header.masthead h1 { font-size: 24px; }
     .main-tab { font-size: 15px; padding: 8px 12px 10px; }
-    .main-tabs { margin-right: -10px; padding-right: 10px; }
+    .main-tabs-scroll { margin-right: -10px; padding-right: 10px; }
 
     .auth-wrap { margin: 6vh auto 0; }
     .auth-card { padding: 20px 16px; }

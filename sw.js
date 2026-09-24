@@ -12,7 +12,7 @@
 // from cache immediately if we have it (fast, works offline), and in the
 // background fetch a fresh copy to store for next time.
 
-var CACHE_NAME = "iv-shell-v12";
+var CACHE_NAME = "iv-shell-v13";
 
 var SHELL_FILES = [
   "./",
