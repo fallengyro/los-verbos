@@ -164,35 +164,6 @@
     color: var(--ink-soft);
   }
 
-  .study-filter-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    background: var(--paper-sunken);
-    border: 1px solid var(--accent);
-    border-left: 4px solid var(--accent);
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin-bottom: 18px;
-    font-size: 13.5px;
-    color: var(--ink);
-  }
-  #study-filter-text { font-weight: 600; }
-  #study-filter-clear {
-    background: none;
-    border: none;
-    padding: 2px 4px;
-    font-family: inherit;
-    font-size: 12.5px;
-    font-style: italic;
-    color: var(--accent-deep);
-    text-decoration: underline;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  #study-filter-clear:hover { color: var(--danger); }
-
   /* ---------- verbs / vocabulario tabs ---------- */
   /* More tabs than reliably fit a phone width (5 as of the phrases tab,
      more later maybe) — same edge-to-edge horizontal-scroll trick as
@@ -378,12 +349,29 @@
     line-height: 1.4;
   }
   .chip:hover { border-color: var(--accent); color: var(--ink); }
-  .chip.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--paper);
+  /* Tri-state: neutral (default above), "included" (.active) or "excluded"
+     (.exclude). Both on-states get a glyph via ::before rather than an
+     injected child node, because applyI18n() sets .textContent directly on
+     any [data-i18n]/[data-i18n-tag] chip, which would wipe out a real DOM
+     node — same precedent as .flash-matrix-cell.on::after. --danger is
+     reused for exclude rather than the --brick family, since --brick
+     already carries "irregular conjugation" meaning elsewhere in the app
+     and --danger is already this app's "remove/wrong" token. */
+  .chip.active, .chip.exclude {
+    padding-left: 26px;
+    position: relative;
     font-weight: 600;
+    color: var(--paper);
   }
+  .chip.active { background: var(--accent); border-color: var(--accent); }
+  .chip.exclude { background: var(--danger); border-color: var(--danger); }
+  .chip.active::before, .chip.exclude::before {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; font-weight: 700; line-height: 1;
+  }
+  .chip.active::before { content: "\2713"; }
+  .chip.exclude::before { content: "\2715"; }
+  .chip-hint { flex-basis: 100%; font-size: 11px; color: var(--ink-soft); font-style: italic; margin: 0 0 2px; }
   .chip-clear {
     background: none;
     border: none;
@@ -397,6 +385,22 @@
     margin-left: auto;
   }
   .chip-clear:hover { color: var(--danger); }
+
+  /* "N hidden by your excludes" — only shown when an active exclude is
+     actually hiding something (see renderHiddenCount() in app.js). Sits
+     between the filter chips and the list itself, so it reads as a note
+     about what's currently filtered out rather than part of the chips. */
+  .hidden-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .hidden-count-row .chip-clear { margin-left: 0; }
 
   .card-list {
     list-style: none;

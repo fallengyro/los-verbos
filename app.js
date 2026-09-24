@@ -52,8 +52,6 @@
       nav_phrases: "Frases",
       nav_flashcards: "Tarjetas",
       nav_lists: "Listas",
-      study_filter_clear: "Salir del filtro",
-      study_filter_studying: "Estudiando la lista “{name}”",
       offline_banner: "Sin conexión — mostrando lo último guardado ({age}).",
       cache_age_moment: "hace un momento",
       cache_age_minutes: "hace {n} minuto",
@@ -71,6 +69,11 @@
       chip_group_gender: "Género",
       chip_group_function: "Función",
       chip_group_register: "Registro",
+      chip_group_list: "Listas",
+      chip_hint_exclude: "Tocá un chip para incluir, dos veces para excluir",
+      hidden_count_s: "{n} resultado oculto por tus exclusiones",
+      hidden_count_pl: "{n} resultados ocultos por tus exclusiones",
+      show_all_btn: "Mostrar todo",
       filters_clear: "Limpiar filtros",
       conj_hint: "deslizá para ver todos los tiempos →",
       mood_indicativo: "Indicativo",
@@ -152,7 +155,6 @@
       btn_create: "Crear",
       btn_copy_link: "Copiar enlace",
       btn_native_share: "Compartir…",
-      btn_study_list: "Estudiar esta lista",
       btn_share: "Compartir",
       btn_delete_list: "Eliminar lista",
       list_picker_new_label: "O creá una lista nueva",
@@ -292,8 +294,6 @@
       nav_phrases: "Phrases",
       nav_flashcards: "Flashcards",
       nav_lists: "Lists",
-      study_filter_clear: "Exit filter",
-      study_filter_studying: "Studying the list “{name}”",
       offline_banner: "Offline — showing what was last saved ({age}).",
       cache_age_moment: "just now",
       cache_age_minutes: "{n} minute ago",
@@ -311,6 +311,11 @@
       chip_group_gender: "Gender",
       chip_group_function: "Function",
       chip_group_register: "Register",
+      chip_group_list: "Lists",
+      chip_hint_exclude: "Tap a chip to include, twice to exclude",
+      hidden_count_s: "{n} result hidden by your excludes",
+      hidden_count_pl: "{n} results hidden by your excludes",
+      show_all_btn: "Show all",
       filters_clear: "Clear filters",
       conj_hint: "swipe to see all tenses →",
       mood_indicativo: "Indicative",
@@ -392,7 +397,6 @@
       btn_create: "Create",
       btn_copy_link: "Copy link",
       btn_native_share: "Share…",
-      btn_study_list: "Study this list",
       btn_share: "Share",
       btn_delete_list: "Delete list",
       list_picker_new_label: "Or create a new list",
@@ -648,10 +652,11 @@
   function refreshAllTranslatedViews() {
     applyGrammarLabels();
     applyI18n();
+    renderListChipGroups();
     renderList();
     renderWordList();
+    renderPhraseList();
     renderListsPanel();
-    renderStudyFilterBanner();
     renderOfflineBanner();
     if (selectedId) selectVerb(selectedId);
     if (selectedWordId) selectWord(selectedWordId);
@@ -977,21 +982,42 @@
   // see the gustar-mode tabs in selectVerb(). Reset to "personal" whenever a
   // different verb is opened; irrelevant (and ignored) for every other verb.
   var detailGustarTab = "personal";
-  // facet filters: verb matches if, for every facet with a non-empty set,
-  // its value is a member of that set (AND across facets, OR within one).
-  var activeVerbFilters = { type: new Set(), irregularity: new Set(), transitivity: new Set(), flag: new Set() };
+  // facet filters: each tag facet is tri-state per value — a value can be
+  // "included" (must match, OR'd against other included values of the same
+  // facet), "excluded" (must not match — excludes always win over includes,
+  // even across different facets), or left neutral. Boolean flag facets
+  // (reflexive/auxiliar/gustarLike, and idiomatic for phrases) are each
+  // independently AND'd rather than OR'd — see flagOk(). The "list" facet
+  // is multi-membership (an item can be in several lists) and follows the
+  // same OR-within-include / excludes-win rule as tag facets.
+  var activeVerbFilters = {
+    type: { include: new Set(), exclude: new Set() },
+    irregularity: { include: new Set(), exclude: new Set() },
+    transitivity: { include: new Set(), exclude: new Set() },
+    flag: { include: new Set(), exclude: new Set() },
+    list: { include: new Set(), exclude: new Set() }
+  };
 
   var allWords = [];      // [{id, data}] — vocabulario (nouns, adjectives, etc.)
   var filteredWords = [];
   var selectedWordId = null;
   var editingWordId = null;
-  var activeWordFilters = { pos: new Set(), gender: new Set() };
+  var activeWordFilters = {
+    pos: { include: new Set(), exclude: new Set() },
+    gender: { include: new Set(), exclude: new Set() },
+    list: { include: new Set(), exclude: new Set() }
+  };
 
   var allPhrases = [];    // [{id, data}] — short common phrases/expressions
   var filteredPhrases = [];
   var selectedPhraseId = null;
   var editingPhraseId = null;
-  var activePhraseFilters = { function: new Set(), register: new Set() };
+  var activePhraseFilters = {
+    function: { include: new Set(), exclude: new Set() },
+    register: { include: new Set(), exclude: new Set() },
+    flag: { include: new Set(), exclude: new Set() },
+    list: { include: new Set(), exclude: new Set() }
+  };
 
   // shared lists — see schema.sql for the lists/list_items tables. Each list
   // is a named, curated subset of the user's own verbs or words; items are
@@ -1001,12 +1027,19 @@
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
   var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
 
-  // When set, narrows the Verbos/Vocabulario tabs (and therefore Tarjetas,
-  // which builds its deck from those same filtered/filteredWords arrays —
-  // see buildFlashDeck) down to just one saved list's items, so you can
-  // come back to a specific word set and study it. Cleared explicitly via
-  // the banner's "Salir del filtro" button, not by switching tabs.
-  var activeStudyList = null; // { id, name, verbSet: Set<normalized infinitive>, wordSet: Set<normalized word>, phraseSet: Set<normalized phrase> }
+  // Reverse membership maps rebuilt every time loadLists() runs (from the
+  // full list_items rows, not just a count). list_items stores denormalized
+  // snapshots rather than foreign keys to verbs/words/phrases (see
+  // addItemToList/addImportSnapshotsToList), so membership can only be
+  // matched by normalized name — norm(infinitive/word/phrase) -> Set<listId>
+  // — same matching convention already used for duplicate-detection and by
+  // the old per-list study-set builder this replaces. EMPTY_ID_SET is a
+  // shared read-only fallback so lookups on a name with no lists don't need
+  // a null check everywhere.
+  var EMPTY_ID_SET = new Set();
+  var verbListMembership = {};   // norm(infinitive) -> Set<listId>
+  var wordListMembership = {};   // norm(word) -> Set<listId>
+  var phraseListMembership = {}; // norm(phrase) -> Set<listId>
 
   // flashcards draw from whatever is currently filtered on the Verbos/
   // Vocabulario tabs (the "filtered"/"filteredWords" arrays above), plus
@@ -1043,9 +1076,6 @@
     banner: document.getElementById("status-banner"),
     offlineBanner: document.getElementById("offline-banner"),
     offlineBannerText: document.getElementById("offline-banner-text"),
-    studyFilterBanner: document.getElementById("study-filter-banner"),
-    studyFilterText: document.getElementById("study-filter-text"),
-    studyFilterClear: document.getElementById("study-filter-clear"),
     search: document.getElementById("search"),
     count: document.getElementById("count"),
     list: document.getElementById("card-list"),
@@ -1091,6 +1121,10 @@
     imperativoFormRow: document.getElementById("imperativo-form-row"),
     verbFilters: document.getElementById("verb-filters"),
     verbFiltersClear: document.getElementById("verb-filters-clear"),
+    verbFiltersListGroup: document.getElementById("verb-filters-list-group"),
+    verbHiddenRow: document.getElementById("verb-hidden-row"),
+    verbHiddenText: document.getElementById("verb-hidden-text"),
+    verbShowAllBtn: document.getElementById("verb-show-all-btn"),
 
     tabVerbs: document.getElementById("tab-verbs"),
     tabWords: document.getElementById("tab-words"),
@@ -1126,6 +1160,10 @@
     wfExample: document.getElementById("wf-example"),
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
+    wordFiltersListGroup: document.getElementById("word-filters-list-group"),
+    wordHiddenRow: document.getElementById("word-hidden-row"),
+    wordHiddenText: document.getElementById("word-hidden-text"),
+    wordShowAllBtn: document.getElementById("word-show-all-btn"),
 
     phraseSearch: document.getElementById("phrase-search"),
     phraseCount: document.getElementById("phrase-count"),
@@ -1156,6 +1194,10 @@
     pfExample: document.getElementById("pf-example"),
     phraseFilters: document.getElementById("phrase-filters"),
     phraseFiltersClear: document.getElementById("phrase-filters-clear"),
+    phraseFiltersListGroup: document.getElementById("phrase-filters-list-group"),
+    phraseHiddenRow: document.getElementById("phrase-hidden-row"),
+    phraseHiddenText: document.getElementById("phrase-hidden-text"),
+    phraseShowAllBtn: document.getElementById("phrase-show-all-btn"),
 
     flashSrcVerbs: document.getElementById("flash-src-verbs"),
     flashSrcWords: document.getElementById("flash-src-words"),
@@ -1209,7 +1251,6 @@
     ldWordsItems: document.getElementById("ld-words-items"),
     ldPhrasesGroup: document.getElementById("ld-phrases-group"),
     ldPhrasesItems: document.getElementById("ld-phrases-items"),
-    ldStudyBtn: document.getElementById("ld-study-btn"),
     ldShareBtn: document.getElementById("ld-share-btn"),
     ldDelete: document.getElementById("ld-delete"),
 
@@ -1327,40 +1368,152 @@
   function stripAccents(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   function norm(s) { return stripAccents(s).toLowerCase().trim(); }
 
-  // ================= filter chips (shared by verbs + vocabulario) =================
-  // A record matches an active-filters map if, for every facet that has at
-  // least one active value, the record's value for that facet is among the
-  // active ones (facets AND together; multiple values within one facet OR).
-  function facetOk(activeFilters, facet, value) {
-    var set = activeFilters[facet];
-    if (!set || set.size === 0) return true;
-    return set.has(value);
+  // ================= filter chips (shared by verbs/vocabulario/frases) =================
+  // Tri-state: every chip is neutral, "included" or "excluded". Tapping a
+  // chip cycles neutral -> include -> exclude -> neutral. Excludes always
+  // win over includes, even across different facets — a record excluded by
+  // any facet is hidden regardless of what else matches. Within one facet,
+  // includes are OR'd (matching any included value is enough); facets are
+  // AND'd together, same as before. Pass ignoreExcludes:true to check only
+  // the include side — used to compute the "hidden by your excludes" count.
+
+  // Single-value tag facets (type/irregularity/transitivity/pos/gender/
+  // function/register): value is a single string per record.
+  function facetOk(activeFilters, facet, value, ignoreExcludes) {
+    var state = activeFilters[facet];
+    if (!state) return true;
+    if (!ignoreExcludes && state.exclude.size && state.exclude.has(value)) return false;
+    if (state.include.size && !state.include.has(value)) return false;
+    return true;
+  }
+
+  // Boolean flag facets (reflexive/auxiliar/gustarLike on verbs, idiomatic
+  // on phrases): each flag chip is independently AND'd, not OR'd — turning
+  // on "reflexivo" AND "auxiliar" together means both must be true, same
+  // as the app's original (pre-tri-state) flag behavior. getFlag(value)
+  // returns whether the record has that boolean flag set.
+  function flagOk(activeFilters, facet, getFlag, ignoreExcludes) {
+    var state = activeFilters[facet];
+    if (!state) return true;
+    var ok = true;
+    state.include.forEach(function (value) { if (!getFlag(value)) ok = false; });
+    if (!ignoreExcludes) {
+      state.exclude.forEach(function (value) { if (getFlag(value)) ok = false; });
+    }
+    return ok;
+  }
+
+  // The "list" facet: multi-membership (a record can be in several lists),
+  // so it's OR-within-include / excludes-win, same shape as a tag facet,
+  // just checked against a membership Set instead of a single value.
+  function listFacetOk(activeFilters, membershipSet, ignoreExcludes) {
+    var state = activeFilters.list;
+    if (!state) return true;
+    membershipSet = membershipSet || EMPTY_ID_SET;
+    if (!ignoreExcludes && state.exclude.size) {
+      var excluded = false;
+      state.exclude.forEach(function (id) { if (membershipSet.has(id)) excluded = true; });
+      if (excluded) return false;
+    }
+    if (state.include.size) {
+      var included = false;
+      state.include.forEach(function (id) { if (membershipSet.has(id)) included = true; });
+      if (!included) return false;
+    }
+    return true;
   }
 
   function anyFilterActive(activeFilters) {
-    return Object.keys(activeFilters).some(function (f) { return activeFilters[f].size > 0; });
+    return Object.keys(activeFilters).some(function (f) {
+      var state = activeFilters[f];
+      return state.include.size > 0 || state.exclude.size > 0;
+    });
   }
 
-  function wireFilterChips(containerEl, clearBtnEl, activeFilters, onChange) {
-    var chips = containerEl.querySelectorAll(".chip");
-    for (var i = 0; i < chips.length; i++) {
-      (function (chip) {
-        var facet = chip.getAttribute("data-facet");
-        var value = chip.getAttribute("data-value");
-        chip.addEventListener("click", function () {
-          var set = activeFilters[facet];
-          if (set.has(value)) { set.delete(value); chip.classList.remove("active"); }
-          else { set.add(value); chip.classList.add("active"); }
-          clearBtnEl.hidden = !anyFilterActive(activeFilters);
-          onChange();
-        });
-      })(chips[i]);
+  // neutral -> include -> exclude -> neutral
+  function cycleFacetValue(activeFilters, facet, value) {
+    var state = activeFilters[facet];
+    if (!state) return;
+    if (state.include.has(value)) {
+      state.include.delete(value);
+      state.exclude.add(value);
+    } else if (state.exclude.has(value)) {
+      state.exclude.delete(value);
+    } else {
+      state.include.add(value);
     }
+  }
+
+  function chipVisualState(activeFilters, facet, value) {
+    var state = activeFilters[facet];
+    if (!state) return "neutral";
+    if (state.include.has(value)) return "include";
+    if (state.exclude.has(value)) return "exclude";
+    return "neutral";
+  }
+
+  function refreshChipVisuals(containerEl, activeFilters) {
+    var chips = containerEl.querySelectorAll(".chip[data-facet]");
+    for (var i = 0; i < chips.length; i++) {
+      var chip = chips[i];
+      var vstate = chipVisualState(activeFilters, chip.getAttribute("data-facet"), chip.getAttribute("data-value"));
+      chip.classList.toggle("active", vstate === "include");
+      chip.classList.toggle("exclude", vstate === "exclude");
+    }
+  }
+
+  // Clears only the exclude side of every facet, leaving includes as they
+  // are — this is what the per-tab "Mostrar todo" button does, since the
+  // hidden-count it responds to only ever counts items hidden by excludes.
+  function clearExcludesOnly(activeFilters) {
+    Object.keys(activeFilters).forEach(function (f) { activeFilters[f].exclude.clear(); });
+  }
+
+  function filtersStorageKey(tabName) { return "iv-filters-" + tabName; }
+
+  function saveFilters(storageKey, activeFilters) {
+    try {
+      var out = {};
+      Object.keys(activeFilters).forEach(function (f) {
+        out[f] = { include: Array.from(activeFilters[f].include), exclude: Array.from(activeFilters[f].exclude) };
+      });
+      localStorage.setItem(storageKey, JSON.stringify(out));
+    } catch (e) { /* localStorage unavailable — filters just won't persist */ }
+  }
+
+  function loadFilters(storageKey, activeFilters) {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      Object.keys(activeFilters).forEach(function (f) {
+        if (!saved[f]) return;
+        (saved[f].include || []).forEach(function (v) { activeFilters[f].include.add(v); });
+        (saved[f].exclude || []).forEach(function (v) { activeFilters[f].exclude.add(v); });
+      });
+    } catch (e) { /* corrupt or unavailable — start from neutral */ }
+  }
+
+  // Event delegation (rather than one addEventListener per chip at wiring
+  // time) so chips added later — the "Listas" group, rebuilt every time
+  // loadLists() runs — react to clicks without being re-wired individually.
+  function wireFilterChips(containerEl, clearBtnEl, activeFilters, storageKey, onChange) {
+    containerEl.addEventListener("click", function (evt) {
+      var chip = evt.target.closest(".chip[data-facet]");
+      if (!chip || !containerEl.contains(chip)) return;
+      var facet = chip.getAttribute("data-facet");
+      var value = chip.getAttribute("data-value");
+      cycleFacetValue(activeFilters, facet, value);
+      refreshChipVisuals(containerEl, activeFilters);
+      clearBtnEl.hidden = !anyFilterActive(activeFilters);
+      saveFilters(storageKey, activeFilters);
+      onChange();
+    });
     clearBtnEl.addEventListener("click", function () {
-      Object.keys(activeFilters).forEach(function (f) { activeFilters[f].clear(); });
-      var activeChips = containerEl.querySelectorAll(".chip.active");
-      for (var j = 0; j < activeChips.length; j++) activeChips[j].classList.remove("active");
+      Object.keys(activeFilters).forEach(function (f) { activeFilters[f].include.clear(); activeFilters[f].exclude.clear(); });
+      refreshChipVisuals(containerEl, activeFilters);
       clearBtnEl.hidden = true;
+      saveFilters(storageKey, activeFilters);
       onChange();
     });
   }
@@ -1422,23 +1575,42 @@
     return li;
   }
 
+  // Shared hidden-count row: how many items would show if the tab's active
+  // excludes were lifted (includes and the search box still apply). Used by
+  // every tab's "Mostrar todo" affordance.
+  function renderHiddenCount(rowEl, textEl, hiddenCount) {
+    if (hiddenCount > 0) {
+      textEl.textContent = hiddenCount === 1 ? t("hidden_count_s", { n: hiddenCount }) : t("hidden_count_pl", { n: hiddenCount });
+      rowEl.hidden = false;
+    } else {
+      rowEl.hidden = true;
+    }
+  }
+
+  function verbPassesFacets(v, ignoreExcludes) {
+    if (!facetOk(activeVerbFilters, "type", v.data.type || "", ignoreExcludes)) return false;
+    if (!facetOk(activeVerbFilters, "irregularity", v.data.irregularity || "regular", ignoreExcludes)) return false;
+    if (!facetOk(activeVerbFilters, "transitivity", v.data.transitivity || "transitivo", ignoreExcludes)) return false;
+    // "flag" chips are independent boolean switches, not OR'd alternatives.
+    if (!flagOk(activeVerbFilters, "flag", function (value) {
+      if (value === "reflexive") return !!v.data.reflexive;
+      if (value === "auxiliar") return !!v.data.auxiliar;
+      if (value === "gustarLike") return !!v.data.gustar_like;
+      return false;
+    }, ignoreExcludes)) return false;
+    if (!listFacetOk(activeVerbFilters, verbListMembership[norm(v.data.infinitive || "")], ignoreExcludes)) return false;
+    return true;
+  }
+
   function renderList() {
     var q = norm(el.search.value);
-    filtered = allVerbs.filter(function (v) {
-      if (q && norm(v.data.infinitive || v.id).indexOf(q) === -1) return false;
-      if (!facetOk(activeVerbFilters, "type", v.data.type || "")) return false;
-      if (!facetOk(activeVerbFilters, "irregularity", v.data.irregularity || "regular")) return false;
-      if (!facetOk(activeVerbFilters, "transitivity", v.data.transitivity || "transitivo")) return false;
-      // "flag" chips are independent boolean switches, not OR'd alternatives.
-      if (activeVerbFilters.flag.has("reflexive") && !v.data.reflexive) return false;
-      if (activeVerbFilters.flag.has("auxiliar") && !v.data.auxiliar) return false;
-      if (activeVerbFilters.flag.has("gustarLike") && !v.data.gustar_like) return false;
-      if (activeStudyList && !activeStudyList.verbSet.has(norm(v.data.infinitive || ""))) return false;
-      return true;
-    });
+    var searchOk = function (v) { return !q || norm(v.data.infinitive || v.id).indexOf(q) !== -1; };
+    filtered = allVerbs.filter(function (v) { return searchOk(v) && verbPassesFacets(v, false); });
+    var wouldShow = allVerbs.filter(function (v) { return searchOk(v) && verbPassesFacets(v, true); });
     filtered.sort(function (a, b) {
       return (a.data.infinitive || a.id).localeCompare(b.data.infinitive || b.id, "es");
     });
+    renderHiddenCount(el.verbHiddenRow, el.verbHiddenText, wouldShow.length - filtered.length);
 
     el.list.innerHTML = "";
     if (filtered.length === 0) {
@@ -2066,18 +2238,22 @@
     return li;
   }
 
+  function wordPassesFacets(v, ignoreExcludes) {
+    if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "", ignoreExcludes)) return false;
+    if (!facetOk(activeWordFilters, "gender", v.data.gender || "", ignoreExcludes)) return false;
+    if (!listFacetOk(activeWordFilters, wordListMembership[norm(v.data.word || "")], ignoreExcludes)) return false;
+    return true;
+  }
+
   function renderWordList() {
     var q = norm(el.wordSearch.value);
-    filteredWords = allWords.filter(function (v) {
-      if (q && norm(v.data.word || v.id).indexOf(q) === -1) return false;
-      if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "")) return false;
-      if (!facetOk(activeWordFilters, "gender", v.data.gender || "")) return false;
-      if (activeStudyList && !activeStudyList.wordSet.has(norm(v.data.word || ""))) return false;
-      return true;
-    });
+    var searchOk = function (v) { return !q || norm(v.data.word || v.id).indexOf(q) !== -1; };
+    filteredWords = allWords.filter(function (v) { return searchOk(v) && wordPassesFacets(v, false); });
+    var wouldShow = allWords.filter(function (v) { return searchOk(v) && wordPassesFacets(v, true); });
     filteredWords.sort(function (a, b) {
       return (a.data.word || a.id).localeCompare(b.data.word || b.id, "es");
     });
+    renderHiddenCount(el.wordHiddenRow, el.wordHiddenText, wouldShow.length - filteredWords.length);
 
     el.wordList.innerHTML = "";
     if (filteredWords.length === 0) {
@@ -2323,18 +2499,26 @@
     return li;
   }
 
+  function phrasePassesFacets(v, ignoreExcludes) {
+    if (!facetOk(activePhraseFilters, "function", v.data.function || "", ignoreExcludes)) return false;
+    if (!facetOk(activePhraseFilters, "register", v.data.register || "", ignoreExcludes)) return false;
+    if (!flagOk(activePhraseFilters, "flag", function (value) {
+      if (value === "idiomatic") return !!v.data.idiomatic;
+      return false;
+    }, ignoreExcludes)) return false;
+    if (!listFacetOk(activePhraseFilters, phraseListMembership[norm(v.data.phrase || "")], ignoreExcludes)) return false;
+    return true;
+  }
+
   function renderPhraseList() {
     var q = norm(el.phraseSearch.value);
-    filteredPhrases = allPhrases.filter(function (v) {
-      if (q && norm(v.data.phrase || v.id).indexOf(q) === -1) return false;
-      if (!facetOk(activePhraseFilters, "function", v.data.function || "")) return false;
-      if (!facetOk(activePhraseFilters, "register", v.data.register || "")) return false;
-      if (activeStudyList && !activeStudyList.phraseSet.has(norm(v.data.phrase || ""))) return false;
-      return true;
-    });
+    var searchOk = function (v) { return !q || norm(v.data.phrase || v.id).indexOf(q) !== -1; };
+    filteredPhrases = allPhrases.filter(function (v) { return searchOk(v) && phrasePassesFacets(v, false); });
+    var wouldShow = allPhrases.filter(function (v) { return searchOk(v) && phrasePassesFacets(v, true); });
     filteredPhrases.sort(function (a, b) {
       return (a.data.phrase || a.id).localeCompare(b.data.phrase || b.id, "es");
     });
+    renderHiddenCount(el.phraseHiddenRow, el.phraseHiddenText, wouldShow.length - filteredPhrases.length);
 
     el.phraseList.innerHTML = "";
     if (filteredPhrases.length === 0) {
@@ -3097,15 +3281,88 @@
   function rowsToLists(rows) {
     return (rows || []).map(function (row) {
       var entry = rowToList(row);
-      entry.data.itemCount = (row.list_items && row.list_items[0] && row.list_items[0].count) || 0;
+      entry.data.itemCount = (row.list_items && row.list_items.length) || 0;
       return entry;
     });
+  }
+
+  // Rebuilds the norm(name) -> Set<listId> reverse-membership maps from the
+  // full list_items rows (see the state-declaration comments above for why
+  // this is matched by name, not id). Called as a side effect of every
+  // loadLists() — success or offline-cache-fallback — so every place that
+  // already refreshes the lists panel also keeps the "Listas" filter chips
+  // and list-membership filtering current, with no extra call sites needed.
+  function rebuildListMembership(rows) {
+    verbListMembership = {};
+    wordListMembership = {};
+    phraseListMembership = {};
+    (rows || []).forEach(function (row) {
+      (row.list_items || []).forEach(function (item) {
+        var data = item.data || {};
+        var map, key;
+        if (item.item_type === "verb") { map = verbListMembership; key = norm(data.infinitive || ""); }
+        else if (item.item_type === "word") { map = wordListMembership; key = norm(data.word || ""); }
+        else if (item.item_type === "phrase") { map = phraseListMembership; key = norm(data.phrase || ""); }
+        else return;
+        if (!key) return;
+        if (!map[key]) map[key] = new Set();
+        map[key].add(row.id);
+      });
+    });
+  }
+
+  // Rebuilds one tab's dynamically-generated "Listas" chip-group from
+  // allLists. No click listeners are attached here — wireFilterChips()
+  // already delegates from the whole filter-chips container, so newly
+  // (re)generated chips just work. Also drops any include/exclude
+  // selection that names a list which no longer exists (deleted, or never
+  // synced), so a stale id can't silently keep filtering forever.
+  function renderListChipGroup(groupEl, activeFilters) {
+    var validIds = {};
+    allLists.forEach(function (l) { validIds[l.id] = true; });
+    ["include", "exclude"].forEach(function (side) {
+      Array.from(activeFilters.list[side]).forEach(function (id) {
+        if (!validIds[id]) activeFilters.list[side].delete(id);
+      });
+    });
+
+    groupEl.innerHTML = "";
+    if (!allLists.length) { groupEl.hidden = true; return; }
+    groupEl.hidden = false;
+    var label = document.createElement("span");
+    label.className = "chip-label";
+    label.textContent = t("chip_group_list");
+    groupEl.appendChild(label);
+    allLists.forEach(function (l) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip";
+      btn.setAttribute("data-facet", "list");
+      btn.setAttribute("data-value", l.id);
+      btn.textContent = l.data.name;
+      var vstate = chipVisualState(activeFilters, "list", l.id);
+      if (vstate === "include") btn.classList.add("active");
+      if (vstate === "exclude") btn.classList.add("exclude");
+      groupEl.appendChild(btn);
+    });
+  }
+
+  function renderListChipGroups() {
+    renderListChipGroup(el.verbFiltersListGroup, activeVerbFilters);
+    renderListChipGroup(el.wordFiltersListGroup, activeWordFilters);
+    renderListChipGroup(el.phraseFiltersListGroup, activePhraseFilters);
+    el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
+    el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
+    el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
+    saveFilters(filtersStorageKey("verbs"), activeVerbFilters);
+    saveFilters(filtersStorageKey("words"), activeWordFilters);
+    saveFilters(filtersStorageKey("phrases"), activePhraseFilters);
   }
 
   function loadLists() {
     return supabaseClient
       .from("lists")
-      .select("*, list_items(count)")
+      .select("*, list_items(id, item_type, data)")
       .order("created_at", { ascending: false })
       .then(function (res) {
         if (res.error) throw res.error;
@@ -3113,7 +3370,12 @@
         markOnline("lists");
         clearBanner();
         allLists = rowsToLists(res.data);
+        rebuildListMembership(res.data);
         renderListsPanel();
+        renderListChipGroups();
+        renderList();
+        renderWordList();
+        renderPhraseList();
         if (selectedListId) {
           var still = allLists.find(function (l) { return l.id === selectedListId; });
           if (still) selectListRow(selectedListId); else { el.listDetail.hidden = true; selectedListId = null; }
@@ -3123,8 +3385,13 @@
         var cached = readCache("lists");
         if (!cached) { showBanner(t("msg_error_cargar_listas", { msg: (err && err.message) || err })); return; }
         allLists = rowsToLists(cached.rows);
+        rebuildListMembership(cached.rows);
         markOffline("lists", cached.savedAt);
         renderListsPanel();
+        renderListChipGroups();
+        renderList();
+        renderWordList();
+        renderPhraseList();
       });
   }
 
@@ -3263,49 +3530,6 @@
       selectedListId = null;
       loadLists();
     });
-  }
-
-  // "Estudiar esta lista" — narrows Verbos/Vocabulario (and so Tarjetas too)
-  // down to just this list's items, so a saved word set becomes a place you
-  // can come back to and study, not just a static snapshot. Re-fetches the
-  // list's items fresh rather than reusing whatever selectListRow already
-  // loaded, since that's simpler than threading the fetched rows through.
-  function startStudyList(id) {
-    var entry = allLists.find(function (l) { return l.id === id; });
-    if (!entry) return;
-    el.ldShareMsg.textContent = "";
-    supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
-      if (res.error) { el.ldShareMsg.textContent = t("msg_error_cargar_lista", { msg: res.error.message }); return; }
-      var rows = res.data || [];
-      var verbSet = new Set();
-      var wordSet = new Set();
-      var phraseSet = new Set();
-      rows.forEach(function (row) {
-        if (row.item_type === "verb") verbSet.add(norm(row.data.infinitive || ""));
-        else if (row.item_type === "word") wordSet.add(norm(row.data.word || ""));
-        else phraseSet.add(norm(row.data.phrase || ""));
-      });
-      activeStudyList = { id: id, name: entry.data.name, verbSet: verbSet, wordSet: wordSet, phraseSet: phraseSet };
-      renderStudyFilterBanner();
-      renderList();
-      renderWordList();
-      renderPhraseList();
-      setMainTab(verbSet.size ? "verbs" : (wordSet.size ? "words" : "phrases"));
-    });
-  }
-
-  function clearStudyList() {
-    activeStudyList = null;
-    renderStudyFilterBanner();
-    renderList();
-    renderWordList();
-    renderPhraseList();
-  }
-
-  function renderStudyFilterBanner() {
-    if (!activeStudyList) { el.studyFilterBanner.hidden = true; return; }
-    el.studyFilterText.textContent = t("study_filter_studying", { name: activeStudyList.name });
-    el.studyFilterBanner.hidden = false;
   }
 
   function handleShareClick() {
@@ -4343,8 +4567,10 @@
       el.listForm.hidden = true;
       el.toggleAddList.hidden = false;
       el.listsList.innerHTML = "";
-      activeStudyList = null;
-      renderStudyFilterBanner();
+      verbListMembership = {};
+      wordListMembership = {};
+      phraseListMembership = {};
+      renderListChipGroups();
       offlineKinds = {};
       renderOfflineBanner();
       if (currentShareList) renderSharePreview();
@@ -4395,7 +4621,17 @@
   el.langEn.addEventListener("click", function () { setLang("en"); });
 
   el.search.addEventListener("input", renderList);
-  wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, renderList);
+  loadFilters(filtersStorageKey("verbs"), activeVerbFilters);
+  refreshChipVisuals(el.verbFilters, activeVerbFilters);
+  el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
+  wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, filtersStorageKey("verbs"), renderList);
+  el.verbShowAllBtn.addEventListener("click", function () {
+    clearExcludesOnly(activeVerbFilters);
+    refreshChipVisuals(el.verbFilters, activeVerbFilters);
+    el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
+    saveFilters(filtersStorageKey("verbs"), activeVerbFilters);
+    renderList();
+  });
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
@@ -4431,7 +4667,17 @@
   el.tabWords.addEventListener("click", function () { setMainTab("words"); });
 
   el.wordSearch.addEventListener("input", renderWordList);
-  wireFilterChips(el.wordFilters, el.wordFiltersClear, activeWordFilters, renderWordList);
+  loadFilters(filtersStorageKey("words"), activeWordFilters);
+  refreshChipVisuals(el.wordFilters, activeWordFilters);
+  el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
+  wireFilterChips(el.wordFilters, el.wordFiltersClear, activeWordFilters, filtersStorageKey("words"), renderWordList);
+  el.wordShowAllBtn.addEventListener("click", function () {
+    clearExcludesOnly(activeWordFilters);
+    refreshChipVisuals(el.wordFilters, activeWordFilters);
+    el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
+    saveFilters(filtersStorageKey("words"), activeWordFilters);
+    renderWordList();
+  });
   el.toggleAddWord.addEventListener("click", function () { openWordForm("add"); });
   el.seedWordsToolbarBtn.addEventListener("click", seedStarterWords);
   el.wordFormCancel.addEventListener("click", closeWordForm);
@@ -4451,7 +4697,17 @@
 
   el.tabPhrases.addEventListener("click", function () { setMainTab("phrases"); });
   el.phraseSearch.addEventListener("input", renderPhraseList);
-  wireFilterChips(el.phraseFilters, el.phraseFiltersClear, activePhraseFilters, renderPhraseList);
+  loadFilters(filtersStorageKey("phrases"), activePhraseFilters);
+  refreshChipVisuals(el.phraseFilters, activePhraseFilters);
+  el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
+  wireFilterChips(el.phraseFilters, el.phraseFiltersClear, activePhraseFilters, filtersStorageKey("phrases"), renderPhraseList);
+  el.phraseShowAllBtn.addEventListener("click", function () {
+    clearExcludesOnly(activePhraseFilters);
+    refreshChipVisuals(el.phraseFilters, activePhraseFilters);
+    el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
+    saveFilters(filtersStorageKey("phrases"), activePhraseFilters);
+    renderPhraseList();
+  });
   el.toggleAddPhrase.addEventListener("click", function () { openPhraseForm("add"); });
   el.seedPhrasesToolbarBtn.addEventListener("click", seedStarterPhrases);
   el.phraseFormCancel.addEventListener("click", closePhraseForm);
@@ -4503,14 +4759,10 @@
   el.toggleAddList.addEventListener("click", openListForm);
   el.listFormCancel.addEventListener("click", closeListForm);
   el.listForm.addEventListener("submit", handleListSubmit);
-  el.ldStudyBtn.addEventListener("click", function () {
-    if (selectedListId) startStudyList(selectedListId);
-  });
   el.ldShareBtn.addEventListener("click", handleShareClick);
   el.ldCopyLink.addEventListener("click", handleCopyLink);
   el.ldNativeShare.addEventListener("click", handleNativeShare);
   el.ldDelete.addEventListener("click", handleListDelete);
-  el.studyFilterClear.addEventListener("click", clearStudyList);
 
   el.listPickerClose.addEventListener("click", closeListPicker);
   el.listPickerCreateBtn.addEventListener("click", handleListPickerCreate);

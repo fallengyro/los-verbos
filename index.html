@@ -83,14 +83,6 @@
     </div>
   </div>
 
-  <!-- Visible above whichever tab is open (Verbos, Vocabulario or Tarjetas
-       all read from the same filtered/filteredWords arrays), since studying
-       a list is a cross-tab mode, not something scoped to one tab. -->
-  <div class="study-filter-banner" id="study-filter-banner" hidden>
-    <span id="study-filter-text"></span>
-    <button type="button" id="study-filter-clear" data-i18n="study_filter_clear">Salir del filtro</button>
-  </div>
-
   <section id="verbs-panel">
 
   <div class="search-card">
@@ -100,6 +92,7 @@
     </div>
 
     <div class="filter-chips" id="verb-filters">
+      <p class="chip-hint" data-i18n="chip_hint_exclude">Tocá un chip para incluir, dos veces para excluir</p>
       <div class="chip-group">
         <span class="chip-label" data-i18n="chip_group_type">Tipo</span>
         <button type="button" class="chip" data-facet="type" data-value="-ar">-ar</button>
@@ -125,7 +118,12 @@
         <button type="button" class="chip" data-facet="flag" data-value="auxiliar" data-i18n-tag="auxiliar">auxiliar</button>
         <button type="button" class="chip" data-facet="flag" data-value="gustarLike" data-i18n-tag="dativo">dativo</button>
       </div>
+      <div class="chip-group" id="verb-filters-list-group"></div>
       <button type="button" class="chip-clear" id="verb-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
+    </div>
+    <div class="hidden-count-row" id="verb-hidden-row" hidden>
+      <span id="verb-hidden-text"></span>
+      <button type="button" class="chip-clear" id="verb-show-all-btn" data-i18n="show_all_btn">Mostrar todo</button>
     </div>
   </div>
 
@@ -294,6 +292,7 @@
     </div>
 
     <div class="filter-chips" id="word-filters">
+      <p class="chip-hint" data-i18n="chip_hint_exclude">Tocá un chip para incluir, dos veces para excluir</p>
       <div class="chip-group">
         <span class="chip-label" data-i18n="chip_group_category">Categoría</span>
         <button type="button" class="chip" data-facet="pos" data-value="sustantivo" data-i18n-tag="sustantivo">sustantivo</button>
@@ -310,7 +309,12 @@
         <button type="button" class="chip" data-facet="gender" data-value="femenino" data-i18n-tag="femenino">femenino</button>
         <button type="button" class="chip" data-facet="gender" data-value="neutro" data-i18n-tag="neutro">neutro</button>
       </div>
+      <div class="chip-group" id="word-filters-list-group"></div>
       <button type="button" class="chip-clear" id="word-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
+    </div>
+    <div class="hidden-count-row" id="word-hidden-row" hidden>
+      <span id="word-hidden-text"></span>
+      <button type="button" class="chip-clear" id="word-show-all-btn" data-i18n="show_all_btn">Mostrar todo</button>
     </div>
   </div>
 
@@ -400,6 +404,7 @@
     </div>
 
     <div class="filter-chips" id="phrase-filters">
+      <p class="chip-hint" data-i18n="chip_hint_exclude">Tocá un chip para incluir, dos veces para excluir</p>
       <div class="chip-group">
         <span class="chip-label" data-i18n="chip_group_function">Función</span>
         <button type="button" class="chip" data-facet="function" data-value="saludo" data-i18n-tag="saludo">saludo</button>
@@ -418,7 +423,16 @@
         <button type="button" class="chip" data-facet="register" data-value="coloquial" data-i18n="register_coloquial">coloquial</button>
         <button type="button" class="chip" data-facet="register" data-value="lunfardo" data-i18n="register_lunfardo">lunfardo</button>
       </div>
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_flags">Marcas</span>
+        <button type="button" class="chip" data-facet="flag" data-value="idiomatic" data-i18n-tag="idiomática">idiomática</button>
+      </div>
+      <div class="chip-group" id="phrase-filters-list-group"></div>
       <button type="button" class="chip-clear" id="phrase-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
+    </div>
+    <div class="hidden-count-row" id="phrase-hidden-row" hidden>
+      <span id="phrase-hidden-text"></span>
+      <button type="button" class="chip-clear" id="phrase-show-all-btn" data-i18n="show_all_btn">Mostrar todo</button>
     </div>
   </div>
 
@@ -612,7 +626,6 @@
         <ul class="card-list" id="ld-phrases-items"></ul>
       </div>
       <div class="detail-actions-footer">
-        <button class="icon-btn" id="ld-study-btn" type="button" data-i18n="btn_study_list">Estudiar esta lista</button>
         <button class="icon-btn" id="ld-share-btn" type="button" data-i18n="btn_share">Compartir</button>
         <button class="icon-btn danger" id="ld-delete" type="button" data-i18n="btn_delete_list">Eliminar lista</button>
       </div>
