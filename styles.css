@@ -119,6 +119,11 @@
     font-size: clamp(28px, 6vw, 40px);
     margin: 0;
     letter-spacing: -0.01em;
+    /* matches the app icon's wordmark color (#6E3B72 light / #D191CE dark,
+       sampled straight from icons/icon-192.png) rather than inheriting the
+       page's near-black --ink, so the title reads as the same mark as the
+       icon instead of plain heading text. */
+    color: var(--accent);
   }
   header.masthead .tag {
     font-size: 12px;
@@ -226,6 +231,7 @@
     font-weight: 600;
     font-size: 30px;
     margin: 0 0 2px;
+    color: var(--accent); /* matches the app icon's wordmark color — see header.masthead h1 */
   }
   .auth-card .tag {
     font-size: 11.5px;
@@ -401,6 +407,46 @@
     font-style: italic;
   }
   .hidden-count-row .chip-clear { margin-left: 0; }
+
+  /* "Listas" filter trigger — one compact control per tab instead of one
+     chip per saved list, which stopped scaling once there were more than
+     a handful of lists. Opens #list-filter-overlay (see below); the tri-
+     state selection itself lives in that modal's rows, this button only
+     ever summarizes it. Dashed border in the neutral state hints "opens
+     something" without looking like a real tri-state chip itself. */
+  .lists-trigger {
+    background: var(--paper-sunken);
+    border: 1px dashed var(--line);
+    border-radius: 20px;
+    padding: 4px 12px 4px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .lists-trigger:hover { border-color: var(--accent); color: var(--ink); }
+  .lists-trigger .stack-icon { font-size: 12px; line-height: 1; }
+  .lists-trigger.has-selection {
+    background: var(--accent);
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--paper);
+    font-weight: 600;
+  }
+  .lists-trigger .count-badge {
+    background: var(--paper);
+    color: var(--accent-deep);
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1px 6px;
+    line-height: 1.4;
+  }
+  .lists-trigger.has-selection .count-badge { background: var(--accent-ink); color: var(--accent-deep); }
 
   .card-list {
     list-style: none;
@@ -1024,6 +1070,78 @@
   }
   .modal-card h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 12px; }
   .list-picker-list { max-height: 180px; }
+
+  /* #list-filter-overlay — the "Listas" trigger's picker. A search box +
+     scrollable tri-state rows, same modal shell as the "add to list"
+     picker above but each row cycles neutral/include/exclude instead of
+     adding once. */
+  .picker-search {
+    width: 100%;
+    font-family: "Public Sans", sans-serif;
+    font-size: 14.5px;
+    background: var(--paper-sunken);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .picker-search:focus { border-color: var(--accent); }
+  .picker-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-raised);
+  }
+  .picker-list li + li { border-top: 1px solid var(--line); }
+  .picker-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14.5px;
+  }
+  .picker-row:hover { background: var(--paper-sunken); }
+  .picker-row .name { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 15.5px; }
+  .picker-row .meta { color: var(--ink-soft); font-size: 12px; margin-left: 8px; }
+  /* the state indicator is its own small circle rather than reusing the
+     chip glyph pattern (::before on the row) — a picker row already has
+     real child nodes (name/meta), so there's no applyI18n()-clobbers-
+     textContent hazard here the way there is for a plain chip. */
+  .picker-row .state-glyph {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--paper-sunken);
+    color: transparent;
+  }
+  .picker-row.state-include .state-glyph { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .picker-row.state-include .state-glyph::after { content: "\2713"; }
+  .picker-row.state-exclude .state-glyph { background: var(--danger); border-color: var(--danger); color: var(--paper); }
+  .picker-row.state-exclude .state-glyph::after { content: "\2715"; }
+  .picker-empty { padding: 16px; text-align: center; color: var(--ink-soft); font-size: 13px; font-style: italic; }
+  .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; }
+  .modal-actions .chip-clear { margin-left: 0; }
 
   /* the JSON-import panel needs more room than the small "add to list"
      picker (a textarea, per-row errors/warnings, a preview list), so it

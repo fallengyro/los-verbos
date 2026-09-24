@@ -74,6 +74,15 @@
       hidden_count_s: "{n} resultado oculto por tus exclusiones",
       hidden_count_pl: "{n} resultados ocultos por tus exclusiones",
       show_all_btn: "Mostrar todo",
+      lists_trigger_prefix: "Listas: ",
+      lists_included_pl: "{n} incluidas",
+      lists_excluded_s: "{n} excluida",
+      lists_excluded_pl: "{n} excluidas",
+      list_filter_title: "Filtrar por lista",
+      list_filter_hint: "Tocá para incluir, dos veces para excluir. Los cambios se aplican al instante.",
+      list_filter_search_placeholder: "Buscar una lista…",
+      list_filter_clear_selection: "Limpiar selección",
+      list_filter_no_matches: "Ninguna lista coincide con “{q}”.",
       filters_clear: "Limpiar filtros",
       conj_hint: "deslizá para ver todos los tiempos →",
       mood_indicativo: "Indicativo",
@@ -316,6 +325,15 @@
       hidden_count_s: "{n} result hidden by your excludes",
       hidden_count_pl: "{n} results hidden by your excludes",
       show_all_btn: "Show all",
+      lists_trigger_prefix: "Lists: ",
+      lists_included_pl: "{n} included",
+      lists_excluded_s: "{n} excluded",
+      lists_excluded_pl: "{n} excluded",
+      list_filter_title: "Filter by list",
+      list_filter_hint: "Tap to include, tap twice to exclude. Changes apply instantly.",
+      list_filter_search_placeholder: "Search for a list…",
+      list_filter_clear_selection: "Clear selection",
+      list_filter_no_matches: "No lists match “{q}”.",
       filters_clear: "Clear filters",
       conj_hint: "swipe to see all tenses →",
       mood_indicativo: "Indicative",
@@ -652,7 +670,7 @@
   function refreshAllTranslatedViews() {
     applyGrammarLabels();
     applyI18n();
-    renderListChipGroups();
+    refreshListFilterUI();
     renderList();
     renderWordList();
     renderPhraseList();
@@ -1025,6 +1043,7 @@
   var allLists = [];      // [{id, data}]
   var selectedListId = null;
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
+  var listFilterTarget = null; // "verbs" | "words" | "phrases" while #list-filter-overlay is open — which tab's activeFilters.list the modal is currently editing
   var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
 
   // Reverse membership maps rebuilt every time loadLists() runs (from the
@@ -1121,7 +1140,9 @@
     imperativoFormRow: document.getElementById("imperativo-form-row"),
     verbFilters: document.getElementById("verb-filters"),
     verbFiltersClear: document.getElementById("verb-filters-clear"),
-    verbFiltersListGroup: document.getElementById("verb-filters-list-group"),
+    verbListsGroup: document.getElementById("verb-lists-group"),
+    verbListsTrigger: document.getElementById("verb-lists-trigger"),
+    verbListsTriggerLabel: document.getElementById("verb-lists-trigger-label"),
     verbHiddenRow: document.getElementById("verb-hidden-row"),
     verbHiddenText: document.getElementById("verb-hidden-text"),
     verbShowAllBtn: document.getElementById("verb-show-all-btn"),
@@ -1160,7 +1181,9 @@
     wfExample: document.getElementById("wf-example"),
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
-    wordFiltersListGroup: document.getElementById("word-filters-list-group"),
+    wordListsGroup: document.getElementById("word-lists-group"),
+    wordListsTrigger: document.getElementById("word-lists-trigger"),
+    wordListsTriggerLabel: document.getElementById("word-lists-trigger-label"),
     wordHiddenRow: document.getElementById("word-hidden-row"),
     wordHiddenText: document.getElementById("word-hidden-text"),
     wordShowAllBtn: document.getElementById("word-show-all-btn"),
@@ -1194,7 +1217,9 @@
     pfExample: document.getElementById("pf-example"),
     phraseFilters: document.getElementById("phrase-filters"),
     phraseFiltersClear: document.getElementById("phrase-filters-clear"),
-    phraseFiltersListGroup: document.getElementById("phrase-filters-list-group"),
+    phraseListsGroup: document.getElementById("phrase-lists-group"),
+    phraseListsTrigger: document.getElementById("phrase-lists-trigger"),
+    phraseListsTriggerLabel: document.getElementById("phrase-lists-trigger-label"),
     phraseHiddenRow: document.getElementById("phrase-hidden-row"),
     phraseHiddenText: document.getElementById("phrase-hidden-text"),
     phraseShowAllBtn: document.getElementById("phrase-show-all-btn"),
@@ -1268,6 +1293,12 @@
     listPickerNewName: document.getElementById("list-picker-new-name"),
     listPickerCreateBtn: document.getElementById("list-picker-create-btn"),
     listPickerClose: document.getElementById("list-picker-close"),
+
+    listFilterOverlay: document.getElementById("list-filter-overlay"),
+    listFilterSearch: document.getElementById("list-filter-search"),
+    listFilterList: document.getElementById("list-filter-list"),
+    listFilterClearBtn: document.getElementById("list-filter-clear-btn"),
+    listFilterClose: document.getElementById("list-filter-close"),
 
     shareOverlay: document.getElementById("share-overlay"),
     shareCloseBtn: document.getElementById("share-close-btn"),
@@ -3311,52 +3342,152 @@
     });
   }
 
-  // Rebuilds one tab's dynamically-generated "Listas" chip-group from
-  // allLists. No click listeners are attached here — wireFilterChips()
-  // already delegates from the whole filter-chips container, so newly
-  // (re)generated chips just work. Also drops any include/exclude
-  // selection that names a list which no longer exists (deleted, or never
-  // synced), so a stale id can't silently keep filtering forever.
-  function renderListChipGroup(groupEl, activeFilters) {
+  // ================= "Listas" filter: compact trigger + picker modal =================
+  // One inline chip per saved list stopped scaling once there were more
+  // than a handful of lists (mason's own call, after seeing that design
+  // running). Replaced with one compact trigger per tab that summarizes
+  // the tab's list-facet selection, opening a shared modal (#list-filter-
+  // overlay) with a search box and every list as a tri-state row. The
+  // underlying facet — activeVerbFilters.list / activeWordFilters.list /
+  // activePhraseFilters.list, each {include, exclude} — is unchanged from
+  // the inline-chip version; only how it's presented changed, so
+  // listFacetOk()/cycleFacetValue()/chipVisualState() are reused as-is.
+  function activeFiltersForTab(tab) {
+    if (tab === "verbs") return activeVerbFilters;
+    if (tab === "words") return activeWordFilters;
+    return activePhraseFilters;
+  }
+  function rerenderTab(tab) {
+    if (tab === "verbs") renderList();
+    else if (tab === "words") renderWordList();
+    else renderPhraseList();
+  }
+  function listsTriggerEls(tab) {
+    if (tab === "verbs") return { group: el.verbListsGroup, trigger: el.verbListsTrigger, label: el.verbListsTriggerLabel, clearBtn: el.verbFiltersClear };
+    if (tab === "words") return { group: el.wordListsGroup, trigger: el.wordListsTrigger, label: el.wordListsTriggerLabel, clearBtn: el.wordFiltersClear };
+    return { group: el.phraseListsGroup, trigger: el.phraseListsTrigger, label: el.phraseListsTriggerLabel, clearBtn: el.phraseFiltersClear };
+  }
+
+  // Updates one tab's trigger button (label + has-selection styling) and
+  // its "Limpiar filtros" visibility — the two things any change to that
+  // tab's list facet always needs refreshed together. Also hides the
+  // whole "Listas" chip-group when there are no saved lists yet, same as
+  // the old inline chip-group did.
+  function updateListsTrigger(tab) {
+    var refs = listsTriggerEls(tab);
+    var filters = activeFiltersForTab(tab);
+    refs.group.hidden = !allLists.length;
+    refs.clearBtn.hidden = !anyFilterActive(filters);
+    var incCount = filters.list.include.size;
+    var excCount = filters.list.exclude.size;
+    if (incCount + excCount === 0) {
+      refs.trigger.classList.remove("has-selection");
+      refs.label.textContent = t("chip_group_list");
+      return;
+    }
+    refs.trigger.classList.add("has-selection");
+    var parts = [];
+    if (incCount === 1) {
+      var onlyId = Array.from(filters.list.include)[0];
+      var entry = allLists.find(function (l) { return l.id === onlyId; });
+      parts.push(entry ? entry.data.name : t("chip_group_list"));
+    } else if (incCount > 1) {
+      parts.push(t("lists_included_pl", { n: incCount }));
+    }
+    if (excCount === 1) parts.push(t("lists_excluded_s", { n: excCount }));
+    else if (excCount > 1) parts.push(t("lists_excluded_pl", { n: excCount }));
+    refs.label.innerHTML = t("lists_trigger_prefix") + parts.join(", ") +
+      ' <span class="count-badge">' + (incCount + excCount) + "</span>";
+  }
+
+  // Drops any include/exclude selection that names a list which no longer
+  // exists (deleted, or never synced) — the modal-picker equivalent of
+  // what the old inline chip-group's rebuild used to do implicitly by
+  // just not drawing a chip for it.
+  function pruneStaleListFilters(tab) {
+    var filters = activeFiltersForTab(tab);
     var validIds = {};
     allLists.forEach(function (l) { validIds[l.id] = true; });
     ["include", "exclude"].forEach(function (side) {
-      Array.from(activeFilters.list[side]).forEach(function (id) {
-        if (!validIds[id]) activeFilters.list[side].delete(id);
+      Array.from(filters.list[side]).forEach(function (id) {
+        if (!validIds[id]) filters.list[side].delete(id);
       });
-    });
-
-    groupEl.innerHTML = "";
-    if (!allLists.length) { groupEl.hidden = true; return; }
-    groupEl.hidden = false;
-    var label = document.createElement("span");
-    label.className = "chip-label";
-    label.textContent = t("chip_group_list");
-    groupEl.appendChild(label);
-    allLists.forEach(function (l) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "chip";
-      btn.setAttribute("data-facet", "list");
-      btn.setAttribute("data-value", l.id);
-      btn.textContent = l.data.name;
-      var vstate = chipVisualState(activeFilters, "list", l.id);
-      if (vstate === "include") btn.classList.add("active");
-      if (vstate === "exclude") btn.classList.add("exclude");
-      groupEl.appendChild(btn);
     });
   }
 
-  function renderListChipGroups() {
-    renderListChipGroup(el.verbFiltersListGroup, activeVerbFilters);
-    renderListChipGroup(el.wordFiltersListGroup, activeWordFilters);
-    renderListChipGroup(el.phraseFiltersListGroup, activePhraseFilters);
-    el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
-    el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
-    el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
-    saveFilters(filtersStorageKey("verbs"), activeVerbFilters);
-    saveFilters(filtersStorageKey("words"), activeWordFilters);
-    saveFilters(filtersStorageKey("phrases"), activePhraseFilters);
+  // Called wherever allLists changes (every loadLists(), sign-out reset,
+  // language switch) — prunes stale selections, refreshes all three
+  // triggers, persists, and if the picker modal happens to be open right
+  // now (e.g. a background list refresh while mason is mid-pick), re-
+  // renders its rows too rather than leaving them stale underneath it.
+  function refreshListFilterUI() {
+    ["verbs", "words", "phrases"].forEach(function (tab) {
+      pruneStaleListFilters(tab);
+      updateListsTrigger(tab);
+      saveFilters(filtersStorageKey(tab), activeFiltersForTab(tab));
+    });
+    if (listFilterTarget && !el.listFilterOverlay.hidden) {
+      renderListFilterRows(el.listFilterSearch.value);
+    }
+  }
+
+  function openListFilterPicker(tab) {
+    listFilterTarget = tab;
+    el.listFilterSearch.value = "";
+    renderListFilterRows("");
+    el.listFilterOverlay.hidden = false;
+    el.listFilterSearch.focus();
+  }
+
+  function closeListFilterPicker() {
+    el.listFilterOverlay.hidden = true;
+    listFilterTarget = null;
+  }
+
+  function renderListFilterRows(filterText) {
+    if (!listFilterTarget) return;
+    var tab = listFilterTarget;
+    var filters = activeFiltersForTab(tab);
+    var q = norm(filterText || "");
+    el.listFilterList.innerHTML = "";
+    var matches = allLists.filter(function (l) { return !q || norm(l.data.name).indexOf(q) !== -1; });
+    if (!matches.length) {
+      var li = document.createElement("li");
+      var note = document.createElement("div");
+      note.className = "picker-empty";
+      note.textContent = allLists.length === 0 ? t("empty_no_lists") : t("list_filter_no_matches", { q: filterText });
+      li.appendChild(note);
+      el.listFilterList.appendChild(li);
+      return;
+    }
+    matches.forEach(function (l) {
+      var liEl = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "picker-row state-" + chipVisualState(filters, "list", l.id);
+      var left = document.createElement("span");
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = l.data.name;
+      var meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = listMetaText(l.data.itemCount || 0);
+      left.appendChild(name);
+      left.appendChild(meta);
+      var glyph = document.createElement("span");
+      glyph.className = "state-glyph";
+      btn.appendChild(left);
+      btn.appendChild(glyph);
+      btn.addEventListener("click", function () {
+        cycleFacetValue(filters, "list", l.id);
+        saveFilters(filtersStorageKey(tab), filters);
+        btn.className = "picker-row state-" + chipVisualState(filters, "list", l.id);
+        updateListsTrigger(tab);
+        rerenderTab(tab);
+      });
+      liEl.appendChild(btn);
+      el.listFilterList.appendChild(liEl);
+    });
   }
 
   function loadLists() {
@@ -3372,7 +3503,7 @@
         allLists = rowsToLists(res.data);
         rebuildListMembership(res.data);
         renderListsPanel();
-        renderListChipGroups();
+        refreshListFilterUI();
         renderList();
         renderWordList();
         renderPhraseList();
@@ -3388,7 +3519,7 @@
         rebuildListMembership(cached.rows);
         markOffline("lists", cached.savedAt);
         renderListsPanel();
-        renderListChipGroups();
+        refreshListFilterUI();
         renderList();
         renderWordList();
         renderPhraseList();
@@ -4570,7 +4701,7 @@
       verbListMembership = {};
       wordListMembership = {};
       phraseListMembership = {};
-      renderListChipGroups();
+      refreshListFilterUI();
       offlineKinds = {};
       renderOfflineBanner();
       if (currentShareList) renderSharePreview();
@@ -4624,14 +4755,20 @@
   loadFilters(filtersStorageKey("verbs"), activeVerbFilters);
   refreshChipVisuals(el.verbFilters, activeVerbFilters);
   el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
-  wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, filtersStorageKey("verbs"), renderList);
+  updateListsTrigger("verbs");
+  wireFilterChips(el.verbFilters, el.verbFiltersClear, activeVerbFilters, filtersStorageKey("verbs"), function () {
+    renderList();
+    updateListsTrigger("verbs");
+  });
   el.verbShowAllBtn.addEventListener("click", function () {
     clearExcludesOnly(activeVerbFilters);
     refreshChipVisuals(el.verbFilters, activeVerbFilters);
     el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
     saveFilters(filtersStorageKey("verbs"), activeVerbFilters);
     renderList();
+    updateListsTrigger("verbs");
   });
+  el.verbListsTrigger.addEventListener("click", function () { openListFilterPicker("verbs"); });
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
@@ -4670,14 +4807,20 @@
   loadFilters(filtersStorageKey("words"), activeWordFilters);
   refreshChipVisuals(el.wordFilters, activeWordFilters);
   el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
-  wireFilterChips(el.wordFilters, el.wordFiltersClear, activeWordFilters, filtersStorageKey("words"), renderWordList);
+  updateListsTrigger("words");
+  wireFilterChips(el.wordFilters, el.wordFiltersClear, activeWordFilters, filtersStorageKey("words"), function () {
+    renderWordList();
+    updateListsTrigger("words");
+  });
   el.wordShowAllBtn.addEventListener("click", function () {
     clearExcludesOnly(activeWordFilters);
     refreshChipVisuals(el.wordFilters, activeWordFilters);
     el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
     saveFilters(filtersStorageKey("words"), activeWordFilters);
     renderWordList();
+    updateListsTrigger("words");
   });
+  el.wordListsTrigger.addEventListener("click", function () { openListFilterPicker("words"); });
   el.toggleAddWord.addEventListener("click", function () { openWordForm("add"); });
   el.seedWordsToolbarBtn.addEventListener("click", seedStarterWords);
   el.wordFormCancel.addEventListener("click", closeWordForm);
@@ -4700,14 +4843,20 @@
   loadFilters(filtersStorageKey("phrases"), activePhraseFilters);
   refreshChipVisuals(el.phraseFilters, activePhraseFilters);
   el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
-  wireFilterChips(el.phraseFilters, el.phraseFiltersClear, activePhraseFilters, filtersStorageKey("phrases"), renderPhraseList);
+  updateListsTrigger("phrases");
+  wireFilterChips(el.phraseFilters, el.phraseFiltersClear, activePhraseFilters, filtersStorageKey("phrases"), function () {
+    renderPhraseList();
+    updateListsTrigger("phrases");
+  });
   el.phraseShowAllBtn.addEventListener("click", function () {
     clearExcludesOnly(activePhraseFilters);
     refreshChipVisuals(el.phraseFilters, activePhraseFilters);
     el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
     saveFilters(filtersStorageKey("phrases"), activePhraseFilters);
     renderPhraseList();
+    updateListsTrigger("phrases");
   });
+  el.phraseListsTrigger.addEventListener("click", function () { openListFilterPicker("phrases"); });
   el.toggleAddPhrase.addEventListener("click", function () { openPhraseForm("add"); });
   el.seedPhrasesToolbarBtn.addEventListener("click", seedStarterPhrases);
   el.phraseFormCancel.addEventListener("click", closePhraseForm);
@@ -4766,6 +4915,20 @@
 
   el.listPickerClose.addEventListener("click", closeListPicker);
   el.listPickerCreateBtn.addEventListener("click", handleListPickerCreate);
+
+  el.listFilterSearch.addEventListener("input", function () { renderListFilterRows(el.listFilterSearch.value); });
+  el.listFilterClose.addEventListener("click", closeListFilterPicker);
+  el.listFilterClearBtn.addEventListener("click", function () {
+    if (!listFilterTarget) return;
+    var tab = listFilterTarget;
+    var filters = activeFiltersForTab(tab);
+    filters.list.include.clear();
+    filters.list.exclude.clear();
+    saveFilters(filtersStorageKey(tab), filters);
+    renderListFilterRows(el.listFilterSearch.value);
+    updateListsTrigger(tab);
+    rerenderTab(tab);
+  });
 
   el.shareCloseBtn.addEventListener("click", closeSharePreview);
   el.shareImportBtn.addEventListener("click", handleShareImport);

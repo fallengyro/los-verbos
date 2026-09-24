@@ -118,7 +118,13 @@
         <button type="button" class="chip" data-facet="flag" data-value="auxiliar" data-i18n-tag="auxiliar">auxiliar</button>
         <button type="button" class="chip" data-facet="flag" data-value="gustarLike" data-i18n-tag="dativo">dativo</button>
       </div>
-      <div class="chip-group" id="verb-filters-list-group"></div>
+      <div class="chip-group" id="verb-lists-group" hidden>
+        <span class="chip-label" data-i18n="chip_group_list">Listas</span>
+        <button type="button" class="lists-trigger" id="verb-lists-trigger">
+          <span class="stack-icon" aria-hidden="true">&#9776;</span>
+          <span id="verb-lists-trigger-label" data-i18n="chip_group_list">Listas</span>
+        </button>
+      </div>
       <button type="button" class="chip-clear" id="verb-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
     </div>
     <div class="hidden-count-row" id="verb-hidden-row" hidden>
@@ -309,7 +315,13 @@
         <button type="button" class="chip" data-facet="gender" data-value="femenino" data-i18n-tag="femenino">femenino</button>
         <button type="button" class="chip" data-facet="gender" data-value="neutro" data-i18n-tag="neutro">neutro</button>
       </div>
-      <div class="chip-group" id="word-filters-list-group"></div>
+      <div class="chip-group" id="word-lists-group" hidden>
+        <span class="chip-label" data-i18n="chip_group_list">Listas</span>
+        <button type="button" class="lists-trigger" id="word-lists-trigger">
+          <span class="stack-icon" aria-hidden="true">&#9776;</span>
+          <span id="word-lists-trigger-label" data-i18n="chip_group_list">Listas</span>
+        </button>
+      </div>
       <button type="button" class="chip-clear" id="word-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
     </div>
     <div class="hidden-count-row" id="word-hidden-row" hidden>
@@ -427,7 +439,13 @@
         <span class="chip-label" data-i18n="chip_group_flags">Marcas</span>
         <button type="button" class="chip" data-facet="flag" data-value="idiomatic" data-i18n-tag="idiomática">idiomática</button>
       </div>
-      <div class="chip-group" id="phrase-filters-list-group"></div>
+      <div class="chip-group" id="phrase-lists-group" hidden>
+        <span class="chip-label" data-i18n="chip_group_list">Listas</span>
+        <button type="button" class="lists-trigger" id="phrase-lists-trigger">
+          <span class="stack-icon" aria-hidden="true">&#9776;</span>
+          <span id="phrase-lists-trigger-label" data-i18n="chip_group_list">Listas</span>
+        </button>
+      </div>
       <button type="button" class="chip-clear" id="phrase-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
     </div>
     <div class="hidden-count-row" id="phrase-hidden-row" hidden>
@@ -649,6 +667,26 @@
     <div class="form-actions">
       <button type="button" class="btn-primary" id="list-picker-create-btn" data-i18n="btn_create_and_add">Crear y agregar</button>
       <button type="button" class="btn-secondary" id="list-picker-close" data-i18n="close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shared across all three tabs (Verbos/Vocabulario/Frases) rather than
+     one modal per tab — listFilterTarget (app.js) tracks which tab's
+     activeFilters it's currently editing, set when its "Listas" trigger
+     opens this. Same shape as the "add to list" modal above, but rows are
+     tri-state (tap to include, tap twice to exclude) instead of a single
+     add action, and a live search narrows the list — this is what scales
+     to many saved lists without the filter-chips row itself growing. -->
+<div class="modal-overlay" id="list-filter-overlay" hidden>
+  <div class="modal-card">
+    <h3 data-i18n="list_filter_title">Filtrar por lista</h3>
+    <p class="flash-setup-note" data-i18n="list_filter_hint">Tocá para incluir, dos veces para excluir. Los cambios se aplican al instante.</p>
+    <input type="text" class="picker-search" id="list-filter-search" data-i18n-placeholder="list_filter_search_placeholder" placeholder="Buscar una lista…" autocomplete="off" />
+    <ul class="picker-list" id="list-filter-list"></ul>
+    <div class="modal-actions">
+      <button type="button" class="chip-clear" id="list-filter-clear-btn" data-i18n="list_filter_clear_selection">Limpiar selección</button>
+      <button type="button" class="btn-secondary" id="list-filter-close" data-i18n="close">Cerrar</button>
     </div>
   </div>
 </div>
