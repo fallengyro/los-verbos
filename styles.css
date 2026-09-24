@@ -399,13 +399,19 @@
     background: var(--paper-raised);
   }
   .card-list li + li { border-top: 1px solid var(--line); }
-  /* the verb, word and phrase selection lists get their own taller height
+  /* the verb, word and phrase selection lists get their own taller box
      (rather than the shared 110px above) so more of the filtered list is
      visible before you have to scroll — all three matched to the same
-     330px (the word list's height, confirmed as the right feel). */
-  #card-list { max-height: 330px; }
-  #word-list { max-height: 330px; }
-  #phrase-list { max-height: 330px; }
+     330px (the word list's height, confirmed as the right feel). A fixed
+     height rather than max-height, deliberately: with max-height, a list
+     with fewer rows than would fill 330px (phrases, being a newer, less
+     populated collection than years-accumulated vocabulary) just renders
+     shorter — same cap, visibly smaller box. A fixed height keeps all
+     three the same size regardless of how many rows are actually in
+     them, which is what "same height as vocabulary" actually means here. */
+  #card-list { height: 330px; }
+  #word-list { height: 330px; }
+  #phrase-list { height: 330px; }
   .card-row {
     width: 100%;
     display: flex;
@@ -895,7 +901,7 @@
        work. Modal-embedded lists (list picker, import preview) keep their
        bounded scroll — those sit inside an already-bounded dialog, a
        different context from the main tab content flow. */
-    #card-list, #word-list, #phrase-list { max-height: none; overflow-y: visible; }
+    #card-list, #word-list, #phrase-list { height: auto; max-height: none; overflow-y: visible; }
 
     .chip { padding: 4px 10px; font-size: 12px; }
     .chip-clear { flex-basis: 100%; margin-left: 0; }
