@@ -205,7 +205,14 @@
     display: flex; gap: 4px; margin-bottom: 22px; border-bottom: 2px solid var(--ink);
     overflow-x: auto; -webkit-overflow-scrolling: touch;
     margin-right: -16px; padding-right: 16px;
+    /* The row itself is the scroll affordance (tabs bleeding off the right
+       edge) — a scrollbar underneath just doubles up on that same signal
+       and looks out of place sitting right on the border-bottom divider.
+       Scrolling still works via swipe/wheel; only the bar is hidden. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .main-tabs::-webkit-scrollbar { display: none; }
   .main-tab {
     background: none; border: none; padding: 9px 18px 11px; cursor: pointer;
     font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 17px;
@@ -872,6 +879,17 @@
     .card-row { padding: 11px 12px; font-size: 14px; flex-wrap: wrap; row-gap: 4px; }
     .card-row .inf { min-width: 0; flex: 1 1 100%; font-size: 16px; }
     .card-row .def { font-size: 12.5px; }
+
+    /* On a touch screen, a short fixed-height box with its own internal
+       scroll (the desktop compromise, so the list doesn't push everything
+       else far down the page) just fights the page scroll instead — your
+       thumb lands on the list and only the list moves, not the page. Let
+       these three grow to their full content height on mobile so the
+       whole page scrolls as one, the way touch scrolling is expected to
+       work. Modal-embedded lists (list picker, import preview) keep their
+       bounded scroll — those sit inside an already-bounded dialog, a
+       different context from the main tab content flow. */
+    #card-list, #word-list, #phrase-list { max-height: none; overflow-y: visible; }
 
     .chip { padding: 4px 10px; font-size: 12px; }
     .chip-clear { flex-basis: 100%; margin-left: 0; }
