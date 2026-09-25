@@ -3371,6 +3371,76 @@
       .catch(function () {});
   }
 
+  // The merged usted/ustedes imperativo cell ("— / — / <real>", td.imp-col)
+  // is speakable text-wise only via its .real span — see selectVerb()'s
+  // imperativoCell() above for why. Both the tap-to-hear click handler and
+  // the row/column prefetch below need this exact same rule, so it lives
+  // here once rather than being duplicated at each call site.
+  function speakableCellText(cell) {
+    var real = cell.querySelector(".real");
+    return real ? real.textContent : cell.textContent;
+  }
+
+  // Row-and-column conjugation-table prefetch (2026-09-25) — mason's own
+  // follow-up to the view-triggered prefetching above, once he'd confirmed
+  // firing a background fetch doesn't touch the main thread and so can't
+  // make the table itself feel slower to use: "let's implement a prefetch
+  // of the row and column (pronoun and tense) that are common to the
+  // user's tapped cell. since we don't know if a user is going to be
+  // drilling a pronoun or a tense and either is a reasonable thing to do."
+  //
+  // Deliberately scoped to just the tapped cell's row + column (at most
+  // ~11 cells: 7 other tenses/imperativo in the row, up to 4 other
+  // persons in the column), not the whole table (30+ cells) — prefetching
+  // everything the instant someone taps one cell would reintroduce a
+  // smaller-scale version of the exact "download things nobody asked for"
+  // concern that ruled out bulk-library prefetching in the first place
+  // (see the project brief's TTS cache warming section). This stays
+  // proportional to what a single tap actually suggests: the user is
+  // about to keep drilling either this pronoun across tenses or this
+  // tense across pronouns — not necessarily the whole table.
+  //
+  // Staggered (setTimeout, CONJ_PREFETCH_STAGGER_MS apart) rather than all
+  // fired at once: although none of this blocks the main thread (fetch()
+  // and invoke() are async, so the table stays perfectly scrollable/
+  // tappable regardless of how many requests are in flight), a burst of
+  // ~10 simultaneous requests would still compete for real bandwidth with
+  // the playTts() call this same tap just kicked off, and with whatever
+  // cell gets tapped next — which could ironically make the thing the
+  // user is actually waiting to hear right now feel slower. Spreading
+  // dispatch out over a second or two keeps each prefetch cheap and lets
+  // a real, explicit tap always win any contention for the connection.
+  //
+  // Pure DOM traversal — reads sibling <td> elements directly off the
+  // already-rendered table (the same .speakable cells selectVerb() marked,
+  // via speakableCellText() above for the merged-cell special case) rather
+  // than reaching back into forms/PERSONS/TENSES a second time to
+  // re-derive which cells exist. Works unmodified for the impersonal row
+  // (llover, nevar) too, since that's just another <tr> in the same tbody
+  // with the same column layout — no separate case needed.
+  function prefetchAdjacentConjugationCells(td) {
+    if (!td || !el.dConjBody.contains(td)) return;
+    var CONJ_PREFETCH_STAGGER_MS = 150;
+    var texts = [];
+    var tr = td.parentNode;
+    // Row: every other speakable cell sharing this <tr> (same pronoun,
+    // every other tense/imperativo).
+    Array.prototype.forEach.call(tr.children, function (cell) {
+      if (cell !== td && cell.classList.contains("speakable")) texts.push(speakableCellText(cell));
+    });
+    // Column: the cell at the same position in every other <tr> (same
+    // tense, every other pronoun).
+    var colIndex = Array.prototype.indexOf.call(tr.children, td);
+    Array.prototype.forEach.call(el.dConjBody.children, function (otherTr) {
+      if (otherTr === tr) return;
+      var cell = otherTr.children[colIndex];
+      if (cell && cell.classList.contains("speakable")) texts.push(speakableCellText(cell));
+    });
+    texts.forEach(function (text, i) {
+      setTimeout(function () { prefetchTts(text); }, i * CONJ_PREFETCH_STAGGER_MS);
+    });
+  }
+
   // ================= TTS cache warming (console utility, 2026-09-25) =================
   // Not a UI feature — there's no button for this anywhere. It's a maintenance
   // operation mason runs himself from the browser console (already signed in
@@ -5287,13 +5357,16 @@
   // usted/ustedes imperativo cell ("— / — / <real>", td.imp-col) is a
   // special case: its speakable text is just the .real span, not the
   // cell's full textContent, which would otherwise include the dash
-  // placeholder and slashes.
+  // placeholder and slashes — see speakableCellText() above, shared with
+  // the row/column prefetch this tap also kicks off below.
   el.dConjBody.addEventListener("click", function (evt) {
     var td = evt.target.closest("td.speakable");
     if (!td || !el.dConjBody.contains(td)) return;
-    var real = td.querySelector(".real");
-    var text = real ? real.textContent : td.textContent;
-    playTts(text, td, el.dTtsMsg);
+    playTts(speakableCellText(td), td, el.dTtsMsg);
+    // See prefetchAdjacentConjugationCells() above: quietly gets a head
+    // start on this cell's row and column, since either is a reasonable
+    // guess at what gets tapped next.
+    prefetchAdjacentConjugationCells(td);
   });
   el.dGerundio.addEventListener("click", function () {
     if (!el.dGerundio.classList.contains("speakable")) return;
