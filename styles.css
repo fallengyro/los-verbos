@@ -108,7 +108,14 @@
     margin-bottom: 24px;
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    /* was `baseline` — that lined the account-menu trigger up with the
+       *bottom* of the large italic Fraunces wordmark, which read low
+       against it. `flex-start` puts it at the true top of the header,
+       opposite "voseá" (mason: "i would like it placed in the upper
+       right corner opposite 'vosea'... this also saves a little vertical
+       real estate") — see .acct-menu-wrap's own margin-top below for the
+       fine adjustment against the wordmark's cap-height. */
+    align-items: flex-start;
     gap: 12px;
     flex-wrap: wrap;
   }
@@ -132,13 +139,79 @@
     color: var(--ink-soft);
     font-weight: 600;
   }
-  .user-bar {
+  /* Account menu — replaced the old .user-bar (email spelled out + two
+     .icon-btn buttons for settings/logout, sitting at the same visual
+     weight as each other and as any other text button in the app) with
+     a single kebab trigger that opens a small popover holding all three.
+     See index.html's header.masthead comment for the full rationale. */
+  .acct-menu-wrap {
+    position: relative;
+    /* Nudges the trigger down from header.masthead's literal flex-start
+       edge so it sits visually centered against the wordmark's cap-height
+       rather than its ascender space — measured against the real
+       rendered header (~2.5-7.5px optical delta between the trigger's
+       and the h1's vertical centers across mobile/desktop), not
+       eyeballed. */
+    margin-top: 4px;
+  }
+  .acct-trigger {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .acct-trigger svg { width: 18px; height: 18px; }
+  .acct-trigger:hover,
+  .acct-trigger[aria-expanded="true"] { border-color: var(--accent); color: var(--accent-deep); }
+  /* No full-screen dim backdrop behind this one (unlike .modal-overlay,
+     which every other overlay in the app sits behind) — it's a small
+     popover, not a destination — so it needs its own drop shadow to read
+     as floating above the page, plus a document-level click-outside
+     listener in app.js to close it. */
+  .acct-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px var(--shadow);
+    padding: 6px;
+    z-index: 150;
+  }
+  .acct-menu-email {
+    padding: 8px 10px 6px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    word-break: break-all;
+  }
+  .acct-menu-divider { border-top: 1px solid var(--line); margin: 4px 2px; }
+  .acct-menu-item {
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 12.5px;
-    color: var(--ink-soft);
+    background: none;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 10px;
+    color: var(--ink);
+    font-family: "Public Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
   }
+  .acct-menu-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .acct-menu-item:hover { background: var(--paper-sunken); }
+  .acct-menu-item.danger { color: var(--danger); }
 
   .status-banner {
     background: var(--brick-soft);
@@ -294,6 +367,13 @@
     background: var(--paper-raised);
     padding: 14px 16px 12px;
     margin-bottom: 20px;
+    /* Matches .detail's raised treatment (mason: "are the detail cards
+       visually different than the selector and filter cards? ... i
+       would like all three to appear raised like the detail cards") —
+       this card already shared .detail's background/border, just not
+       its shadow, which is what actually reads as "raised" rather than
+       "flat with a border." See .card-list below for the third card. */
+    box-shadow: 0 2px 10px var(--shadow);
   }
   .search-box { position: relative; margin-bottom: 4px; }
   .search-box input {
@@ -455,8 +535,13 @@
     max-height: 110px;
     overflow-y: auto;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    /* 8px -> 10px to match .detail/.search-card exactly, now that the
+       shadow below makes all three cards' edges more prominent. */
+    border-radius: 10px;
     background: var(--paper-raised);
+    /* Same raised treatment as .detail/.search-card — see the comment
+       on .search-card above. */
+    box-shadow: 0 2px 10px var(--shadow);
   }
   .card-list li + li { border-top: 1px solid var(--line); }
   /* the verb, word and phrase selection lists get their own taller box
@@ -572,8 +657,6 @@
   }
   .icon-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
   .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
-  /* the gear glyph reads small at the plain .icon-btn text size */
-  #settings-btn { font-size: 15px; line-height: 1; }
 
   .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }

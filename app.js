@@ -121,7 +121,7 @@
       btn_edit: "Editar",
       btn_delete: "Eliminar",
       btn_add_verb_toggle: "+ Agregar verbo",
-      seed_verbs_btn: "Cargar {n} verbos de ejemplo",
+      seed_verbs_btn: "Cargar verbos de ejemplo",
       btn_add_filtered_to_list: "Agregar filtrados a una lista",
       form_title_add_verb: "Agregar verbo",
       label_infinitivo: "Infinitivo",
@@ -141,7 +141,7 @@
       btn_cancel: "Cancelar",
       word_search_placeholder: "Escribí una palabra… (ej. mesa)",
       btn_add_word_toggle: "+ Agregar palabra",
-      seed_words_btn: "Cargar {n} palabras de ejemplo",
+      seed_words_btn: "Cargar palabras de ejemplo",
       form_title_add_word: "Agregar palabra",
       label_palabra: "Palabra",
       label_categoria_gramatical: "Categoría gramatical",
@@ -151,7 +151,7 @@
       placeholder_ejemplo: "ej. Tomo mucha agua todos los días.",
       phrase_search_placeholder: "Escribí una frase… (ej. dale)",
       btn_add_phrase_toggle: "+ Agregar frase",
-      seed_phrases_btn: "Cargar {n} frases de ejemplo",
+      seed_phrases_btn: "Cargar frases de ejemplo",
       form_title_add_phrase: "Agregar frase",
       form_title_edit_phrase: "Editar frase",
       label_frase: "Frase",
@@ -379,7 +379,7 @@
       btn_edit: "Edit",
       btn_delete: "Delete",
       btn_add_verb_toggle: "+ Add verb",
-      seed_verbs_btn: "Load {n} example verbs",
+      seed_verbs_btn: "Load example verbs",
       btn_add_filtered_to_list: "Add filtered to a list",
       form_title_add_verb: "Add verb",
       label_infinitivo: "Infinitive",
@@ -399,7 +399,7 @@
       btn_cancel: "Cancel",
       word_search_placeholder: "Type a word… (e.g. mesa)",
       btn_add_word_toggle: "+ Add word",
-      seed_words_btn: "Load {n} example words",
+      seed_words_btn: "Load example words",
       form_title_add_word: "Add word",
       label_palabra: "Word",
       label_categoria_gramatical: "Part of speech",
@@ -409,7 +409,7 @@
       placeholder_ejemplo: "e.g. Tomo mucha agua todos los días.",
       phrase_search_placeholder: "Type a phrase… (e.g. dale)",
       btn_add_phrase_toggle: "+ Add phrase",
-      seed_phrases_btn: "Load {n} example phrases",
+      seed_phrases_btn: "Load example phrases",
       form_title_add_phrase: "Add phrase",
       form_title_edit_phrase: "Edit phrase",
       label_frase: "Phrase",
@@ -676,12 +676,16 @@
       elx.textContent = tagLabel(elx.getAttribute("data-i18n-tag"));
     });
     document.documentElement.lang = currentLang;
-    // The two toolbar "load example X" buttons include a count, so unlike
-    // everything else with a data-i18n attribute they need a variable —
-    // set directly here rather than through the attribute walk above.
-    if (el.seedToolbarBtn) el.seedToolbarBtn.textContent = t("seed_verbs_btn", { n: STARTER_VERBS.length });
-    if (el.seedWordsToolbarBtn) el.seedWordsToolbarBtn.textContent = t("seed_words_btn", { n: STARTER_WORDS.length });
-    if (el.seedPhrasesToolbarBtn) el.seedPhrasesToolbarBtn.textContent = t("seed_phrases_btn", { n: STARTER_PHRASES.length });
+    // The three toolbar "load example X" buttons are set directly here
+    // rather than through the data-i18n attribute walk above, since they
+    // aren't static markup — see the matching empty-state seed buttons in
+    // renderVerbList()/renderWordList()/renderPhraseList() below, which set
+    // the same text the same way when they're (re)created. No count in the
+    // label (mason, 2026-09-25: "there is no need to indicate the number of
+    // defaults that will be added") — just "Cargar verbos de ejemplo" etc.
+    if (el.seedToolbarBtn) el.seedToolbarBtn.textContent = t("seed_verbs_btn");
+    if (el.seedWordsToolbarBtn) el.seedWordsToolbarBtn.textContent = t("seed_words_btn");
+    if (el.seedPhrasesToolbarBtn) el.seedPhrasesToolbarBtn.textContent = t("seed_phrases_btn");
   }
 
   // ================= settings (app language, tts voice) =================
@@ -997,6 +1001,13 @@
     { infinitive: "comer", definition: "to eat", type: "-er", irregularity: "regular", pattern: "regular -er", reflexive: false, transitivity: "ambos", preposicion: "", auxiliar: false, forms: { presente: { yo: "como", vos: "comés", el: "come", nosotros: "comemos", ellos: "comen" }, preterito: { yo: "comí", vos: "comiste", el: "comió", nosotros: "comimos", ellos: "comieron" }, imperfecto: { yo: "comía", vos: "comías", el: "comía", nosotros: "comíamos", ellos: "comían" }, futuro: { yo: "comeré", vos: "comerás", el: "comerá", nosotros: "comeremos", ellos: "comerán" }, condicional: { yo: "comería", vos: "comerías", el: "comería", nosotros: "comeríamos", ellos: "comerían" }, subjPresente: { yo: "coma", vos: "comas", el: "coma", nosotros: "comamos", ellos: "coman" }, subjPasado: { yo: "comiera", vos: "comieras", el: "comiera", nosotros: "comiéramos", ellos: "comieran" }, imperativo: { vos: "comé", usted: "coma", nosotros: "comamos", ustedes: "coman" }, gerundio: "comiendo", participio: "comido" } },
     { infinitive: "llamarse", definition: "to be called / to be named", type: "-ar", irregularity: "regular", pattern: "regular reflexive", reflexive: true, transitivity: "intransitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "me llamo", vos: "te llamás", el: "se llama", nosotros: "nos llamamos", ellos: "se llaman" }, preterito: { yo: "me llamé", vos: "te llamaste", el: "se llamó", nosotros: "nos llamamos", ellos: "se llamaron" }, imperfecto: { yo: "me llamaba", vos: "te llamabas", el: "se llamaba", nosotros: "nos llamábamos", ellos: "se llamaban" }, futuro: { yo: "me llamaré", vos: "te llamarás", el: "se llamará", nosotros: "nos llamaremos", ellos: "se llamarán" }, condicional: { yo: "me llamaría", vos: "te llamarías", el: "se llamaría", nosotros: "nos llamaríamos", ellos: "se llamarían" }, subjPresente: { yo: "me llame", vos: "te llames", el: "se llame", nosotros: "nos llamemos", ellos: "se llamen" }, subjPasado: { yo: "me llamara", vos: "te llamaras", el: "se llamara", nosotros: "nos llamáramos", ellos: "se llamaran" }, imperativo: { vos: "llamate", usted: "se llame", nosotros: "nos llamemos", ustedes: "se llamen" }, gerundio: "llamándose", participio: "llamado" } },
     { infinitive: "gustar", definition: "to be pleasing to / to like", type: "-ar", irregularity: "regular", pattern: "verbo \"tipo gustar\": el sujeto es lo que gusta; la persona lleva pronombre de objeto indirecto (me/te/le/nos/les). Ej.: \"Me gusta el café\" / \"Me gustan los perros\".", reflexive: false, transitivity: "intransitivo", preposicion: "", auxiliar: false, gustar_like: true, forms: { presente: { yo: "gusto", vos: "gustás", el: "gusta", nosotros: "gustamos", ellos: "gustan" }, preterito: { yo: "gusté", vos: "gustaste", el: "gustó", nosotros: "gustamos", ellos: "gustaron" }, imperfecto: { yo: "gustaba", vos: "gustabas", el: "gustaba", nosotros: "gustábamos", ellos: "gustaban" }, futuro: { yo: "gustaré", vos: "gustarás", el: "gustará", nosotros: "gustaremos", ellos: "gustarán" }, condicional: { yo: "gustaría", vos: "gustarías", el: "gustaría", nosotros: "gustaríamos", ellos: "gustarían" }, subjPresente: { yo: "guste", vos: "gustes", el: "guste", nosotros: "gustemos", ellos: "gusten" }, subjPasado: { yo: "gustara", vos: "gustaras", el: "gustara", nosotros: "gustáramos", ellos: "gustaran" }, imperativo: { vos: "gustá", usted: "guste", nosotros: "gustemos", ustedes: "gusten" }, gerundio: "gustando", participio: "gustado" } },
+    // Added 2026-09-25 per mason: "it's a real miss to not include the verb
+    // vosear in the default list" — genuinely on-theme for an app that's
+    // specifically about rioplatense voseo. Fully regular -ar verb (no
+    // spelling-change cells like the -car/-gar/-zar verbs elsewhere in this
+    // project), so every form below follows the same regular -ar pattern as
+    // "comer"/"llamarse" above, just with the -ar endings.
+    { infinitive: "vosear", definition: "to address (someone) as \"vos\" (rather than \"tú\")", type: "-ar", irregularity: "regular", pattern: "regular -ar", reflexive: false, transitivity: "transitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "voseo", vos: "voseás", el: "vosea", nosotros: "voseamos", ellos: "vosean" }, preterito: { yo: "voseé", vos: "voseaste", el: "voseó", nosotros: "voseamos", ellos: "vosearon" }, imperfecto: { yo: "voseaba", vos: "voseabas", el: "voseaba", nosotros: "voseábamos", ellos: "voseaban" }, futuro: { yo: "vosearé", vos: "vosearás", el: "voseará", nosotros: "vosearemos", ellos: "vosearán" }, condicional: { yo: "vosearía", vos: "vosearías", el: "vosearía", nosotros: "vosearíamos", ellos: "vosearían" }, subjPresente: { yo: "vosee", vos: "vosees", el: "vosee", nosotros: "voseemos", ellos: "voseen" }, subjPasado: { yo: "voseara", vos: "vosearas", el: "voseara", nosotros: "voseáramos", ellos: "vosearan" }, imperativo: { vos: "voseá", usted: "vosee", nosotros: "voseemos", ustedes: "voseen" }, gerundio: "voseando", participio: "voseado" } },
   ];
 
   // ================= starter vocabulary (100 common words, offered to a brand-new account) =================
@@ -1074,7 +1085,13 @@
     { phrase: "¿Viste?", definition: "you know? / see what I mean?", function: "muletilla", register: "coloquial", idiomatic: true, literal: "did you see?" },
     { phrase: "¿Me podés ayudar?", definition: "can you help me?", function: "pregunta", register: "neutro", idiomatic: false, literal: "" },
     { phrase: "¿Cuánto sale?", definition: "how much does it cost?", function: "pregunta", register: "coloquial", idiomatic: true, literal: "how much does it come out?" },
-    { phrase: "Todo bien", definition: "all good / no worries / it's fine", function: "otro", register: "coloquial", idiomatic: true, literal: "all good" }
+    { phrase: "Todo bien", definition: "all good / no worries / it's fine", function: "otro", register: "coloquial", idiomatic: true, literal: "all good" },
+    // Added 2026-09-25 per mason's ask for "a really colloquial expression
+    // that uses vos" — "cargar" here means to tease/mess with someone, a
+    // very common porteño usage (not the literal "to load/charge"), so this
+    // is genuinely idiomatic rather than just a sentence that happens to
+    // contain the pronoun.
+    { phrase: "¿Vos me estás cargando?", definition: "are you messing with me? / are you serious?", function: "sorpresa", register: "coloquial", idiomatic: true, literal: "are you loading/charging me?" }
   ];
 
   // ================= state =================
@@ -1757,7 +1774,7 @@
         var seedBtn = document.createElement("button");
         seedBtn.type = "button";
         seedBtn.className = "seed-btn";
-        seedBtn.textContent = t("seed_verbs_btn", { n: STARTER_VERBS.length });
+        seedBtn.textContent = t("seed_verbs_btn");
         seedBtn.addEventListener("click", seedStarterVerbs);
         note.appendChild(seedBtn);
       }
@@ -2424,7 +2441,7 @@
         var seedWordsBtn = document.createElement("button");
         seedWordsBtn.type = "button";
         seedWordsBtn.className = "seed-btn";
-        seedWordsBtn.textContent = t("seed_words_btn", { n: STARTER_WORDS.length });
+        seedWordsBtn.textContent = t("seed_words_btn");
         seedWordsBtn.addEventListener("click", seedStarterWords);
         note.appendChild(seedWordsBtn);
       }
@@ -2691,7 +2708,7 @@
         var seedPhrasesBtn = document.createElement("button");
         seedPhrasesBtn.type = "button";
         seedPhrasesBtn.className = "seed-btn";
-        seedPhrasesBtn.textContent = t("seed_phrases_btn", { n: STARTER_PHRASES.length });
+        seedPhrasesBtn.textContent = t("seed_phrases_btn");
         seedPhrasesBtn.addEventListener("click", seedStarterPhrases);
         note.appendChild(seedPhrasesBtn);
       }
