@@ -539,6 +539,24 @@
     box-shadow: 0 2px 10px var(--shadow);
   }
   .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  /* Word/phrase (and, soon, verb) detail-page speaker button — same
+     radiating-pulse SVG + playTts() as the flashcard version
+     (.flash-speak-btn), but laid out as a normal flex child of
+     .detail-head (which is already `display: flex; justify-content:
+     space-between`) rather than absolutely positioned, since here it sits
+     next to a definition paragraph that can wrap to different heights
+     instead of over a fixed card face. */
+  .detail-speak-btn {
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--paper); color: var(--accent-deep); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0.55; transition: opacity 0.15s;
+  }
+  .detail-speak-btn svg { width: 18px; height: 18px; }
+  .detail-speak-btn:hover, .detail-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
+  .detail-speak-btn:disabled { opacity: 0.3; cursor: default; }
+  /* Reuses .form-msg's red error-text treatment, same as .flash-tts-msg. */
+  .detail-tts-msg { margin: 0 0 10px; min-height: 0; }
   .detail-actions-footer {
     display: flex;
     gap: 8px;

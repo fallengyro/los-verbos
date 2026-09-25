@@ -1229,6 +1229,8 @@
     wdBadges: document.getElementById("wd-badges"),
     wdNotes: document.getElementById("wd-notes"),
     wdExample: document.getElementById("wd-example"),
+    wdSpeak: document.getElementById("wd-speak"),
+    wdTtsMsg: document.getElementById("wd-tts-msg"),
     wdEdit: document.getElementById("wd-edit"),
     wdDelete: document.getElementById("wd-delete"),
     toggleAddWord: document.getElementById("toggle-add-word"),
@@ -1262,6 +1264,8 @@
     pdLiteral: document.getElementById("pd-literal"),
     pdNotes: document.getElementById("pd-notes"),
     pdExample: document.getElementById("pd-example"),
+    pdSpeak: document.getElementById("pd-speak"),
+    pdTtsMsg: document.getElementById("pd-tts-msg"),
     pdEdit: document.getElementById("pd-edit"),
     pdDelete: document.getElementById("pd-delete"),
     toggleAddPhrase: document.getElementById("toggle-add-phrase"),
@@ -2403,6 +2407,7 @@
     el.wdNotes.style.display = data.notes ? "" : "none";
     el.wdExample.textContent = data.example || "";
     el.wdExample.style.display = data.example ? "" : "none";
+    el.wdTtsMsg.textContent = "";
 
     el.wordDetail.hidden = false;
     el.wordDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -2669,6 +2674,7 @@
     el.pdNotes.style.display = data.notes ? "" : "none";
     el.pdExample.textContent = data.example || "";
     el.pdExample.style.display = data.example ? "" : "none";
+    el.pdTtsMsg.textContent = "";
 
     el.phraseDetail.hidden = false;
     el.phraseDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -3167,12 +3173,19 @@
   // Plays `text` in the currently-selected Azure voice, via the "tts" Edge
   // Function (see supabase/functions/tts/index.ts) — app.js never talks to
   // Azure directly, and never sees the Azure key. `btn` is the speaker
-  // button that was tapped, purely so we can show a brief "..." while the
-  // request is in flight and restore it after; it plays fine without one.
-  function playTts(text, btn) {
+  // button (or, for the verb conjugation table, the table cell) that was
+  // tapped, purely so we can show a brief "..." while the request is in
+  // flight and restore it after; it plays fine without one. `msgEl` is
+  // where a "couldn't play that" error gets shown — each screen with a
+  // speaker button has its own small message element (flashcards:
+  // flash-tts-msg, word/phrase detail: wd-tts-msg/pd-tts-msg) since only
+  // one of them is ever visible at a time; defaults to flash-tts-msg so
+  // existing flashcard call sites don't need to change.
+  function playTts(text, btn, msgEl) {
     if (!text || ttsInFlight) return;
+    if (!msgEl) msgEl = el.flashTtsMsg;
     ttsInFlight = true;
-    el.flashTtsMsg.textContent = "";
+    msgEl.textContent = "";
     var originalLabel = btn ? btn.innerHTML : "";
     if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
 
@@ -3184,7 +3197,7 @@
         return ttsAudioEl.play();
       })
       .catch(function () {
-        el.flashTtsMsg.textContent = t("tts_error");
+        msgEl.textContent = t("tts_error");
       })
       .then(function () {
         ttsInFlight = false;
@@ -4942,6 +4955,10 @@
   el.seedWordsToolbarBtn.addEventListener("click", seedStarterWords);
   el.wordFormCancel.addEventListener("click", closeWordForm);
   el.wordForm.addEventListener("submit", handleWordSubmit);
+  el.wdSpeak.addEventListener("click", function () {
+    var entry = allWords.find(function (v) { return v.id === selectedWordId; });
+    if (entry) playTts(entry.data.word, el.wdSpeak, el.wdTtsMsg);
+  });
   el.wdEdit.addEventListener("click", function () {
     var entry = allWords.find(function (v) { return v.id === selectedWordId; });
     if (entry) openWordForm("edit", entry.data);
@@ -4980,6 +4997,10 @@
   el.phraseForm.addEventListener("submit", handlePhraseSubmit);
   el.pfIdiomatic.addEventListener("change", function () {
     el.pfLiteralWrap.hidden = !el.pfIdiomatic.checked;
+  });
+  el.pdSpeak.addEventListener("click", function () {
+    var entry = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
+    if (entry) playTts(entry.data.phrase, el.pdSpeak, el.pdTtsMsg);
   });
   el.pdEdit.addEventListener("click", function () {
     var entry = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
