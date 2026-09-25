@@ -68,7 +68,7 @@
       auth_password_label: "Contraseña",
       auth_submit_login: "Entrar",
       logout_btn: "Cerrar sesión",
-      settings_btn_label: "Configuración",
+      acct_menu_aria: "Menú de cuenta",
       nav_verbs: "Verbos",
       nav_words: "Vocabulario",
       nav_phrases: "Frases",
@@ -326,7 +326,7 @@
       auth_password_label: "Password",
       auth_submit_login: "Log in",
       logout_btn: "Log out",
-      settings_btn_label: "Settings",
+      acct_menu_aria: "Account menu",
       nav_verbs: "Verbs",
       nav_words: "Vocabulary",
       nav_phrases: "Phrases",
@@ -718,6 +718,27 @@
 
   function closeSettings() {
     el.settingsOverlay.hidden = true;
+  }
+
+  // Account menu (2026-09-25) — the kebab trigger opposite the "voseá"
+  // wordmark that replaced the old always-visible email/settings/logout
+  // row. Unlike the app's modals (settings, list filter, etc.), which sit
+  // behind a full-screen dim .modal-overlay and only close via an explicit
+  // button, this is a small popover with nothing behind it — so it also
+  // needs to close on an outside click, which is new for this codebase.
+  function closeAcctMenu() {
+    el.acctMenu.hidden = true;
+    el.acctTrigger.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleAcctMenu(evt) {
+    evt.stopPropagation();
+    var willOpen = el.acctMenu.hidden;
+    closeAcctMenu();
+    if (willOpen) {
+      el.acctMenu.hidden = false;
+      el.acctTrigger.setAttribute("aria-expanded", "true");
+    }
   }
 
   // Re-paints everything that was already rendered before the language
@@ -1147,9 +1168,11 @@
     authPassword: document.getElementById("auth-password"),
     authSubmit: document.getElementById("auth-submit"),
     authMsg: document.getElementById("auth-msg"),
-    userEmail: document.getElementById("user-email"),
-    logoutBtn: document.getElementById("logout-btn"),
-    settingsBtn: document.getElementById("settings-btn"),
+    acctTrigger: document.getElementById("acct-trigger"),
+    acctMenu: document.getElementById("acct-menu"),
+    acctMenuEmail: document.getElementById("acct-menu-email"),
+    acctMenuSettings: document.getElementById("acct-menu-settings"),
+    acctMenuLogout: document.getElementById("acct-menu-logout"),
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
     settingsClose: document.getElementById("settings-close"),
@@ -3210,14 +3233,33 @@
     var originalLabel = btn ? btn.innerHTML : "";
     if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
 
+    // Temporary diagnostic (2026-09-25): the Edge Function already knows
+    // whether it served a cached clip or paid for a fresh Azure synthesis
+    // (res.data.cached), but until now the client just threw that away.
+    // Logging it here — with the round-trip time — lets us see directly in
+    // the browser console whether "it feels slow sometimes" is really Azure
+    // being re-hit on already-heard content, or just normal Edge
+    // Function/network latency on a genuine cache hit. Safe to leave in
+    // permanently (console.debug, no UI change, negligible cost); pull it
+    // out later if it stops being useful.
+    var ttsStartedAt = (window.performance && performance.now) ? performance.now() : Date.now();
+
     supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
       .then(function (res) {
+        var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+        if (res.data.cached) {
+          console.debug("%c[tts] cache hit%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
+        } else {
+          console.debug("%c[tts] AZURE SYNTHESIS (cache miss)%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
+        }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
         return ttsAudioEl.play();
       })
-      .catch(function () {
+      .catch(function (err) {
+        var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
+        console.debug("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
       })
       .then(function () {
@@ -4802,7 +4844,7 @@
     if (currentUser) {
       el.authScreen.hidden = true;
       el.appScreen.hidden = false;
-      el.userEmail.textContent = currentUser.email || "";
+      el.acctMenuEmail.textContent = currentUser.email || "";
       loadUserSettings();
       loadVerbs();
       loadWords();
@@ -4894,8 +4936,24 @@
   el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
   el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
   el.authForm.addEventListener("submit", handleAuthSubmit);
-  el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
-  el.settingsBtn.addEventListener("click", openSettings);
+  el.acctTrigger.addEventListener("click", toggleAcctMenu);
+  el.acctMenuSettings.addEventListener("click", function () {
+    closeAcctMenu();
+    openSettings();
+  });
+  el.acctMenuLogout.addEventListener("click", function () {
+    closeAcctMenu();
+    supabaseClient.auth.signOut();
+  });
+  // Only this one document-level listener is needed for the outside-click
+  // close, since the account menu is the only popover of its kind in the
+  // app right now — if a second one is ever added, this should become a
+  // shared helper rather than duplicated.
+  document.addEventListener("click", function (evt) {
+    if (!el.acctMenu.hidden && !evt.target.closest(".acct-menu-wrap")) {
+      closeAcctMenu();
+    }
+  });
   el.settingsClose.addEventListener("click", closeSettings);
   el.langEs.addEventListener("click", function () { setLang("es"); });
   el.langEn.addEventListener("click", function () { setLang("en"); });
