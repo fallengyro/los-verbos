@@ -3268,6 +3268,167 @@
       });
   }
 
+  // ================= TTS cache warming (console utility, 2026-09-25) =================
+  // Not a UI feature — there's no button for this anywhere. It's a maintenance
+  // operation mason runs himself from the browser console (already signed in
+  // as himself) to pre-synthesize every piece of Spanish text the app can
+  // currently speak, for both voices, so real usage later always hits an
+  // instant cache hit instead of paying Azure's synthesis latency the first
+  // time a given form/word/phrase gets tapped. The Edge Function's cache is
+  // content-addressed (sha256 of voice+text) and shared across all accounts,
+  // so this benefits everyone, not just whoever runs it.
+  //
+  // Deliberately NOT something this codebase's author (Claude) can trigger
+  // directly against the live backend — there's no service-role key or any
+  // other credential available here, by design (see the project brief's
+  // working agreement). This just exposes the capability; mason runs
+  // `warmTtsCache()` from the console himself, using his own real session.
+  //
+  // Reuses selectVerb()'s actual rendering to decide which conjugated forms
+  // are "speakable" (imperativo's yo-less/merged-usted-ustedes quirks, the
+  // personal-vs-dativo gustar_like split, etc.) rather than re-deriving that
+  // logic a second time here — whatever selectVerb() marks .speakable IS the
+  // set of verb forms a real user can tap to hear, by definition.
+  function collectSpeakableTextsForVerb(id) {
+    var texts = [];
+    var entry = allVerbs.find(function (v) { return v.id === id; });
+    if (!entry) return texts;
+    if (entry.data.infinitive) texts.push(entry.data.infinitive);
+
+    function renderAndCollect(tab) {
+      detailGustarTab = tab;
+      selectVerb(id);
+      var cells = el.dConjBody.querySelectorAll("td.speakable");
+      cells.forEach(function (td) {
+        var real = td.querySelector(".real");
+        var text = real ? real.textContent : td.textContent;
+        if (text && text !== "—") texts.push(text);
+      });
+      if (el.dGerundio.classList.contains("speakable")) texts.push(el.dGerundio.textContent);
+      if (el.dParticipio.classList.contains("speakable")) texts.push(el.dParticipio.textContent);
+    }
+
+    renderAndCollect("personal");
+    // A verb that's both gustar_like and also_personal_use (e.g. "parecer")
+    // renders genuinely different spoken text depending on which tab is
+    // active (regular conjugation vs. "me parece" style) — both need warming.
+    if (entry.data.gustar_like && entry.data.also_personal_use) {
+      renderAndCollect("dativo");
+    }
+    return texts;
+  }
+
+  function collectAllSpeakableTexts() {
+    var texts = [];
+
+    allWords.forEach(function (w) { if (w.data.word) texts.push(w.data.word); });
+    STARTER_WORDS.forEach(function (w) { if (w.word) texts.push(w.word); });
+
+    allPhrases.forEach(function (p) { if (p.data.phrase) texts.push(p.data.phrase); });
+    STARTER_PHRASES.forEach(function (p) { if (p.phrase) texts.push(p.phrase); });
+
+    var existingInfinitives = {};
+    allVerbs.forEach(function (v) { existingInfinitives[norm(v.data.infinitive || "")] = true; });
+    allVerbs.forEach(function (v) {
+      texts = texts.concat(collectSpeakableTextsForVerb(v.id));
+    });
+
+    // Starter verbs aren't in allVerbs (they're only offered via the "seed"
+    // buttons on an empty account) — temporarily splice synthetic {id, data}
+    // entries in so selectVerb() can render them exactly like a real saved
+    // verb, then splice them back out. Skip any starter verb whose
+    // infinitive the account already has saved, so it isn't warmed twice.
+    var synthetic = [];
+    STARTER_VERBS.forEach(function (sv, i) {
+      if (existingInfinitives[norm(sv.infinitive || "")]) return;
+      synthetic.push({ id: "__warm_starter_verb_" + i, data: sv });
+    });
+    synthetic.forEach(function (se) { allVerbs.push(se); });
+    synthetic.forEach(function (se) {
+      texts = texts.concat(collectSpeakableTextsForVerb(se.id));
+    });
+    if (synthetic.length) allVerbs.splice(allVerbs.length - synthetic.length, synthetic.length);
+
+    return texts;
+  }
+
+  function warmTtsCache() {
+    if (!currentUser) {
+      console.error("[warm] Sign in first — this needs your real session to call the tts function.");
+      return;
+    }
+
+    // Remember what the detail pane was showing before we start, so we can
+    // put it back — collectSpeakableTextsForVerb() drives selectVerb() over
+    // and over, which means the verb detail card will visibly flicker
+    // through every verb in the collection while this runs. Expected; just
+    // don't run this mid-lesson.
+    var originalSelectedId = selectedId;
+    var originalGustarTab = detailGustarTab;
+
+    var texts = collectAllSpeakableTexts();
+
+    if (originalSelectedId && allVerbs.some(function (v) { return v.id === originalSelectedId; })) {
+      detailGustarTab = originalGustarTab;
+      selectVerb(originalSelectedId);
+    } else {
+      selectedId = null;
+      detailGustarTab = "personal";
+      el.detail.hidden = true;
+    }
+
+    var uniqueTexts = Array.from(new Set(texts.filter(function (s) { return !!s; })));
+    var voiceKeys = Object.keys(TTS_VOICES);
+    var pairs = [];
+    voiceKeys.forEach(function (vk) {
+      uniqueTexts.forEach(function (text) {
+        pairs.push({ voiceKey: vk, voice: TTS_VOICES[vk], text: text });
+      });
+    });
+
+    console.log("[warm] " + uniqueTexts.length + " unique texts × " + voiceKeys.length + " voices = " + pairs.length + " calls to make. Starting…");
+
+    var stats = { hit: 0, miss: 0, error: 0 };
+    var DELAY_MS = 150;
+
+    function wait(ms) {
+      return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    function runNext(i) {
+      if (i >= pairs.length) {
+        console.log("[warm] done — " + stats.hit + " already cached, " + stats.miss + " newly synthesized, " + stats.error + " errors.");
+        return;
+      }
+      var pair = pairs[i];
+      supabaseClient.functions.invoke("tts", { body: { text: pair.text, voice: pair.voice } })
+        .then(function (res) {
+          if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+          if (res.data.cached) {
+            stats.hit++;
+          } else {
+            stats.miss++;
+            console.log("[warm] synthesized (" + pair.voiceKey + "): \"" + pair.text + "\"");
+          }
+        })
+        .catch(function (err) {
+          stats.error++;
+          console.warn("[warm] FAILED (" + pair.voiceKey + "): \"" + pair.text + "\"", err);
+        })
+        .then(function () {
+          if ((i + 1) % 25 === 0 || i + 1 === pairs.length) {
+            console.log("[warm] progress: " + (i + 1) + " / " + pairs.length + " — " + stats.hit + " cached, " + stats.miss + " new, " + stats.error + " errors");
+          }
+          return wait(DELAY_MS);
+        })
+        .then(function () { runNext(i + 1); });
+    }
+
+    runNext(0);
+    return "[warm] started — watch the console for progress.";
+  }
+  window.warmTtsCache = warmTtsCache;
+
   function shuffleArray(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
