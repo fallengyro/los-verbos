@@ -3250,31 +3250,43 @@
     return frag;
   }
 
-  // Once a clip actually starts playing, restarts its .tts-active ring
-  // (see styles.css) as a single revolution timed to the clip's own real
-  // duration, instead of the indefinite 0.9s loop that ring uses by
-  // default while nobody yet knows how long the clip is. Without this, a
-  // short clip (most of what this app plays — single words, one
-  // conjugated form) finishes well before a 0.9s loop completes even
-  // once, so the ring visibly kept chasing after the audio had already
-  // gone quiet — mason flagged this (2026-09-25) the day after the ring
-  // first shipped.
-  // Just changing the CSS custom property that holds the duration
-  // wouldn't restart an already-running animation cleanly — a browser
-  // reinterprets the time it's already spent against the new duration
-  // rather than resetting to 0%, which would jump the ring to some
-  // arbitrary point instead of starting a fresh, full lap. So this
-  // removes .tts-active, forces a reflow (`btn.offsetWidth`) so the
-  // browser actually drops the animation's state, then re-adds it — a
-  // genuinely fresh start, now with the real duration already in place.
+  // Once a clip actually starts playing, nudges its .tts-active ring's
+  // already-running animation to a new speed that lands it on a clean lap
+  // boundary right around when the clip finishes — so it still looks
+  // "done" in step with the audio, without ever restarting or jumping.
+  // Mason flagged this twice (2026-09-25): first that the ring's fixed
+  // 0.9s loop outlasted this app's typically-short clips (single words,
+  // one conjugated form), so it visibly kept chasing after the audio had
+  // already gone quiet; then, after a first fix that restarted the ring
+  // with the real duration baked in, that the restart itself produced a
+  // visible jump the instant playback began. Restarting a CSS animation —
+  // however it's done, even via a forced reflow — always snaps it back to
+  // its 0% frame, which is a pop no matter what duration you give it.
+  // `playbackRate` is the one platform primitive that changes an
+  // animation's speed with no discontinuity at all: the browser just
+  // keeps advancing the exact same animation from wherever it already is,
+  // only faster or slower from this point on. Nothing resets, so there's
+  // nothing to jump.
   function syncChaseToAudio(btn) {
     if (!btn || !ttsAudioEl) return;
     var dur = ttsAudioEl.duration;
-    if (!isFinite(dur) || dur <= 0) return; // unknown length — keep the default loop
-    btn.classList.remove("tts-active", "tts-synced");
-    void btn.offsetWidth; // force reflow so the browser drops the old animation state
-    btn.style.setProperty("--tts-chase-duration", dur + "s");
-    btn.classList.add("tts-active", "tts-synced");
+    if (!isFinite(dur) || dur <= 0) return; // unknown length — leave it at its default pace
+    var anims = btn.getAnimations({ subtree: true });
+    var anim = null;
+    for (var i = 0; i < anims.length; i++) {
+      if (anims[i].animationName === "tts-chase") { anim = anims[i]; break; }
+    }
+    if (!anim) return;
+    // styles.css authors the ring's own base speed as one lap every 0.9s
+    // (`.tts-active::after`'s `animation: tts-chase 0.9s ...`). Picking
+    // the nearest whole number of laps that fit in the clip's remaining
+    // length, then setting playbackRate to make exactly that many laps
+    // take exactly that long, keeps the speed change close to 1x (subtle)
+    // for clips near 0.9s, rather than a big, obvious lurch either way.
+    var baseLapMs = 900;
+    var remainingMs = dur * 1000;
+    var laps = Math.max(1, Math.round(remainingMs / baseLapMs));
+    anim.playbackRate = (laps * baseLapMs) / remainingMs;
   }
 
   // Plays `text` in the currently-selected Azure voice, via the "tts" Edge
@@ -3313,15 +3325,12 @@
       // playing previous clip, this new tap is about to cut that playback
       // off, so clear its ring now rather than leaving it stuck on with
       // nothing actually playing behind it.
-      if (ttsActiveEl && ttsActiveEl !== btn) {
-        ttsActiveEl.classList.remove("tts-active", "tts-synced");
-        ttsActiveEl.style.removeProperty("--tts-chase-duration");
-      }
+      if (ttsActiveEl && ttsActiveEl !== btn) ttsActiveEl.classList.remove("tts-active");
       ttsActiveEl = btn;
-      // Starts as styles.css's plain indefinite loop — the real clip
-      // length isn't known yet. syncChaseToAudio() below swaps this to a
-      // single, exactly-timed revolution once playback actually begins.
-      btn.classList.remove("tts-synced");
+      // Starts at styles.css's default pace (one lap every 0.9s) — the
+      // real clip length isn't known yet. syncChaseToAudio() below
+      // adjusts this same running animation's speed, without restarting
+      // it, once playback actually begins.
       btn.classList.add("tts-active");
     }
 
@@ -3382,17 +3391,13 @@
         // for us, so onended firing late (or never, its src having since
         // moved on) has nothing left to clean up.
         ttsAudioEl.onended = function () {
-          if (btn) {
-            btn.classList.remove("tts-active", "tts-synced");
-            btn.style.removeProperty("--tts-chase-duration");
-          }
+          if (btn) btn.classList.remove("tts-active");
           if (ttsActiveEl === btn) ttsActiveEl = null;
         };
         return ttsAudioEl.play().then(function () {
           // Now that the clip is actually playing, its real duration is
-          // known — sync the ring's animation to it (see syncChaseToAudio()
-          // above) so it finishes exactly as the clip does, rather than
-          // looping on its own fixed 0.9s cadence regardless of clip length.
+          // known — nudge the ring's already-running animation to match it
+          // (see syncChaseToAudio() above), with no restart and no jump.
           syncChaseToAudio(btn);
           var totalMs = msSince(ttsStartedAt);
           console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
@@ -3402,10 +3407,7 @@
         var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
-        if (btn) {
-          btn.classList.remove("tts-active", "tts-synced");
-          btn.style.removeProperty("--tts-chase-duration");
-        }
+        if (btn) btn.classList.remove("tts-active");
         if (ttsActiveEl === btn) ttsActiveEl = null;
       })
       .then(function () {
