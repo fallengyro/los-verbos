@@ -68,7 +68,7 @@
       auth_password_label: "Contraseña",
       auth_submit_login: "Entrar",
       logout_btn: "Cerrar sesión",
-      acct_menu_aria: "Menú de cuenta",
+      settings_btn_label: "Configuración",
       nav_verbs: "Verbos",
       nav_words: "Vocabulario",
       nav_phrases: "Frases",
@@ -326,7 +326,7 @@
       auth_password_label: "Password",
       auth_submit_login: "Log in",
       logout_btn: "Log out",
-      acct_menu_aria: "Account menu",
+      settings_btn_label: "Settings",
       nav_verbs: "Verbs",
       nav_words: "Vocabulary",
       nav_phrases: "Phrases",
@@ -718,27 +718,6 @@
 
   function closeSettings() {
     el.settingsOverlay.hidden = true;
-  }
-
-  // Account menu (2026-09-25) — the kebab trigger opposite the "voseá"
-  // wordmark that replaced the old always-visible email/settings/logout
-  // row. Unlike the app's modals (settings, list filter, etc.), which sit
-  // behind a full-screen dim .modal-overlay and only close via an explicit
-  // button, this is a small popover with nothing behind it — so it also
-  // needs to close on an outside click, which is new for this codebase.
-  function closeAcctMenu() {
-    el.acctMenu.hidden = true;
-    el.acctTrigger.setAttribute("aria-expanded", "false");
-  }
-
-  function toggleAcctMenu(evt) {
-    evt.stopPropagation();
-    var willOpen = el.acctMenu.hidden;
-    closeAcctMenu();
-    if (willOpen) {
-      el.acctMenu.hidden = false;
-      el.acctTrigger.setAttribute("aria-expanded", "true");
-    }
   }
 
   // Re-paints everything that was already rendered before the language
@@ -1168,11 +1147,9 @@
     authPassword: document.getElementById("auth-password"),
     authSubmit: document.getElementById("auth-submit"),
     authMsg: document.getElementById("auth-msg"),
-    acctTrigger: document.getElementById("acct-trigger"),
-    acctMenu: document.getElementById("acct-menu"),
-    acctMenuEmail: document.getElementById("acct-menu-email"),
-    acctMenuSettings: document.getElementById("acct-menu-settings"),
-    acctMenuLogout: document.getElementById("acct-menu-logout"),
+    userEmail: document.getElementById("user-email"),
+    logoutBtn: document.getElementById("logout-btn"),
+    settingsBtn: document.getElementById("settings-btn"),
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
     settingsClose: document.getElementById("settings-close"),
@@ -3233,60 +3210,14 @@
     var originalLabel = btn ? btn.innerHTML : "";
     if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
 
-    // Temporary diagnostic (2026-09-25): the Edge Function already knows
-    // whether it served a cached clip or paid for a fresh Azure synthesis
-    // (res.data.cached), but until now the client just threw that away.
-    // Logging it here — with the round-trip time — lets us see directly in
-    // the browser console whether "it feels slow sometimes" is really Azure
-    // being re-hit on already-heard content, or just normal Edge
-    // Function/network latency on a genuine cache hit. Safe to leave in
-    // permanently (console.log, no UI change, negligible cost); pull it out
-    // later if it stops being useful.
-    //
-    // Deliberately console.log, not console.debug (as originally shipped):
-    // Chrome DevTools buckets console.debug() under its "Verbose" level,
-    // which is hidden from the console by default — so these lines were
-    // silently invisible unless that filter was manually enabled, defeating
-    // the entire point of a diagnostic someone's supposed to just glance at.
-    // Found 2026-09-25 when mason filtered the console for "[tts]" while
-    // testing warmTtsCache()'s effect and saw nothing at all, even on a
-    // word already confirmed warmed.
-    //
-    // Second gap found the same day: the original version only timed the
-    // Edge Function round trip (getting back {url, cached}), not the actual
-    // audio. Even on a genuine cache hit, the browser still has to fetch the
-    // real audio bytes from that URL before anything is audible — a step
-    // that's fast on a REPEAT play of the same URL (the browser's own HTTP
-    // cache already has it — the upload sets a 1-year cache header) but not
-    // on the first play of a given clip in this browser session, which is
-    // very likely the actual source of "first tap feels slower than the
-    // second." Now timing both phases separately so that's visible directly
-    // instead of inferred.
-    var ttsStartedAt = (window.performance && performance.now) ? performance.now() : Date.now();
-    function msSince(t0) {
-      var now = (window.performance && performance.now) ? performance.now() : Date.now();
-      return Math.round(now - t0);
-    }
-
     supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
       .then(function (res) {
-        var edgeMs = msSince(ttsStartedAt);
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
-        if (res.data.cached) {
-          console.log("%c[tts] cache hit%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
-        } else {
-          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
-        }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
-        return ttsAudioEl.play().then(function () {
-          var totalMs = msSince(ttsStartedAt);
-          console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
-        });
+        return ttsAudioEl.play();
       })
-      .catch(function (err) {
-        var elapsedMs = msSince(ttsStartedAt);
-        console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
+      .catch(function () {
         msgEl.textContent = t("tts_error");
       })
       .then(function () {
@@ -3294,167 +3225,6 @@
         if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
       });
   }
-
-  // ================= TTS cache warming (console utility, 2026-09-25) =================
-  // Not a UI feature — there's no button for this anywhere. It's a maintenance
-  // operation mason runs himself from the browser console (already signed in
-  // as himself) to pre-synthesize every piece of Spanish text the app can
-  // currently speak, for both voices, so real usage later always hits an
-  // instant cache hit instead of paying Azure's synthesis latency the first
-  // time a given form/word/phrase gets tapped. The Edge Function's cache is
-  // content-addressed (sha256 of voice+text) and shared across all accounts,
-  // so this benefits everyone, not just whoever runs it.
-  //
-  // Deliberately NOT something this codebase's author (Claude) can trigger
-  // directly against the live backend — there's no service-role key or any
-  // other credential available here, by design (see the project brief's
-  // working agreement). This just exposes the capability; mason runs
-  // `warmTtsCache()` from the console himself, using his own real session.
-  //
-  // Reuses selectVerb()'s actual rendering to decide which conjugated forms
-  // are "speakable" (imperativo's yo-less/merged-usted-ustedes quirks, the
-  // personal-vs-dativo gustar_like split, etc.) rather than re-deriving that
-  // logic a second time here — whatever selectVerb() marks .speakable IS the
-  // set of verb forms a real user can tap to hear, by definition.
-  function collectSpeakableTextsForVerb(id) {
-    var texts = [];
-    var entry = allVerbs.find(function (v) { return v.id === id; });
-    if (!entry) return texts;
-    if (entry.data.infinitive) texts.push(entry.data.infinitive);
-
-    function renderAndCollect(tab) {
-      detailGustarTab = tab;
-      selectVerb(id);
-      var cells = el.dConjBody.querySelectorAll("td.speakable");
-      cells.forEach(function (td) {
-        var real = td.querySelector(".real");
-        var text = real ? real.textContent : td.textContent;
-        if (text && text !== "—") texts.push(text);
-      });
-      if (el.dGerundio.classList.contains("speakable")) texts.push(el.dGerundio.textContent);
-      if (el.dParticipio.classList.contains("speakable")) texts.push(el.dParticipio.textContent);
-    }
-
-    renderAndCollect("personal");
-    // A verb that's both gustar_like and also_personal_use (e.g. "parecer")
-    // renders genuinely different spoken text depending on which tab is
-    // active (regular conjugation vs. "me parece" style) — both need warming.
-    if (entry.data.gustar_like && entry.data.also_personal_use) {
-      renderAndCollect("dativo");
-    }
-    return texts;
-  }
-
-  function collectAllSpeakableTexts() {
-    var texts = [];
-
-    allWords.forEach(function (w) { if (w.data.word) texts.push(w.data.word); });
-    STARTER_WORDS.forEach(function (w) { if (w.word) texts.push(w.word); });
-
-    allPhrases.forEach(function (p) { if (p.data.phrase) texts.push(p.data.phrase); });
-    STARTER_PHRASES.forEach(function (p) { if (p.phrase) texts.push(p.phrase); });
-
-    var existingInfinitives = {};
-    allVerbs.forEach(function (v) { existingInfinitives[norm(v.data.infinitive || "")] = true; });
-    allVerbs.forEach(function (v) {
-      texts = texts.concat(collectSpeakableTextsForVerb(v.id));
-    });
-
-    // Starter verbs aren't in allVerbs (they're only offered via the "seed"
-    // buttons on an empty account) — temporarily splice synthetic {id, data}
-    // entries in so selectVerb() can render them exactly like a real saved
-    // verb, then splice them back out. Skip any starter verb whose
-    // infinitive the account already has saved, so it isn't warmed twice.
-    var synthetic = [];
-    STARTER_VERBS.forEach(function (sv, i) {
-      if (existingInfinitives[norm(sv.infinitive || "")]) return;
-      synthetic.push({ id: "__warm_starter_verb_" + i, data: sv });
-    });
-    synthetic.forEach(function (se) { allVerbs.push(se); });
-    synthetic.forEach(function (se) {
-      texts = texts.concat(collectSpeakableTextsForVerb(se.id));
-    });
-    if (synthetic.length) allVerbs.splice(allVerbs.length - synthetic.length, synthetic.length);
-
-    return texts;
-  }
-
-  function warmTtsCache() {
-    if (!currentUser) {
-      console.error("[warm] Sign in first — this needs your real session to call the tts function.");
-      return;
-    }
-
-    // Remember what the detail pane was showing before we start, so we can
-    // put it back — collectSpeakableTextsForVerb() drives selectVerb() over
-    // and over, which means the verb detail card will visibly flicker
-    // through every verb in the collection while this runs. Expected; just
-    // don't run this mid-lesson.
-    var originalSelectedId = selectedId;
-    var originalGustarTab = detailGustarTab;
-
-    var texts = collectAllSpeakableTexts();
-
-    if (originalSelectedId && allVerbs.some(function (v) { return v.id === originalSelectedId; })) {
-      detailGustarTab = originalGustarTab;
-      selectVerb(originalSelectedId);
-    } else {
-      selectedId = null;
-      detailGustarTab = "personal";
-      el.detail.hidden = true;
-    }
-
-    var uniqueTexts = Array.from(new Set(texts.filter(function (s) { return !!s; })));
-    var voiceKeys = Object.keys(TTS_VOICES);
-    var pairs = [];
-    voiceKeys.forEach(function (vk) {
-      uniqueTexts.forEach(function (text) {
-        pairs.push({ voiceKey: vk, voice: TTS_VOICES[vk], text: text });
-      });
-    });
-
-    console.log("[warm] " + uniqueTexts.length + " unique texts × " + voiceKeys.length + " voices = " + pairs.length + " calls to make. Starting…");
-
-    var stats = { hit: 0, miss: 0, error: 0 };
-    var DELAY_MS = 150;
-
-    function wait(ms) {
-      return new Promise(function (resolve) { setTimeout(resolve, ms); });
-    }
-
-    function runNext(i) {
-      if (i >= pairs.length) {
-        console.log("[warm] done — " + stats.hit + " already cached, " + stats.miss + " newly synthesized, " + stats.error + " errors.");
-        return;
-      }
-      var pair = pairs[i];
-      supabaseClient.functions.invoke("tts", { body: { text: pair.text, voice: pair.voice } })
-        .then(function (res) {
-          if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
-          if (res.data.cached) {
-            stats.hit++;
-          } else {
-            stats.miss++;
-            console.log("[warm] synthesized (" + pair.voiceKey + "): \"" + pair.text + "\"");
-          }
-        })
-        .catch(function (err) {
-          stats.error++;
-          console.warn("[warm] FAILED (" + pair.voiceKey + "): \"" + pair.text + "\"", err);
-        })
-        .then(function () {
-          if ((i + 1) % 25 === 0 || i + 1 === pairs.length) {
-            console.log("[warm] progress: " + (i + 1) + " / " + pairs.length + " — " + stats.hit + " cached, " + stats.miss + " new, " + stats.error + " errors");
-          }
-          return wait(DELAY_MS);
-        })
-        .then(function () { runNext(i + 1); });
-    }
-
-    runNext(0);
-    return "[warm] started — watch the console for progress.";
-  }
-  window.warmTtsCache = warmTtsCache;
 
   function shuffleArray(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
@@ -5032,7 +4802,7 @@
     if (currentUser) {
       el.authScreen.hidden = true;
       el.appScreen.hidden = false;
-      el.acctMenuEmail.textContent = currentUser.email || "";
+      el.userEmail.textContent = currentUser.email || "";
       loadUserSettings();
       loadVerbs();
       loadWords();
@@ -5124,24 +4894,8 @@
   el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
   el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
   el.authForm.addEventListener("submit", handleAuthSubmit);
-  el.acctTrigger.addEventListener("click", toggleAcctMenu);
-  el.acctMenuSettings.addEventListener("click", function () {
-    closeAcctMenu();
-    openSettings();
-  });
-  el.acctMenuLogout.addEventListener("click", function () {
-    closeAcctMenu();
-    supabaseClient.auth.signOut();
-  });
-  // Only this one document-level listener is needed for the outside-click
-  // close, since the account menu is the only popover of its kind in the
-  // app right now — if a second one is ever added, this should become a
-  // shared helper rather than duplicated.
-  document.addEventListener("click", function (evt) {
-    if (!el.acctMenu.hidden && !evt.target.closest(".acct-menu-wrap")) {
-      closeAcctMenu();
-    }
-  });
+  el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
+  el.settingsBtn.addEventListener("click", openSettings);
   el.settingsClose.addEventListener("click", closeSettings);
   el.langEs.addEventListener("click", function () { setLang("es"); });
   el.langEn.addEventListener("click", function () { setLang("en"); });
