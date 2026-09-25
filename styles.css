@@ -583,6 +583,11 @@
   .detail .example-note::after { content: "\201D"; color: var(--ink-soft); }
 
   .conj-hint { display: none; }
+  /* Unlike .conj-hint (mobile-only — desktop has no horizontal scroll to
+     explain), this one applies at every width: tapping a form to hear it
+     isn't discoverable from a hover affordance alone on a touch device,
+     and even on desktop it's a new-enough interaction to call out once. */
+  .conj-tap-hint { font-size: 11px; font-style: italic; color: var(--ink-soft); margin: 0 0 4px; }
   .conj-wrap { display: flex; align-items: flex-start; }
   .conj-scroll { overflow-x: auto; flex: 1 1 auto; min-width: 0; margin-right: -22px; padding-right: 22px; }
   table.conj { border-collapse: collapse; width: 100%; min-width: 560px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
@@ -641,6 +646,21 @@
   }
   table.conj tbody tr.impersonal-row td { color: var(--accent-deep); }
 
+  /* Tap-to-hear: app.js (selectVerb) only adds this class to a cell that
+     actually has a real form to speak — a bare "—" cell (no imperativo for
+     "yo", an unfilled tense, etc.) never gets it, so the pointer cursor and
+     hover ring only ever appear where a tap does something. An inset
+     box-shadow rather than a background-color, so it reads clearly over an
+     .irreg cell's own brick-soft background too, not just the plain ones.
+     playTts() (see app.js) swaps the cell's own text for "…" while a
+     request is in flight, so no separate loading/pulse state is needed
+     here — the same treatment flashcard/detail speak buttons already use. */
+  table.conj tbody td.speakable { cursor: pointer; }
+  table.conj tbody td.speakable:hover, table.conj tbody td.speakable:focus-visible {
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+    outline: none;
+  }
+
   /* frozen pronoun column, as its own small table beside the scrolling one
      rather than a sticky cell inside it (sticky-in-table renders unreliably,
      especially in mobile Safari, causing the column to visibly pop/duplicate
@@ -670,6 +690,14 @@
   .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
   .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }
   .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
+  /* Same tap-to-hear treatment as table.conj tbody td.speakable above,
+     applied to the gerundio/participio tiles — small negative-margin trick
+     so the hover ring's padding doesn't shift surrounding text. */
+  .nonpersonal .tile .val.speakable { cursor: pointer; padding: 1px 4px; margin: -1px -4px; border-radius: 4px; }
+  .nonpersonal .tile .val.speakable:hover, .nonpersonal .tile .val.speakable:focus-visible {
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+    outline: none;
+  }
 
   .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .add-toggle {

@@ -107,6 +107,7 @@
       list_filter_no_matches: "Ninguna lista coincide con “{q}”.",
       filters_clear: "Limpiar filtros",
       conj_hint: "deslizá para ver todos los tiempos →",
+      conj_tap_hint: "Tocá cualquier forma para escucharla",
       mood_indicativo: "Indicativo",
       mood_subjuntivo: "Subjuntivo",
       mood_imperativo: "Imperativo",
@@ -364,6 +365,7 @@
       list_filter_no_matches: "No lists match “{q}”.",
       filters_clear: "Clear filters",
       conj_hint: "swipe to see all tenses →",
+      conj_tap_hint: "Tap any form to hear it",
       mood_indicativo: "Indicative",
       mood_subjuntivo: "Subjunctive",
       mood_imperativo: "Imperative",
@@ -1165,6 +1167,8 @@
     detail: document.getElementById("detail"),
     dInfinitive: document.getElementById("d-infinitive"),
     dDefinition: document.getElementById("d-definition"),
+    dSpeak: document.getElementById("d-speak"),
+    dTtsMsg: document.getElementById("d-tts-msg"),
     dBadges: document.getElementById("d-badges"),
     dPattern: document.getElementById("d-pattern"),
     dPreposicion: document.getElementById("d-preposicion"),
@@ -1797,6 +1801,7 @@
     el.dPattern.style.display = data.pattern ? "" : "none";
     el.dPreposicion.textContent = data.preposicion ? t("preposicion_note", { prep: data.preposicion }) : "";
     el.dPreposicion.style.display = data.preposicion ? "" : "none";
+    el.dTtsMsg.textContent = "";
 
     var imper = forms.imperativo || {};
     var hasImperativo = IMPERATIVE_PERSONS.some(function (p) { return imper[p.key]; });
@@ -1816,10 +1821,12 @@
       }
       if (personKey === "vos") {
         td.textContent = imper.vos || "—";
+        if (imper.vos) td.classList.add("speakable");
         return td;
       }
       if (personKey === "nosotros") {
         td.textContent = imper.nosotros || "—";
+        if (imper.nosotros) td.classList.add("speakable");
         return td;
       }
       var realVal = personKey === "el" ? imper.usted : imper.ustedes;
@@ -1832,6 +1839,10 @@
       real.className = "real";
       real.textContent = realVal || "—";
       td.appendChild(real);
+      // Speakable text here is just the .real span (usted/ustedes) — not
+      // the full "— / — / <real>" td.textContent — see the tap-to-hear
+      // click handler below, which special-cases td.imp-col for this.
+      if (realVal) td.classList.add("speakable");
       return td;
     }
 
@@ -1851,22 +1862,28 @@
       TENSES.forEach(function (t) {
         var td = document.createElement("td");
         if (effectiveGustar) {
-          td.textContent = gustarCellText(forms, t.key, p.key);
+          var gText = gustarCellText(forms, t.key, p.key);
+          td.textContent = gText;
+          if (gText !== "—") td.classList.add("speakable");
         } else {
           var val = (forms[t.key] && forms[t.key][p.key]) || "";
           td.textContent = val || "—";
           if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
+          if (val) td.classList.add("speakable");
         }
         tr.appendChild(td);
       });
       SUBJ_TENSES.forEach(function (t) {
         var tdSubj = document.createElement("td");
         if (effectiveGustar) {
-          tdSubj.textContent = gustarCellText(forms, t.key, p.key);
+          var gSubjText = gustarCellText(forms, t.key, p.key);
+          tdSubj.textContent = gSubjText;
+          if (gSubjText !== "—") tdSubj.classList.add("speakable");
         } else {
           var subjVal = (forms[t.key] && forms[t.key][p.key]) || "";
           tdSubj.textContent = subjVal || "—";
           if (isCellIrregular(data, t.key, p.key, subjVal)) tdSubj.classList.add("irreg");
+          if (subjVal) tdSubj.classList.add("speakable");
         }
         tr.appendChild(tdSubj);
       });
@@ -1889,11 +1906,13 @@
       TENSES.forEach(function (t) {
         var td = document.createElement("td");
         td.textContent = imp[t.key] || "—";
+        if (imp[t.key]) td.classList.add("speakable");
         impTr.appendChild(td);
       });
       SUBJ_TENSES.forEach(function (t) {
         var impTdSubj = document.createElement("td");
         impTdSubj.textContent = imp[t.key] || "—";
+        if (imp[t.key]) impTdSubj.classList.add("speakable");
         impTr.appendChild(impTdSubj);
       });
       // impersonal verbs (llover, nevar) have no imperativo at all
@@ -1905,7 +1924,9 @@
     }
 
     el.dGerundio.textContent = forms.gerundio || "—";
+    el.dGerundio.classList.toggle("speakable", !!forms.gerundio);
     el.dParticipio.textContent = forms.participio || "—";
+    el.dParticipio.classList.toggle("speakable", !!forms.participio);
 
     el.detail.hidden = false;
     el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -4916,6 +4937,33 @@
     if (detailGustarTab === "dativo") return;
     detailGustarTab = "dativo";
     if (selectedId) selectVerb(selectedId);
+  });
+  el.dSpeak.addEventListener("click", function () {
+    var entry = allVerbs.find(function (v) { return v.id === selectedId; });
+    if (entry) playTts(entry.data.infinitive, el.dSpeak, el.dTtsMsg);
+  });
+  // Tap-any-conjugated-form-to-hear-it: one delegated listener on the whole
+  // tbody rather than a button per cell (there are 35+ of them) — see
+  // selectVerb() above for where td.speakable gets added (only to cells
+  // that actually have a real form, never a bare "—"). The merged
+  // usted/ustedes imperativo cell ("— / — / <real>", td.imp-col) is a
+  // special case: its speakable text is just the .real span, not the
+  // cell's full textContent, which would otherwise include the dash
+  // placeholder and slashes.
+  el.dConjBody.addEventListener("click", function (evt) {
+    var td = evt.target.closest("td.speakable");
+    if (!td || !el.dConjBody.contains(td)) return;
+    var real = td.querySelector(".real");
+    var text = real ? real.textContent : td.textContent;
+    playTts(text, td, el.dTtsMsg);
+  });
+  el.dGerundio.addEventListener("click", function () {
+    if (!el.dGerundio.classList.contains("speakable")) return;
+    playTts(el.dGerundio.textContent, el.dGerundio, el.dTtsMsg);
+  });
+  el.dParticipio.addEventListener("click", function () {
+    if (!el.dParticipio.classList.contains("speakable")) return;
+    playTts(el.dParticipio.textContent, el.dParticipio, el.dTtsMsg);
   });
   el.dEdit.addEventListener("click", function () {
     var entry = allVerbs.find(function (v) { return v.id === selectedId; });
