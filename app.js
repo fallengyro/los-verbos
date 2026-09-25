@@ -3250,6 +3250,33 @@
     return frag;
   }
 
+  // Once a clip actually starts playing, restarts its .tts-active ring
+  // (see styles.css) as a single revolution timed to the clip's own real
+  // duration, instead of the indefinite 0.9s loop that ring uses by
+  // default while nobody yet knows how long the clip is. Without this, a
+  // short clip (most of what this app plays — single words, one
+  // conjugated form) finishes well before a 0.9s loop completes even
+  // once, so the ring visibly kept chasing after the audio had already
+  // gone quiet — mason flagged this (2026-09-25) the day after the ring
+  // first shipped.
+  // Just changing the CSS custom property that holds the duration
+  // wouldn't restart an already-running animation cleanly — a browser
+  // reinterprets the time it's already spent against the new duration
+  // rather than resetting to 0%, which would jump the ring to some
+  // arbitrary point instead of starting a fresh, full lap. So this
+  // removes .tts-active, forces a reflow (`btn.offsetWidth`) so the
+  // browser actually drops the animation's state, then re-adds it — a
+  // genuinely fresh start, now with the real duration already in place.
+  function syncChaseToAudio(btn) {
+    if (!btn || !ttsAudioEl) return;
+    var dur = ttsAudioEl.duration;
+    if (!isFinite(dur) || dur <= 0) return; // unknown length — keep the default loop
+    btn.classList.remove("tts-active", "tts-synced");
+    void btn.offsetWidth; // force reflow so the browser drops the old animation state
+    btn.style.setProperty("--tts-chase-duration", dur + "s");
+    btn.classList.add("tts-active", "tts-synced");
+  }
+
   // Plays `text` in the currently-selected Azure voice, via the "tts" Edge
   // Function (see supabase/functions/tts/index.ts) — app.js never talks to
   // Azure directly, and never sees the Azure key. `btn` is the speaker
@@ -3286,8 +3313,15 @@
       // playing previous clip, this new tap is about to cut that playback
       // off, so clear its ring now rather than leaving it stuck on with
       // nothing actually playing behind it.
-      if (ttsActiveEl && ttsActiveEl !== btn) ttsActiveEl.classList.remove("tts-active");
+      if (ttsActiveEl && ttsActiveEl !== btn) {
+        ttsActiveEl.classList.remove("tts-active", "tts-synced");
+        ttsActiveEl.style.removeProperty("--tts-chase-duration");
+      }
       ttsActiveEl = btn;
+      // Starts as styles.css's plain indefinite loop — the real clip
+      // length isn't known yet. syncChaseToAudio() below swaps this to a
+      // single, exactly-timed revolution once playback actually begins.
+      btn.classList.remove("tts-synced");
       btn.classList.add("tts-active");
     }
 
@@ -3348,10 +3382,18 @@
         // for us, so onended firing late (or never, its src having since
         // moved on) has nothing left to clean up.
         ttsAudioEl.onended = function () {
-          if (btn) btn.classList.remove("tts-active");
+          if (btn) {
+            btn.classList.remove("tts-active", "tts-synced");
+            btn.style.removeProperty("--tts-chase-duration");
+          }
           if (ttsActiveEl === btn) ttsActiveEl = null;
         };
         return ttsAudioEl.play().then(function () {
+          // Now that the clip is actually playing, its real duration is
+          // known — sync the ring's animation to it (see syncChaseToAudio()
+          // above) so it finishes exactly as the clip does, rather than
+          // looping on its own fixed 0.9s cadence regardless of clip length.
+          syncChaseToAudio(btn);
           var totalMs = msSince(ttsStartedAt);
           console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
         });
@@ -3360,7 +3402,10 @@
         var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
-        if (btn) btn.classList.remove("tts-active");
+        if (btn) {
+          btn.classList.remove("tts-active", "tts-synced");
+          btn.style.removeProperty("--tts-chase-duration");
+        }
         if (ttsActiveEl === btn) ttsActiveEl = null;
       })
       .then(function () {

@@ -820,7 +820,17 @@
      angle instead keeps the ring's own box perfectly still and just sweeps
      the color around it, which looks right on every shape. In a browser
      that doesn't support @property, --tts-angle just won't visibly
-     animate — the ring still shows, static, which is a fine fallback. */
+     animate — the ring still shows, static, which is a fine fallback.
+     Duration: defaults to a 0.9s repeating loop (--tts-chase-duration
+     unset) for the "waiting on the network" phase, where there's no
+     length to sync to yet. Once playback actually starts, app.js's
+     playTts() (now that it knows the real clip length from the audio
+     element itself) sets --tts-chase-duration to that exact duration and
+     adds .tts-synced, which switches the loop to a single revolution —
+     so the ring completes right as the clip finishes instead of looping
+     on its own fixed 0.9s cadence regardless of how long the clip is.
+     Mason flagged (2026-09-25) that the ring was visibly still chasing
+     after short clips had already finished playing — this is the fix. */
   @property --tts-angle {
     syntax: "<angle>";
     inherits: false;
@@ -836,9 +846,15 @@
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
             mask-composite: exclude;
-    animation: tts-chase 0.9s linear infinite;
+    animation: tts-chase var(--tts-chase-duration, 0.9s) linear infinite;
     pointer-events: none;
     z-index: 3;
+  }
+  .tts-active.tts-synced::after {
+    /* Once app.js knows the real clip length, one clean revolution
+       spanning exactly --tts-chase-duration replaces the indefinite
+       0.9s loop above — see the comment block above this rule. */
+    animation-iteration-count: 1;
   }
   @keyframes tts-chase {
     to { --tts-angle: 360deg; }
