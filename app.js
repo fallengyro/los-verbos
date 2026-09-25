@@ -58,6 +58,8 @@
   })();
   var ttsAudioEl = null; // lazily created single <audio> element, reused for every play
   var ttsInFlight = false; // guards against overlapping requests from rapid double-taps
+  var ttsPrefetched = {}; // "voiceKey\u0000text" -> true, so prefetchTts() never re-fetches the same clip twice in a session
+  var warmTtsCacheRunning = false; // true only while warmTtsCache() is actively driving selectVerb() itself — see prefetchTts()
 
   var I18N = {
     es: {
@@ -68,7 +70,7 @@
       auth_password_label: "Contraseña",
       auth_submit_login: "Entrar",
       logout_btn: "Cerrar sesión",
-      settings_btn_label: "Configuración",
+      acct_menu_aria: "Menú de cuenta",
       nav_verbs: "Verbos",
       nav_words: "Vocabulario",
       nav_phrases: "Frases",
@@ -326,7 +328,7 @@
       auth_password_label: "Password",
       auth_submit_login: "Log in",
       logout_btn: "Log out",
-      settings_btn_label: "Settings",
+      acct_menu_aria: "Account menu",
       nav_verbs: "Verbs",
       nav_words: "Vocabulary",
       nav_phrases: "Phrases",
@@ -718,6 +720,27 @@
 
   function closeSettings() {
     el.settingsOverlay.hidden = true;
+  }
+
+  // Account menu (2026-09-25) — the kebab trigger opposite the "voseá"
+  // wordmark that replaced the old always-visible email/settings/logout
+  // row. Unlike the app's modals (settings, list filter, etc.), which sit
+  // behind a full-screen dim .modal-overlay and only close via an explicit
+  // button, this is a small popover with nothing behind it — so it also
+  // needs to close on an outside click, which is new for this codebase.
+  function closeAcctMenu() {
+    el.acctMenu.hidden = true;
+    el.acctTrigger.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleAcctMenu(evt) {
+    evt.stopPropagation();
+    var willOpen = el.acctMenu.hidden;
+    closeAcctMenu();
+    if (willOpen) {
+      el.acctMenu.hidden = false;
+      el.acctTrigger.setAttribute("aria-expanded", "true");
+    }
   }
 
   // Re-paints everything that was already rendered before the language
@@ -1147,9 +1170,11 @@
     authPassword: document.getElementById("auth-password"),
     authSubmit: document.getElementById("auth-submit"),
     authMsg: document.getElementById("auth-msg"),
-    userEmail: document.getElementById("user-email"),
-    logoutBtn: document.getElementById("logout-btn"),
-    settingsBtn: document.getElementById("settings-btn"),
+    acctTrigger: document.getElementById("acct-trigger"),
+    acctMenu: document.getElementById("acct-menu"),
+    acctMenuEmail: document.getElementById("acct-menu-email"),
+    acctMenuSettings: document.getElementById("acct-menu-settings"),
+    acctMenuLogout: document.getElementById("acct-menu-logout"),
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
     settingsClose: document.getElementById("settings-close"),
@@ -1770,6 +1795,13 @@
     var entry = allVerbs.find(function (v) { return v.id === id; });
     if (!entry) { el.detail.hidden = true; return; }
     var data = entry.data;
+    // Quietly starts downloading the infinitive's audio the moment the verb
+    // detail page opens, so it's likely already in the browser's cache by
+    // the time someone taps the speak button — see prefetchTts() above. Just
+    // the infinitive, not the whole conjugation table: individual cells stay
+    // fetch-on-tap only, so glancing through many verbs doesn't download
+    // audio for forms nobody actually asked to hear.
+    prefetchTts(data.infinitive);
     var forms = data.forms || {};
     // A verb can be gustar_like AND also_personal_use (e.g. "parecer") — the
     // stored forms are identical either way, only the reinterpretation
@@ -2418,6 +2450,7 @@
     var entry = allWords.find(function (v) { return v.id === id; });
     if (!entry) { el.wordDetail.hidden = true; return; }
     var data = entry.data;
+    prefetchTts(data.word); // see prefetchTts() above
 
     el.wdWord.textContent = data.word || id;
     el.wdDefinition.textContent = data.definition || "";
@@ -2682,6 +2715,7 @@
     var entry = allPhrases.find(function (v) { return v.id === id; });
     if (!entry) { el.phraseDetail.hidden = true; return; }
     var data = entry.data;
+    prefetchTts(data.phrase); // see prefetchTts() above
 
     el.pdPhrase.textContent = data.phrase || id;
     el.pdDefinition.textContent = data.definition || "";
@@ -3210,14 +3244,60 @@
     var originalLabel = btn ? btn.innerHTML : "";
     if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
 
+    // Temporary diagnostic (2026-09-25): the Edge Function already knows
+    // whether it served a cached clip or paid for a fresh Azure synthesis
+    // (res.data.cached), but until now the client just threw that away.
+    // Logging it here — with the round-trip time — lets us see directly in
+    // the browser console whether "it feels slow sometimes" is really Azure
+    // being re-hit on already-heard content, or just normal Edge
+    // Function/network latency on a genuine cache hit. Safe to leave in
+    // permanently (console.log, no UI change, negligible cost); pull it out
+    // later if it stops being useful.
+    //
+    // Deliberately console.log, not console.debug (as originally shipped):
+    // Chrome DevTools buckets console.debug() under its "Verbose" level,
+    // which is hidden from the console by default — so these lines were
+    // silently invisible unless that filter was manually enabled, defeating
+    // the entire point of a diagnostic someone's supposed to just glance at.
+    // Found 2026-09-25 when mason filtered the console for "[tts]" while
+    // testing warmTtsCache()'s effect and saw nothing at all, even on a
+    // word already confirmed warmed.
+    //
+    // Second gap found the same day: the original version only timed the
+    // Edge Function round trip (getting back {url, cached}), not the actual
+    // audio. Even on a genuine cache hit, the browser still has to fetch the
+    // real audio bytes from that URL before anything is audible — a step
+    // that's fast on a REPEAT play of the same URL (the browser's own HTTP
+    // cache already has it — the upload sets a 1-year cache header) but not
+    // on the first play of a given clip in this browser session, which is
+    // very likely the actual source of "first tap feels slower than the
+    // second." Now timing both phases separately so that's visible directly
+    // instead of inferred.
+    var ttsStartedAt = (window.performance && performance.now) ? performance.now() : Date.now();
+    function msSince(t0) {
+      var now = (window.performance && performance.now) ? performance.now() : Date.now();
+      return Math.round(now - t0);
+    }
+
     supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
       .then(function (res) {
+        var edgeMs = msSince(ttsStartedAt);
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+        if (res.data.cached) {
+          console.log("%c[tts] cache hit%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
+        } else {
+          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
+        }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
-        return ttsAudioEl.play();
+        return ttsAudioEl.play().then(function () {
+          var totalMs = msSince(ttsStartedAt);
+          console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
+        });
       })
-      .catch(function () {
+      .catch(function (err) {
+        var elapsedMs = msSince(ttsStartedAt);
+        console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
       })
       .then(function () {
@@ -3225,6 +3305,242 @@
         if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
       });
   }
+
+  // Quietly downloads a clip's audio bytes into the browser's own HTTP cache
+  // *before* anyone taps a speaker button, so that by the time they do, the
+  // real playTts() call below is hitting the browser's own cache instead of
+  // paying the ~0.5-1.5s first-time network fetch (see playTts()'s two-phase
+  // timing above, and the project brief's "TTS cache warming" section for
+  // the "barato" evidence that pinned this down).
+  //
+  // Added 2026-09-25, same day as the warming-vs-per-device-caching
+  // discussion above: mason's own proposal, once he'd seen that discussion,
+  // was to fetch a card's audio the moment it's actually displayed rather
+  // than the whole library up front — since a flashcard or detail page sits
+  // on screen for a beat before anyone taps anything, that gap is enough
+  // time for the fetch to finish quietly in the background. This is
+  // deliberately much lighter than the bulk-audio-prefetch idea mason
+  // turned down: it only ever downloads bytes for content someone is
+  // actually looking at right now, so total data used stays proportional to
+  // how much of the app someone actually browses, not the size of the
+  // library.
+  //
+  // Calls the same "tts" Edge Function warmTtsCache() does (so it's still
+  // free/instant if the clip's already server-cached) and then just
+  // fetch()es the returned URL — never audio.play(), since triggering sound
+  // with no user gesture would be bad UX even where the browser allows it.
+  // That plain fetch() is what actually lands the bytes in the browser's
+  // HTTP cache, via the Storage upload's existing 1-year cacheControl
+  // header — no other code needed for a later playTts() call on the same
+  // text to benefit.
+  //
+  // Silent and best-effort throughout: nothing here ever touches
+  // msgEl/btn or shows an error. If this fails (offline, cold Edge
+  // Function, whatever), the user just doesn't get the head start — the
+  // real playTts() call still works exactly as it does today when they
+  // actually tap speak.
+  //
+  // ttsPrefetched dedupes by voice+text so flipping back and forth over the
+  // same handful of cards doesn't refire a network call every time — once a
+  // clip's been requested this session, it's left to the browser's own
+  // cache from then on.
+  //
+  // Guarded against warmTtsCacheRunning: selectVerb() gets called
+  // separately from collectSpeakableTextsForVerb() during warmTtsCache()'s
+  // own scan (see below), and that's a synthetic, non-visual drive-through
+  // of every verb — not a real "the user is looking at this" event. Without
+  // this guard, running warmTtsCache() would itself download every verb
+  // infinitive's actual audio bytes as a side effect, which is exactly the
+  // bulk-download behavior mason deliberately chose not to build.
+  function prefetchTts(text) {
+    if (!text || !currentUser || warmTtsCacheRunning) return;
+    // Respect the OS/browser's own Data Saver setting where it's exposed
+    // (Chrome/Android; not in Safari, where navigator.connection is simply
+    // undefined and this just no-ops) — someone who's explicitly asked
+    // their device to use less data shouldn't have this quietly working
+    // against that.
+    if (window.navigator && navigator.connection && navigator.connection.saveData) return;
+    var key = ttsVoiceKey + "\u0000" + text;
+    if (ttsPrefetched[key]) return;
+    ttsPrefetched[key] = true;
+    supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
+      .then(function (res) {
+        if (res.error || !res.data || !res.data.url) return;
+        return fetch(res.data.url).catch(function () {});
+      })
+      .catch(function () {});
+  }
+
+  // ================= TTS cache warming (console utility, 2026-09-25) =================
+  // Not a UI feature — there's no button for this anywhere. It's a maintenance
+  // operation mason runs himself from the browser console (already signed in
+  // as himself) to pre-synthesize every piece of Spanish text the app can
+  // currently speak, for both voices, so real usage later always hits an
+  // instant cache hit instead of paying Azure's synthesis latency the first
+  // time a given form/word/phrase gets tapped. The Edge Function's cache is
+  // content-addressed (sha256 of voice+text) and shared across all accounts,
+  // so this benefits everyone, not just whoever runs it.
+  //
+  // Deliberately NOT something this codebase's author (Claude) can trigger
+  // directly against the live backend — there's no service-role key or any
+  // other credential available here, by design (see the project brief's
+  // working agreement). This just exposes the capability; mason runs
+  // `warmTtsCache()` from the console himself, using his own real session.
+  //
+  // Reuses selectVerb()'s actual rendering to decide which conjugated forms
+  // are "speakable" (imperativo's yo-less/merged-usted-ustedes quirks, the
+  // personal-vs-dativo gustar_like split, etc.) rather than re-deriving that
+  // logic a second time here — whatever selectVerb() marks .speakable IS the
+  // set of verb forms a real user can tap to hear, by definition.
+  function collectSpeakableTextsForVerb(id) {
+    var texts = [];
+    var entry = allVerbs.find(function (v) { return v.id === id; });
+    if (!entry) return texts;
+    if (entry.data.infinitive) texts.push(entry.data.infinitive);
+
+    function renderAndCollect(tab) {
+      detailGustarTab = tab;
+      selectVerb(id);
+      var cells = el.dConjBody.querySelectorAll("td.speakable");
+      cells.forEach(function (td) {
+        var real = td.querySelector(".real");
+        var text = real ? real.textContent : td.textContent;
+        if (text && text !== "—") texts.push(text);
+      });
+      if (el.dGerundio.classList.contains("speakable")) texts.push(el.dGerundio.textContent);
+      if (el.dParticipio.classList.contains("speakable")) texts.push(el.dParticipio.textContent);
+    }
+
+    renderAndCollect("personal");
+    // A verb that's both gustar_like and also_personal_use (e.g. "parecer")
+    // renders genuinely different spoken text depending on which tab is
+    // active (regular conjugation vs. "me parece" style) — both need warming.
+    if (entry.data.gustar_like && entry.data.also_personal_use) {
+      renderAndCollect("dativo");
+    }
+    return texts;
+  }
+
+  function collectAllSpeakableTexts() {
+    var texts = [];
+
+    allWords.forEach(function (w) { if (w.data.word) texts.push(w.data.word); });
+    STARTER_WORDS.forEach(function (w) { if (w.word) texts.push(w.word); });
+
+    allPhrases.forEach(function (p) { if (p.data.phrase) texts.push(p.data.phrase); });
+    STARTER_PHRASES.forEach(function (p) { if (p.phrase) texts.push(p.phrase); });
+
+    var existingInfinitives = {};
+    allVerbs.forEach(function (v) { existingInfinitives[norm(v.data.infinitive || "")] = true; });
+    allVerbs.forEach(function (v) {
+      texts = texts.concat(collectSpeakableTextsForVerb(v.id));
+    });
+
+    // Starter verbs aren't in allVerbs (they're only offered via the "seed"
+    // buttons on an empty account) — temporarily splice synthetic {id, data}
+    // entries in so selectVerb() can render them exactly like a real saved
+    // verb, then splice them back out. Skip any starter verb whose
+    // infinitive the account already has saved, so it isn't warmed twice.
+    var synthetic = [];
+    STARTER_VERBS.forEach(function (sv, i) {
+      if (existingInfinitives[norm(sv.infinitive || "")]) return;
+      synthetic.push({ id: "__warm_starter_verb_" + i, data: sv });
+    });
+    synthetic.forEach(function (se) { allVerbs.push(se); });
+    synthetic.forEach(function (se) {
+      texts = texts.concat(collectSpeakableTextsForVerb(se.id));
+    });
+    if (synthetic.length) allVerbs.splice(allVerbs.length - synthetic.length, synthetic.length);
+
+    return texts;
+  }
+
+  function warmTtsCache() {
+    if (!currentUser) {
+      console.error("[warm] Sign in first — this needs your real session to call the tts function.");
+      return;
+    }
+
+    // Remember what the detail pane was showing before we start, so we can
+    // put it back — collectSpeakableTextsForVerb() drives selectVerb() over
+    // and over, which means the verb detail card will visibly flicker
+    // through every verb in the collection while this runs. Expected; just
+    // don't run this mid-lesson.
+    var originalSelectedId = selectedId;
+    var originalGustarTab = detailGustarTab;
+
+    // See prefetchTts()'s comment for why this matters: collectAllSpeakableTexts()
+    // drives selectVerb() directly (via collectSpeakableTextsForVerb()) to read
+    // back which cells it marks .speakable, and without this flag that would
+    // also trigger a real audio-byte prefetch for every verb's infinitive as an
+    // unwanted side effect — exactly the bulk-download behavior mason chose not
+    // to build. Cleared once every call in `pairs` has actually finished, in
+    // runNext()'s completion branch below.
+    warmTtsCacheRunning = true;
+
+    var texts = collectAllSpeakableTexts();
+
+    if (originalSelectedId && allVerbs.some(function (v) { return v.id === originalSelectedId; })) {
+      detailGustarTab = originalGustarTab;
+      selectVerb(originalSelectedId);
+    } else {
+      selectedId = null;
+      detailGustarTab = "personal";
+      el.detail.hidden = true;
+    }
+
+    var uniqueTexts = Array.from(new Set(texts.filter(function (s) { return !!s; })));
+    var voiceKeys = Object.keys(TTS_VOICES);
+    var pairs = [];
+    voiceKeys.forEach(function (vk) {
+      uniqueTexts.forEach(function (text) {
+        pairs.push({ voiceKey: vk, voice: TTS_VOICES[vk], text: text });
+      });
+    });
+
+    console.log("[warm] " + uniqueTexts.length + " unique texts × " + voiceKeys.length + " voices = " + pairs.length + " calls to make. Starting…");
+
+    var stats = { hit: 0, miss: 0, error: 0 };
+    var DELAY_MS = 150;
+
+    function wait(ms) {
+      return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    function runNext(i) {
+      if (i >= pairs.length) {
+        warmTtsCacheRunning = false;
+        console.log("[warm] done — " + stats.hit + " already cached, " + stats.miss + " newly synthesized, " + stats.error + " errors.");
+        return;
+      }
+      var pair = pairs[i];
+      supabaseClient.functions.invoke("tts", { body: { text: pair.text, voice: pair.voice } })
+        .then(function (res) {
+          if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+          if (res.data.cached) {
+            stats.hit++;
+          } else {
+            stats.miss++;
+            console.log("[warm] synthesized (" + pair.voiceKey + "): \"" + pair.text + "\"");
+          }
+        })
+        .catch(function (err) {
+          stats.error++;
+          console.warn("[warm] FAILED (" + pair.voiceKey + "): \"" + pair.text + "\"", err);
+        })
+        .then(function () {
+          if ((i + 1) % 25 === 0 || i + 1 === pairs.length) {
+            console.log("[warm] progress: " + (i + 1) + " / " + pairs.length + " — " + stats.hit + " cached, " + stats.miss + " new, " + stats.error + " errors");
+          }
+          return wait(DELAY_MS);
+        })
+        .then(function () { runNext(i + 1); });
+    }
+
+    runNext(0);
+    return "[warm] started — watch the console for progress.";
+  }
+  window.warmTtsCache = warmTtsCache;
 
   function shuffleArray(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
@@ -3259,6 +3575,12 @@
     el.flashFrontSpeak.hidden = !card.frontSpeak;
     el.flashBackSpeak.hidden = !card.backSpeak;
     el.flashTtsMsg.textContent = "";
+    // Quietly start downloading both faces' audio as soon as this card
+    // becomes the current one — most cards sit on screen for a moment
+    // before anyone taps speak or flips, which is enough time for this to
+    // land before it's needed. See prefetchTts() above.
+    prefetchTts(card.frontSpeak);
+    prefetchTts(card.backSpeak);
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
     el.flashPrevBtn.disabled = flashIndex === 0;
     el.flashArrowPrev.disabled = flashIndex === 0;
@@ -4802,7 +5124,7 @@
     if (currentUser) {
       el.authScreen.hidden = true;
       el.appScreen.hidden = false;
-      el.userEmail.textContent = currentUser.email || "";
+      el.acctMenuEmail.textContent = currentUser.email || "";
       loadUserSettings();
       loadVerbs();
       loadWords();
@@ -4894,8 +5216,24 @@
   el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
   el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
   el.authForm.addEventListener("submit", handleAuthSubmit);
-  el.logoutBtn.addEventListener("click", function () { supabaseClient.auth.signOut(); });
-  el.settingsBtn.addEventListener("click", openSettings);
+  el.acctTrigger.addEventListener("click", toggleAcctMenu);
+  el.acctMenuSettings.addEventListener("click", function () {
+    closeAcctMenu();
+    openSettings();
+  });
+  el.acctMenuLogout.addEventListener("click", function () {
+    closeAcctMenu();
+    supabaseClient.auth.signOut();
+  });
+  // Only this one document-level listener is needed for the outside-click
+  // close, since the account menu is the only popover of its kind in the
+  // app right now — if a second one is ever added, this should become a
+  // shared helper rather than duplicated.
+  document.addEventListener("click", function (evt) {
+    if (!el.acctMenu.hidden && !evt.target.closest(".acct-menu-wrap")) {
+      closeAcctMenu();
+    }
+  });
   el.settingsClose.addEventListener("click", closeSettings);
   el.langEs.addEventListener("click", function () { setLang("es"); });
   el.langEn.addEventListener("click", function () { setLang("en"); });
