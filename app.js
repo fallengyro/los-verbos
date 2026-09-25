@@ -40,12 +40,12 @@
   // ================= Text-to-speech (flashcards only, for now) =================
   // Azure's two Rioplatense voices, behind a short key so the rest of the
   // code never juggles the full "es-AR-...Neural" strings — see the
-  // project brief's "Planned feature: Text-to-speech" section for why
-  // Azure/these specific voices were chosen. Device-level preference only
-  // (localStorage, not synced to user_settings like currentLang above) —
-  // a deliberate scope cut for this first pass, since which voice someone
-  // prefers to hear is a much lower-stakes, more experimental choice than
-  // their UI language.
+  // project brief's "Feature: Text-to-speech" section for why Azure/these
+  // specific voices were chosen. As of 2026-09-25 the choice of voice is an
+  // account-level preference synced via user_settings.tts_voice, the same
+  // pattern as currentLang/LANG_LOCAL_KEY above — TTS_VOICE_LOCAL_KEY here
+  // is likewise just a fast device-level guess used to avoid picking the
+  // wrong voice before loadUserSettings() returns the real, synced value.
   var TTS_VOICES = { elena: "es-AR-ElenaNeural", tomas: "es-AR-TomasNeural" };
   var TTS_VOICE_LOCAL_KEY = "iv-tts-voice";
   var ttsVoiceKey = (function () {
@@ -200,6 +200,8 @@
       settings_title: "Configuración",
       settings_lang_label: "Idioma de la app",
       settings_lang_note: "Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.",
+      settings_voice_label: "Voz de pronunciación",
+      settings_voice_note: "La voz que escuchás al tocar el parlante en las flashcards.",
       remove_btn: "Quitar",
       empty_no_verbs: "Todavía no hay verbos en tu cuenta.",
       empty_no_verb_match: "Ningún infinitivo coincide con “{q}”.",
@@ -455,6 +457,8 @@
       settings_title: "Settings",
       settings_lang_label: "App language",
       settings_lang_note: "This only changes the app's own text — your verbs and vocabulary always stay in Spanish.",
+      settings_voice_label: "Pronunciation voice",
+      settings_voice_note: "The voice you hear when you tap the speaker on flashcards.",
       remove_btn: "Remove",
       empty_no_verbs: "You don't have any verbs yet.",
       empty_no_verb_match: "No infinitive matches “{q}”.",
@@ -676,15 +680,37 @@
     if (el.seedPhrasesToolbarBtn) el.seedPhrasesToolbarBtn.textContent = t("seed_phrases_btn", { n: STARTER_PHRASES.length });
   }
 
-  // ================= settings (app language) =================
+  // ================= settings (app language, tts voice) =================
   function renderLangButtons() {
     el.langEs.classList.toggle("active", currentLang === "es");
     el.langEn.classList.toggle("active", currentLang === "en");
   }
 
+  function renderVoiceButtons() {
+    el.settingsVoiceElena.classList.toggle("active", ttsVoiceKey === "elena");
+    el.settingsVoiceTomas.classList.toggle("active", ttsVoiceKey === "tomas");
+  }
+
+  // Mirrors setLang() below: device-local guess applied immediately, then
+  // synced to the account (once one is signed in) the same way lang is.
+  function setTtsVoice(voiceKey) {
+    if ((voiceKey !== "elena" && voiceKey !== "tomas") || voiceKey === ttsVoiceKey) return;
+    ttsVoiceKey = voiceKey;
+    try { localStorage.setItem(TTS_VOICE_LOCAL_KEY, voiceKey); } catch (e) {}
+    renderVoiceButtons();
+    if (currentUser) {
+      supabaseClient.from("user_settings")
+        .upsert({ user_id: currentUser.id, tts_voice: voiceKey, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+        .then(function (res) {
+          if (res.error) el.settingsMsg.textContent = t("msg_error_guardar", { msg: res.error.message });
+        });
+    }
+  }
+
   function openSettings() {
     el.settingsMsg.textContent = "";
     renderLangButtons();
+    renderVoiceButtons();
     el.settingsOverlay.hidden = false;
   }
 
@@ -738,7 +764,7 @@
   // settings.
   function loadUserSettings() {
     if (!currentUser) return;
-    supabaseClient.from("user_settings").select("lang").eq("user_id", currentUser.id).maybeSingle().then(function (res) {
+    supabaseClient.from("user_settings").select("lang, tts_voice").eq("user_id", currentUser.id).maybeSingle().then(function (res) {
       if (res.error) return;
       var lang = (res.data && res.data.lang) || "es";
       if (lang !== currentLang) {
@@ -748,6 +774,12 @@
       } else {
         renderLangButtons();
       }
+      var voice = (res.data && res.data.tts_voice) || "elena";
+      if (voice !== ttsVoiceKey) {
+        ttsVoiceKey = voice;
+        try { localStorage.setItem(TTS_VOICE_LOCAL_KEY, voice); } catch (e) {}
+      }
+      renderVoiceButtons();
     });
   }
 
@@ -1121,6 +1153,8 @@
     settingsClose: document.getElementById("settings-close"),
     langEs: document.getElementById("lang-es"),
     langEn: document.getElementById("lang-en"),
+    settingsVoiceElena: document.getElementById("settings-voice-elena"),
+    settingsVoiceTomas: document.getElementById("settings-voice-tomas"),
 
     banner: document.getElementById("status-banner"),
     offlineBanner: document.getElementById("offline-banner"),
@@ -1272,8 +1306,6 @@
     flashOverlay: document.getElementById("flash-overlay"),
     flashCloseBtn: document.getElementById("flash-close-btn"),
     flashProgress: document.getElementById("flash-progress"),
-    flashVoiceElena: document.getElementById("flash-voice-elena"),
-    flashVoiceTomas: document.getElementById("flash-voice-tomas"),
     flashCard: document.getElementById("flash-card"),
     flashFrontMain: document.getElementById("flash-front-main"),
     flashFrontSub: document.getElementById("flash-front-sub"),
@@ -3160,18 +3192,6 @@
       });
   }
 
-  function refreshTtsVoiceButtons() {
-    el.flashVoiceElena.classList.toggle("active", ttsVoiceKey === "elena");
-    el.flashVoiceTomas.classList.toggle("active", ttsVoiceKey === "tomas");
-  }
-
-  function setTtsVoice(voiceKey) {
-    if (voiceKey !== "elena" && voiceKey !== "tomas") return;
-    ttsVoiceKey = voiceKey;
-    try { localStorage.setItem(TTS_VOICE_LOCAL_KEY, voiceKey); } catch (e) {}
-    refreshTtsVoiceButtons();
-  }
-
   function shuffleArray(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -4845,6 +4865,8 @@
   el.settingsClose.addEventListener("click", closeSettings);
   el.langEs.addEventListener("click", function () { setLang("es"); });
   el.langEn.addEventListener("click", function () { setLang("en"); });
+  el.settingsVoiceElena.addEventListener("click", function () { setTtsVoice("elena"); });
+  el.settingsVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
 
   el.search.addEventListener("input", renderList);
   loadFilters(filtersStorageKey("verbs"), activeVerbFilters);
@@ -4989,9 +5011,6 @@
   el.flashDirWord.addEventListener("change", function () { if (el.flashDirWord.checked) flashDirection = "word2def"; });
   el.flashStartBtn.addEventListener("click", startFlashcards);
   el.flashCloseBtn.addEventListener("click", closeFlashcards);
-  el.flashVoiceElena.addEventListener("click", function () { setTtsVoice("elena"); });
-  el.flashVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
-  refreshTtsVoiceButtons();
   // stopPropagation on both speaker buttons — without it, a tap would also
   // bubble up to el.flashCard's own click listener (toggleFlashFlip) below
   // and flip the card at the same time as playing the audio.

@@ -495,6 +495,14 @@ create table if not exists public.user_settings (
   updated_at timestamptz not null default now()
 );
 
+-- Added 2026-09-25, alongside moving the flashcard voice picker into the
+-- Settings modal: which Azure Rioplatense voice (see the tts-cache bucket
+-- below) a person hears is now an account-level preference synced the same
+-- way `lang` is, rather than a device-only localStorage value — see
+-- setTtsVoice()/loadUserSettings() in app.js.
+alter table public.user_settings
+  add column if not exists tts_voice text not null default 'elena' check (tts_voice in ('elena', 'tomas'));
+
 alter table public.user_settings enable row level security;
 
 drop policy if exists "select own settings" on public.user_settings;

@@ -702,6 +702,14 @@
       </div>
     </div>
     <p class="flash-setup-note" data-i18n="settings_lang_note">Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.</p>
+    <div class="field">
+      <label data-i18n="settings_voice_label">Voz de pronunciación</label>
+      <div class="lang-toggle">
+        <button type="button" class="lang-option" id="settings-voice-elena" data-i18n-aria-label="tts_voice_elena_aria" aria-label="Voz: Elena">Elena</button>
+        <button type="button" class="lang-option" id="settings-voice-tomas" data-i18n-aria-label="tts_voice_tomas_aria" aria-label="Voz: Tomás">Tomás</button>
+      </div>
+    </div>
+    <p class="flash-setup-note" data-i18n="settings_voice_note">La voz que escuchás al tocar el parlante en las flashcards.</p>
     <p class="form-msg" id="settings-msg"></p>
     <div class="form-actions">
       <button type="button" class="btn-secondary" id="settings-close" data-i18n="close">Cerrar</button>
@@ -786,14 +794,9 @@
 <div class="flash-overlay" id="flash-overlay" hidden>
   <div class="flash-topbar">
     <button type="button" class="icon-btn" id="flash-close-btn"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
-    <!-- Which Azure Rioplatense voice the speaker buttons below use — see
-         app.js's setTtsVoice()/TTS_VOICES. Reuses the settings screen's
-         .lang-toggle segmented-button look, narrowed via .flash-voice-toggle,
-         same precedent as .gustar-mode-toggle elsewhere in this file. -->
-    <div class="lang-toggle flash-voice-toggle">
-      <button type="button" class="lang-option" id="flash-voice-elena" data-i18n-aria-label="tts_voice_elena_aria" aria-label="Voz: Elena">Elena</button>
-      <button type="button" class="lang-option" id="flash-voice-tomas" data-i18n-aria-label="tts_voice_tomas_aria" aria-label="Voz: Tomás">Tomás</button>
-    </div>
+    <!-- Which Azure Rioplatense voice the speaker buttons below use is now
+         picked in Settings (id="settings-voice-elena"/"-tomas") rather than
+         here — see app.js's setTtsVoice()/TTS_VOICES. -->
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
