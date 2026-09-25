@@ -3240,8 +3240,17 @@
     // the browser console whether "it feels slow sometimes" is really Azure
     // being re-hit on already-heard content, or just normal Edge
     // Function/network latency on a genuine cache hit. Safe to leave in
-    // permanently (console.debug, no UI change, negligible cost); pull it
-    // out later if it stops being useful.
+    // permanently (console.log, no UI change, negligible cost); pull it out
+    // later if it stops being useful.
+    //
+    // Deliberately console.log, not console.debug (as originally shipped):
+    // Chrome DevTools buckets console.debug() under its "Verbose" level,
+    // which is hidden from the console by default — so these lines were
+    // silently invisible unless that filter was manually enabled, defeating
+    // the entire point of a diagnostic someone's supposed to just glance at.
+    // Found 2026-09-25 when mason filtered the console for "[tts]" while
+    // testing warmTtsCache()'s effect and saw nothing at all, even on a
+    // word already confirmed warmed.
     var ttsStartedAt = (window.performance && performance.now) ? performance.now() : Date.now();
 
     supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
@@ -3249,9 +3258,9 @@
         var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
         if (res.data.cached) {
-          console.debug("%c[tts] cache hit%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
+          console.log("%c[tts] cache hit%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
         } else {
-          console.debug("%c[tts] AZURE SYNTHESIS (cache miss)%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
+          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
         }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
@@ -3259,7 +3268,7 @@
       })
       .catch(function (err) {
         var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
-        console.debug("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
+        console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
       })
       .then(function () {
