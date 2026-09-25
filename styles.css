@@ -632,6 +632,7 @@
      next to a definition paragraph that can wrap to different heights
      instead of over a fixed card face. */
   .detail-speak-btn {
+    position: relative; /* containing block for .tts-active's ring, see below */
     width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
     background: var(--paper); color: var(--accent-deep); flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -735,10 +736,13 @@
      hover ring only ever appear where a tap does something. An inset
      box-shadow rather than a background-color, so it reads clearly over an
      .irreg cell's own brick-soft background too, not just the plain ones.
-     playTts() (see app.js) swaps the cell's own text for "…" while a
-     request is in flight, so no separate loading/pulse state is needed
-     here — the same treatment flashcard/detail speak buttons already use. */
-  table.conj tbody td.speakable { cursor: pointer; }
+     `position: relative` is only here for .tts-active's ring below — while
+     a request is in flight (and through actual playback), that's the only
+     visible change; playTts() never touches the cell's own text anymore
+     (mason, 2026-09-25 — the old version swapped it for "…", which hid the
+     very word being studied right as it was spoken, fighting the app's own
+     "hear and see it at once" point). */
+  table.conj tbody td.speakable { position: relative; cursor: pointer; }
   table.conj tbody td.speakable:hover, table.conj tbody td.speakable:focus-visible {
     box-shadow: inset 0 0 0 1.5px var(--accent);
     outline: none;
@@ -775,11 +779,69 @@
   .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
   /* Same tap-to-hear treatment as table.conj tbody td.speakable above,
      applied to the gerundio/participio tiles — small negative-margin trick
-     so the hover ring's padding doesn't shift surrounding text. */
-  .nonpersonal .tile .val.speakable { cursor: pointer; padding: 1px 4px; margin: -1px -4px; border-radius: 4px; }
+     so the hover ring's padding doesn't shift surrounding text. `display:
+     inline-block` (a plain <span> otherwise) so .tts-active's absolutely-
+     positioned ring below has a predictable box to sit against. */
+  .nonpersonal .tile .val.speakable {
+    position: relative; display: inline-block;
+    cursor: pointer; padding: 1px 4px; margin: -1px -4px; border-radius: 4px;
+  }
   .nonpersonal .tile .val.speakable:hover, .nonpersonal .tile .val.speakable:focus-visible {
     box-shadow: inset 0 0 0 1.5px var(--accent);
     outline: none;
+  }
+
+  /* Chasing-border "something's happening" ring — toggled by app.js's
+     playTts() on whatever was tapped (a speak button, a conjugation-table
+     cell, or a gerundio/participio tile) from the moment of the tap
+     through the end of the clip's actual playback. Replaces the old plain
+     "…" text-swap everywhere it used to appear: mason asked for this
+     (2026-09-25) specifically because turning a conjugation cell's text
+     into "…" hid the word right as it was being spoken, working against
+     the app's own "hear and see it at the same time" point — an animated
+     ring says "in progress" without ever touching the element's own
+     content, so it works the same way on a button's icon as it does on a
+     cell's or tile's text.
+     A conic-gradient clipped down to a thin band via mask (the classic
+     animated-gradient-border trick) traces whatever border-radius the
+     element already has — round for the speak buttons, the cell's own 5px
+     for a table cell, 4px for a tile — so one rule covers every shape
+     without knowing which one it's on. Every element above that can
+     receive .tts-active already has (or was just given) `position:
+     relative` or `absolute`, which is what this ring positions against.
+     The "chasing" motion animates the gradient's own --tts-angle custom
+     property (registered via @property below, purely so the browser knows
+     it's an <angle> and is willing to animate it smoothly) rather than
+     rotating the whole pseudo-element with `transform: rotate()` — a table
+     cell or a short word tile is far from square, and physically spinning
+     a wide rectangle swings its corners wildly outside the element on
+     every frame (confirmed while building this: looked fine on the round
+     speak buttons, badly broken on the conjugation table). Animating the
+     angle instead keeps the ring's own box perfectly still and just sweeps
+     the color around it, which looks right on every shape. In a browser
+     that doesn't support @property, --tts-angle just won't visibly
+     animate — the ring still shows, static, which is a fine fallback. */
+  @property --tts-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .tts-active::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(from var(--tts-angle), var(--accent) 0deg, transparent 75%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: tts-chase 0.9s linear infinite;
+    pointer-events: none;
+    z-index: 3;
+  }
+  @keyframes tts-chase {
+    to { --tts-angle: 360deg; }
   }
 
   .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -1058,9 +1120,11 @@
      the project brief's Text-to-speech section for why this replaced the
      🔊 emoji) that reads its color from the button via `stroke="currentColor"`,
      so it follows --accent-deep automatically in both themes with no extra
-     CSS. playTts() temporarily swaps this markup out for a plain "…" text
-     node while a request is in flight (see app.js) — flex centering handles
-     that case too, no separate rule needed. */
+     CSS. While a request is in flight (and through actual playback), the
+     button just gets a .tts-active chasing-border ring (see below) — its
+     own markup, icon included, is never touched, so this rule needs no
+     special-casing for a busy state. Already `position: absolute` above,
+     which doubles as the containing block that ring needs. */
   .flash-speak-btn svg { width: 18px; height: 18px; }
   .flash-speak-btn:hover, .flash-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
   .flash-speak-btn:disabled { opacity: 0.3; cursor: default; }

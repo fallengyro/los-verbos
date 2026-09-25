@@ -58,6 +58,7 @@
   })();
   var ttsAudioEl = null; // lazily created single <audio> element, reused for every play
   var ttsInFlight = false; // guards against overlapping requests from rapid double-taps
+  var ttsActiveEl = null; // whichever button/cell currently has the .tts-active chasing-border ring on it, so a later tap on something else can clear it first — see playTts()
   var ttsPrefetched = {}; // "voiceKey\u0000text" -> true, so prefetchTts() never re-fetches the same clip twice in a session
   var warmTtsCacheRunning = false; // true only while warmTtsCache() is actively driving selectVerb() itself — see prefetchTts()
 
@@ -1812,14 +1813,21 @@
     var entry = allVerbs.find(function (v) { return v.id === id; });
     if (!entry) { el.detail.hidden = true; return; }
     var data = entry.data;
+    var forms = data.forms || {};
     // Quietly starts downloading the infinitive's audio the moment the verb
     // detail page opens, so it's likely already in the browser's cache by
-    // the time someone taps the speak button — see prefetchTts() above. Just
-    // the infinitive, not the whole conjugation table: individual cells stay
-    // fetch-on-tap only, so glancing through many verbs doesn't download
-    // audio for forms nobody actually asked to hear.
+    // the time someone taps the speak button — see prefetchTts() above.
+    // Also the gerundio/participio — mason's own request (2026-09-25):
+    // those two sit as their own standalone speakable tiles right on this
+    // same page (not buried in the conjugation table), so a tap on either
+    // is a likely-enough first move that it's worth the same head start as
+    // the infinitive. Everything else in the table stays fetch-on-tap
+    // only (plus the row/column prefetch once a cell IS tapped — see
+    // prefetchAdjacentConjugationCells()), so glancing through many verbs
+    // still doesn't download audio for forms nobody asked to hear.
     prefetchTts(data.infinitive);
-    var forms = data.forms || {};
+    if (forms.gerundio) prefetchTts(forms.gerundio);
+    if (forms.participio) prefetchTts(forms.participio);
     // A verb can be gustar_like AND also_personal_use (e.g. "parecer") — the
     // stored forms are identical either way, only the reinterpretation
     // differs, so a small tab control picks which one this render uses.
@@ -3245,21 +3253,43 @@
   // Plays `text` in the currently-selected Azure voice, via the "tts" Edge
   // Function (see supabase/functions/tts/index.ts) — app.js never talks to
   // Azure directly, and never sees the Azure key. `btn` is the speaker
-  // button (or, for the verb conjugation table, the table cell) that was
-  // tapped, purely so we can show a brief "..." while the request is in
+  // button (or, for the verb conjugation table, the table cell — or the
+  // gerundio/participio tile) that was tapped, purely so we can put a
+  // "something's happening" indicator on it while the request is in
   // flight and restore it after; it plays fine without one. `msgEl` is
   // where a "couldn't play that" error gets shown — each screen with a
   // speaker button has its own small message element (flashcards:
   // flash-tts-msg, word/phrase detail: wd-tts-msg/pd-tts-msg) since only
   // one of them is ever visible at a time; defaults to flash-tts-msg so
   // existing flashcard call sites don't need to change.
+  //
+  // Used to swap `btn`'s own markup out for a plain "…" while busy. Mason
+  // asked (2026-09-25) to replace that with a "chasing border" animation
+  // instead (.tts-active, see styles.css): a conjugation-table cell's text
+  // IS the word being studied, and hiding it right as it's spoken worked
+  // against the app's whole point — hearing and seeing a word at the same
+  // time. So now `btn`'s own content is never touched; only a class toggles.
+  // That class also now spans a wider window than the old "…" swap did: on
+  // from the moment of the tap, off only once the clip actually finishes
+  // playing (ttsAudioEl's "ended", below) — not just once the network
+  // request resolves — since "while the audio is playing" was the other
+  // half of what mason asked for.
   function playTts(text, btn, msgEl) {
     if (!text || ttsInFlight) return;
     if (!msgEl) msgEl = el.flashTtsMsg;
     ttsInFlight = true;
     msgEl.textContent = "";
-    var originalLabel = btn ? btn.innerHTML : "";
-    if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
+    if (btn) {
+      btn.disabled = true;
+      // Only one clip plays at a time (ttsAudioEl is a single shared
+      // element) — if something else's ring is still showing from a still-
+      // playing previous clip, this new tap is about to cut that playback
+      // off, so clear its ring now rather than leaving it stuck on with
+      // nothing actually playing behind it.
+      if (ttsActiveEl && ttsActiveEl !== btn) ttsActiveEl.classList.remove("tts-active");
+      ttsActiveEl = btn;
+      btn.classList.add("tts-active");
+    }
 
     // Temporary diagnostic (2026-09-25): the Edge Function already knows
     // whether it served a cached clip or paid for a fresh Azure synthesis
@@ -3307,6 +3337,20 @@
         }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
+        // Keeps the chasing-border ring on through the actual playback,
+        // not just the fetch — "ended" is the real end of a tap-to-hear
+        // interaction from mason's point of view. Reassigning onended
+        // fresh on every call is safe: only one clip ever plays on this
+        // shared <audio> element at a time, so there's never a stale
+        // handler left over from an earlier tap by the time this fires —
+        // and if THIS clip gets interrupted by a later tap before it ever
+        // ends, that later tap's own setup above already cleared this ring
+        // for us, so onended firing late (or never, its src having since
+        // moved on) has nothing left to clean up.
+        ttsAudioEl.onended = function () {
+          if (btn) btn.classList.remove("tts-active");
+          if (ttsActiveEl === btn) ttsActiveEl = null;
+        };
         return ttsAudioEl.play().then(function () {
           var totalMs = msSince(ttsStartedAt);
           console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
@@ -3316,10 +3360,12 @@
         var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
+        if (btn) btn.classList.remove("tts-active");
+        if (ttsActiveEl === btn) ttsActiveEl = null;
       })
       .then(function () {
         ttsInFlight = false;
-        if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
+        if (btn) { btn.disabled = false; }
       });
   }
 
