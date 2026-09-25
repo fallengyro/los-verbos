@@ -3251,23 +3251,41 @@
     // Found 2026-09-25 when mason filtered the console for "[tts]" while
     // testing warmTtsCache()'s effect and saw nothing at all, even on a
     // word already confirmed warmed.
+    //
+    // Second gap found the same day: the original version only timed the
+    // Edge Function round trip (getting back {url, cached}), not the actual
+    // audio. Even on a genuine cache hit, the browser still has to fetch the
+    // real audio bytes from that URL before anything is audible — a step
+    // that's fast on a REPEAT play of the same URL (the browser's own HTTP
+    // cache already has it — the upload sets a 1-year cache header) but not
+    // on the first play of a given clip in this browser session, which is
+    // very likely the actual source of "first tap feels slower than the
+    // second." Now timing both phases separately so that's visible directly
+    // instead of inferred.
     var ttsStartedAt = (window.performance && performance.now) ? performance.now() : Date.now();
+    function msSince(t0) {
+      var now = (window.performance && performance.now) ? performance.now() : Date.now();
+      return Math.round(now - t0);
+    }
 
     supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
       .then(function (res) {
-        var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
+        var edgeMs = msSince(ttsStartedAt);
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
         if (res.data.cached) {
-          console.log("%c[tts] cache hit%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
+          console.log("%c[tts] cache hit%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
         } else {
-          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — " + elapsedMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
+          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
         }
         if (!ttsAudioEl) ttsAudioEl = new Audio();
         ttsAudioEl.src = res.data.url;
-        return ttsAudioEl.play();
+        return ttsAudioEl.play().then(function () {
+          var totalMs = msSince(ttsStartedAt);
+          console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
+        });
       })
       .catch(function (err) {
-        var elapsedMs = Math.round(((window.performance && performance.now) ? performance.now() : Date.now()) - ttsStartedAt);
+        var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
         msgEl.textContent = t("tts_error");
       })
