@@ -786,16 +786,26 @@
 <div class="flash-overlay" id="flash-overlay" hidden>
   <div class="flash-topbar">
     <button type="button" class="icon-btn" id="flash-close-btn"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
+    <!-- Which Azure Rioplatense voice the speaker buttons below use — see
+         app.js's setTtsVoice()/TTS_VOICES. Reuses the settings screen's
+         .lang-toggle segmented-button look, narrowed via .flash-voice-toggle,
+         same precedent as .gustar-mode-toggle elsewhere in this file. -->
+    <div class="lang-toggle flash-voice-toggle">
+      <button type="button" class="lang-option" id="flash-voice-elena" data-i18n-aria-label="tts_voice_elena_aria" aria-label="Voz: Elena">Elena</button>
+      <button type="button" class="lang-option" id="flash-voice-tomas" data-i18n-aria-label="tts_voice_tomas_aria" aria-label="Voz: Tomás">Tomás</button>
+    </div>
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
     <button type="button" class="flash-arrow flash-arrow-prev" id="flash-arrow-prev" data-i18n-aria-label="flash_arrow_prev_aria" aria-label="Anterior">&lsaquo;</button>
     <div class="flash-card" id="flash-card">
       <div class="flash-face flash-front">
+        <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden>&#128266;</button>
         <div class="flash-prompt-main" id="flash-front-main"></div>
         <div class="flash-prompt-sub" id="flash-front-sub"></div>
       </div>
       <div class="flash-face flash-back">
+        <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden>&#128266;</button>
         <div class="flash-answer" id="flash-back-main"></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
@@ -803,6 +813,7 @@
     </div>
     <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" data-i18n-aria-label="flash_arrow_next_aria" aria-label="Siguiente">&rsaquo;</button>
   </div>
+  <p class="form-msg flash-tts-msg" id="flash-tts-msg"></p>
   <p class="flash-hint" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
   <div class="flash-controls">
     <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>

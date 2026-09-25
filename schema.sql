@@ -508,3 +508,24 @@ create policy "insert own settings" on public.user_settings
 drop policy if exists "update own settings" on public.user_settings;
 create policy "update own settings" on public.user_settings
   for update using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Text-to-speech audio cache (added 2026-09-25). Holds one .mp3 per unique
+-- (voice, text) pair ever spoken by the app — see supabase/functions/tts/
+-- and the project brief's "Planned feature: Text-to-speech" section for the
+-- full design. No table is needed for this: the Edge Function content-
+-- addresses each clip by a hash of voice+text as its Storage path, so the
+-- existence of that path IS the cache entry.
+--
+-- Marked public so a cached clip's URL can be played directly by <audio>/
+-- new Audio() with no auth round-trip — Supabase serves a public bucket's
+-- objects without checking storage.objects RLS at all, which is why no
+-- select policy is added below. No insert/update/delete policy is added
+-- either: the only writer is the tts Edge Function, which uses the
+-- service-role/secret key and so bypasses RLS entirely — ordinary users
+-- (anon or authenticated) get no direct write access to this bucket.
+-- ---------------------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('tts-cache', 'tts-cache', true)
+on conflict (id) do nothing;

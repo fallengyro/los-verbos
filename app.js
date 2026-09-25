@@ -37,6 +37,28 @@
     }
   })();
 
+  // ================= Text-to-speech (flashcards only, for now) =================
+  // Azure's two Rioplatense voices, behind a short key so the rest of the
+  // code never juggles the full "es-AR-...Neural" strings — see the
+  // project brief's "Planned feature: Text-to-speech" section for why
+  // Azure/these specific voices were chosen. Device-level preference only
+  // (localStorage, not synced to user_settings like currentLang above) —
+  // a deliberate scope cut for this first pass, since which voice someone
+  // prefers to hear is a much lower-stakes, more experimental choice than
+  // their UI language.
+  var TTS_VOICES = { elena: "es-AR-ElenaNeural", tomas: "es-AR-TomasNeural" };
+  var TTS_VOICE_LOCAL_KEY = "iv-tts-voice";
+  var ttsVoiceKey = (function () {
+    try {
+      var saved = localStorage.getItem(TTS_VOICE_LOCAL_KEY);
+      return (saved === "elena" || saved === "tomas") ? saved : "elena";
+    } catch (e) {
+      return "elena";
+    }
+  })();
+  var ttsAudioEl = null; // lazily created single <audio> element, reused for every play
+  var ttsInFlight = false; // guards against overlapping requests from rapid double-taps
+
   var I18N = {
     es: {
       app_tagline: "rioplatense · voseo",
@@ -155,6 +177,10 @@
       flash_next: "Siguiente ›",
       flash_arrow_prev_aria: "Anterior",
       flash_arrow_next_aria: "Siguiente",
+      tts_play_aria: "Escuchar pronunciación",
+      tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
+      tts_voice_elena_aria: "Voz: Elena",
+      tts_voice_tomas_aria: "Voz: Tomás",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
@@ -406,6 +432,10 @@
       flash_next: "Next ›",
       flash_arrow_prev_aria: "Previous",
       flash_arrow_next_aria: "Next",
+      tts_play_aria: "Hear pronunciation",
+      tts_error: "Couldn't play the audio. Try again.",
+      tts_voice_elena_aria: "Voice: Elena",
+      tts_voice_tomas_aria: "Voice: Tomás",
       lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
@@ -1242,12 +1272,17 @@
     flashOverlay: document.getElementById("flash-overlay"),
     flashCloseBtn: document.getElementById("flash-close-btn"),
     flashProgress: document.getElementById("flash-progress"),
+    flashVoiceElena: document.getElementById("flash-voice-elena"),
+    flashVoiceTomas: document.getElementById("flash-voice-tomas"),
     flashCard: document.getElementById("flash-card"),
     flashFrontMain: document.getElementById("flash-front-main"),
     flashFrontSub: document.getElementById("flash-front-sub"),
+    flashFrontSpeak: document.getElementById("flash-front-speak"),
     flashBackMain: document.getElementById("flash-back-main"),
     flashBackSub: document.getElementById("flash-back-sub"),
+    flashBackSpeak: document.getElementById("flash-back-speak"),
     flashBackBadges: document.getElementById("flash-back-badges"),
+    flashTtsMsg: document.getElementById("flash-tts-msg"),
     flashPrevBtn: document.getElementById("flash-prev-btn"),
     flashNextBtn: document.getElementById("flash-next-btn"),
     flashArrowPrev: document.getElementById("flash-arrow-prev"),
@@ -2960,8 +2995,13 @@
     el.flashSetupMsg.textContent = noSource ? t("flash_no_source") : "";
   }
 
-  // A flashcard is { kind: "verb"|"word"|"phrase", data, frontMain, frontSub, backMain, backSub }.
-  // frontMain/backMain are the big headline text; the *Sub lines and badges are secondary.
+  // A flashcard is { kind: "verb"|"word"|"phrase", data, frontMain, frontSub, backMain, backSub,
+  // frontSpeak, backSpeak }. frontMain/backMain are the big headline text; the *Sub lines and
+  // badges are secondary. frontSpeak/backSpeak are the TTS-friendly text for a face, and are
+  // only set on the side(s) that are actually Spanish — a verb's front and back are both
+  // Spanish (infinitive, conjugated form), while a word/phrase card only has one Spanish side,
+  // depending on flashDirection; the other side is left undefined so renderFlashCard hides that
+  // face's speaker button rather than reading an English definition in an Argentine accent.
   function buildFlashDeck() {
     var deck = [];
 
@@ -2988,7 +3028,8 @@
             deck.push({
               kind: "verb", data: data,
               frontMain: inf, frontSub: frontLabel + " · " + t.label.toLowerCase(),
-              backMain: val, backSub: def ? "(" + def + ")" : ""
+              backMain: val, backSub: def ? "(" + def + ")" : "",
+              frontSpeak: inf, backSpeak: val
             });
           });
         });
@@ -3003,7 +3044,8 @@
           deck.push({
             kind: "verb", data: data,
             frontMain: inf, frontSub: "impersonal · " + t.label.toLowerCase(),
-            backMain: val, backSub: def ? "(" + def + ")" : ""
+            backMain: val, backSub: def ? "(" + def + ")" : "",
+            frontSpeak: inf, backSpeak: val
           });
         });
 
@@ -3015,7 +3057,8 @@
             deck.push({
               kind: "verb", data: data,
               frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · " + t("mood_imperativo").toLowerCase(),
-              backMain: val, backSub: def ? "(" + def + ")" : ""
+              backMain: val, backSub: def ? "(" + def + ")" : "",
+              frontSpeak: inf, backSpeak: val
             });
           });
         }
@@ -3027,7 +3070,8 @@
           deck.push({
             kind: "verb", data: data,
             frontMain: inf, frontSub: t(item.i18nKey),
-            backMain: val, backSub: def ? "(" + def + ")" : ""
+            backMain: val, backSub: def ? "(" + def + ")" : "",
+            frontSpeak: inf, backSpeak: val
           });
         });
       });
@@ -3039,9 +3083,12 @@
         var word = data.word || w.id;
         var def = data.definition || "";
         if (flashDirection === "word2def") {
-          deck.push({ kind: "word", data: data, frontMain: word, frontSub: "", backMain: def || "—", backSub: "" });
+          // Front is the Spanish word (speakable); back is the English
+          // definition, which a Rioplatense voice would just mangle — no
+          // backSpeak here.
+          deck.push({ kind: "word", data: data, frontMain: word, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: word });
         } else {
-          deck.push({ kind: "word", data: data, frontMain: def || word, frontSub: "", backMain: word, backSub: "" });
+          deck.push({ kind: "word", data: data, frontMain: def || word, frontSub: "", backMain: word, backSub: "", backSpeak: word });
         }
       });
     }
@@ -3054,9 +3101,9 @@
         // Same shared flashDirection as words above (see renderFlashSetup's
         // comment) — "word2def" here reads as "phrase → definition".
         if (flashDirection === "word2def") {
-          deck.push({ kind: "phrase", data: data, frontMain: phrase, frontSub: "", backMain: def || "—", backSub: "" });
+          deck.push({ kind: "phrase", data: data, frontMain: phrase, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: phrase });
         } else {
-          deck.push({ kind: "phrase", data: data, frontMain: def || phrase, frontSub: "", backMain: phrase, backSub: "" });
+          deck.push({ kind: "phrase", data: data, frontMain: def || phrase, frontSub: "", backMain: phrase, backSub: "", backSpeak: phrase });
         }
       });
     }
@@ -3085,6 +3132,46 @@
     return frag;
   }
 
+  // Plays `text` in the currently-selected Azure voice, via the "tts" Edge
+  // Function (see supabase/functions/tts/index.ts) — app.js never talks to
+  // Azure directly, and never sees the Azure key. `btn` is the speaker
+  // button that was tapped, purely so we can show a brief "..." while the
+  // request is in flight and restore it after; it plays fine without one.
+  function playTts(text, btn) {
+    if (!text || ttsInFlight) return;
+    ttsInFlight = true;
+    el.flashTtsMsg.textContent = "";
+    var originalLabel = btn ? btn.innerHTML : "";
+    if (btn) { btn.disabled = true; btn.innerHTML = "&hellip;"; }
+
+    supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
+      .then(function (res) {
+        if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+        if (!ttsAudioEl) ttsAudioEl = new Audio();
+        ttsAudioEl.src = res.data.url;
+        return ttsAudioEl.play();
+      })
+      .catch(function () {
+        el.flashTtsMsg.textContent = t("tts_error");
+      })
+      .then(function () {
+        ttsInFlight = false;
+        if (btn) { btn.disabled = false; btn.innerHTML = originalLabel; }
+      });
+  }
+
+  function refreshTtsVoiceButtons() {
+    el.flashVoiceElena.classList.toggle("active", ttsVoiceKey === "elena");
+    el.flashVoiceTomas.classList.toggle("active", ttsVoiceKey === "tomas");
+  }
+
+  function setTtsVoice(voiceKey) {
+    if (voiceKey !== "elena" && voiceKey !== "tomas") return;
+    ttsVoiceKey = voiceKey;
+    try { localStorage.setItem(TTS_VOICE_LOCAL_KEY, voiceKey); } catch (e) {}
+    refreshTtsVoiceButtons();
+  }
+
   function shuffleArray(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -3110,6 +3197,14 @@
     el.flashBackSub.style.display = card.backSub ? "" : "none";
     el.flashBackBadges.innerHTML = "";
     el.flashBackBadges.appendChild(flashBackBadges(card));
+    // A speak button only shows on a face whose text is actually Spanish —
+    // for verbs that's both faces (infinitive front, conjugated form back),
+    // for words/phrases only whichever side isn't the English definition
+    // (see buildFlashDeck's frontSpeak/backSpeak). Reading the definition
+    // aloud in an Argentine Spanish voice would just be noise.
+    el.flashFrontSpeak.hidden = !card.frontSpeak;
+    el.flashBackSpeak.hidden = !card.backSpeak;
+    el.flashTtsMsg.textContent = "";
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
     el.flashPrevBtn.disabled = flashIndex === 0;
     el.flashArrowPrev.disabled = flashIndex === 0;
@@ -4894,6 +4989,22 @@
   el.flashDirWord.addEventListener("change", function () { if (el.flashDirWord.checked) flashDirection = "word2def"; });
   el.flashStartBtn.addEventListener("click", startFlashcards);
   el.flashCloseBtn.addEventListener("click", closeFlashcards);
+  el.flashVoiceElena.addEventListener("click", function () { setTtsVoice("elena"); });
+  el.flashVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
+  refreshTtsVoiceButtons();
+  // stopPropagation on both speaker buttons — without it, a tap would also
+  // bubble up to el.flashCard's own click listener (toggleFlashFlip) below
+  // and flip the card at the same time as playing the audio.
+  el.flashFrontSpeak.addEventListener("click", function (evt) {
+    evt.stopPropagation();
+    var card = flashDeck[flashIndex];
+    if (card) playTts(card.frontSpeak, el.flashFrontSpeak);
+  });
+  el.flashBackSpeak.addEventListener("click", function (evt) {
+    evt.stopPropagation();
+    var card = flashDeck[flashIndex];
+    if (card) playTts(card.backSpeak, el.flashBackSpeak);
+  });
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
   el.flashCard.addEventListener("touchmove", handleFlashTouchMove, { passive: false });

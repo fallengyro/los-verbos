@@ -826,8 +826,13 @@
     position: fixed; inset: 0; background: var(--paper); z-index: 100;
     display: flex; flex-direction: column; padding: 16px;
   }
-  .flash-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .flash-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
   .flash-progress { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-soft); }
+  /* Narrow variant of the settings screen's .lang-toggle, same treatment as
+     .gustar-mode-toggle above — sits between the close button and the
+     progress counter in the flashcard topbar. */
+  .flash-voice-toggle { max-width: 160px; flex: none; }
+  .flash-voice-toggle .lang-option { padding: 6px 8px; font-size: 12.5px; }
 
   /* The prev/next arrows are laid out as ordinary flex siblings of the card
      (not absolutely positioned against the full-width stage) so they always
@@ -912,6 +917,20 @@
     padding: 28px; text-align: center; gap: 10px;
   }
   .flash-back { transform: rotateY(180deg); }
+  /* Sits in the top-right corner of whichever face it's on. .flash-face is
+     already `position: relative`'s natural container (it's `position:
+     absolute; inset: 0`), so this just needs its own absolute position
+     relative to that — no extra wrapper needed. Hidden by default; JS
+     (renderFlashCard) only shows it on a face whose text is actually
+     Spanish (see buildFlashDeck's frontSpeak/backSpeak). */
+  .flash-speak-btn {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--paper); color: var(--accent-deep); font-size: 15px; line-height: 1;
+    cursor: pointer; opacity: 0.55; transition: opacity 0.15s;
+  }
+  .flash-speak-btn:hover, .flash-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
+  .flash-speak-btn:disabled { opacity: 0.3; cursor: default; }
 
   .flash-prompt-main, .flash-answer {
     font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600;
@@ -921,6 +940,9 @@
   .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
   .flash-back-badges { justify-content: center; margin-top: 4px; }
   .flash-hint { text-align: center; font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 10px 0 0; }
+  /* Reuses .form-msg's red error-text treatment; only ever shown briefly,
+     on a failed playTts() call — see app.js. */
+  .flash-tts-msg { text-align: center; margin: 6px 0 0; min-height: 0; }
 
   .flash-controls { display: flex; justify-content: center; gap: 14px; margin-top: 14px; }
 
