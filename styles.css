@@ -921,9 +921,18 @@
   .flash-speak-btn {
     position: absolute; top: 10px; right: 10px; z-index: 2;
     width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
-    background: var(--paper); color: var(--accent-deep); font-size: 15px; line-height: 1;
+    background: var(--paper); color: var(--accent-deep);
+    display: flex; align-items: center; justify-content: center;
     cursor: pointer; opacity: 0.55; transition: opacity 0.15s;
   }
+  /* The button's icon is an inline SVG (a small radiating-pulse glyph — see
+     the project brief's Text-to-speech section for why this replaced the
+     🔊 emoji) that reads its color from the button via `stroke="currentColor"`,
+     so it follows --accent-deep automatically in both themes with no extra
+     CSS. playTts() temporarily swaps this markup out for a plain "…" text
+     node while a request is in flight (see app.js) — flex centering handles
+     that case too, no separate rule needed. */
+  .flash-speak-btn svg { width: 18px; height: 18px; }
   .flash-speak-btn:hover, .flash-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
   .flash-speak-btn:disabled { opacity: 0.3; cursor: default; }
 
