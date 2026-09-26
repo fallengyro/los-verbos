@@ -790,18 +790,24 @@
   .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
   /* Same tap-to-hear treatment as table.conj tbody td.speakable above,
      applied to the gerundio/participio tiles — small negative-margin trick
-     so the hover ring's padding doesn't shift surrounding text. Click
-     target and hover affordance stay on just the word (`display:
-     inline-block` is still needed so the hover box-shadow hugs the word,
-     not the whole flex row) — only the .tts-active ring itself moved to
-     the containing .tile, per the comment on .nonpersonal .tile above. */
+     keeps the word's own padding from shifting surrounding text. Click
+     target stays on just the word (`display: inline-block` is still
+     needed so that padding hugs the word, not the whole flex row) — but
+     the HOVER/FOCUS indicator, like the .tts-active ring, is drawn on the
+     containing .tile, not the word (2026-09-26, mason's follow-up: the
+     two had drifted apart when the ring itself moved to the tile — see
+     the comment on .nonpersonal .tile above — leaving hover still on the
+     word, which read as inconsistent with what the click ring actually
+     highlights). `:has()` lets the tile react to its own descendant's
+     hover/focus state without any JS change. */
   .nonpersonal .tile .val.speakable {
     display: inline-block;
     cursor: pointer; padding: 1px 4px; margin: -1px -4px; border-radius: 4px;
   }
-  .nonpersonal .tile .val.speakable:hover, .nonpersonal .tile .val.speakable:focus-visible {
+  .nonpersonal .tile .val.speakable:focus-visible { outline: none; }
+  .nonpersonal .tile:has(.val.speakable:hover),
+  .nonpersonal .tile:has(.val.speakable:focus-visible) {
     box-shadow: inset 0 0 0 1.5px var(--accent);
-    outline: none;
   }
 
   /* Chasing-border "something's happening" ring — toggled by app.js's
