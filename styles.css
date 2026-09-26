@@ -623,7 +623,24 @@
     margin: 26px 0 24px;
     box-shadow: 0 2px 10px var(--shadow);
   }
-  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  /* No flex-wrap here on purpose (bug fix, 2026-09-26 — mason: a long
+     phrase pushed the speak button out of place, down near the badges, on
+     mobile). With wrap allowed and the text div below having no width
+     limit of its own, a flex item's default min-width is its content's
+     min-content size — for a long headline that's still wide enough that
+     the row couldn't fit both the text and the button, so the button (the
+     second flex item) got bumped onto its own line instead of staying
+     pinned top-right. Fixed at the text div (.detail-head-text) below by
+     letting IT shrink instead. */
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 4px; }
+  /* Lets the h2/definition block shrink to fit the row instead of forcing
+     the row to wrap (see .detail-head above) — min-width: 0 overrides a
+     flex item's default content-based minimum, so a long headline wraps
+     onto its own line(s) within this box while .detail-speak-btn (which
+     has flex-shrink: 0) stays put beside it. Same pattern already used for
+     the selector-list row's long-phrase case, see .card-row .inf under the
+     mobile media query below. */
+  .detail-head-text { flex: 1 1 auto; min-width: 0; }
   /* Word/phrase (and, soon, verb) detail-page speaker button — same
      radiating-pulse SVG + playTts() as the flashcard version
      (.flash-speak-btn), but laid out as a normal flex child of
