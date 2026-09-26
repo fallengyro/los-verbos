@@ -774,16 +774,29 @@
   }
 
   .nonpersonal { display: flex; gap: 10px; margin: 18px 0 20px; flex-wrap: wrap; }
-  .nonpersonal .tile { background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
+  /* `position: relative` here (2026-09-26, mason's ask) is only for
+     .tts-active's ring below to have this whole tile as its containing
+     block — see app.js's dGerundio/dParticipio click handlers, which now
+     pass the tile itself (el.dGerundio.closest(".tile")), not the .val
+     word span, as playTts()'s `btn`. Previously the ring was drawn against
+     just the word (see .val.speakable below, which used to carry this same
+     `position: relative` for that reason); mason wanted the chase to trace
+     the tile's own box instead, matching how it already traces a whole
+     conjugation-table cell rather than hugging one word. Harmless to leave
+     unconditional here even for a tile whose .val never becomes
+     .speakable (no .tts-active is ever added to it, so no ring appears). */
+  .nonpersonal .tile { position: relative; background: var(--paper-sunken); border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 140px; }
   .nonpersonal .tile .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); display: block; margin-bottom: 2px; }
   .nonpersonal .tile .val { font-family: "JetBrains Mono", monospace; color: var(--accent-deep); font-size: 15px; }
   /* Same tap-to-hear treatment as table.conj tbody td.speakable above,
      applied to the gerundio/participio tiles — small negative-margin trick
-     so the hover ring's padding doesn't shift surrounding text. `display:
-     inline-block` (a plain <span> otherwise) so .tts-active's absolutely-
-     positioned ring below has a predictable box to sit against. */
+     so the hover ring's padding doesn't shift surrounding text. Click
+     target and hover affordance stay on just the word (`display:
+     inline-block` is still needed so the hover box-shadow hugs the word,
+     not the whole flex row) — only the .tts-active ring itself moved to
+     the containing .tile, per the comment on .nonpersonal .tile above. */
   .nonpersonal .tile .val.speakable {
-    position: relative; display: inline-block;
+    display: inline-block;
     cursor: pointer; padding: 1px 4px; margin: -1px -4px; border-radius: 4px;
   }
   .nonpersonal .tile .val.speakable:hover, .nonpersonal .tile .val.speakable:focus-visible {
@@ -805,7 +818,10 @@
      A conic-gradient clipped down to a thin band via mask (the classic
      animated-gradient-border trick) traces whatever border-radius the
      element already has — round for the speak buttons, the cell's own 5px
-     for a table cell, 4px for a tile — so one rule covers every shape
+     for a table cell, 8px for a gerundio/participio tile (the tile's own
+     box, as of 2026-09-26 — see .nonpersonal .tile above; originally this
+     traced just the word's own 4px, before mason asked for the whole box)
+     — so one rule covers every shape
      without knowing which one it's on. Every element above that can
      receive .tts-active already has (or was just given) `position:
      relative` or `absolute`, which is what this ring positions against.

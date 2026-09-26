@@ -5483,11 +5483,18 @@
   });
   el.dGerundio.addEventListener("click", function () {
     if (!el.dGerundio.classList.contains("speakable")) return;
-    playTts(el.dGerundio.textContent, el.dGerundio, el.dTtsMsg);
+    // Passes the surrounding .tile (not the .val word span itself) as the
+    // element playTts() puts its .tts-active chasing-border ring on — see
+    // styles.css's .nonpersonal .tile comment (2026-09-26, mason's ask):
+    // the ring should trace the whole tile's box, matching how it already
+    // traces a conjugation-table cell, not just hug the word's own text.
+    // The click target and hover affordance stay on the word itself; only
+    // which element the ring is drawn against changes.
+    playTts(el.dGerundio.textContent, el.dGerundio.closest(".tile"), el.dTtsMsg);
   });
   el.dParticipio.addEventListener("click", function () {
     if (!el.dParticipio.classList.contains("speakable")) return;
-    playTts(el.dParticipio.textContent, el.dParticipio, el.dTtsMsg);
+    playTts(el.dParticipio.textContent, el.dParticipio.closest(".tile"), el.dTtsMsg);
   });
   el.dEdit.addEventListener("click", function () {
     var entry = allVerbs.find(function (v) { return v.id === selectedId; });
