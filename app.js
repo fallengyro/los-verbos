@@ -26,14 +26,16 @@
   //
   // LANG_LOCAL_KEY is a fast, device-level guess used only to avoid a
   // flash of the wrong language before the account's real (Supabase-
-  // synced) preference loads — see loadUserSettings().
+  // synced) preference loads — see loadUserSettings(). Default is "en"
+  // (2026-09-26, mason's ask) — see loadUserSettings()/schema.sql for the
+  // other two places this same default lives.
   var LANG_LOCAL_KEY = "iv-lang";
   var currentLang = (function () {
     try {
       var saved = localStorage.getItem(LANG_LOCAL_KEY);
-      return (saved === "en" || saved === "es") ? saved : "es";
+      return (saved === "en" || saved === "es") ? saved : "en";
     } catch (e) {
-      return "es";
+      return "en";
     }
   })();
 
@@ -790,13 +792,14 @@
   // the wrong language; this corrects it to the account's real, synced
   // preference once it's back from Supabase. A first-ever login has no row
   // yet (maybeSingle() returns null rather than erroring), which just
-  // means the default ('es') stands until the person picks something in
-  // settings.
+  // means the default ('en', see LANG_LOCAL_KEY above and schema.sql's
+  // user_settings.lang column — 2026-09-26, mason's ask) stands until the
+  // person picks something in settings.
   function loadUserSettings() {
     if (!currentUser) return;
     supabaseClient.from("user_settings").select("lang, tts_voice").eq("user_id", currentUser.id).maybeSingle().then(function (res) {
       if (res.error) return;
-      var lang = (res.data && res.data.lang) || "es";
+      var lang = (res.data && res.data.lang) || "en";
       if (lang !== currentLang) {
         currentLang = lang;
         try { localStorage.setItem(LANG_LOCAL_KEY, lang); } catch (e) {}

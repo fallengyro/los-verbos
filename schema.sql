@@ -491,9 +491,20 @@ grant execute on function public.get_shared_list(text) to anon, authenticated;
 
 create table if not exists public.user_settings (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  lang text not null default 'es' check (lang in ('en', 'es')),
+  lang text not null default 'en' check (lang in ('en', 'es')),
   updated_at timestamptz not null default now()
 );
+
+-- Changed 2026-09-26 (mason's ask): the app's default UI language is now
+-- English, not Spanish. This only matters for a signed-in account that has
+-- never touched Settings, and only sets what a brand-new row gets — it does
+-- NOT touch any row that already exists (so it won't silently flip anyone's
+-- already-chosen language preference). The `create table if not exists`
+-- above won't re-run against an existing database, hence this separate
+-- `alter column ... set default`, safe to re-run. See app.js's
+-- LANG_LOCAL_KEY/loadUserSettings() for the two matching client-side
+-- defaults that changed alongside this one.
+alter table public.user_settings alter column lang set default 'en';
 
 -- Added 2026-09-25, alongside moving the flashcard voice picker into the
 -- Settings modal: which Azure Rioplatense voice (see the tts-cache bucket
