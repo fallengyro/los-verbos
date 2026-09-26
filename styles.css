@@ -1116,7 +1116,7 @@
   .flash-arrow:hover, .flash-arrow:focus-visible { opacity: 0.9; color: var(--accent-deep); border-color: var(--accent); }
   .flash-arrow:disabled { opacity: 0.15; cursor: default; }
   .flash-face {
-    position: absolute; inset: 0; backface-visibility: hidden;
+    position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
     border: 1px solid var(--line); border-radius: 16px;
     background-color: var(--paper-raised);
     /* A faint fractal-noise grain, tiled, so the card reads as cardstock
@@ -1155,6 +1155,46 @@
   .flash-speak-btn svg { width: 18px; height: 18px; }
   .flash-speak-btn:hover, .flash-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
   .flash-speak-btn:disabled { opacity: 0.3; cursor: default; }
+  /* Bug fix (2026-09-26, mason's report): after a flip, the FRONT face's
+     speak button kept showing through in the opposite corner — visibly
+     rendered on mobile, and (on desktop, where it painted correctly) still
+     silently clickable even though invisible. `.flash-face`'s
+     backface-visibility: hidden above is supposed to hide a rotated-away
+     face's entire contents, but this button is a `position: absolute` +
+     `z-index: 2` descendant — its own stacking context — and browsers are
+     inconsistent about whether backface-visibility on an ANCESTOR reliably
+     hides (both painting AND hit-testing) a descendant like that. Rather
+     than lean harder on backface-visibility (the `-webkit-` prefix added
+     above helps but doesn't fully close this), drive this button's
+     visibility/clickability directly off .flash-card's own `.flipped`
+     class instead — that's a plain, universally-supported mechanism with
+     no dependency on any engine's particular 3D-transform/hit-testing
+     behavior, so it can't vary by browser or device the way the bug did.
+     The 0.25s transition-delay is exactly half of `.flash-card`'s own 0.5s
+     flip transition, so the button still visually disappears/reappears
+     right as the real face would be edge-on to the viewer mid-flip, not
+     abruptly at the moment of the tap — visibility and pointer-events are
+     transitioned together so it's never clickable-but-invisible or
+     visible-but-unclickable during that window. A jump-cut card change
+     (renderFlashCard's `.no-anim` reset, which removes `.flipped`
+     synchronously with no transition) still lands instantly, since the
+     "become active/default" direction of each pair below carries a 0s
+     delay. */
+  .flash-front .flash-speak-btn {
+    transition: visibility 0s linear 0s, pointer-events 0s linear 0s, opacity 0.15s;
+  }
+  .flash-card.flipped .flash-front .flash-speak-btn {
+    visibility: hidden; pointer-events: none;
+    transition: visibility 0s linear 0.25s, pointer-events 0s linear 0.25s, opacity 0.15s;
+  }
+  .flash-back .flash-speak-btn {
+    visibility: hidden; pointer-events: none;
+    transition: visibility 0s linear 0s, pointer-events 0s linear 0s, opacity 0.15s;
+  }
+  .flash-card.flipped .flash-back .flash-speak-btn {
+    visibility: visible; pointer-events: auto;
+    transition: visibility 0s linear 0.25s, pointer-events 0s linear 0.25s, opacity 0.15s;
+  }
 
   .flash-prompt-main, .flash-answer {
     font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600;
