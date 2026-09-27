@@ -4320,6 +4320,26 @@
   var flashDragging = false;
   var flashDragDx = 0, flashDragDy = 0;
 
+  // The drag/toss fade goes on the two FACES, never on .flash-card itself.
+  // Bug fix (2026-09-28, mason: holding the answer side to swipe showed the
+  // front side's text mirrored): opacity below 1 on the preserve-3d card —
+  // and even just `will-change: opacity` — is a CSS "grouping property" that
+  // flattens the card's 3D rendering context. Flattened, each face's
+  // backface-visibility is judged against the card's own plane, so while
+  // the card is rotated 180° the FRONT face is what paints, seen from
+  // behind (mirrored), and the back face disappears. Same root cause as the
+  // earlier tap-to-flip bug documented on .flash-card.no-anim in styles.css.
+  // Fading each face individually looks identical and doesn't flatten
+  // anything. Verified in Chromium with a real touch drag: fade on the card
+  // → mirrored front; fade on the faces → correct back.
+  var flashFaces = el.flashCard.querySelectorAll(".flash-face");
+  function setFlashFaceFade(opacity, transition) {
+    for (var i = 0; i < flashFaces.length; i++) {
+      flashFaces[i].style.transition = transition || "";
+      flashFaces[i].style.opacity = opacity;
+    }
+  }
+
   function handleFlashTouchStart(evt) {
     var t = evt.touches[0];
     flashTouchStartX = t.clientX;
@@ -4352,7 +4372,7 @@
     el.flashCard.style.transform =
       "translate(" + dx + "px, " + (dy * 0.4) + "px) rotate(" + tilt + "deg)" +
       (flipped ? " rotateY(180deg)" : "");
-    el.flashCard.style.opacity = String(fade);
+    setFlashFaceFade(String(fade)); // not the card's own opacity — see setFlashFaceFade()
   }
 
   // Once the finger lifts, either let the tile finish flying off screen
@@ -4360,30 +4380,42 @@
   // enough) — both as a quick, separate transition from the normal flip
   // animation, cleaned up afterward so later flips go back to that one.
   function settleFlashDrag(exit, isNext) {
+    var flipped = el.flashCard.classList.contains("flipped");
+    var easing = exit ? " 0.32s ease-in" : " 0.25s ease-out";
     el.flashCard.classList.remove("no-anim");
-    el.flashCard.style.transition = exit
-      ? "transform 0.32s ease-in, opacity 0.32s ease-in"
-      : "transform 0.25s ease-out, opacity 0.25s ease-out";
+    el.flashCard.style.transition = "transform" + easing;
     if (exit) {
       var horizontal = Math.abs(flashDragDx) >= Math.abs(flashDragDy);
       var flyX = horizontal ? (isNext ? -1 : 1) * window.innerWidth * 0.9 : flashDragDx * 0.5;
       var flyY = horizontal ? flashDragDy * 0.5 : (isNext ? -1 : 1) * window.innerHeight * 0.6;
       // A gentler spin than the drag distance would suggest — enough to
-      // read as a toss, not enough to look like a flip or a spill.
-      el.flashCard.style.transform = "translate(" + flyX + "px, " + flyY + "px) rotate(" + (isNext ? -8 : 8) + "deg)";
-      el.flashCard.style.opacity = "0";
+      // read as a toss, not enough to look like a flip or a spill. Keeps
+      // rotateY(180deg) on a flipped card: without it the transition
+      // interpolates rotateY 180°→0° on the way out, so the card visibly
+      // turned back over to its front mid-toss.
+      el.flashCard.style.transform = "translate(" + flyX + "px, " + flyY + "px) rotate(" + (isNext ? -8 : 8) + "deg)" +
+        (flipped ? " rotateY(180deg)" : "");
+      setFlashFaceFade("0", "opacity" + easing);
     } else {
-      el.flashCard.style.transform = "";
-      el.flashCard.style.opacity = "";
+      // Same function list as the drag transform (translate, rotate, then
+      // rotateY if flipped) so the spring-back interpolates each piece
+      // directly, rather than the browser falling back to a matrix blend
+      // between two mismatched lists.
+      el.flashCard.style.transform = "translate(0px, 0px) rotate(0deg)" + (flipped ? " rotateY(180deg)" : "");
+      setFlashFaceFade("", "opacity" + easing);
     }
     var done = false;
-    function finish() {
+    function finish(evt) {
+      // transitionend bubbles — only the card's own transform finishing
+      // counts (the faces' opacity transitions end at the same moment, and
+      // a speaker button's own transition could end at any time).
+      if (evt && (evt.target !== el.flashCard || evt.propertyName !== "transform")) return;
       if (done) return;
       done = true;
       el.flashCard.removeEventListener("transitionend", finish);
       el.flashCard.style.transition = "";
       el.flashCard.style.transform = "";
-      el.flashCard.style.opacity = "";
+      setFlashFaceFade("", "");
       if (exit) { if (isNext) nextFlashCard(); else prevFlashCard(); }
     }
     el.flashCard.addEventListener("transitionend", finish);

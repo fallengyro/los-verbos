@@ -1237,7 +1237,16 @@
      FRONT face instead of the back one. Scoping it to the drag window keeps
      the smoother compositing during a swipe without breaking the ordinary
      tap-to-flip. */
-  .flash-card.no-anim { transition: none; will-change: transform, opacity; }
+  /* will-change is transform ONLY — never opacity (bug fix 2026-09-28,
+     mason: dragging a flipped card showed the front's text mirrored).
+     `will-change: opacity`, like a real opacity below 1, is a grouping
+     property that flattens this preserve-3d card, and flattened, the
+     rotated-away front face paints through mirrored instead of the back
+     face. Verified in Chromium: transform alone is safe, anything with
+     opacity breaks it. For the same reason the drag/toss fade in app.js is
+     applied to the two .flash-face elements, not this card — see
+     setFlashFaceFade(). */
+  .flash-card.no-anim { transition: none; will-change: transform; }
   .flash-arrow {
     flex: none; z-index: 5;
     width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);
