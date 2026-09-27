@@ -918,6 +918,15 @@
     border-radius: 6px; background: var(--paper); color: var(--ink);
   }
   .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* Wraps the infinitive/word input together with its "Buscar en RAE"
+     button (2026-09-26 — RAE-lookup shortcut for the add-verb/add-word
+     forms) on one row. Same min-width: 0 pattern as .detail-head-text
+     above: the input is the flexible item that shrinks/wraps if the row
+     ever gets tight, so the button (flex-shrink: 0) never gets pushed
+     around. */
+  .field-input-row { display: flex; align-items: center; gap: 6px; }
+  .field-input-row input { flex: 1 1 auto; min-width: 0; }
+  .field-input-row .icon-btn { flex-shrink: 0; white-space: nowrap; }
   .field textarea {
     font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 8px 9px; border: 1px solid var(--line);
     border-radius: 6px; background: var(--paper); color: var(--ink); resize: vertical; min-height: 160px;

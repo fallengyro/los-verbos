@@ -60,6 +60,7 @@
   })();
   var ttsAudioEl = null; // lazily created single <audio> element, reused for every play
   var ttsInFlight = false; // guards against overlapping requests from rapid double-taps
+  var raeLookupInFlight = false; // guards lookupInRae() against overlapping requests from rapid double-taps on "Buscar en RAE"
   var ttsActiveEl = null; // whichever button/cell currently has the .tts-active chasing-border ring on it, so a later tap on something else can clear it first — see playTts()
   var ttsPrefetched = {}; // "voiceKey\u0000text" -> true, so prefetchTts() never re-fetches the same clip twice in a session
   var warmTtsCacheRunning = false; // true only while warmTtsCache() is actively driving selectVerb() itself — see prefetchTts()
@@ -187,6 +188,12 @@
       tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
       tts_voice_elena_aria: "Voz: Elena",
       tts_voice_tomas_aria: "Voz: Tomás",
+      btn_rae_lookup: "Buscar en RAE",
+      rae_lookup_looking_up: "Buscando…",
+      rae_lookup_not_found: "No se encontró en el DLE. Completá los campos a mano.",
+      rae_lookup_filled: "Campos completados desde el DLE — revisalos antes de guardar.",
+      rae_lookup_maybe_irregular: "El DLE muestra “{form}” para “yo”, que no coincide con la conjugación regular esperada — probablemente este verbo sea irregular; revisá el patrón.",
+      rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
@@ -445,6 +452,12 @@
       tts_error: "Couldn't play the audio. Try again.",
       tts_voice_elena_aria: "Voice: Elena",
       tts_voice_tomas_aria: "Voice: Tomás",
+      btn_rae_lookup: "Look up in RAE",
+      rae_lookup_looking_up: "Looking up…",
+      rae_lookup_not_found: "Not found in the DLE. Fill in the fields by hand.",
+      rae_lookup_filled: "Fields filled in from the DLE — check them over before saving.",
+      rae_lookup_maybe_irregular: "The DLE shows “{form}” for “yo”, which doesn't match the expected regular conjugation — this verb is probably irregular; check the pattern.",
+      rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
       lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
@@ -1251,6 +1264,7 @@
     fAlsoPersonalUse: document.getElementById("f-also-personal-use"),
     fGerundio: document.getElementById("f-gerundio"),
     fParticipio: document.getElementById("f-participio"),
+    fRaeLookup: document.getElementById("f-rae-lookup"),
     imperativoFormRow: document.getElementById("imperativo-form-row"),
     verbFilters: document.getElementById("verb-filters"),
     verbFiltersClear: document.getElementById("verb-filters-clear"),
@@ -1295,6 +1309,7 @@
     wfGender: document.getElementById("wf-gender"),
     wfNotes: document.getElementById("wf-notes"),
     wfExample: document.getElementById("wf-example"),
+    wfRaeLookup: document.getElementById("wf-rae-lookup"),
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
     wordListsGroup: document.getElementById("word-lists-group"),
@@ -3419,6 +3434,88 @@
       });
   }
 
+  // Powers the "Buscar en RAE" shortcut on the add-verb and add-word forms
+  // (2026-09-26). Calls the dle-lookup Edge Function (see
+  // supabase/functions/dle-lookup/index.ts for the full rationale — RAE
+  // itself has no public API, so this goes through the free, unofficial
+  // rae-api.com) and pre-fills the editable fields from whatever it finds.
+  // Same convention as handleSubmit/handleWordSubmit's own .form-msg text:
+  // el.formMsg/el.wordFormMsg just get a plain status string, no extra
+  // class. Every field it touches stays a normal editable input afterward —
+  // this is a shortcut for typing, not an import: mason/his wife still see
+  // and can change (or clear) anything before saving, exactly like the
+  // existing JSON-import path.
+  //
+  // Deliberately does NOT touch f-type (-ar/-er/-ir), f-irregularity, or any
+  // conjugation-table cell — those stay exactly as today, either derived
+  // from the infinitive elsewhere or typed in by hand. The one exception is
+  // the informational-only irregularity note below, which never writes to
+  // f-irregularity itself, just tells mason/his wife to go look at it: RAE's
+  // own "yo" form is real dictionary data, but deciding how a real irregular
+  // verb's whole pattern is annotated in this app is still a human judgment
+  // call, not something to guess at automatically.
+  function lookupInRae(kind) {
+    var isVerb = kind === "verb";
+    var termEl = isVerb ? el.fInfinitive : el.wfWord;
+    var btn = isVerb ? el.fRaeLookup : el.wfRaeLookup;
+    var msgEl = isVerb ? el.formMsg : el.wordFormMsg;
+    var term = (termEl.value || "").trim();
+
+    if (!term) {
+      msgEl.textContent = isVerb ? t("msg_falta_infinitivo") : t("msg_falta_palabra");
+      return;
+    }
+    if (raeLookupInFlight) return;
+    raeLookupInFlight = true;
+    btn.disabled = true;
+    msgEl.textContent = t("rae_lookup_looking_up");
+
+    supabaseClient.functions.invoke("dle-lookup", { body: { term: term, kind: kind } })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        var data = res.data || {};
+        if (!data.found) {
+          msgEl.textContent = t("rae_lookup_not_found");
+          return;
+        }
+
+        if (isVerb) {
+          if (data.definition && !el.fDefinition.value) el.fDefinition.value = data.definition;
+          if (data.transitivity) el.fTransitivity.value = data.transitivity;
+          if (data.reflexive) el.fReflexive.checked = true;
+          if (data.gerundio) el.fGerundio.value = data.gerundio;
+          if (data.participio) el.fParticipio.value = data.participio;
+
+          // Non-presumptuous irregularity hint: reuse the app's own
+          // regularForm() (the same function the conjugation table itself
+          // uses to flag deviations) rather than re-deriving what a regular
+          // "yo" form looks like a second time. If RAE's real "yo" doesn't
+          // match, that's a plain factual mismatch worth flagging — it
+          // never sets f-irregularity for them.
+          var expectedYo = regularForm(term, "presente", "yo");
+          var msg = t("rae_lookup_filled");
+          if (data.presentYo && expectedYo && data.presentYo.toLowerCase() !== expectedYo.toLowerCase()) {
+            msg += " " + t("rae_lookup_maybe_irregular", { form: data.presentYo });
+          }
+          msgEl.textContent = msg;
+        } else {
+          if (data.definition && !el.wfDefinition.value) el.wfDefinition.value = data.definition;
+          if (data.pos) el.wfPos.value = data.pos;
+          if (data.gender) el.wfGender.value = data.gender;
+          if (data.example && !el.wfExample.value) el.wfExample.value = data.example;
+          msgEl.textContent = t("rae_lookup_filled");
+        }
+      })
+      .catch(function (err) {
+        console.log("[dle-lookup] request failed", err);
+        msgEl.textContent = t("rae_lookup_error");
+      })
+      .then(function () {
+        raeLookupInFlight = false;
+        btn.disabled = false;
+      });
+  }
+
   // Quietly downloads a clip's audio bytes into the browser's own HTTP cache
   // *before* anyone taps a speaker button, so that by the time they do, the
   // real playTts() call below is hitting the browser's own cache instead of
@@ -5445,6 +5542,7 @@
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
   el.form.addEventListener("submit", handleSubmit);
+  el.fRaeLookup.addEventListener("click", function () { lookupInRae("verb"); });
   el.fGustarLike.addEventListener("change", function () {
     el.fAlsoPersonalUseWrap.hidden = !el.fGustarLike.checked;
     if (!el.fGustarLike.checked) el.fAlsoPersonalUse.checked = false;
@@ -5534,6 +5632,7 @@
   el.seedWordsToolbarBtn.addEventListener("click", seedStarterWords);
   el.wordFormCancel.addEventListener("click", closeWordForm);
   el.wordForm.addEventListener("submit", handleWordSubmit);
+  el.wfRaeLookup.addEventListener("click", function () { lookupInRae("word"); });
   el.wdSpeak.addEventListener("click", function () {
     var entry = allWords.find(function (v) { return v.id === selectedWordId; });
     if (entry) playTts(entry.data.word, el.wdSpeak, el.wdTtsMsg);
