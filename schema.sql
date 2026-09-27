@@ -345,14 +345,23 @@ create index if not exists phrases_user_id_idx on public.phrases (user_id);
 -- ---------------------------------------------------------------------------
 -- Self-assessed mastery flag ("known" / "sabido" — 2026-09-28, mason's
 -- wife's ask while drilling flashcards off an imported list). Deliberately
--- binary, not a spectrum: a card is either marked known ("Lo sé") or not
--- yet ("Todavía no"), with "not yet" as the default for every existing and
--- future row — there's no separate "never reviewed" state to track. Reuses
--- the same boolean-flag machinery verbs/phrases already have (reflexive/
--- auxiliar/gustar_like/idiomatic above) — see app.js's flagOk()-based
--- "Sabido" filter chip (one more chip in the existing "Marcas" group for
--- verbs/phrases, a brand-new "Marcas" group for words, which had none) and
--- the flashcard back face's two buttons, which set it and auto-advance.
+-- binary, not a spectrum: an item is either marked known ("Sabido") or not
+-- yet, with "not yet" as the default for every existing and future row.
+-- Reuses the same boolean-flag filter machinery as reflexive/auxiliar/
+-- gustar_like/idiomatic above (app.js's flagOk()-based "Sabido" chip), and
+-- is set from a single on/off toggle under each flashcard and on each
+-- detail page (app.js's setItemKnown()).
+--
+-- This is per-person PROGRESS, not part of the content. It needs no table
+-- of its own: every verbs/words/phrases row already belongs to exactly one
+-- user (RLS above), so each person's "known" lives on their own copy. The
+-- only way content crosses between accounts is via list_items snapshots
+-- (sharing a list, then importing it), and app.js strips "known" out of
+-- every snapshot and every shared-list import (listSnapshot()), so the
+-- recipient always starts at "todavía no". The one-time update at the end
+-- of this block cleans any snapshot written by the first version of this
+-- feature, before that stripping existed.
+--
 -- The three `create table` blocks above already include this column
 -- directly for a brand-new install; these three statements are what
 -- actually add it to an existing database like this one.
@@ -361,6 +370,19 @@ create index if not exists phrases_user_id_idx on public.phrases (user_id);
 alter table public.verbs add column if not exists known boolean not null default false;
 alter table public.words add column if not exists known boolean not null default false;
 alter table public.phrases add column if not exists known boolean not null default false;
+
+-- One-time cleanup (safe to re-run — matches nothing once clean): remove
+-- "known" from any list snapshot that captured it. `data - 'known'` drops
+-- that one key from the jsonb and leaves everything else untouched. Must run
+-- AFTER the list_items table exists; it's declared further down in this
+-- file, so on a brand-new install this runs against a table that doesn't
+-- exist yet — hence the to_regclass() guard.
+do $$
+begin
+  if to_regclass('public.list_items') is not null then
+    update public.list_items set data = data - 'known' where data ? 'known';
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Shared lists — a named, curated subset of your own verbs/words that you can

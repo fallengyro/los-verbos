@@ -166,7 +166,7 @@
       </div>
       <button type="button" class="detail-speak-btn" id="d-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
     </div>
-    <div class="badges" id="d-badges"></div>
+    <div class="badges" id="d-badges"><button type="button" class="known-toggle sm" id="d-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="d-pattern"></p>
     <p class="pattern-note" id="d-preposicion"></p>
 
@@ -289,10 +289,6 @@
         <input type="checkbox" id="f-also-personal-use" />
         <label for="f-also-personal-use" style="margin:0;" data-i18n="check_also_personal_use">¿También tiene uso personal (no dativo)?</label>
       </div>
-      <div class="field checks">
-        <input type="checkbox" id="f-known" />
-        <label for="f-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
-      </div>
     </div>
 
     <div class="conj-form-scroll">
@@ -377,7 +373,7 @@
       </div>
       <button type="button" class="detail-speak-btn" id="wd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
     </div>
-    <div class="badges" id="wd-badges"></div>
+    <div class="badges" id="wd-badges"><button type="button" class="known-toggle sm" id="wd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="wd-notes"></p>
     <p class="example-note" id="wd-example"></p>
     <p class="form-msg detail-tts-msg" id="wd-tts-msg"></p>
@@ -437,10 +433,6 @@
       <div class="field field-wide">
         <label for="wf-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
         <input type="text" id="wf-example" data-i18n-placeholder="placeholder_ejemplo" placeholder="ej. Tomo mucha agua todos los días." />
-      </div>
-      <div class="field checks">
-        <input type="checkbox" id="wf-known" />
-        <label for="wf-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
       </div>
     </div>
 
@@ -511,7 +503,7 @@
       </div>
       <button type="button" class="detail-speak-btn" id="pd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
     </div>
-    <div class="badges" id="pd-badges"></div>
+    <div class="badges" id="pd-badges"><button type="button" class="known-toggle sm" id="pd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="pd-literal"></p>
     <p class="pattern-note" id="pd-notes"></p>
     <p class="example-note" id="pd-example"></p>
@@ -566,10 +558,6 @@
       <div class="field checks">
         <input type="checkbox" id="pf-idiomatic" />
         <label for="pf-idiomatic" style="margin:0;" data-i18n="check_idiomatic">¿Es idiomática (no se traduce palabra por palabra)?</label>
-      </div>
-      <div class="field checks">
-        <input type="checkbox" id="pf-known" />
-        <label for="pf-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
       </div>
       <div class="field" id="pf-literal-wrap" hidden>
         <label for="pf-literal" data-i18n="label_literal">Traducción literal</label>
@@ -865,13 +853,15 @@
         <div class="flash-answer" id="flash-back-main"></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
-        <div class="flash-mastery-row" id="flash-mastery-row">
-          <button type="button" class="btn-secondary flash-not-yet-btn" id="flash-not-yet-btn" data-i18n="flash_not_yet_btn" data-i18n-aria-label="flash_mark_not_yet_aria" aria-label="Marcar como todavía no">Todavía no</button>
-          <button type="button" class="btn-primary flash-know-btn" id="flash-know-btn" data-i18n="flash_know_btn" data-i18n-aria-label="flash_mark_known_aria" aria-label="Marcar como sabido">Lo sé</button>
-        </div>
       </div>
     </div>
     <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" data-i18n-aria-label="flash_arrow_next_aria" aria-label="Siguiente">&rsaquo;</button>
+  </div>
+  <!-- "Sabido" toggle — deliberately OUTSIDE .flash-card: same spot on every
+       card and both faces, never flips the card, never advances. See
+       app.js's setItemKnown(). -->
+  <div class="flash-known-row">
+    <button type="button" class="known-toggle" id="flash-known-toggle" aria-pressed="false" data-i18n="known_toggle">Sabido</button>
   </div>
   <p class="form-msg flash-tts-msg" id="flash-tts-msg"></p>
   <p class="flash-hint" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>

@@ -154,7 +154,6 @@
       check_auxiliar: "¿Auxiliar / modal?",
       check_gustar: "¿Tipo gustar?",
       check_also_personal_use: "¿También tiene uso personal (no dativo)?",
-      check_sabido: "¿Ya lo sabés?",
       gustar_tab_personal: "Uso personal",
       gustar_tab_dativo: "Uso dativo",
       impersonal_optional: "impersonal (opcional)",
@@ -202,10 +201,10 @@
       flash_next: "Siguiente ›",
       flash_arrow_prev_aria: "Anterior",
       flash_arrow_next_aria: "Siguiente",
-      flash_know_btn: "Lo sé",
-      flash_not_yet_btn: "Todavía no",
-      flash_mark_known_aria: "Marcar como sabido",
-      flash_mark_not_yet_aria: "Marcar como todavía no",
+      known_toggle: "Sabido",
+      known_toggle_aria_on: "Sabido — tocá para desmarcar",
+      known_toggle_aria_off: "Marcar como sabido",
+      known_mark_aria: "Sabido",
       tts_play_aria: "Escuchar pronunciación",
       tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
       tts_voice_elena_aria: "Voz: Elena",
@@ -435,7 +434,6 @@
       check_auxiliar: "Auxiliary / modal?",
       check_gustar: "Gustar-type?",
       check_also_personal_use: "Also has a personal-subject (non-dative) use?",
-      check_sabido: "Do you already know it?",
       gustar_tab_personal: "Personal use",
       gustar_tab_dativo: "Dative use",
       impersonal_optional: "impersonal (optional)",
@@ -483,10 +481,10 @@
       flash_next: "Next ›",
       flash_arrow_prev_aria: "Previous",
       flash_arrow_next_aria: "Next",
-      flash_know_btn: "I know it",
-      flash_not_yet_btn: "Not yet",
-      flash_mark_known_aria: "Mark as known",
-      flash_mark_not_yet_aria: "Mark as not yet known",
+      known_toggle: "Known",
+      known_toggle_aria_on: "Known — tap to unmark",
+      known_toggle_aria_off: "Mark as known",
+      known_mark_aria: "Known",
       tts_play_aria: "Hear pronunciation",
       tts_error: "Couldn't play the audio. Try again.",
       tts_voice_elena_aria: "Voice: Elena",
@@ -1346,7 +1344,6 @@
     fGustarLike: document.getElementById("f-gustar-like"),
     fAlsoPersonalUseWrap: document.getElementById("f-also-personal-use-wrap"),
     fAlsoPersonalUse: document.getElementById("f-also-personal-use"),
-    fKnown: document.getElementById("f-known"),
     fGerundio: document.getElementById("f-gerundio"),
     fParticipio: document.getElementById("f-participio"),
     fRaeLookup: document.getElementById("f-rae-lookup"),
@@ -1394,7 +1391,6 @@
     wfGender: document.getElementById("wf-gender"),
     wfNotes: document.getElementById("wf-notes"),
     wfExample: document.getElementById("wf-example"),
-    wfKnown: document.getElementById("wf-known"),
     wfRaeLookup: document.getElementById("wf-rae-lookup"),
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
@@ -1434,7 +1430,6 @@
     pfLiteral: document.getElementById("pf-literal"),
     pfNotes: document.getElementById("pf-notes"),
     pfExample: document.getElementById("pf-example"),
-    pfKnown: document.getElementById("pf-known"),
     phraseFilters: document.getElementById("phrase-filters"),
     phraseFiltersClear: document.getElementById("phrase-filters-clear"),
     phraseListsGroup: document.getElementById("phrase-lists-group"),
@@ -1470,8 +1465,10 @@
     flashBackSub: document.getElementById("flash-back-sub"),
     flashBackSpeak: document.getElementById("flash-back-speak"),
     flashBackBadges: document.getElementById("flash-back-badges"),
-    flashKnowBtn: document.getElementById("flash-know-btn"),
-    flashNotYetBtn: document.getElementById("flash-not-yet-btn"),
+    flashKnownToggle: document.getElementById("flash-known-toggle"),
+    dKnown: document.getElementById("d-known"),
+    wdKnown: document.getElementById("wd-known"),
+    pdKnown: document.getElementById("pd-known"),
     flashTtsMsg: document.getElementById("flash-tts-msg"),
     flashPrevBtn: document.getElementById("flash-prev-btn"),
     flashNextBtn: document.getElementById("flash-next-btn"),
@@ -1869,10 +1866,12 @@
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "card-row";
+    btn.dataset.itemId = id; // lets refreshKnownUi() patch this row in place
 
     var inf = document.createElement("span");
     inf.className = "inf";
     inf.textContent = data.infinitive || id;
+    if (data.known) inf.appendChild(knownMark());
     btn.appendChild(inf);
 
     if (data.type) {
@@ -2040,6 +2039,7 @@
     if (data.reflexive) el.dBadges.appendChild(badge("reflexive", tagLabel("reflexivo")));
     if (data.auxiliar) el.dBadges.appendChild(badge("auxiliar", tagLabel("auxiliar")));
     if (data.gustar_like) el.dBadges.appendChild(badge("gustarLike", tagLabel("dativo")));
+    appendKnownToggle(el.dBadges, el.dKnown, data.known);
     el.dPattern.textContent = data.pattern || "";
     el.dPattern.style.display = data.pattern ? "" : "none";
     el.dPreposicion.textContent = data.preposicion ? t("preposicion_note", { prep: data.preposicion }) : "";
@@ -2317,7 +2317,6 @@
     el.fGustarLike.checked = false;
     el.fAlsoPersonalUse.checked = false;
     el.fAlsoPersonalUseWrap.hidden = true;
-    el.fKnown.checked = false;
     el.fGerundio.value = "";
     el.fParticipio.value = "";
     PERSONS.forEach(function (p) {
@@ -2349,7 +2348,6 @@
     el.fGustarLike.checked = !!data.gustar_like;
     el.fAlsoPersonalUse.checked = !!data.also_personal_use;
     el.fAlsoPersonalUseWrap.hidden = !data.gustar_like;
-    el.fKnown.checked = !!data.known;
     var forms = data.forms || {};
     el.fGerundio.value = forms.gerundio || "";
     el.fParticipio.value = forms.participio || "";
@@ -2442,7 +2440,6 @@
       auxiliar: el.fAuxiliar.checked,
       gustar_like: el.fGustarLike.checked,
       also_personal_use: el.fGustarLike.checked && el.fAlsoPersonalUse.checked,
-      known: el.fKnown.checked,
       forms: forms
     };
   }
@@ -2588,10 +2585,12 @@
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "card-row";
+    btn.dataset.itemId = id;
 
     var w = document.createElement("span");
     w.className = "inf";
     w.textContent = data.word || id;
+    if (data.known) w.appendChild(knownMark());
     btn.appendChild(w);
 
     if (data.partOfSpeech) btn.appendChild(badge("type", tagLabel(data.partOfSpeech)));
@@ -2686,6 +2685,7 @@
     el.wdBadges.innerHTML = "";
     if (data.partOfSpeech) el.wdBadges.appendChild(badge("type", tagLabel(data.partOfSpeech)));
     if (data.gender) el.wdBadges.appendChild(badge("gender", tagLabel(data.gender)));
+    appendKnownToggle(el.wdBadges, el.wdKnown, data.known);
     el.wdNotes.textContent = data.notes || "";
     el.wdNotes.style.display = data.notes ? "" : "none";
     el.wdExample.textContent = data.example || "";
@@ -2703,7 +2703,6 @@
     el.wfGender.value = "";
     el.wfNotes.value = "";
     el.wfExample.value = "";
-    el.wfKnown.checked = false;
   }
 
   function fillWordForm(data) {
@@ -2713,7 +2712,6 @@
     el.wfGender.value = data.gender || "";
     el.wfNotes.value = data.notes || "";
     el.wfExample.value = data.example || "";
-    el.wfKnown.checked = !!data.known;
   }
 
   function openWordForm(mode, data) {
@@ -2743,8 +2741,7 @@
       partOfSpeech: el.wfPos.value,
       gender: el.wfGender.value,
       notes: el.wfNotes.value.trim(),
-      example: el.wfExample.value.trim(),
-      known: el.wfKnown.checked
+      example: el.wfExample.value.trim()
     };
   }
 
@@ -2801,8 +2798,7 @@
       part_of_speech: data.partOfSpeech,
       gender: data.gender,
       notes: data.notes,
-      example: data.example,
-      known: data.known
+      example: data.example
     };
 
     var query = editingWordId
@@ -2868,10 +2864,12 @@
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "card-row";
+    btn.dataset.itemId = id;
 
     var p = document.createElement("span");
     p.className = "inf";
     p.textContent = data.phrase || id;
+    if (data.known) p.appendChild(knownMark());
     btn.appendChild(p);
 
     if (data.function) btn.appendChild(badge("type", tagLabel(data.function)));
@@ -2967,6 +2965,7 @@
     if (data.function) el.pdBadges.appendChild(badge("type", tagLabel(data.function)));
     if (data.register && data.register !== "neutro") el.pdBadges.appendChild(badge("register", registerLabel(data.register)));
     if (data.idiomatic) el.pdBadges.appendChild(badge("idiomatic", tagLabel("idiomática")));
+    appendKnownToggle(el.pdBadges, el.pdKnown, data.known);
     el.pdLiteral.textContent = data.literal || "";
     el.pdLiteral.style.display = (data.idiomatic && data.literal) ? "" : "none";
     el.pdNotes.textContent = data.notes || "";
@@ -2989,7 +2988,6 @@
     el.pfLiteral.value = "";
     el.pfNotes.value = "";
     el.pfExample.value = "";
-    el.pfKnown.checked = false;
   }
 
   function fillPhraseForm(data) {
@@ -3002,7 +3000,6 @@
     el.pfLiteral.value = data.literal || "";
     el.pfNotes.value = data.notes || "";
     el.pfExample.value = data.example || "";
-    el.pfKnown.checked = !!data.known;
   }
 
   function openPhraseForm(mode, data) {
@@ -3034,8 +3031,7 @@
       idiomatic: el.pfIdiomatic.checked,
       literal: el.pfLiteral.value.trim(),
       notes: el.pfNotes.value.trim(),
-      example: el.pfExample.value.trim(),
-      known: el.pfKnown.checked
+      example: el.pfExample.value.trim()
     };
   }
 
@@ -3096,8 +3092,7 @@
       idiomatic: data.idiomatic,
       literal: data.literal,
       notes: data.notes,
-      example: data.example,
-      known: data.known
+      example: data.example
     };
 
     var query = editingPhraseId
@@ -4138,6 +4133,7 @@
     // aloud in an Argentine Spanish voice would just be noise.
     el.flashFrontSpeak.hidden = !card.frontSpeak;
     el.flashBackSpeak.hidden = !card.backSpeak;
+    setKnownToggleState(el.flashKnownToggle, !!card.data.known);
     el.flashTtsMsg.textContent = "";
     // Quietly start downloading both faces' audio as soon as this card
     // becomes the current one — most cards sit on screen for a moment
@@ -4206,35 +4202,111 @@
     el.flashCard.classList.toggle("flipped");
   }
 
-  // buildFlashDeck() pushes a live reference to the item's own data object
-  // (so mutating card.data here is immediately visible in allVerbs/allWords/
-  // allPhrases too — see below), but it doesn't carry that item's id, which
-  // lives as a sibling v.id outside data. Personal vocab lists are small, so
+  // ================= Sabido (self-assessed "I know this one") =================
+  // "known" is one person's own progress, not a property of the content. It
+  // lives only on that user's own verbs/words/phrases rows (already private
+  // per user via RLS) and is stripped from anything copied between accounts
+  // — see listSnapshot() in the listas compartidas section.
+  //
+  // One on/off toggle, shown in two kinds of places: a row under the
+  // flashcard (outside the card itself) and a pill at the end of each detail
+  // page's badge row. Toggling never flips or advances a flashcard — the
+  // first version ("Lo sé"/"Todavía no" buttons that auto-advanced) added a
+  // second way to move between cards, which mason found disrupted the
+  // tap-to-flip / swipe flow (2026-09-28).
+
+  function knownCollection(kind) {
+    return kind === "verb" ? allVerbs : (kind === "word" ? allWords : allPhrases);
+  }
+
+  // buildFlashDeck() pushes a live reference to each item's own data object
+  // but not its id (a sibling of data). Personal collections are small, so
   // an O(n) reference-equality scan at click-time is cheap and avoids
-  // threading id through all the deck.push() call sites above.
+  // threading id through every deck.push() call site.
   function findItemId(kind, data) {
-    var arr = kind === "verb" ? allVerbs : (kind === "word" ? allWords : allPhrases);
-    var found = arr.find(function (item) { return item.data === data; });
+    var found = knownCollection(kind).find(function (item) { return item.data === data; });
     return found ? found.id : null;
   }
 
-  // Self-reported mastery ("Lo sé" / "Todavía no"). Mutates the shared data
-  // object in place so the verbs/words/phrases tabs pick up the change on
-  // their next render with no explicit re-render call, then advances right
-  // away rather than waiting on the network round-trip — the Supabase write
-  // happens in the background and only a banner shows if it fails.
-  function setFlashCardMastery(known) {
-    if (flashIndex < 0 || flashIndex >= flashDeck.length) return;
-    var card = flashDeck[flashIndex];
-    card.data.known = known;
-    var table = card.kind === "verb" ? "verbs" : (card.kind === "word" ? "words" : "phrases");
-    var id = findItemId(card.kind, card.data);
-    if (id) {
-      supabaseClient.from(table).update({ known: known }).eq("id", id).then(function (res) {
-        if (res.error) showBanner(t("msg_error_guardar", { msg: res.error.message }));
-      });
+  function setKnownToggleState(btn, known) {
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", known ? "true" : "false");
+    btn.setAttribute("aria-label", t(known ? "known_toggle_aria_on" : "known_toggle_aria_off"));
+  }
+
+  // select*() rebuilds each detail badge row with innerHTML = "", which
+  // detaches the toggle; this re-appends the same persistent node (and so
+  // the same click listener) rather than creating a new button per render.
+  function appendKnownToggle(container, btn, known) {
+    setKnownToggleState(btn, !!known);
+    container.appendChild(btn);
+  }
+
+  function popKnownToggle(btn) {
+    btn.classList.remove("pop");
+    void btn.offsetWidth; // restart the animation on rapid repeat taps
+    btn.classList.add("pop");
+  }
+
+  function knownMark() {
+    var s = document.createElement("span");
+    s.className = "known-mark";
+    s.textContent = "✓";
+    s.setAttribute("role", "img");
+    s.setAttribute("aria-label", t("known_mark_aria"));
+    return s;
+  }
+
+  function knownFilterActive(filters) {
+    var f = filters.flag;
+    return !!f && (f.include.has("known") || f.exclude.has("known"));
+  }
+
+  // Brings every on-screen reflection of one item's known state up to date.
+  // With a Sabido chip active on that item's tab, the whole list re-renders,
+  // since the item may now fall on the other side of the filter. Otherwise
+  // only that one row's check mark is patched in place — a full re-render
+  // also resets the list's scroll position to the top, which is jarring
+  // when all you did was tick one word.
+  function refreshKnownUi(kind, id) {
+    var entry = id ? knownCollection(kind).find(function (x) { return x.id === id; }) : null;
+    var known = !!(entry && entry.data.known);
+    var filters = kind === "verb" ? activeVerbFilters : (kind === "word" ? activeWordFilters : activePhraseFilters);
+    var listEl = kind === "verb" ? el.list : (kind === "word" ? el.wordList : el.phraseList);
+    if (knownFilterActive(filters)) {
+      if (kind === "verb") renderList(); else if (kind === "word") renderWordList(); else renderPhraseList();
+    } else if (id) {
+      var inf = listEl.querySelector('.card-row[data-item-id="' + id + '"] .inf');
+      if (inf) {
+        var mark = inf.querySelector(".known-mark");
+        if (known && !mark) inf.appendChild(knownMark());
+        else if (!known && mark) mark.remove();
+      }
     }
-    nextFlashCard();
+    var selected = kind === "verb" ? selectedId : (kind === "word" ? selectedWordId : selectedPhraseId);
+    var toggle = kind === "verb" ? el.dKnown : (kind === "word" ? el.wdKnown : el.pdKnown);
+    if (id && selected === id) setKnownToggleState(toggle, known);
+    var card = flashDeck[flashIndex];
+    if (card && entry && card.data === entry.data) setKnownToggleState(el.flashKnownToggle, known);
+  }
+
+  // Updates the shared in-memory data object right away (the UI never waits
+  // on the network), saves in the background, and rolls back with a banner
+  // if the save fails. Deliberately does NOT call loadVerbs()/loadWords()/
+  // loadPhrases(): those replace every data object with a fresh one, which
+  // would orphan the references an open flashcard deck is holding.
+  function setItemKnown(kind, data, known) {
+    var id = findItemId(kind, data);
+    data.known = known;
+    refreshKnownUi(kind, id);
+    if (!id) return;
+    var table = kind === "verb" ? "verbs" : (kind === "word" ? "words" : "phrases");
+    supabaseClient.from(table).update({ known: known }).eq("id", id).then(function (res) {
+      if (!res.error) return;
+      data.known = !known;
+      refreshKnownUi(kind, id);
+      showBanner(t("msg_error_guardar", { msg: res.error.message }));
+    });
   }
 
   // Swiping the card (any of the four directions — up/left = "forward",
@@ -4346,6 +4418,19 @@
   // for the real verb/word detail views can be reused here, and importing a
   // verb snapshot is a straight insert; importing a word snapshot needs the
   // same camelCase→snake_case mapping handleWordSubmit already does.
+
+  // "known" (Sabido) is one person's own progress, not part of the content,
+  // so it never goes into a list snapshot — lists are the one path by which
+  // a verb/word/phrase's data crosses from one account to another (sharing
+  // a list, then importing it). Every list_items insert and the shared-list
+  // import's verb insert run their data through this. Words/phrases on
+  // import were already safe (they map fields explicitly), but routing
+  // everything through one helper keeps the rule in one place.
+  function listSnapshot(data) {
+    var copy = Object.assign({}, data);
+    delete copy.known;
+    return copy;
+  }
 
   function rowToList(row) {
     return {
@@ -4903,7 +4988,7 @@
         var key = norm(data.infinitive || data.word || data.phrase || "");
         if (existing[key]) { skipped++; return; }
         existing[key] = true; // also guards against dupes within this same batch
-        toInsert.push({ list_id: listId, item_type: itemType, data: data });
+        toInsert.push({ list_id: listId, item_type: itemType, data: listSnapshot(data) });
       });
       if (toInsert.length === 0) {
         el.listPickerMsg.textContent = skipped
@@ -5073,7 +5158,10 @@
         var inf = it.data.infinitive || "";
         if (existingInf[norm(inf)]) { skippedV.push(inf); return; }
         existingInf[norm(inf)] = true;
-        toInsertV.push(Object.assign({}, it.data)); // verb data keys already match column names 1:1
+        // verb data keys already match column names 1:1; listSnapshot() also
+        // drops any "known" an older snapshot might still carry, so the
+        // recipient always starts at "todavía no" on everything imported.
+        toInsertV.push(listSnapshot(it.data));
       }
     });
 
@@ -5115,7 +5203,7 @@
           return;
         }
         var listItemRows = s.items.map(function (it) {
-          return { list_id: listRes.data.id, item_type: it.itemType, data: it.data };
+          return { list_id: listRes.data.id, item_type: it.itemType, data: listSnapshot(it.data) };
         });
         supabaseClient.from("list_items").insert(listItemRows).then(function (itemsRes) {
           if (itemsRes.error) {
@@ -5606,7 +5694,7 @@
         var key = norm(data.infinitive || data.word || data.phrase || "");
         if (existing[key]) { already++; return; }
         existing[key] = true;
-        toInsert.push({ list_id: listId, item_type: itemType, data: data });
+        toInsert.push({ list_id: listId, item_type: itemType, data: listSnapshot(data) });
       });
       if (!toInsert.length) return { added: 0, already: already, error: null };
       return supabaseClient.from("list_items").insert(toInsert).then(function (insRes) {
@@ -6089,15 +6177,33 @@
     var card = flashDeck[flashIndex];
     if (card) playTts(card.backSpeak, el.flashBackSpeak);
   });
-  // Same stopPropagation reasoning as the speaker buttons above — without
-  // it, tapping either mastery button would also flip the card.
-  el.flashKnowBtn.addEventListener("click", function (evt) {
-    evt.stopPropagation();
-    setFlashCardMastery(true);
+  // Sabido toggles — see setItemKnown(). The flashcard one sits outside
+  // .flash-card, so unlike the speaker buttons it needs no stopPropagation
+  // to keep a tap from also flipping the card.
+  el.flashKnownToggle.addEventListener("click", function () {
+    var card = flashDeck[flashIndex];
+    if (!card) return;
+    setItemKnown(card.kind, card.data, !card.data.known);
+    setKnownToggleState(el.flashKnownToggle, !!card.data.known);
+    popKnownToggle(el.flashKnownToggle);
   });
-  el.flashNotYetBtn.addEventListener("click", function (evt) {
-    evt.stopPropagation();
-    setFlashCardMastery(false);
+  el.dKnown.addEventListener("click", function () {
+    var entry = allVerbs.find(function (v) { return v.id === selectedId; });
+    if (!entry) return;
+    setItemKnown("verb", entry.data, !entry.data.known);
+    popKnownToggle(el.dKnown);
+  });
+  el.wdKnown.addEventListener("click", function () {
+    var entry = allWords.find(function (v) { return v.id === selectedWordId; });
+    if (!entry) return;
+    setItemKnown("word", entry.data, !entry.data.known);
+    popKnownToggle(el.wdKnown);
+  });
+  el.pdKnown.addEventListener("click", function () {
+    var entry = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
+    if (!entry) return;
+    setItemKnown("phrase", entry.data, !entry.data.known);
+    popKnownToggle(el.pdKnown);
   });
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
