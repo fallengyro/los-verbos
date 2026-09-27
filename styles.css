@@ -909,7 +909,43 @@
 
   form#verb-form { border: 1px dashed var(--line); border-radius: 10px; padding: 20px; background: var(--paper-raised); margin-bottom: 32px; }
   form#verb-form h3 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-size: 20px; margin: 0 0 14px; }
-  .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  /* Add-verb/add-word field layout (reworked 2026-09-26). Used to be a CSS
+     Grid with `grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))`
+     — every field got an equal fractional share of the row no matter what
+     it actually held, so a 3-option "-ar/-er/-ir" <select> took the exact
+     same width as the infinitive field, which (once the RAE-lookup button
+     moved in beside it) badly needed MORE room than that shared column
+     gave it, while short selects/checkboxes had far more room than their
+     content needed. A flex row with explicit proportional size tiers
+     fixes both at once: width now reflects what a field holds, not just
+     how many fields fit across the row. `.field-grid > .field` is the
+     fallback for anything not given one of the tiers below (e.g. "Patrón /
+     notas", "Preposición fija" — short, specialized text that doesn't need
+     its own tier). Tiers, applied via a second class alongside `.field` in
+     the HTML:
+       .field-tight  — a handful of characters at most (e.g. the -ar/-er/-ir
+                        type select).
+       .field-narrow — a short dropdown list (irregularidad, transitividad,
+                        categoría gramatical, género).
+       .field-wide   — free text expected to run to a full phrase/sentence
+                        (definición, notas, oración de ejemplo).
+       .field-lead   — the infinitive/word input + its "Buscar en RAE"
+                        button, which needs real room for both.
+     All four are min/max-bounded, not fixed, so the row still reflows
+     naturally at narrow (mobile) widths — see `.field-input-row` right
+     below for how the button/input split whatever width `.field-lead`
+     ends up with. */
+  .field-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .field-grid > .field { flex: 1 1 170px; min-width: 150px; }
+  .field-grid > .field.field-tight { flex: 0 1 110px; min-width: 90px; max-width: 140px; }
+  .field-grid > .field.field-narrow { flex: 0 1 160px; min-width: 140px; max-width: 210px; }
+  .field-grid > .field.field-wide { flex: 2 1 260px; min-width: 220px; }
+  .field-grid > .field.field-lead { flex: 1 1 240px; min-width: 220px; }
+  .field-grid > .field.checks { flex: 0 1 auto; }
+  /* The one long-label checkbox ("¿También tiene uso personal...?") needs
+     its own full row rather than being squeezed into a narrow auto-width
+     column like its short-label checkbox siblings above. */
+  #f-also-personal-use-wrap { flex-basis: 100%; }
   .field { display: flex; flex-direction: column; gap: 4px; }
   .field.checks { flex-direction: row; align-items: center; gap: 8px; }
   .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); font-weight: 600; }

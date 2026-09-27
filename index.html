@@ -228,18 +228,18 @@
   <form id="verb-form" hidden>
     <h3 id="form-title" data-i18n="form_title_add_verb">Agregar verbo</h3>
     <div class="field-grid">
-      <div class="field">
+      <div class="field field-lead">
         <label for="f-infinitive" data-i18n="label_infinitivo">Infinitivo</label>
         <div class="field-input-row">
           <input type="text" id="f-infinitive" required />
           <button type="button" class="icon-btn" id="f-rae-lookup" data-i18n="btn_rae_lookup">Buscar en RAE</button>
         </div>
       </div>
-      <div class="field">
+      <div class="field field-wide">
         <label for="f-definition" data-i18n="label_definicion">Definición</label>
         <input type="text" id="f-definition" />
       </div>
-      <div class="field">
+      <div class="field field-tight">
         <label for="f-type" data-i18n="chip_group_type">Tipo</label>
         <select id="f-type">
           <option value="-ar">-ar</option>
@@ -247,7 +247,7 @@
           <option value="-ir">-ir</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field field-narrow">
         <label for="f-irregularity" data-i18n="chip_group_irregularity">Irregularidad</label>
         <select id="f-irregularity">
           <option value="regular" data-i18n-tag="regular">regular</option>
@@ -256,7 +256,7 @@
           <option value="irregular (total)" data-i18n-tag="irregular (total)">irregular (total)</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field field-narrow">
         <label for="f-transitivity" data-i18n="chip_group_transitivity">Transitividad</label>
         <select id="f-transitivity">
           <option value="transitivo" data-i18n-tag="transitivo">transitivo</option>
@@ -389,18 +389,18 @@
   <form id="word-form" hidden>
     <h3 id="word-form-title" data-i18n="form_title_add_word">Agregar palabra</h3>
     <div class="field-grid">
-      <div class="field">
+      <div class="field field-lead">
         <label for="wf-word" data-i18n="label_palabra">Palabra</label>
         <div class="field-input-row">
           <input type="text" id="wf-word" required />
           <button type="button" class="icon-btn" id="wf-rae-lookup" data-i18n="btn_rae_lookup">Buscar en RAE</button>
         </div>
       </div>
-      <div class="field">
+      <div class="field field-wide">
         <label for="wf-definition" data-i18n="label_definicion">Definición</label>
         <input type="text" id="wf-definition" />
       </div>
-      <div class="field">
+      <div class="field field-narrow">
         <label for="wf-pos" data-i18n="label_categoria_gramatical">Categoría gramatical</label>
         <select id="wf-pos">
           <option value="sustantivo" data-i18n-tag="sustantivo">sustantivo</option>
@@ -412,7 +412,7 @@
           <option value="interjección" data-i18n-tag="interjección">interjección</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field field-tight">
         <label for="wf-gender" data-i18n="chip_group_gender">Género</label>
         <select id="wf-gender">
           <option value="">N/A</option>
@@ -421,11 +421,11 @@
           <option value="neutro" data-i18n-tag="neutro">neutro</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field field-wide">
         <label for="wf-notes" data-i18n="label_notas">Notas / excepciones</label>
         <input type="text" id="wf-notes" data-i18n-placeholder="placeholder_notas" placeholder="ej. femenino, pero usa &quot;el&quot;: el agua" />
       </div>
-      <div class="field">
+      <div class="field field-wide">
         <label for="wf-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
         <input type="text" id="wf-example" data-i18n-placeholder="placeholder_ejemplo" placeholder="ej. Tomo mucha agua todos los días." />
       </div>

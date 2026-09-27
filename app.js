@@ -193,6 +193,7 @@
       rae_lookup_not_found: "No se encontró en el DLE. Completá los campos a mano.",
       rae_lookup_filled: "Campos completados desde el DLE — revisalos antes de guardar.",
       rae_lookup_maybe_irregular: "El DLE muestra “{form}” para “yo”, que no coincide con la conjugación regular esperada — probablemente este verbo sea irregular; revisá el patrón.",
+      rae_lookup_translation_unavailable: " La traducción automática no está disponible ahora, así que la definición quedó en español.",
       rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
@@ -457,6 +458,7 @@
       rae_lookup_not_found: "Not found in the DLE. Fill in the fields by hand.",
       rae_lookup_filled: "Fields filled in from the DLE — check them over before saving.",
       rae_lookup_maybe_irregular: "The DLE shows “{form}” for “yo”, which doesn't match the expected regular conjugation — this verb is probably irregular; check the pattern.",
+      rae_lookup_translation_unavailable: " Automatic translation isn't available right now, so the definition stayed in Spanish.",
       rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
       lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
@@ -3454,6 +3456,12 @@
   // own "yo" form is real dictionary data, but deciding how a real irregular
   // verb's whole pattern is annotated in this app is still a human judgment
   // call, not something to guess at automatically.
+  //
+  // `data.definition` arrives already translated to English by the Edge
+  // Function (Azure Translator, added 2026-09-26 — see dle-lookup/index.ts)
+  // — a RAE definition is Spanish-only, which isn't useful for this field's
+  // job as an English gloss. The example sentence is NOT translated, on
+  // purpose: it's meant to stay real Spanish usage to read.
   function lookupInRae(kind) {
     var isVerb = kind === "verb";
     var termEl = isVerb ? el.fInfinitive : el.wfWord;
@@ -3497,13 +3505,26 @@
           if (data.presentYo && expectedYo && data.presentYo.toLowerCase() !== expectedYo.toLowerCase()) {
             msg += " " + t("rae_lookup_maybe_irregular", { form: data.presentYo });
           }
+          // The Edge Function translates the definition es->en via Azure
+          // Translator (see dle-lookup/index.ts) and reports whether that
+          // actually happened — say so plainly rather than silently leaving
+          // a Spanish sentence in a field meant to be an English gloss
+          // (e.g. before mason has deployed the AZURE_TRANSLATOR_KEY
+          // secret, or on a transient Azure hiccup).
+          if (data.definition && data.definitionTranslated === false) {
+            msg += t("rae_lookup_translation_unavailable");
+          }
           msgEl.textContent = msg;
         } else {
           if (data.definition && !el.wfDefinition.value) el.wfDefinition.value = data.definition;
           if (data.pos) el.wfPos.value = data.pos;
           if (data.gender) el.wfGender.value = data.gender;
           if (data.example && !el.wfExample.value) el.wfExample.value = data.example;
-          msgEl.textContent = t("rae_lookup_filled");
+          var wordMsg = t("rae_lookup_filled");
+          if (data.definition && data.definitionTranslated === false) {
+            wordMsg += t("rae_lookup_translation_unavailable");
+          }
+          msgEl.textContent = wordMsg;
         }
       })
       .catch(function (err) {
