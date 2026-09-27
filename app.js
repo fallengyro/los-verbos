@@ -192,7 +192,7 @@
       rae_lookup_looking_up: "Buscando…",
       rae_lookup_not_found: "No se encontró en el DLE. Completá los campos a mano.",
       rae_lookup_filled: "Campos completados desde el DLE — revisalos antes de guardar.",
-      rae_lookup_maybe_irregular: "El DLE muestra “{form}” para “yo”, que no coincide con la conjugación regular esperada — probablemente este verbo sea irregular; revisá el patrón.",
+      rae_lookup_maybe_irregular: "Algunas de las formas que trajo el DLE no coinciden con la conjugación regular esperada — probablemente este verbo sea irregular; revisá el patrón y la Irregularidad.",
       rae_lookup_translation_unavailable: " La traducción automática no está disponible ahora, así que la definición quedó en español.",
       rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
@@ -457,7 +457,7 @@
       rae_lookup_looking_up: "Looking up…",
       rae_lookup_not_found: "Not found in the DLE. Fill in the fields by hand.",
       rae_lookup_filled: "Fields filled in from the DLE — check them over before saving.",
-      rae_lookup_maybe_irregular: "The DLE shows “{form}” for “yo”, which doesn't match the expected regular conjugation — this verb is probably irregular; check the pattern.",
+      rae_lookup_maybe_irregular: "Some of the forms the DLE filled in don't match the expected regular conjugation — this verb is probably irregular; check the pattern and Irregularidad.",
       rae_lookup_translation_unavailable: " Automatic translation isn't available right now, so the definition stayed in Spanish.",
       rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
       lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
@@ -3448,20 +3448,77 @@
   // and can change (or clear) anything before saving, exactly like the
   // existing JSON-import path.
   //
-  // Deliberately does NOT touch f-type (-ar/-er/-ir), f-irregularity, or any
-  // conjugation-table cell — those stay exactly as today, either derived
-  // from the infinitive elsewhere or typed in by hand. The one exception is
-  // the informational-only irregularity note below, which never writes to
-  // f-irregularity itself, just tells mason/his wife to go look at it: RAE's
-  // own "yo" form is real dictionary data, but deciding how a real irregular
-  // verb's whole pattern is annotated in this app is still a human judgment
-  // call, not something to guess at automatically.
+  // f-type (-ar/-er/-ir) and the whole conjugation table, including
+  // imperativo, are now auto-filled too (2026-09-27, per mason: "i think
+  // that i would rather pull the conjugations and the tags based on what is
+  // on rae since there is a tu/vos in the api that we are using" — reversing
+  // this function's original "never touch the table" design). See
+  // dle-lookup/index.ts's file header for the full rationale, especially
+  // what's still deliberately left alone: f-irregularity (RAE has no such
+  // classification, and guessing it is a real judgment call — confirmed with
+  // mason rather than assumed) and the vos cell of a reflexive verb's
+  // imperativo row (needs an enclitic pronoun suffix, not a plain prefix).
   //
   // `data.definition` arrives already translated to English by the Edge
   // Function (Azure Translator, added 2026-09-26 — see dle-lookup/index.ts)
   // — a RAE definition is Spanish-only, which isn't useful for this field's
   // job as an English gloss. The example sentence is NOT translated, on
   // purpose: it's meant to stay real Spanish usage to read.
+
+  // Fills the conjugation-table + imperativo inputs from the `forms` object
+  // dle-lookup/index.ts builds out of RAE's own data (see that file's header
+  // for exactly which rae-api.com field feeds which cell). Same
+  // non-presumptuous convention as every other RAE-lookup field: only ever
+  // writes into a cell that's still empty.
+  //
+  // RAE's conjugated forms never include the reflexive pronoun (a
+  // pronominal verb's "yo" cell comes back as "llamo," not "me llamo"),
+  // while this app's own stored forms always do (see STARTER_VERBS' llamarse
+  // above) — so a reflexive verb's cells get the right pronoun prefixed on
+  // here. The one deliberate exception is the vos imperativo cell: Spanish
+  // attaches that pronoun as an enclitic suffix instead ("llamate," not "te
+  // llamá"), which isn't a plain prefix and isn't attempted — left blank for
+  // a human to type, same philosophy as never auto-setting f-irregularity.
+  var IMPERATIVO_REFLEXIVE_PRONOUNS = { vos: "te", usted: "se", nosotros: "nos", ustedes: "se" };
+  function fillConjugationCellsFromRae(forms, reflexive) {
+    PERSONS.forEach(function (p) {
+      TENSES.concat(SUBJ_TENSES).forEach(function (t) {
+        var raw = forms[t.key] && forms[t.key][p.key];
+        if (!raw) return;
+        var inp = document.getElementById("f-" + t.key + "-" + p.key);
+        if (!inp || inp.value) return;
+        inp.value = reflexive ? REFLEXIVE_PRONOUNS[p.key] + " " + raw : raw;
+      });
+    });
+
+    var imper = forms.imperativo || {};
+    IMPERATIVE_PERSONS.forEach(function (p) {
+      if (reflexive && p.key === "vos") return; // enclitic case, see above
+      var raw = imper[p.key];
+      if (!raw) return;
+      var inp = document.getElementById("f-imperativo-" + p.key);
+      if (!inp || inp.value) return;
+      inp.value = reflexive ? IMPERATIVO_REFLEXIVE_PRONOUNS[p.key] + " " + raw : raw;
+    });
+  }
+
+  // Whole-table version of the old yo-only irregularity hint: reuses the
+  // app's own isCellIrregular() (the same function the conjugation table
+  // itself uses to flag deviations) across every cell RAE just supplied,
+  // rather than re-deriving what a regular form looks like a second time.
+  // Purely informational — never sets f-irregularity itself (see above).
+  function raeFormsLookIrregular(forms, term, reflexive) {
+    var hintData = { infinitive: term, reflexive: reflexive };
+    return PERSONS.some(function (p) {
+      return TENSES.concat(SUBJ_TENSES).some(function (t) {
+        var raw = forms[t.key] && forms[t.key][p.key];
+        if (!raw) return false;
+        var val = reflexive ? REFLEXIVE_PRONOUNS[p.key] + " " + raw : raw;
+        return isCellIrregular(hintData, t.key, p.key, val);
+      });
+    });
+  }
+
   function lookupInRae(kind) {
     var isVerb = kind === "verb";
     var termEl = isVerb ? el.fInfinitive : el.wfWord;
@@ -3494,16 +3551,18 @@
           if (data.gerundio) el.fGerundio.value = data.gerundio;
           if (data.participio) el.fParticipio.value = data.participio;
 
-          // Non-presumptuous irregularity hint: reuse the app's own
-          // regularForm() (the same function the conjugation table itself
-          // uses to flag deviations) rather than re-deriving what a regular
-          // "yo" form looks like a second time. If RAE's real "yo" doesn't
-          // match, that's a plain factual mismatch worth flagging — it
-          // never sets f-irregularity for them.
-          var expectedYo = regularForm(term, "presente", "yo");
+          // -ar/-er/-ir is fully implied by the two letters already sitting
+          // in f-infinitive — not RAE data at all, just the same verbClass()
+          // the conjugation table itself uses, run a second time here.
+          var klass = verbClass(term);
+          if (klass) el.fType.value = "-" + klass;
+
+          var reflexiveNow = el.fReflexive.checked;
+          if (data.forms) fillConjugationCellsFromRae(data.forms, reflexiveNow);
+
           var msg = t("rae_lookup_filled");
-          if (data.presentYo && expectedYo && data.presentYo.toLowerCase() !== expectedYo.toLowerCase()) {
-            msg += " " + t("rae_lookup_maybe_irregular", { form: data.presentYo });
+          if (data.forms && raeFormsLookIrregular(data.forms, term, reflexiveNow)) {
+            msg += " " + t("rae_lookup_maybe_irregular");
           }
           // The Edge Function translates the definition es->en via Azure
           // Translator (see dle-lookup/index.ts) and reports whether that
