@@ -139,6 +139,7 @@
         <button type="button" class="chip" data-facet="flag" data-value="reflexive" data-i18n-tag="reflexivo">reflexivo</button>
         <button type="button" class="chip" data-facet="flag" data-value="auxiliar" data-i18n-tag="auxiliar">auxiliar</button>
         <button type="button" class="chip" data-facet="flag" data-value="gustarLike" data-i18n-tag="dativo">dativo</button>
+        <button type="button" class="chip" data-facet="flag" data-value="known" data-i18n-tag="sabido">sabido</button>
       </div>
       <div class="chip-group" id="verb-lists-group" hidden>
         <span class="chip-label" data-i18n="chip_group_list">Listas</span>
@@ -288,6 +289,10 @@
         <input type="checkbox" id="f-also-personal-use" />
         <label for="f-also-personal-use" style="margin:0;" data-i18n="check_also_personal_use">¿También tiene uso personal (no dativo)?</label>
       </div>
+      <div class="field checks">
+        <input type="checkbox" id="f-known" />
+        <label for="f-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
+      </div>
     </div>
 
     <div class="conj-form-scroll">
@@ -342,6 +347,10 @@
         <button type="button" class="chip" data-facet="gender" data-value="masculino" data-i18n-tag="masculino">masculino</button>
         <button type="button" class="chip" data-facet="gender" data-value="femenino" data-i18n-tag="femenino">femenino</button>
         <button type="button" class="chip" data-facet="gender" data-value="neutro" data-i18n-tag="neutro">neutro</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_flags">Marcas</span>
+        <button type="button" class="chip" data-facet="flag" data-value="known" data-i18n-tag="sabido">sabido</button>
       </div>
       <div class="chip-group" id="word-lists-group" hidden>
         <span class="chip-label" data-i18n="chip_group_list">Listas</span>
@@ -429,6 +438,10 @@
         <label for="wf-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
         <input type="text" id="wf-example" data-i18n-placeholder="placeholder_ejemplo" placeholder="ej. Tomo mucha agua todos los días." />
       </div>
+      <div class="field checks">
+        <input type="checkbox" id="wf-known" />
+        <label for="wf-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
+      </div>
     </div>
 
     <div class="form-actions">
@@ -471,6 +484,7 @@
       <div class="chip-group">
         <span class="chip-label" data-i18n="chip_group_flags">Marcas</span>
         <button type="button" class="chip" data-facet="flag" data-value="idiomatic" data-i18n-tag="idiomática">idiomática</button>
+        <button type="button" class="chip" data-facet="flag" data-value="known" data-i18n-tag="sabido">sabido</button>
       </div>
       <div class="chip-group" id="phrase-lists-group" hidden>
         <span class="chip-label" data-i18n="chip_group_list">Listas</span>
@@ -552,6 +566,10 @@
       <div class="field checks">
         <input type="checkbox" id="pf-idiomatic" />
         <label for="pf-idiomatic" style="margin:0;" data-i18n="check_idiomatic">¿Es idiomática (no se traduce palabra por palabra)?</label>
+      </div>
+      <div class="field checks">
+        <input type="checkbox" id="pf-known" />
+        <label for="pf-known" style="margin:0;" data-i18n="check_sabido">¿Ya lo sabés?</label>
       </div>
       <div class="field" id="pf-literal-wrap" hidden>
         <label for="pf-literal" data-i18n="label_literal">Traducción literal</label>
@@ -847,6 +865,10 @@
         <div class="flash-answer" id="flash-back-main"></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
+        <div class="flash-mastery-row" id="flash-mastery-row">
+          <button type="button" class="btn-secondary flash-not-yet-btn" id="flash-not-yet-btn" data-i18n="flash_not_yet_btn" data-i18n-aria-label="flash_mark_not_yet_aria" aria-label="Marcar como todavía no">Todavía no</button>
+          <button type="button" class="btn-primary flash-know-btn" id="flash-know-btn" data-i18n="flash_know_btn" data-i18n-aria-label="flash_mark_known_aria" aria-label="Marcar como sabido">Lo sé</button>
+        </div>
       </div>
     </div>
     <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" data-i18n-aria-label="flash_arrow_next_aria" aria-label="Siguiente">&rsaquo;</button>

@@ -1353,6 +1353,30 @@
   .flash-prompt-sub { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--accent-deep); }
   .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
   .flash-back-badges { justify-content: center; margin-top: 4px; }
+  /* "Lo sé" / "Todavía no" — self-reported mastery, back face only (2026-09-28,
+     mason's wife's ask while drilling). Compact padding/font vs. the default
+     .btn-primary/.btn-secondary sizing: the fixed-height .flash-card (min(56vh,
+     320px) desktop, min(48vh,280px) mobile — see .flash-card above) has no
+     scroll, so a wide row here risks overflowing past the card on short
+     screens or long back-face text; verified with the project's Playwright
+     harness rather than by inspection alone. Same .flipped-driven visibility
+     mechanism as .flash-speak-btn above, timed to the same 0.16s real 90°
+     crossover of .flash-card's flip transition — see the long comment on
+     .flash-speak-btn for why that number and not a naive half-duration guess. */
+  .flash-mastery-row { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; justify-content: center; }
+  .flash-mastery-row .btn-primary, .flash-mastery-row .btn-secondary {
+    padding: 7px 14px; font-size: 13px;
+  }
+  .flash-back .flash-mastery-row {
+    visibility: hidden; pointer-events: none;
+    transition: visibility 0s linear 0s, pointer-events 0s linear 0s, opacity 0.15s;
+    opacity: 0;
+  }
+  .flash-card.flipped .flash-back .flash-mastery-row {
+    visibility: visible; pointer-events: auto;
+    transition: visibility 0s linear 0.16s, pointer-events 0s linear 0.16s, opacity 0.15s;
+    opacity: 1;
+  }
   .flash-hint { text-align: center; font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 10px 0 0; }
   /* Reuses .form-msg's red error-text treatment; only ever shown briefly,
      on a failed playTts() call — see app.js. */

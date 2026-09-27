@@ -154,6 +154,7 @@
       check_auxiliar: "¿Auxiliar / modal?",
       check_gustar: "¿Tipo gustar?",
       check_also_personal_use: "¿También tiene uso personal (no dativo)?",
+      check_sabido: "¿Ya lo sabés?",
       gustar_tab_personal: "Uso personal",
       gustar_tab_dativo: "Uso dativo",
       impersonal_optional: "impersonal (opcional)",
@@ -201,6 +202,10 @@
       flash_next: "Siguiente ›",
       flash_arrow_prev_aria: "Anterior",
       flash_arrow_next_aria: "Siguiente",
+      flash_know_btn: "Lo sé",
+      flash_not_yet_btn: "Todavía no",
+      flash_mark_known_aria: "Marcar como sabido",
+      flash_mark_not_yet_aria: "Marcar como todavía no",
       tts_play_aria: "Escuchar pronunciación",
       tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
       tts_voice_elena_aria: "Voz: Elena",
@@ -430,6 +435,7 @@
       check_auxiliar: "Auxiliary / modal?",
       check_gustar: "Gustar-type?",
       check_also_personal_use: "Also has a personal-subject (non-dative) use?",
+      check_sabido: "Do you already know it?",
       gustar_tab_personal: "Personal use",
       gustar_tab_dativo: "Dative use",
       impersonal_optional: "impersonal (optional)",
@@ -477,6 +483,10 @@
       flash_next: "Next ›",
       flash_arrow_prev_aria: "Previous",
       flash_arrow_next_aria: "Next",
+      flash_know_btn: "I know it",
+      flash_not_yet_btn: "Not yet",
+      flash_mark_known_aria: "Mark as known",
+      flash_mark_not_yet_aria: "Mark as not yet known",
       tts_play_aria: "Hear pronunciation",
       tts_error: "Couldn't play the audio. Try again.",
       tts_voice_elena_aria: "Voice: Elena",
@@ -667,7 +677,8 @@
     "pregunta": { es: "pregunta", en: "question" },
     "muletilla": { es: "muletilla", en: "filler word" },
     "otro": { es: "otro", en: "other" },
-    "idiomática": { es: "idiomática", en: "idiomatic" }
+    "idiomática": { es: "idiomática", en: "idiomatic" },
+    "sabido": { es: "sabido", en: "known" }
   };
 
   // Register labels can't live in TAG_LABELS above (its "neutro" key is
@@ -1173,7 +1184,8 @@
   var editingWordId = null;
   var activeWordFilters = {
     pos: { include: new Set(), exclude: new Set() },
-    gender: { include: new Set(), exclude: new Set() }
+    gender: { include: new Set(), exclude: new Set() },
+    flag: { include: new Set(), exclude: new Set() }
   };
 
   var allPhrases = [];    // [{id, data}] — short common phrases/expressions
@@ -1334,6 +1346,7 @@
     fGustarLike: document.getElementById("f-gustar-like"),
     fAlsoPersonalUseWrap: document.getElementById("f-also-personal-use-wrap"),
     fAlsoPersonalUse: document.getElementById("f-also-personal-use"),
+    fKnown: document.getElementById("f-known"),
     fGerundio: document.getElementById("f-gerundio"),
     fParticipio: document.getElementById("f-participio"),
     fRaeLookup: document.getElementById("f-rae-lookup"),
@@ -1381,6 +1394,7 @@
     wfGender: document.getElementById("wf-gender"),
     wfNotes: document.getElementById("wf-notes"),
     wfExample: document.getElementById("wf-example"),
+    wfKnown: document.getElementById("wf-known"),
     wfRaeLookup: document.getElementById("wf-rae-lookup"),
     wordFilters: document.getElementById("word-filters"),
     wordFiltersClear: document.getElementById("word-filters-clear"),
@@ -1420,6 +1434,7 @@
     pfLiteral: document.getElementById("pf-literal"),
     pfNotes: document.getElementById("pf-notes"),
     pfExample: document.getElementById("pf-example"),
+    pfKnown: document.getElementById("pf-known"),
     phraseFilters: document.getElementById("phrase-filters"),
     phraseFiltersClear: document.getElementById("phrase-filters-clear"),
     phraseListsGroup: document.getElementById("phrase-lists-group"),
@@ -1455,6 +1470,8 @@
     flashBackSub: document.getElementById("flash-back-sub"),
     flashBackSpeak: document.getElementById("flash-back-speak"),
     flashBackBadges: document.getElementById("flash-back-badges"),
+    flashKnowBtn: document.getElementById("flash-know-btn"),
+    flashNotYetBtn: document.getElementById("flash-not-yet-btn"),
     flashTtsMsg: document.getElementById("flash-tts-msg"),
     flashPrevBtn: document.getElementById("flash-prev-btn"),
     flashNextBtn: document.getElementById("flash-next-btn"),
@@ -1904,6 +1921,7 @@
       if (value === "reflexive") return !!v.data.reflexive;
       if (value === "auxiliar") return !!v.data.auxiliar;
       if (value === "gustarLike") return !!v.data.gustar_like;
+      if (value === "known") return !!v.data.known;
       return false;
     }, ignoreExcludes)) return false;
     if (!listFacetOk(sharedListFilter, verbListMembership[norm(v.data.infinitive || "")], ignoreExcludes)) return false;
@@ -2299,6 +2317,7 @@
     el.fGustarLike.checked = false;
     el.fAlsoPersonalUse.checked = false;
     el.fAlsoPersonalUseWrap.hidden = true;
+    el.fKnown.checked = false;
     el.fGerundio.value = "";
     el.fParticipio.value = "";
     PERSONS.forEach(function (p) {
@@ -2330,6 +2349,7 @@
     el.fGustarLike.checked = !!data.gustar_like;
     el.fAlsoPersonalUse.checked = !!data.also_personal_use;
     el.fAlsoPersonalUseWrap.hidden = !data.gustar_like;
+    el.fKnown.checked = !!data.known;
     var forms = data.forms || {};
     el.fGerundio.value = forms.gerundio || "";
     el.fParticipio.value = forms.participio || "";
@@ -2422,6 +2442,7 @@
       auxiliar: el.fAuxiliar.checked,
       gustar_like: el.fGustarLike.checked,
       also_personal_use: el.fGustarLike.checked && el.fAlsoPersonalUse.checked,
+      known: el.fKnown.checked,
       forms: forms
     };
   }
@@ -2442,6 +2463,7 @@
         auxiliar: !!row.auxiliar,
         gustar_like: !!row.gustar_like,
         also_personal_use: !!row.also_personal_use,
+        known: !!row.known,
         forms: row.forms || {}
       }
     };
@@ -2525,6 +2547,7 @@
       auxiliar: !!sv.auxiliar,
       gustar_like: !!sv.gustar_like,
       also_personal_use: !!sv.also_personal_use,
+      known: !!sv.known,
       forms: sv.forms || {}
     };
   }
@@ -2589,6 +2612,10 @@
   function wordPassesFacets(v, ignoreExcludes) {
     if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "", ignoreExcludes)) return false;
     if (!facetOk(activeWordFilters, "gender", v.data.gender || "", ignoreExcludes)) return false;
+    if (!flagOk(activeWordFilters, "flag", function (value) {
+      if (value === "known") return !!v.data.known;
+      return false;
+    }, ignoreExcludes)) return false;
     if (!listFacetOk(sharedListFilter, wordListMembership[norm(v.data.word || "")], ignoreExcludes)) return false;
     return true;
   }
@@ -2676,6 +2703,7 @@
     el.wfGender.value = "";
     el.wfNotes.value = "";
     el.wfExample.value = "";
+    el.wfKnown.checked = false;
   }
 
   function fillWordForm(data) {
@@ -2685,6 +2713,7 @@
     el.wfGender.value = data.gender || "";
     el.wfNotes.value = data.notes || "";
     el.wfExample.value = data.example || "";
+    el.wfKnown.checked = !!data.known;
   }
 
   function openWordForm(mode, data) {
@@ -2714,7 +2743,8 @@
       partOfSpeech: el.wfPos.value,
       gender: el.wfGender.value,
       notes: el.wfNotes.value.trim(),
-      example: el.wfExample.value.trim()
+      example: el.wfExample.value.trim(),
+      known: el.wfKnown.checked
     };
   }
 
@@ -2727,7 +2757,8 @@
         partOfSpeech: row.part_of_speech || "sustantivo",
         gender: row.gender || "",
         notes: row.notes || "",
-        example: row.example || ""
+        example: row.example || "",
+        known: !!row.known
       }
     };
   }
@@ -2770,7 +2801,8 @@
       part_of_speech: data.partOfSpeech,
       gender: data.gender,
       notes: data.notes,
-      example: data.example
+      example: data.example,
+      known: data.known
     };
 
     var query = editingWordId
@@ -2863,6 +2895,7 @@
     if (!facetOk(activePhraseFilters, "register", v.data.register || "", ignoreExcludes)) return false;
     if (!flagOk(activePhraseFilters, "flag", function (value) {
       if (value === "idiomatic") return !!v.data.idiomatic;
+      if (value === "known") return !!v.data.known;
       return false;
     }, ignoreExcludes)) return false;
     if (!listFacetOk(sharedListFilter, phraseListMembership[norm(v.data.phrase || "")], ignoreExcludes)) return false;
@@ -2956,6 +2989,7 @@
     el.pfLiteral.value = "";
     el.pfNotes.value = "";
     el.pfExample.value = "";
+    el.pfKnown.checked = false;
   }
 
   function fillPhraseForm(data) {
@@ -2968,6 +3002,7 @@
     el.pfLiteral.value = data.literal || "";
     el.pfNotes.value = data.notes || "";
     el.pfExample.value = data.example || "";
+    el.pfKnown.checked = !!data.known;
   }
 
   function openPhraseForm(mode, data) {
@@ -2999,7 +3034,8 @@
       idiomatic: el.pfIdiomatic.checked,
       literal: el.pfLiteral.value.trim(),
       notes: el.pfNotes.value.trim(),
-      example: el.pfExample.value.trim()
+      example: el.pfExample.value.trim(),
+      known: el.pfKnown.checked
     };
   }
 
@@ -3014,7 +3050,8 @@
         idiomatic: !!row.idiomatic,
         literal: row.literal || "",
         notes: row.notes || "",
-        example: row.example || ""
+        example: row.example || "",
+        known: !!row.known
       }
     };
   }
@@ -3059,7 +3096,8 @@
       idiomatic: data.idiomatic,
       literal: data.literal,
       notes: data.notes,
-      example: data.example
+      example: data.example,
+      known: data.known
     };
 
     var query = editingPhraseId
@@ -4166,6 +4204,37 @@
 
   function toggleFlashFlip() {
     el.flashCard.classList.toggle("flipped");
+  }
+
+  // buildFlashDeck() pushes a live reference to the item's own data object
+  // (so mutating card.data here is immediately visible in allVerbs/allWords/
+  // allPhrases too — see below), but it doesn't carry that item's id, which
+  // lives as a sibling v.id outside data. Personal vocab lists are small, so
+  // an O(n) reference-equality scan at click-time is cheap and avoids
+  // threading id through all the deck.push() call sites above.
+  function findItemId(kind, data) {
+    var arr = kind === "verb" ? allVerbs : (kind === "word" ? allWords : allPhrases);
+    var found = arr.find(function (item) { return item.data === data; });
+    return found ? found.id : null;
+  }
+
+  // Self-reported mastery ("Lo sé" / "Todavía no"). Mutates the shared data
+  // object in place so the verbs/words/phrases tabs pick up the change on
+  // their next render with no explicit re-render call, then advances right
+  // away rather than waiting on the network round-trip — the Supabase write
+  // happens in the background and only a banner shows if it fails.
+  function setFlashCardMastery(known) {
+    if (flashIndex < 0 || flashIndex >= flashDeck.length) return;
+    var card = flashDeck[flashIndex];
+    card.data.known = known;
+    var table = card.kind === "verb" ? "verbs" : (card.kind === "word" ? "words" : "phrases");
+    var id = findItemId(card.kind, card.data);
+    if (id) {
+      supabaseClient.from(table).update({ known: known }).eq("id", id).then(function (res) {
+        if (res.error) showBanner(t("msg_error_guardar", { msg: res.error.message }));
+      });
+    }
+    nextFlashCard();
   }
 
   // Swiping the card (any of the four directions — up/left = "forward",
@@ -6019,6 +6088,16 @@
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
     if (card) playTts(card.backSpeak, el.flashBackSpeak);
+  });
+  // Same stopPropagation reasoning as the speaker buttons above — without
+  // it, tapping either mastery button would also flip the card.
+  el.flashKnowBtn.addEventListener("click", function (evt) {
+    evt.stopPropagation();
+    setFlashCardMastery(true);
+  });
+  el.flashNotYetBtn.addEventListener("click", function (evt) {
+    evt.stopPropagation();
+    setFlashCardMastery(false);
   });
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
