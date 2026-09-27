@@ -678,10 +678,10 @@
 
   /* Listas panel row (2026-09-27, shared-list-filter feature) — .card-row
      used to BE the row's one <button> (the whole row selected the list);
-     now the row needs a second, separate action ("Filtrar por esta lista"),
-     and a button can't nest inside another button. .card-row is now a
-     plain div wrapper instead, holding .list-row-main (still does the
-     select-on-click it always did) alongside the new shortcut button.
+     now the row needs a second, separate action (the tri-state filter
+     toggle below), and a button can't nest inside another button. .card-row
+     is now a plain div wrapper instead, holding .list-row-main (still does
+     the select-on-click it always did) alongside the toggle button.
      display: contents on .list-row-main deliberately makes it generate no
      box of its own — its .inf/.def children become direct flex items of
      .card-row, same as when .card-row was itself the button, so every
@@ -699,7 +699,45 @@
      button's own centered text-align instead of .card-row's "left"
      (caught by rendering this at 375px/desktop before shipping). */
   .list-row-main { display: contents; text-align: left; color: inherit; font: inherit; }
-  .list-filter-shortcut-btn { flex-shrink: 0; align-self: center; }
+
+  /* The Listas panel's own tri-state toggle (2026-09-27, follow-up to the
+     shared-list-filter feature above) — replaces what was originally a
+     one-way "Filtrar por esta lista" shortcut button. Mason found the old
+     button's behavior (set to include, then jump to whichever content tab
+     he'd been on) unintuitive given the filter is global, and asked for
+     the same tri-state control the Listas picker modal already uses
+     instead, so toggling a list's filter looks and behaves identically
+     whether it's done from a content tab's picker or straight from this
+     panel. Reuses the picker modal's .state-glyph visual (same
+     accent/danger circle + checkmark/cross) at a smaller, icon-sized
+     footprint appropriate for sitting beside .list-row-main rather than
+     being a full-width row of its own like the modal's picker-row is. */
+  .list-row-filter-toggle {
+    flex-shrink: 0;
+    align-self: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper-sunken);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .list-row-filter-toggle:hover { border-color: var(--accent); }
+  .list-row-filter-toggle .state-glyph {
+    width: 100%; height: 100%; border-radius: inherit;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: transparent;
+  }
+  .list-row-filter-toggle.state-include { background: var(--accent); border-color: var(--accent); }
+  .list-row-filter-toggle.state-include .state-glyph { color: var(--paper); }
+  .list-row-filter-toggle.state-include .state-glyph::after { content: "\2713"; }
+  .list-row-filter-toggle.state-exclude { background: var(--danger); border-color: var(--danger); }
+  .list-row-filter-toggle.state-exclude .state-glyph { color: var(--paper); }
+  .list-row-filter-toggle.state-exclude .state-glyph::after { content: "\2715"; }
 
   .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }

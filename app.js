@@ -1238,11 +1238,6 @@
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
   var listFilterTarget = null; // "verbs" | "words" | "phrases" — which tab's trigger opened #list-filter-overlay (the shared list facet itself is edited the same way regardless of tab; this only matters for reopening the modal in place)
   var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
-  // Last of the three content tabs (not "lists" or "flashcards") that was
-  // active — where the Listas panel's "Filtrar por esta lista" shortcut
-  // sends mason after it sets the filter, since a list can span all three
-  // and the tab he came from is the best guess at which one he wants to see.
-  var lastContentTab = "verbs";
 
   // Reverse membership maps rebuilt every time loadLists() runs (from the
   // full list_items rows, not just a count). list_items stores denormalized
@@ -2550,7 +2545,6 @@
 
   // ================= vocabulario (general words) =================
   function setMainTab(tab) {
-    if (tab === "verbs" || tab === "words" || tab === "phrases") lastContentTab = tab;
     el.tabVerbs.classList.toggle("active", tab === "verbs");
     el.tabWords.classList.toggle("active", tab === "words");
     el.tabPhrases.classList.toggle("active", tab === "phrases");
@@ -4538,23 +4532,6 @@
       });
   }
 
-  // Sets one list to "include" in the shared Listas facet — a shortcut for
-  // what tri-state-toggling it to include in the picker already does, not a
-  // reset (see the handoff doc): every other included list stays included
-  // (union), every tag filter on every tab is left exactly as it was, and
-  // an excluded list simply becomes included instead. Then jumps mason to
-  // whichever content tab he was on before opening Listas, since that's the
-  // best guess at which of the (possibly mixed) content types in this list
-  // he wants to see filtered — a list can hold verbs, words and phrases at
-  // once, so there's no single "the" filtered tab to land on otherwise.
-  function filterToList(listId) {
-    sharedListFilter.list.exclude.delete(listId);
-    sharedListFilter.list.include.add(listId);
-    saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
-    ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); rerenderTab(tab); });
-    setMainTab(lastContentTab);
-  }
-
   function renderListsPanel() {
     el.listsList.innerHTML = "";
     el.listsEmptyMsg.hidden = allLists.length !== 0;
@@ -4588,14 +4565,31 @@
         else selectListRow(l.id);
       });
 
-      var filterBtn = document.createElement("button");
-      filterBtn.type = "button";
-      filterBtn.className = "icon-btn list-filter-shortcut-btn";
-      filterBtn.textContent = t("btn_filter_to_list");
-      filterBtn.addEventListener("click", function () { filterToList(l.id); });
+      // The same tri-state control as the Listas picker modal's rows
+      // (renderListFilterRows above) — neutral -> include -> exclude ->
+      // neutral, same accent/danger state-glyph — so toggling the shared
+      // list filter looks and behaves identically whichever screen mason
+      // does it from. Deliberately does NOT navigate anywhere: mason found
+      // the old "Filtrar por esta lista" shortcut's jump-to-last-tab
+      // unhelpful when toggling several lists in a row from this panel, so
+      // this just updates the filter in place and leaves him on Listas.
+      var toggleBtn = document.createElement("button");
+      toggleBtn.type = "button";
+      toggleBtn.className = "list-row-filter-toggle state-" + chipVisualState(sharedListFilter, "list", l.id);
+      toggleBtn.setAttribute("aria-label", t("btn_filter_to_list") + " — " + l.data.name);
+      var glyph = document.createElement("span");
+      glyph.className = "state-glyph";
+      toggleBtn.appendChild(glyph);
+      toggleBtn.addEventListener("click", function () {
+        cycleFacetValue(sharedListFilter, "list", l.id);
+        saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+        toggleBtn.className = "list-row-filter-toggle state-" + chipVisualState(sharedListFilter, "list", l.id);
+        toggleBtn.setAttribute("aria-label", t("btn_filter_to_list") + " — " + l.data.name);
+        ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); rerenderTab(tab); });
+      });
 
       wrap.appendChild(btn);
-      wrap.appendChild(filterBtn);
+      wrap.appendChild(toggleBtn);
       li.appendChild(wrap);
       el.listsList.appendChild(li);
     });
