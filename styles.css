@@ -676,6 +676,31 @@
   .icon-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
   .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
 
+  /* Listas panel row (2026-09-27, shared-list-filter feature) — .card-row
+     used to BE the row's one <button> (the whole row selected the list);
+     now the row needs a second, separate action ("Filtrar por esta lista"),
+     and a button can't nest inside another button. .card-row is now a
+     plain div wrapper instead, holding .list-row-main (still does the
+     select-on-click it always did) alongside the new shortcut button.
+     display: contents on .list-row-main deliberately makes it generate no
+     box of its own — its .inf/.def children become direct flex items of
+     .card-row, same as when .card-row was itself the button, so every
+     existing .card-row/.card-row .inf/.card-row .def rule (including the
+     640px-wide wrap-to-its-own-line override below) keeps working
+     unchanged for them. Trade-off: a couple of browsers drop a
+     display:contents element's own focus ring, so keyboard-focusing this
+     button shows no outline — acceptable here since .card-row:hover/
+     :focus-visible's background swap still gives a visible cue.
+     text-align/color/font still need an explicit reset here even though
+     the box itself is gone: an inherited property's value comes from the
+     immediate DOM parent's computed value regardless of whether that
+     parent generates a box, and an unstyled <button> defaults to centered,
+     non-inherited text — without this, .inf/.def would inherit the
+     button's own centered text-align instead of .card-row's "left"
+     (caught by rendering this at 375px/desktop before shipping). */
+  .list-row-main { display: contents; text-align: left; color: inherit; font: inherit; }
+  .list-filter-shortcut-btn { flex-shrink: 0; align-self: center; }
+
   .detail .definition { color: var(--ink-soft); font-size: 15px; margin: 2px 0 10px; }
   .detail .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
   .detail .pattern-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 6px 0 18px; }

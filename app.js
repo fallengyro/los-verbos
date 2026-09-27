@@ -112,6 +112,23 @@
       list_filter_clear_selection: "Limpiar selección",
       list_filter_no_matches: "Ninguna lista coincide con “{q}”.",
       filters_clear: "Limpiar filtros",
+      // "Filtrar por esta lista" (Listas panel row) + the two list-aware
+      // empty-tab messages — added 2026-09-27 for the shared-list-filter
+      // feature (see handoff doc). One pair per content type because
+      // Spanish noun/adjective agreement ("oculto"/"oculta", "verbo"/
+      // "verbos") can't be parameterized the way the generic
+      // hidden_count_s/pl strings above are.
+      btn_filter_to_list: "Filtrar por esta lista",
+      empty_list_clear_filters_btn: "Quitar los demás filtros",
+      empty_list_no_verbs: "Esta lista no tiene verbos.",
+      empty_list_hidden_verbs_s: "Hay {n} verbo de esta lista oculto por otros filtros.",
+      empty_list_hidden_verbs_pl: "Hay {n} verbos de esta lista ocultos por otros filtros.",
+      empty_list_no_words: "Esta lista no tiene palabras.",
+      empty_list_hidden_words_s: "Hay {n} palabra de esta lista oculta por otros filtros.",
+      empty_list_hidden_words_pl: "Hay {n} palabras de esta lista ocultas por otros filtros.",
+      empty_list_no_phrases: "Esta lista no tiene frases.",
+      empty_list_hidden_phrases_s: "Hay {n} frase de esta lista oculta por otros filtros.",
+      empty_list_hidden_phrases_pl: "Hay {n} frases de esta lista ocultas por otros filtros.",
       conj_hint: "deslizá para ver todos los tiempos →",
       conj_tap_hint: "Tocá cualquier forma para escucharla",
       mood_indicativo: "Indicativo",
@@ -377,6 +394,17 @@
       list_filter_clear_selection: "Clear selection",
       list_filter_no_matches: "No lists match “{q}”.",
       filters_clear: "Clear filters",
+      btn_filter_to_list: "Filter to this list",
+      empty_list_clear_filters_btn: "Clear the other filters",
+      empty_list_no_verbs: "This list has no verbs.",
+      empty_list_hidden_verbs_s: "There's {n} verb from this list hidden by other filters.",
+      empty_list_hidden_verbs_pl: "There are {n} verbs from this list hidden by other filters.",
+      empty_list_no_words: "This list has no words.",
+      empty_list_hidden_words_s: "There's {n} word from this list hidden by other filters.",
+      empty_list_hidden_words_pl: "There are {n} words from this list hidden by other filters.",
+      empty_list_no_phrases: "This list has no phrases.",
+      empty_list_hidden_phrases_s: "There's {n} phrase from this list hidden by other filters.",
+      empty_list_hidden_phrases_pl: "There are {n} phrases from this list hidden by other filters.",
       conj_hint: "swipe to see all tenses →",
       conj_tap_hint: "Tap any form to hear it",
       mood_indicativo: "Indicative",
@@ -1130,13 +1158,13 @@
   // (reflexive/auxiliar/gustarLike, and idiomatic for phrases) are each
   // independently AND'd rather than OR'd — see flagOk(). The "list" facet
   // is multi-membership (an item can be in several lists) and follows the
-  // same OR-within-include / excludes-win rule as tag facets.
+  // same OR-within-include / excludes-win rule as tag facets, but — unlike
+  // every other facet here — it is NOT per-tab. See sharedListFilter below.
   var activeVerbFilters = {
     type: { include: new Set(), exclude: new Set() },
     irregularity: { include: new Set(), exclude: new Set() },
     transitivity: { include: new Set(), exclude: new Set() },
-    flag: { include: new Set(), exclude: new Set() },
-    list: { include: new Set(), exclude: new Set() }
+    flag: { include: new Set(), exclude: new Set() }
   };
 
   var allWords = [];      // [{id, data}] — vocabulario (nouns, adjectives, etc.)
@@ -1145,8 +1173,7 @@
   var editingWordId = null;
   var activeWordFilters = {
     pos: { include: new Set(), exclude: new Set() },
-    gender: { include: new Set(), exclude: new Set() },
-    list: { include: new Set(), exclude: new Set() }
+    gender: { include: new Set(), exclude: new Set() }
   };
 
   var allPhrases = [];    // [{id, data}] — short common phrases/expressions
@@ -1156,9 +1183,52 @@
   var activePhraseFilters = {
     function: { include: new Set(), exclude: new Set() },
     register: { include: new Set(), exclude: new Set() },
-    flag: { include: new Set(), exclude: new Set() },
-    list: { include: new Set(), exclude: new Set() }
+    flag: { include: new Set(), exclude: new Set() }
   };
+
+  // The "Listas" facet — unlike every filter above, this ONE is shared
+  // across verbs/words/phrases (and flashcard deck assembly, which just
+  // draws from each tab's already-filtered pool): a list cuts across all
+  // three content types, so reviewing one shouldn't mean toggling it on
+  // separately per tab (2026-09-27, mason's ask, see handoff doc). Wrapped
+  // in a { list: {include, exclude} } shape — rather than a bare
+  // {include, exclude} — purely so the existing facetOk()/cycleFacetValue()/
+  // chipVisualState()/listFacetOk()/anyFilterActive()/saveFilters()/
+  // loadFilters() helpers, all written against a facets-keyed object, work
+  // on it completely unchanged; "list" is just this object's only key.
+  var sharedListFilter = { list: { include: new Set(), exclude: new Set() } };
+  var SHARED_LIST_STORAGE_KEY = "iv-filters-lists-shared";
+  // One-time upgrade path from the old per-tab list state (each tab's own
+  // now-removed activeFilters.list, still sitting in iv-filters-verbs/
+  // words/phrases from before this feature) into the new shared state —
+  // union of every tab's includes, excludes winning on conflict, same
+  // precedence listFacetOk() already gives excludes generally. Runs once,
+  // guarded by SHARED_LIST_STORAGE_KEY already existing, so it never
+  // clobbers a shared selection made after this shipped. Mason's call,
+  // asked directly rather than decided silently (see handoff doc) — he
+  // chose to migrate rather than drop the old per-tab state.
+  function migrateLegacyPerTabListFilters() {
+    try {
+      if (localStorage.getItem(SHARED_LIST_STORAGE_KEY) != null) return; // already migrated (or already used)
+      var include = new Set();
+      var exclude = new Set();
+      var sawAny = false;
+      ["verbs", "words", "phrases"].forEach(function (tab) {
+        var raw = localStorage.getItem(filtersStorageKey(tab));
+        if (!raw) return;
+        var saved = JSON.parse(raw);
+        if (!saved || !saved.list) return;
+        sawAny = true;
+        (saved.list.include || []).forEach(function (id) { include.add(id); });
+        (saved.list.exclude || []).forEach(function (id) { exclude.add(id); });
+      });
+      if (!sawAny) return;
+      exclude.forEach(function (id) { include.delete(id); }); // excludes win on conflict
+      include.forEach(function (id) { sharedListFilter.list.include.add(id); });
+      exclude.forEach(function (id) { sharedListFilter.list.exclude.add(id); });
+      saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+    } catch (e) { /* corrupt/unavailable — start the shared filter neutral */ }
+  }
 
   // shared lists — see schema.sql for the lists/list_items tables. Each list
   // is a named, curated subset of the user's own verbs or words; items are
@@ -1166,8 +1236,13 @@
   var allLists = [];      // [{id, data}]
   var selectedListId = null;
   var listPickerTarget = null; // { itemType: "verb"|"word", data } while #list-picker-overlay is open
-  var listFilterTarget = null; // "verbs" | "words" | "phrases" while #list-filter-overlay is open — which tab's activeFilters.list the modal is currently editing
+  var listFilterTarget = null; // "verbs" | "words" | "phrases" — which tab's trigger opened #list-filter-overlay (the shared list facet itself is edited the same way regardless of tab; this only matters for reopening the modal in place)
   var currentShareList = null; // { listId, listName, ownerLabel, items } while previewing a ?share= link
+  // Last of the three content tabs (not "lists" or "flashcards") that was
+  // active — where the Listas panel's "Filtrar por esta lista" shortcut
+  // sends mason after it sets the filter, since a list can span all three
+  // and the tab he came from is the best guess at which one he wants to see.
+  var lastContentTab = "verbs";
 
   // Reverse membership maps rebuilt every time loadLists() runs (from the
   // full list_items rows, not just a count). list_items stores denormalized
@@ -1663,6 +1738,75 @@
     } catch (e) { /* corrupt or unavailable — start from neutral */ }
   }
 
+  // Clears one tab's own tag facets (and its search box) — NOT the shared
+  // Listas facet. Used by the list-aware empty-state's "clear the other
+  // filters" action (see renderListAwareEmptyNote below): the whole point
+  // there is to reveal items that ARE in the active list(s) but hidden by
+  // this tab's own filters, so the list selection itself must survive. This
+  // is deliberately narrower than wireFilterChips()'s "Limpiar filtros"
+  // button, which (now that list is shared rather than per-tab) also only
+  // touches this tab's own tag facets — clearing the shared list facet from
+  // a single tab's button would otherwise silently drop it out from under
+  // the other two tabs mid-review, so that's left to the list-filter modal's
+  // own "Limpiar selección" or the picker's tri-state toggle instead.
+  function clearTabFiltersOnly(tab) {
+    var filters = activeFiltersForTab(tab);
+    Object.keys(filters).forEach(function (f) { filters[f].include.clear(); filters[f].exclude.clear(); });
+    saveFilters(filtersStorageKey(tab), filters);
+    if (tab === "verbs") {
+      el.search.value = "";
+      refreshChipVisuals(el.verbFilters, activeVerbFilters);
+      el.verbFiltersClear.hidden = !anyFilterActive(activeVerbFilters);
+      renderList();
+    } else if (tab === "words") {
+      el.wordSearch.value = "";
+      refreshChipVisuals(el.wordFilters, activeWordFilters);
+      el.wordFiltersClear.hidden = !anyFilterActive(activeWordFilters);
+      renderWordList();
+    } else {
+      el.phraseSearch.value = "";
+      refreshChipVisuals(el.phraseFilters, activePhraseFilters);
+      el.phraseFiltersClear.hidden = !anyFilterActive(activePhraseFilters);
+      renderPhraseList();
+    }
+    updateListsTrigger(tab);
+  }
+
+  // Shared by renderList()/renderWordList()/renderPhraseList()'s empty
+  // state. Only kicks in when the shared Listas facet is actually doing
+  // something (an include or exclude is set) — otherwise the tab's own
+  // plain "nothing matches your search" message applies as before. When the
+  // facet is active, tells apart two cases the handoff asked to distinguish:
+  // the active list(s) genuinely have no items of this content type, vs.
+  // they do, but this tab's own tag filters (or search) are hiding them —
+  // in which case a one-tap action clears just this tab's own filters,
+  // leaving the list selection (and the other two tabs) alone. Reuses the
+  // existing .empty-note/seed-btn styling rather than inventing new markup.
+  // Returns true when it rendered something, so the caller skips its own
+  // generic empty message.
+  function renderListAwareEmptyNote(noteEl, opts) {
+    var state = sharedListFilter.list;
+    if (!state.include.size && !state.exclude.size) return false;
+    var inLists = opts.allItems.filter(function (item) {
+      return listFacetOk(sharedListFilter, opts.membership(item), false);
+    });
+    var p = document.createElement("p");
+    if (inLists.length === 0) {
+      p.textContent = t(opts.noneKey);
+      noteEl.appendChild(p);
+    } else {
+      p.textContent = t(inLists.length === 1 ? opts.hiddenSKey : opts.hiddenPlKey, { n: inLists.length });
+      noteEl.appendChild(p);
+      var clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "seed-btn";
+      clearBtn.textContent = t("empty_list_clear_filters_btn");
+      clearBtn.addEventListener("click", opts.onClear);
+      noteEl.appendChild(clearBtn);
+    }
+    return true;
+  }
+
   // Event delegation (rather than one addEventListener per chip at wiring
   // time) so chips added later — the "Listas" group, rebuilt every time
   // loadLists() runs — react to clicks without being re-wired individually.
@@ -1767,7 +1911,7 @@
       if (value === "gustarLike") return !!v.data.gustar_like;
       return false;
     }, ignoreExcludes)) return false;
-    if (!listFacetOk(activeVerbFilters, verbListMembership[norm(v.data.infinitive || "")], ignoreExcludes)) return false;
+    if (!listFacetOk(sharedListFilter, verbListMembership[norm(v.data.infinitive || "")], ignoreExcludes)) return false;
     return true;
   }
 
@@ -1786,18 +1930,27 @@
       var li = document.createElement("li");
       var note = document.createElement("div");
       note.className = "empty-note";
-      var p = document.createElement("p");
-      p.textContent = allVerbs.length === 0
-        ? t("empty_no_verbs")
-        : t("empty_no_verb_match", { q: el.search.value });
-      note.appendChild(p);
       if (allVerbs.length === 0) {
+        var p = document.createElement("p");
+        p.textContent = t("empty_no_verbs");
+        note.appendChild(p);
         var seedBtn = document.createElement("button");
         seedBtn.type = "button";
         seedBtn.className = "seed-btn";
         seedBtn.textContent = t("seed_verbs_btn");
         seedBtn.addEventListener("click", seedStarterVerbs);
         note.appendChild(seedBtn);
+      } else if (!renderListAwareEmptyNote(note, {
+        allItems: allVerbs,
+        membership: function (v) { return verbListMembership[norm(v.data.infinitive || "")]; },
+        noneKey: "empty_list_no_verbs",
+        hiddenSKey: "empty_list_hidden_verbs_s",
+        hiddenPlKey: "empty_list_hidden_verbs_pl",
+        onClear: function () { clearTabFiltersOnly("verbs"); }
+      })) {
+        var p2 = document.createElement("p");
+        p2.textContent = t("empty_no_verb_match", { q: el.search.value });
+        note.appendChild(p2);
       }
       li.appendChild(note);
       el.list.appendChild(li);
@@ -2397,6 +2550,7 @@
 
   // ================= vocabulario (general words) =================
   function setMainTab(tab) {
+    if (tab === "verbs" || tab === "words" || tab === "phrases") lastContentTab = tab;
     el.tabVerbs.classList.toggle("active", tab === "verbs");
     el.tabWords.classList.toggle("active", tab === "words");
     el.tabPhrases.classList.toggle("active", tab === "phrases");
@@ -2441,7 +2595,7 @@
   function wordPassesFacets(v, ignoreExcludes) {
     if (!facetOk(activeWordFilters, "pos", v.data.partOfSpeech || "", ignoreExcludes)) return false;
     if (!facetOk(activeWordFilters, "gender", v.data.gender || "", ignoreExcludes)) return false;
-    if (!listFacetOk(activeWordFilters, wordListMembership[norm(v.data.word || "")], ignoreExcludes)) return false;
+    if (!listFacetOk(sharedListFilter, wordListMembership[norm(v.data.word || "")], ignoreExcludes)) return false;
     return true;
   }
 
@@ -2460,18 +2614,27 @@
       var li = document.createElement("li");
       var note = document.createElement("div");
       note.className = "empty-note";
-      var p = document.createElement("p");
-      p.textContent = allWords.length === 0
-        ? t("empty_no_words")
-        : t("empty_no_word_match", { q: el.wordSearch.value });
-      note.appendChild(p);
       if (allWords.length === 0) {
+        var p = document.createElement("p");
+        p.textContent = t("empty_no_words");
+        note.appendChild(p);
         var seedWordsBtn = document.createElement("button");
         seedWordsBtn.type = "button";
         seedWordsBtn.className = "seed-btn";
         seedWordsBtn.textContent = t("seed_words_btn");
         seedWordsBtn.addEventListener("click", seedStarterWords);
         note.appendChild(seedWordsBtn);
+      } else if (!renderListAwareEmptyNote(note, {
+        allItems: allWords,
+        membership: function (v) { return wordListMembership[norm(v.data.word || "")]; },
+        noneKey: "empty_list_no_words",
+        hiddenSKey: "empty_list_hidden_words_s",
+        hiddenPlKey: "empty_list_hidden_words_pl",
+        onClear: function () { clearTabFiltersOnly("words"); }
+      })) {
+        var p2 = document.createElement("p");
+        p2.textContent = t("empty_no_word_match", { q: el.wordSearch.value });
+        note.appendChild(p2);
       }
       li.appendChild(note);
       el.wordList.appendChild(li);
@@ -2708,7 +2871,7 @@
       if (value === "idiomatic") return !!v.data.idiomatic;
       return false;
     }, ignoreExcludes)) return false;
-    if (!listFacetOk(activePhraseFilters, phraseListMembership[norm(v.data.phrase || "")], ignoreExcludes)) return false;
+    if (!listFacetOk(sharedListFilter, phraseListMembership[norm(v.data.phrase || "")], ignoreExcludes)) return false;
     return true;
   }
 
@@ -2727,18 +2890,27 @@
       var li = document.createElement("li");
       var note = document.createElement("div");
       note.className = "empty-note";
-      var p = document.createElement("p");
-      p.textContent = allPhrases.length === 0
-        ? t("empty_no_phrases")
-        : t("empty_no_phrase_match", { q: el.phraseSearch.value });
-      note.appendChild(p);
       if (allPhrases.length === 0) {
+        var p = document.createElement("p");
+        p.textContent = t("empty_no_phrases");
+        note.appendChild(p);
         var seedPhrasesBtn = document.createElement("button");
         seedPhrasesBtn.type = "button";
         seedPhrasesBtn.className = "seed-btn";
         seedPhrasesBtn.textContent = t("seed_phrases_btn");
         seedPhrasesBtn.addEventListener("click", seedStarterPhrases);
         note.appendChild(seedPhrasesBtn);
+      } else if (!renderListAwareEmptyNote(note, {
+        allItems: allPhrases,
+        membership: function (v) { return phraseListMembership[norm(v.data.phrase || "")]; },
+        noneKey: "empty_list_no_phrases",
+        hiddenSKey: "empty_list_hidden_phrases_s",
+        hiddenPlKey: "empty_list_hidden_phrases_pl",
+        onClear: function () { clearTabFiltersOnly("phrases"); }
+      })) {
+        var p2 = document.createElement("p");
+        p2.textContent = t("empty_no_phrase_match", { q: el.phraseSearch.value });
+        note.appendChild(p2);
       }
       li.appendChild(note);
       el.phraseList.appendChild(li);
@@ -4177,12 +4349,15 @@
   // One inline chip per saved list stopped scaling once there were more
   // than a handful of lists (mason's own call, after seeing that design
   // running). Replaced with one compact trigger per tab that summarizes
-  // the tab's list-facet selection, opening a shared modal (#list-filter-
-  // overlay) with a search box and every list as a tri-state row. The
-  // underlying facet — activeVerbFilters.list / activeWordFilters.list /
-  // activePhraseFilters.list, each {include, exclude} — is unchanged from
-  // the inline-chip version; only how it's presented changed, so
-  // listFacetOk()/cycleFacetValue()/chipVisualState() are reused as-is.
+  // the CURRENT selection of the "Listas" facet, opening a shared modal
+  // (#list-filter-overlay) with a search box and every list as a tri-state
+  // row. As of 2026-09-27 that facet is sharedListFilter — one selection
+  // for all three tabs, not three separate ones — so every tab's trigger
+  // shows the exact same selection and editing it from any tab (or from the
+  // "Filtrar por esta lista" button in the Listas panel, see renderListsPanel
+  // below) changes it everywhere at once. listFacetOk()/cycleFacetValue()/
+  // chipVisualState() still work unchanged against it — see the
+  // sharedListFilter declaration up top for why.
   function activeFiltersForTab(tab) {
     if (tab === "verbs") return activeVerbFilters;
     if (tab === "words") return activeWordFilters;
@@ -4200,17 +4375,24 @@
   }
 
   // Updates one tab's trigger button (label + has-selection styling) and
-  // its "Limpiar filtros" visibility — the two things any change to that
-  // tab's list facet always needs refreshed together. Also hides the
-  // whole "Listas" chip-group when there are no saved lists yet, same as
-  // the old inline chip-group did.
+  // its "Limpiar filtros" visibility — the two things any change to the
+  // shared list facet, or this tab's own tag facets, always needs refreshed
+  // together. Also hides the whole "Listas" chip-group when there are no
+  // saved lists yet, same as the old inline chip-group did. Reads
+  // sharedListFilter directly (not activeFiltersForTab(tab)) for the list
+  // counts/label, since that facet is the same for all three tabs now —
+  // calling this once per tab is still right, since each tab has its own
+  // trigger button/label element to refresh, they just all show the same
+  // numbers. "Limpiar filtros" itself only clears this tab's own tag
+  // facets (see clearTabFiltersOnly's comment above), so its visibility is
+  // still keyed off just those, not the shared list facet.
   function updateListsTrigger(tab) {
     var refs = listsTriggerEls(tab);
     var filters = activeFiltersForTab(tab);
     refs.group.hidden = !allLists.length;
     refs.clearBtn.hidden = !anyFilterActive(filters);
-    var incCount = filters.list.include.size;
-    var excCount = filters.list.exclude.size;
+    var incCount = sharedListFilter.list.include.size;
+    var excCount = sharedListFilter.list.exclude.size;
     if (incCount + excCount === 0) {
       refs.trigger.classList.remove("has-selection");
       refs.label.textContent = t("chip_group_list");
@@ -4219,7 +4401,7 @@
     refs.trigger.classList.add("has-selection");
     var parts = [];
     if (incCount === 1) {
-      var onlyId = Array.from(filters.list.include)[0];
+      var onlyId = Array.from(sharedListFilter.list.include)[0];
       var entry = allLists.find(function (l) { return l.id === onlyId; });
       parts.push(entry ? entry.data.name : t("chip_group_list"));
     } else if (incCount > 1) {
@@ -4234,29 +4416,28 @@
   // Drops any include/exclude selection that names a list which no longer
   // exists (deleted, or never synced) — the modal-picker equivalent of
   // what the old inline chip-group's rebuild used to do implicitly by
-  // just not drawing a chip for it.
-  function pruneStaleListFilters(tab) {
-    var filters = activeFiltersForTab(tab);
+  // just not drawing a chip for it. Runs once against the shared facet now,
+  // not once per tab.
+  function pruneStaleListFilter() {
     var validIds = {};
     allLists.forEach(function (l) { validIds[l.id] = true; });
     ["include", "exclude"].forEach(function (side) {
-      Array.from(filters.list[side]).forEach(function (id) {
-        if (!validIds[id]) filters.list[side].delete(id);
+      Array.from(sharedListFilter.list[side]).forEach(function (id) {
+        if (!validIds[id]) sharedListFilter.list[side].delete(id);
       });
     });
   }
 
   // Called wherever allLists changes (every loadLists(), sign-out reset,
-  // language switch) — prunes stale selections, refreshes all three
-  // triggers, persists, and if the picker modal happens to be open right
-  // now (e.g. a background list refresh while mason is mid-pick), re-
-  // renders its rows too rather than leaving them stale underneath it.
+  // language switch) — prunes stale selections from the shared facet,
+  // refreshes all three triggers, persists it, and if the picker modal
+  // happens to be open right now (e.g. a background list refresh while
+  // mason is mid-pick), re-renders its rows too rather than leaving them
+  // stale underneath it.
   function refreshListFilterUI() {
-    ["verbs", "words", "phrases"].forEach(function (tab) {
-      pruneStaleListFilters(tab);
-      updateListsTrigger(tab);
-      saveFilters(filtersStorageKey(tab), activeFiltersForTab(tab));
-    });
+    pruneStaleListFilter();
+    saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+    ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); });
     if (listFilterTarget && !el.listFilterOverlay.hidden) {
       renderListFilterRows(el.listFilterSearch.value);
     }
@@ -4275,10 +4456,11 @@
     listFilterTarget = null;
   }
 
+  // Toggling a row here edits the ONE shared facet, so every tab — not just
+  // whichever one's trigger opened the modal — needs its trigger label and
+  // filtered content refreshed afterward.
   function renderListFilterRows(filterText) {
     if (!listFilterTarget) return;
-    var tab = listFilterTarget;
-    var filters = activeFiltersForTab(tab);
     var q = norm(filterText || "");
     el.listFilterList.innerHTML = "";
     var matches = allLists.filter(function (l) { return !q || norm(l.data.name).indexOf(q) !== -1; });
@@ -4295,7 +4477,7 @@
       var liEl = document.createElement("li");
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "picker-row state-" + chipVisualState(filters, "list", l.id);
+      btn.className = "picker-row state-" + chipVisualState(sharedListFilter, "list", l.id);
       var left = document.createElement("span");
       var name = document.createElement("span");
       name.className = "name";
@@ -4310,11 +4492,10 @@
       btn.appendChild(left);
       btn.appendChild(glyph);
       btn.addEventListener("click", function () {
-        cycleFacetValue(filters, "list", l.id);
-        saveFilters(filtersStorageKey(tab), filters);
-        btn.className = "picker-row state-" + chipVisualState(filters, "list", l.id);
-        updateListsTrigger(tab);
-        rerenderTab(tab);
+        cycleFacetValue(sharedListFilter, "list", l.id);
+        saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+        btn.className = "picker-row state-" + chipVisualState(sharedListFilter, "list", l.id);
+        ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); rerenderTab(tab); });
       });
       liEl.appendChild(btn);
       el.listFilterList.appendChild(liEl);
@@ -4357,14 +4538,40 @@
       });
   }
 
+  // Sets one list to "include" in the shared Listas facet — a shortcut for
+  // what tri-state-toggling it to include in the picker already does, not a
+  // reset (see the handoff doc): every other included list stays included
+  // (union), every tag filter on every tab is left exactly as it was, and
+  // an excluded list simply becomes included instead. Then jumps mason to
+  // whichever content tab he was on before opening Listas, since that's the
+  // best guess at which of the (possibly mixed) content types in this list
+  // he wants to see filtered — a list can hold verbs, words and phrases at
+  // once, so there's no single "the" filtered tab to land on otherwise.
+  function filterToList(listId) {
+    sharedListFilter.list.exclude.delete(listId);
+    sharedListFilter.list.include.add(listId);
+    saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+    ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); rerenderTab(tab); });
+    setMainTab(lastContentTab);
+  }
+
   function renderListsPanel() {
     el.listsList.innerHTML = "";
     el.listsEmptyMsg.hidden = allLists.length !== 0;
     allLists.forEach(function (l) {
       var li = document.createElement("li");
+      // A div wrapper with two sibling buttons (not one button nested
+      // inside another, which is invalid) — same pattern listItemRow()
+      // below already uses for its own per-row action button. .card-row's
+      // existing flex/padding styling now lives on this wrapper; .list-row-
+      // main resets its own button-ness so the name/count still look and
+      // flow exactly as they did when the whole row was one <button>.
+      var wrap = document.createElement("div");
+      wrap.className = "card-row list-row";
+
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "card-row";
+      btn.className = "list-row-main";
 
       var name = document.createElement("span");
       name.className = "inf";
@@ -4380,7 +4587,16 @@
         if (selectedListId === l.id) { selectedListId = null; el.listDetail.hidden = true; }
         else selectListRow(l.id);
       });
-      li.appendChild(btn);
+
+      var filterBtn = document.createElement("button");
+      filterBtn.type = "button";
+      filterBtn.className = "icon-btn list-filter-shortcut-btn";
+      filterBtn.textContent = t("btn_filter_to_list");
+      filterBtn.addEventListener("click", function () { filterToList(l.id); });
+
+      wrap.appendChild(btn);
+      wrap.appendChild(filterBtn);
+      li.appendChild(wrap);
       el.listsList.appendChild(li);
     });
   }
@@ -5600,6 +5816,13 @@
   el.settingsVoiceElena.addEventListener("click", function () { setTtsVoice("elena"); });
   el.settingsVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
 
+  // The shared Listas facet loads once, before any tab's own filters or
+  // trigger — migrateLegacyPerTabListFilters() upgrades old per-tab list
+  // selections into it the first time this runs post-update (see its own
+  // comment up top), and every updateListsTrigger() call below reads it.
+  migrateLegacyPerTabListFilters();
+  loadFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+
   el.search.addEventListener("input", renderList);
   loadFilters(filtersStorageKey("verbs"), activeVerbFilters);
   refreshChipVisuals(el.verbFilters, activeVerbFilters);
@@ -5829,14 +6052,11 @@
   el.listFilterClose.addEventListener("click", closeListFilterPicker);
   el.listFilterClearBtn.addEventListener("click", function () {
     if (!listFilterTarget) return;
-    var tab = listFilterTarget;
-    var filters = activeFiltersForTab(tab);
-    filters.list.include.clear();
-    filters.list.exclude.clear();
-    saveFilters(filtersStorageKey(tab), filters);
+    sharedListFilter.list.include.clear();
+    sharedListFilter.list.exclude.clear();
+    saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
     renderListFilterRows(el.listFilterSearch.value);
-    updateListsTrigger(tab);
-    rerenderTab(tab);
+    ["verbs", "words", "phrases"].forEach(function (tab) { updateListsTrigger(tab); rerenderTab(tab); });
   });
 
   el.shareCloseBtn.addEventListener("click", closeSharePreview);
