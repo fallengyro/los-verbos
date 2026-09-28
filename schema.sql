@@ -27,6 +27,8 @@ create table if not exists public.verbs (
   gustar_like boolean not null default false,
   known boolean not null default false,
   known_forms jsonb not null default '{}'::jsonb,
+  forms_en jsonb not null default '{}'::jsonb,
+  forms_en_sig text not null default '',
   forms jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -379,6 +381,67 @@ alter table public.phrases add column if not exists known boolean not null defau
 -- card counts as known if either is set. Per-person progress like `known`,
 -- so also stripped from list snapshots (app.js listSnapshot()).
 alter table public.verbs add column if not exists known_forms jsonb not null default '{}'::jsonb;
+
+-- English for each conjugated form (2026-09-28): { "<formKey>": "I have" },
+-- same keys as known_forms, written by the verb-gloss Edge Function via
+-- app.js (generateVerbGloss) so a verb flashcard's answer side can show
+-- "(I have)" under "tengo" instead of the infinitive's definition.
+-- forms_en_sig fingerprints the forms/definition the glosses were made
+-- from; the app regenerates only when it no longer matches. Unlike known /
+-- known_forms this is CONTENT, not progress, so it's kept in list
+-- snapshots — a shared verb arrives with its English already filled in.
+alter table public.verbs add column if not exists forms_en jsonb not null default '{}'::jsonb;
+alter table public.verbs add column if not exists forms_en_sig text not null default '';
+
+-- Shared, app-wide "truth" for verb English (2026-09-28, mason: "the first
+-- instance of a verb on the server is truth and the translated
+-- conjugations use that version of the infinitive definition (even if the
+-- user has entered a different definition on their account)"). One row per
+-- (infinitive, mode) — mode 'gustar' when the card shows "me parece / me
+-- parecen", 'personal' when it shows "parezco" — holding the definition of
+-- whoever created it first plus the English for every form seen so far.
+-- The verb-gloss Edge Function reads it first and only asks Claude for
+-- forms it doesn't have yet (always with the canonical definition); each
+-- account then keeps its own copy in verbs.forms_en above.
+-- No RLS policies on purpose: only the Edge Function (service role, which
+-- bypasses RLS) can read or write it — so no app user can change the
+-- truth. To correct a bad gloss, edit the row here in the dashboard (Table
+-- Editor → verb_gloss_canon), then bump VERB_GLOSS_VERSION in app.js so
+-- every account's stored copy refreshes from it (cache hits, no cost).
+create table if not exists public.verb_gloss_canon (
+  infinitive_key text not null,
+  mode text not null default 'personal' check (mode in ('personal', 'gustar')),
+  definition text not null default '',
+  glosses jsonb not null default '{}'::jsonb,
+  forms_es jsonb not null default '{}'::jsonb,
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (infinitive_key, mode)
+);
+
+alter table public.verb_gloss_canon enable row level security;
+
+-- Insert-or-merge in one atomic statement. `excluded.glosses || c.glosses`
+-- lets EXISTING keys win (jsonb || takes the right-hand value on a
+-- clash), so the first gloss stored for a form is never overwritten, even
+-- if two requests race. The definition is only ever set on insert.
+create or replace function public.verb_gloss_merge(
+  p_key text, p_mode text, p_definition text, p_glosses jsonb, p_forms_es jsonb, p_user uuid
+) returns public.verb_gloss_canon
+language sql
+as $$
+  insert into public.verb_gloss_canon as c (infinitive_key, mode, definition, glosses, forms_es, created_by)
+  values (p_key, p_mode, coalesce(p_definition, ''), coalesce(p_glosses, '{}'::jsonb), coalesce(p_forms_es, '{}'::jsonb), p_user)
+  on conflict (infinitive_key, mode) do update
+    set glosses = excluded.glosses || c.glosses,
+        forms_es = excluded.forms_es || c.forms_es,
+        updated_at = now()
+  returning *;
+$$;
+
+revoke all on function public.verb_gloss_merge(text, text, text, jsonb, jsonb, uuid) from public, anon, authenticated;
+grant execute on function public.verb_gloss_merge(text, text, text, jsonb, jsonb, uuid) to service_role;
 
 -- One-time cleanup (safe to re-run — matches nothing once clean): remove
 -- "known" from any list snapshot that captured it. `data - 'known'` drops

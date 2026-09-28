@@ -2480,6 +2480,8 @@
         also_personal_use: !!row.also_personal_use,
         known: !!row.known,
         known_forms: row.known_forms || {},
+        forms_en: row.forms_en || {},
+        forms_en_sig: row.forms_en_sig || "",
         forms: row.forms || {}
       }
     };
@@ -2497,6 +2499,7 @@
         clearBanner();
         allVerbs = (res.data || []).map(rowToVerb);
         renderList();
+        queueVerbGlosses(); // fills in English for any verb that's missing/outdated — see verb-gloss section
         if (selectedId) {
           var still = allVerbs.find(function (v) { return v.id === selectedId; });
           if (still) selectVerb(selectedId); else { el.detail.hidden = true; selectedId = null; }
@@ -3369,6 +3372,171 @@
     el.flashSetupMsg.textContent = noSource ? t("flash_no_source") : "";
   }
 
+  // ================= English per conjugated form (verb-gloss) =================
+  // A verb card's answer side shows the English of THAT form ("tengo" →
+  // "(I have)") rather than the infinitive's definition — mason, 2026-09-28.
+  // Nothing about English conjugation is derived here: the verb-gloss Edge
+  // Function asks Claude for every form of one verb in a single call, and
+  // the result is stored on the verb (verbs.forms_en, keyed by the same
+  // form keys as known_forms — see flashCellKey), so studying never calls
+  // the API.
+  //
+  // The English itself is SHARED app-wide (mason: "the first instance of a
+  // verb on the server is truth"): the Edge Function keeps one canonical
+  // set per verb in public.verb_gloss_canon, made with the definition of
+  // whoever added that verb first, and only asks Claude for forms nobody
+  // has glossed yet. So two people adding "tener" get identical English and
+  // only the first one costs anything. See the header of
+  // supabase/functions/verb-gloss/index.ts.
+  //
+  // verbs.forms_en_sig fingerprints what this account's copy was fetched
+  // for — the verb, its gustar mode, and WHICH forms it has. Deliberately
+  // not the user's own definition (the canonical one is used regardless)
+  // nor the Spanish spelling of each form (fixing a typo doesn't change the
+  // English of that slot). A verb is fetched again only when that changes:
+  // new verb, forms added/removed, import, or a verb that predates this
+  // feature (the one-time backfill happens on its own, in the background,
+  // the first time each account loads its verbs).
+
+  // Bump to make every account re-fetch its copy — e.g. after correcting a
+  // row of verb_gloss_canon by hand. Cheap: the canonical rows answer it.
+  var VERB_GLOSS_VERSION = 2;
+
+  // Every form of a verb that a flashcard can show, with the exact Spanish
+  // text the card shows and a human label of its slot for the model.
+  // Mirrors buildFlashDeck()'s own value logic; allVerbFormKeys() is built
+  // on this so the two can't drift apart.
+  function verbFormEntries(data) {
+    var forms = data.forms || {};
+    var out = [];
+    FLASH_PERSONAL_TENSES.forEach(function (tn) {
+      var mood = SUBJ_TENSES.some(function (s) { return s.key === tn.key; }) ? "subjuntivo" : "indicativo";
+      PERSONS.forEach(function (p) {
+        var val = data.gustar_like ? gustarCellText(forms, tn.key, p.key) : ((forms[tn.key] && forms[tn.key][p.key]) || "");
+        if (val && val !== "—") out.push({ key: flashCellKey(tn.key, p.key), es: val, slot: p.label + " · " + tn.label.toLowerCase() + " (" + mood + ")" });
+      });
+      var imp = (forms.impersonal || {})[tn.key];
+      if (imp) out.push({ key: flashCellKey(tn.key, "impersonal"), es: imp, slot: "impersonal · " + tn.label.toLowerCase() + " (" + mood + ")" });
+    });
+    Object.keys(IMPERATIVO_FORM_KEY).forEach(function (pk) {
+      var val = (forms.imperativo || {})[IMPERATIVO_FORM_KEY[pk]];
+      if (val) out.push({ key: flashCellKey("imperativo", pk), es: val, slot: IMPERATIVO_FORM_KEY[pk] + " · imperativo afirmativo" });
+    });
+    if (forms.gerundio) out.push({ key: "gerundio", es: forms.gerundio, slot: "gerundio" });
+    if (forms.participio) out.push({ key: "participio", es: forms.participio, slot: "participio" });
+    return out;
+  }
+
+  // Cached per data object: a verb's data object is replaced wholesale when
+  // its forms change (loadVerbs), and the in-place mutations (known,
+  // known_forms, forms_en) don't feed the fingerprint.
+  var verbGlossSigCache = new WeakMap();
+  function verbGlossSig(data) {
+    var cached = verbGlossSigCache.get(data);
+    if (cached) return cached;
+    var src = JSON.stringify({
+      v: VERB_GLOSS_VERSION,
+      i: (data.infinitive || "").normalize("NFC").trim().toLowerCase(),
+      g: !!data.gustar_like,
+      k: verbFormEntries(data).map(function (e) { return e.key; }).sort()
+    });
+    var h = 5381;
+    for (var i = 0; i < src.length; i++) h = ((h * 33) ^ src.charCodeAt(i)) >>> 0;
+    var sig = VERB_GLOSS_VERSION + "-" + h.toString(36) + "-" + src.length.toString(36);
+    verbGlossSigCache.set(data, sig);
+    return sig;
+  }
+
+  function verbNeedsGloss(data) {
+    return verbFormEntries(data).length > 0 && data.forms_en_sig !== verbGlossSig(data);
+  }
+
+  // The English for one form, or "" if there isn't a current one (not
+  // generated yet, or generated from forms that have since been edited).
+  function verbFormGloss(data, formKey) {
+    if (!formKey || !data.forms_en || data.forms_en_sig !== verbGlossSig(data)) return "";
+    return data.forms_en[formKey] || "";
+  }
+
+  // What goes under the Spanish on a card's answer side. Computed at render
+  // time (not deck-build time) so glosses that finish generating while a
+  // deck is open show up on the very next card.
+  function cardBackSub(card) {
+    if (card.kind === "verb") {
+      var gloss = verbFormGloss(card.data, card.formKey);
+      if (gloss) return "(" + gloss + ")";
+    }
+    return card.backSub || "";
+  }
+
+  // Background queue: one verb at a time, never more than one attempt per
+  // (verb, fingerprint) per page load, and it switches itself off for the
+  // session after two consecutive failures (function not deployed yet,
+  // schema.sql not run yet, offline) — so a problem can't turn into a loop
+  // of paid calls. Progress is logged to the console with a [verb-gloss]
+  // prefix.
+  var verbGlossAttempted = new Set();
+  var verbGlossRunning = false;
+  var verbGlossDisabled = false;
+  var verbGlossFailures = 0;
+
+  function queueVerbGlosses() {
+    if (verbGlossRunning || verbGlossDisabled || !currentUser) return;
+    verbGlossRunning = true;
+    (function step() {
+      if (verbGlossDisabled) { verbGlossRunning = false; return; }
+      var next = allVerbs.find(function (v) {
+        return verbNeedsGloss(v.data) && !verbGlossAttempted.has(v.id + ":" + verbGlossSig(v.data));
+      });
+      if (!next) { verbGlossRunning = false; return; }
+      verbGlossAttempted.add(next.id + ":" + verbGlossSig(next.data));
+      generateVerbGloss(next).then(function () { setTimeout(step, 250); });
+    })();
+  }
+
+  function noteVerbGlossFailure(infinitive, why) {
+    verbGlossFailures++;
+    console.warn("[verb-gloss] " + infinitive + ": " + why);
+    if (verbGlossFailures >= 2) {
+      verbGlossDisabled = true;
+      console.warn("[verb-gloss] paused for this session after repeated failures — is the verb-gloss function deployed and schema.sql run?");
+    }
+  }
+
+  function generateVerbGloss(entry) {
+    var id = entry.id, data = entry.data;
+    var entries = verbFormEntries(data);
+    var sig = verbGlossSig(data);
+    var started = Date.now();
+    return supabaseClient.functions.invoke("verb-gloss", {
+      body: {
+        infinitive: data.infinitive || "", definition: data.definition || "",
+        reflexive: !!data.reflexive, gustarLike: !!data.gustar_like, forms: entries
+      }
+    }).then(function (res) {
+      var glosses = res && res.data && res.data.glosses;
+      if (res.error || !glosses || !Object.keys(glosses).length) {
+        noteVerbGlossFailure(data.infinitive, (res.error && res.error.message) || "empty reply");
+        return;
+      }
+      return supabaseClient.from("verbs").update({ forms_en: glosses, forms_en_sig: sig }).eq("id", id).then(function (up) {
+        if (up.error) { noteVerbGlossFailure(data.infinitive, "couldn't save (" + up.error.message + ")"); return; }
+        verbGlossFailures = 0;
+        // The list may have been reloaded meanwhile (new data objects) —
+        // update whichever copies still describe the same forms.
+        var current = allVerbs.find(function (v) { return v.id === id; });
+        [data, current && current.data].forEach(function (d) {
+          if (d && verbGlossSig(d) === sig) { d.forms_en = glosses; d.forms_en_sig = sig; }
+        });
+        var d = res.data;
+        console.info("[verb-gloss] " + data.infinitive + ": " + Object.keys(glosses).length + "/" + entries.length + " forms in " + (Date.now() - started) + " ms" +
+          (typeof d.cached === "number" ? " (" + d.cached + " from the shared cache, " + (d.generated || 0) + " newly generated)" : ""));
+      });
+    }).catch(function (err) {
+      noteVerbGlossFailure(data.infinitive, (err && err.message) || String(err));
+    });
+  }
+
   // A flashcard is { kind: "verb"|"word"|"phrase", data, frontMain, frontSub, backMain, backSub,
   // frontSpeak, backSpeak }. frontMain/backMain are the big headline text; the *Sub lines and
   // badges are secondary. frontSpeak/backSpeak are the TTS-friendly text for a face, and are
@@ -4161,8 +4329,9 @@
     el.flashFrontSub.textContent = card.frontSub || "";
     el.flashFrontSub.style.display = card.frontSub ? "" : "none";
     el.flashBackMain.textContent = card.backMain;
-    el.flashBackSub.textContent = card.backSub || "";
-    el.flashBackSub.style.display = card.backSub ? "" : "none";
+    var backSub = cardBackSub(card); // a verb form's own English when available — see verbFormGloss()
+    el.flashBackSub.textContent = backSub;
+    el.flashBackSub.style.display = backSub ? "" : "none";
     el.flashBackBadges.innerHTML = "";
     el.flashBackBadges.appendChild(flashBackBadges(card));
     // A speak button only shows on a face whose text is actually Spanish —
@@ -4375,22 +4544,9 @@
   // Every form key this verb actually has a value for — the same cells
   // buildFlashDeck() can make cards from (ignoring the setup matrix).
   function allVerbFormKeys(data) {
-    var forms = data.forms || {};
-    var keys = [];
-    FLASH_PERSONAL_TENSES.forEach(function (tn) {
-      PERSONS.forEach(function (p) {
-        var val = data.gustar_like ? gustarCellText(forms, tn.key, p.key) : ((forms[tn.key] && forms[tn.key][p.key]) || "");
-        if (val && val !== "—") keys.push(flashCellKey(tn.key, p.key));
-      });
-      if ((forms.impersonal || {})[tn.key]) keys.push(flashCellKey(tn.key, "impersonal"));
-    });
-    Object.keys(IMPERATIVO_FORM_KEY).forEach(function (pk) {
-      if ((forms.imperativo || {})[IMPERATIVO_FORM_KEY[pk]]) keys.push(flashCellKey("imperativo", pk));
-    });
-    if (forms.gerundio) keys.push("gerundio");
-    if (forms.participio) keys.push("participio");
-    return keys;
+    return verbFormEntries(data).map(function (e) { return e.key; }); // see verbFormEntries()
   }
+
 
   // Marks/un-marks one form of a verb. Special case: un-marking a form of a
   // verb that's marked known as a WHOLE turns that whole-verb mark into
