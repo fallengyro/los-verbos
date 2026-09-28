@@ -3177,10 +3177,23 @@
     cellButtons.forEach(function (btn) {
       btn.classList.toggle("on", activeFlashCells.has(btn.getAttribute("data-cell")));
     });
-    var allKeys = flashAllCellKeys();
-    var allOn = allKeys.every(function (k) { return activeFlashCells.has(k); });
+    // The gerundio/participio chips sit outside the grid (they have no
+    // person or tense) but are part of "everything" as far as the corner
+    // Todo/Ninguno button is concerned — bug fix 2026-09-28 (mason: Todo/
+    // Ninguno left them untouched).
+    if (el.flashStandaloneToggles) {
+      el.flashStandaloneToggles.querySelectorAll(".chip[data-key]").forEach(function (btn) {
+        btn.classList.toggle("active", activeFlashStandalone.has(btn.getAttribute("data-key")));
+      });
+    }
     var toggleAllBtn = el.flashMatrix.querySelector(".flash-matrix-toggle-all");
-    if (toggleAllBtn) toggleAllBtn.textContent = allOn ? "Ninguno" : "Todo";
+    if (toggleAllBtn) toggleAllBtn.textContent = flashEverythingOn() ? "Ninguno" : "Todo";
+  }
+
+  var FLASH_STANDALONE_KEYS = ["gerundio", "participio"];
+  function flashEverythingOn() {
+    return flashAllCellKeys().every(function (k) { return activeFlashCells.has(k); }) &&
+      FLASH_STANDALONE_KEYS.every(function (k) { return activeFlashStandalone.has(k); });
   }
 
   function buildFlashMatrix() {
@@ -3205,9 +3218,13 @@
     cornerBtn.type = "button";
     cornerBtn.className = "flash-matrix-toggle-all";
     cornerBtn.addEventListener("click", function () {
-      var keys = flashAllCellKeys();
-      var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
-      if (allOn) activeFlashCells.clear(); else keys.forEach(function (k) { activeFlashCells.add(k); });
+      if (flashEverythingOn()) {
+        activeFlashCells.clear();
+        activeFlashStandalone.clear();
+      } else {
+        flashAllCellKeys().forEach(function (k) { activeFlashCells.add(k); });
+        FLASH_STANDALONE_KEYS.forEach(function (k) { activeFlashStandalone.add(k); });
+      }
       refreshFlashMatrixVisuals();
     });
     cornerTh.appendChild(cornerBtn);
@@ -3301,10 +3318,11 @@
       btn.type = "button";
       btn.className = "chip";
       btn.textContent = t(item.i18nKey);
+      btn.setAttribute("data-key", item.key);
       btn.classList.toggle("active", activeFlashStandalone.has(item.key));
       btn.addEventListener("click", function () {
         if (activeFlashStandalone.has(item.key)) activeFlashStandalone.delete(item.key); else activeFlashStandalone.add(item.key);
-        btn.classList.toggle("active", activeFlashStandalone.has(item.key));
+        refreshFlashMatrixVisuals(); // syncs this chip and the corner Todo/Ninguno label
       });
       el.flashStandaloneToggles.appendChild(btn);
     });
