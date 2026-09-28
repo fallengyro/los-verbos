@@ -567,6 +567,31 @@
      silently being capped back down to 110px regardless of its value.
      That's what actually caused the "card is short again" reports. */
   #card-list, #word-list, #phrase-list { height: 208px; max-height: none; }
+  /* Short lists shrink (mason, 2026-09-28: "the selection card [should
+     be] no more than 1 entry larger than the number of entries... The
+     maximum size should stay as is"). Below 5 rows the box drops its fixed
+     height and fits its rows plus one empty row-sized slot (the ::after
+     spacer: --slot, the average height of the rows shown, set by
+     fitShortSelectionList() in app.js; falls back to a fifth of the full
+     box). At 5+ rows, :has() restores the
+     fixed height above and removes the spacer, so a long list looks and
+     scrolls exactly as before. The empty-state note (an li holding
+     .empty-note) is sized to fit, with no spacer. */
+  #card-list, #word-list, #phrase-list { --list-h: 208px; }
+  #card-list:not(:has(> li:nth-child(5))),
+  #word-list:not(:has(> li:nth-child(5))),
+  #phrase-list:not(:has(> li:nth-child(5))) { height: auto; max-height: var(--list-h); }
+  #card-list::after, #word-list::after, #phrase-list::after {
+    content: "";
+    display: block;
+    height: var(--slot, calc(var(--list-h) / 5));
+  }
+  #card-list:has(> li:nth-child(5))::after,
+  #word-list:has(> li:nth-child(5))::after,
+  #phrase-list:has(> li:nth-child(5))::after,
+  #card-list:has(> li > .empty-note)::after,
+  #word-list:has(> li > .empty-note)::after,
+  #phrase-list:has(> li > .empty-note)::after { display: none; }
   .card-row {
     width: 100%;
     display: flex;
@@ -1474,9 +1499,9 @@
        badges plus a fuller definition) than verbs or words. Measured via
        a real render of each list's starter content at a 375px viewport,
        ceil'd to the exact pixel where the 5th row's bottom edge lands. */
-    #card-list { height: 308px; }
-    #word-list { height: 318px; }
-    #phrase-list { height: 428px; }
+    #card-list { height: 308px; --list-h: 308px; }
+    #word-list { height: 318px; --list-h: 318px; }
+    #phrase-list { height: 428px; --list-h: 428px; }
 
     .chip { padding: 4px 10px; font-size: 12px; }
     .chip-clear { flex-basis: 100%; margin-left: 0; }

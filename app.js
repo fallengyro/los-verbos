@@ -2020,8 +2020,37 @@
     // case, which left the box looking empty and stuck until it was
     // manually scrolled back up — resetting it here avoids that.
     el.list.scrollTop = 0;
+    fitShortSelectionList(el.list);
     el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
     updateFlashCounts();
+  }
+
+  // Short selection lists shrink to their rows plus one empty row-sized
+  // slot (mason, 2026-09-28: "no more than 1 entry larger than the number
+  // of entries"). The sizing itself is CSS (see #card-list in styles.css);
+  // this only sets --slot to the AVERAGE height of the rows actually shown,
+  // so the empty slot matches them — rows vary a lot on a phone (1–3 lines),
+  // and the CSS fallback (a fifth of the full box) was built for the
+  // starter content's longer rows. Only when there are 1–4 real rows; a
+  // hidden tab's rows measure 0, so a ResizeObserver re-measures when the
+  // list becomes visible or the width changes (rows re-wrap).
+  var shortListObserver = typeof ResizeObserver === "function"
+    ? new ResizeObserver(function (entries) { entries.forEach(function (e) { measureShortListSlot(e.target); }); })
+    : null;
+  function measureShortListSlot(ul) {
+    var rows = Array.prototype.filter.call(ul.children, function (c) { return c.tagName === "LI" && !c.querySelector(".empty-note"); });
+    var total = 0;
+    rows.forEach(function (li) { total += li.getBoundingClientRect().height; });
+    if (rows.length && rows.length < 5 && total > 0) {
+      var slot = Math.round(total / rows.length) + "px";
+      if (ul.style.getPropertyValue("--slot") !== slot) ul.style.setProperty("--slot", slot);
+    } else if (!rows.length || rows.length >= 5) {
+      ul.style.removeProperty("--slot");
+    }
+  }
+  function fitShortSelectionList(ul) {
+    if (shortListObserver && !ul.__fitObserved) { shortListObserver.observe(ul); ul.__fitObserved = true; }
+    measureShortListSlot(ul);
   }
 
   // ================= detail =================
@@ -2725,6 +2754,7 @@
     // See the matching comment in renderList(): reset scroll position so a
     // filter that shrinks the list can't leave it scrolled past its own end.
     el.wordList.scrollTop = 0;
+    fitShortSelectionList(el.wordList);
     el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
     updateFlashCounts();
   }
@@ -3004,6 +3034,7 @@
       filteredPhrases.forEach(function (v) { el.phraseList.appendChild(phraseCardRow(v.id, v.data)); });
     }
     el.phraseList.scrollTop = 0;
+    fitShortSelectionList(el.phraseList);
     el.phraseCount.textContent = allPhrases.length ? (filteredPhrases.length + " / " + allPhrases.length) : "";
     updateFlashCounts();
   }
