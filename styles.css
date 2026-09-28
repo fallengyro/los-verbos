@@ -439,7 +439,7 @@
      (.exclude). Both on-states get a glyph via ::before rather than an
      injected child node, because applyI18n() sets .textContent directly on
      any [data-i18n]/[data-i18n-tag] chip, which would wipe out a real DOM
-     node — same precedent as .flash-matrix-cell.on::after. --danger is
+     node — same precedent the old flashcard grid's checked cells used. --danger is
      reused for exclude rather than the --brick family, since --brick
      already carries "irregular conjugation" meaning elsewhere in the app
      and --danger is already this app's "remove/wrong" token. */
@@ -1107,67 +1107,50 @@
   }
   .flash-check-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
-  .flash-matrix-scroll { overflow-x: auto; margin: 0 0 6px; padding-bottom: 2px; }
-  table.flash-matrix { border-collapse: collapse; font-family: "JetBrains Mono", monospace; font-size: 12px; }
-  table.flash-matrix th, table.flash-matrix td { padding: 3px; text-align: center; }
-  /* Two-row header mirroring #detail table.conj-tenses' own mood-row/
-     tense-row split (see table.conj thead tr.mood-row above) — adapted to
-     this grid's smaller monospace sizing — so indicative "Presente" and
-     subjunctive "Presente" (etc.) read as different groups instead of
-     looking like duplicate columns. */
-  table.flash-matrix thead tr.mood-row th {
-    font-family: "Public Sans", sans-serif; font-size: 9.5px; font-weight: 700;
-    letter-spacing: 0.07em; text-transform: uppercase;
-    color: var(--accent-deep); padding-bottom: 4px; border-bottom: none;
-  }
-  table.flash-matrix thead tr.mood-row th.imp-head { color: var(--brick); }
-  table.flash-matrix thead tr.tense-row th { padding-top: 2px; padding-bottom: 5px; }
-  table.flash-matrix thead th.flash-matrix-corner { vertical-align: bottom; }
-  .flash-matrix-head {
-    background: var(--paper-sunken); border: 1px solid var(--line); cursor: pointer; font: inherit; font-weight: 700;
-    color: var(--ink-soft); padding: 6px 10px; border-radius: 8px; white-space: nowrap;
-    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-  }
-  .flash-matrix-head:hover { background: var(--accent); border-color: var(--accent-deep); color: var(--paper); }
-  .flash-matrix-row-head { text-align: left; }
-  .flash-matrix-toggle-all {
-    background: var(--paper-sunken); border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
-    font: inherit; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
-    color: var(--ink-soft); padding: 6px 9px;
-    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-  }
-  .flash-matrix-toggle-all:hover { background: var(--accent); border-color: var(--accent-deep); color: var(--paper); }
-  /* More breathing room + rounded corners consistent with .chip, and an
-     on-state that doesn't rely on a background swap alone (a checkmark),
-     so a selected cell reads clearly in both themes even where the accent
-     background's contrast against the border is lower. */
-  .flash-matrix-cell {
-    width: 34px; height: 30px; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--paper); cursor: pointer; padding: 0; position: relative;
-    transition: background 0.12s ease, border-color 0.12s ease;
-  }
-  .flash-matrix-cell:hover { border-color: var(--accent); background: var(--paper-sunken); }
-  .flash-matrix-cell.on { background: var(--accent); border-color: var(--accent-deep); }
-  .flash-matrix-cell.on::after {
-    content: "\2713";
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: "Public Sans", sans-serif; font-size: 15px; font-weight: 700; color: var(--accent-ink);
-  }
-  .flash-matrix-na { background: none; }
-  /* subtle zebra shading across the 5 person rows for scannability — only
-     visible where a button doesn't already cover the cell (the row-head
-     label and any n/a cell), since the cell buttons keep their own opaque
-     background either way. */
-  table.flash-matrix tbody tr:nth-child(even) > th,
-  table.flash-matrix tbody tr:nth-child(even) > td { background: var(--paper-sunken); }
-  .flash-matrix-hint { font-size: 11.5px; color: var(--ink-soft); font-style: italic; margin: 0 0 10px; }
+  /* ---- Flashcard tense/person picker (2026-09-28 redesign — quick picks +
+     "Personalizar"; see renderFlashPicker() in app.js). Replaces the old
+     persons × tenses grid. Reuses .chip / .chip.active from the filter chips;
+     .chip.partial (dashed) marks a pick or person that's only partly on. */
+  .flash-pick-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .flash-pick-head .flash-group-label { margin-bottom: 8px; }
+  .flash-pick-links { display: flex; gap: 6px; align-items: baseline; color: var(--ink-soft); font-size: 12px; }
+  .flash-pick-link { background: none; border: none; padding: 2px; font: inherit; font-size: 12.5px; color: var(--accent-deep); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .flash-presets { display: flex; flex-wrap: wrap; gap: 7px; }
+  .flash-presets .chip { font-size: 13.5px; padding: 6px 13px; }
+  .flash-presets .chip.active { padding-left: 28px; }
+  .chip.partial { border-style: dashed; border-color: var(--accent); color: var(--accent-deep); }
+  .flash-custom-toggle { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: none; padding: 4px 0; font: inherit; font-size: 13px; color: var(--accent-deep); cursor: pointer; }
+  .flash-custom-caret::before { content: "\25B8"; display: inline-block; width: 10px; transition: transform 0.15s ease; }
+  .flash-custom-toggle.open .flash-custom-caret::before { transform: rotate(90deg); }
+  .flash-custom { margin-top: 6px; padding: 10px 12px 6px; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); }
+  .flash-custom-cols { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin: 0 0 8px; }
+  .flash-custom-cols-label { flex-basis: 100%; font-size: 11.5px; color: var(--ink-soft); margin-bottom: 1px; }
+  .flash-custom-cols .chip { padding: 3px 9px; font-size: 12px; }
+  .flash-custom-cols .chip.active { padding-left: 22px; }
+  .flash-custom-cols .chip.active::before { left: 8px; font-size: 10px; }
+  .flash-custom-block { margin: 0 0 4px; }
+  .flash-custom-mood { font-family: "JetBrains Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-deep); margin: 10px 0 2px; }
+  .flash-custom-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid var(--line); }
+  .flash-custom-block .flash-custom-row:first-of-type { border-top: none; }
+  .flash-custom-name { display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 4px 0; font-family: "Fraunces", Georgia, serif; font-size: 15.5px; font-weight: 600; color: var(--ink); cursor: pointer; text-align: left; min-width: 0; }
+  .flash-custom-name.none { color: var(--ink-soft); font-weight: 500; }
+  .flash-custom-box { position: relative; flex: none; width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--paper-raised); }
+  .flash-custom-name.all .flash-custom-box { background: var(--accent); border-color: var(--accent); }
+  .flash-custom-name.all .flash-custom-box::after { content: "\2713"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--accent-ink); font: 700 11px "Public Sans", sans-serif; }
+  .flash-custom-name.some .flash-custom-box { border-color: var(--accent); }
+  .flash-custom-name.some .flash-custom-box::after { content: ""; position: absolute; left: 3px; right: 3px; top: 6px; height: 2px; border-radius: 2px; background: var(--accent); }
+  .flash-custom-persons { display: flex; gap: 3px; flex: none; }
+  .flash-custom-p { min-width: 34px; height: 26px; padding: 0 5px; border-radius: 13px; border: 1px solid var(--line); background: var(--paper-raised); color: var(--ink-soft); font-family: "JetBrains Mono", monospace; font-size: 10.5px; cursor: pointer; }
+  .flash-custom-p.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .flash-custom-p.na { display: inline-flex; align-items: center; justify-content: center; border-style: dashed; background: none; cursor: default; opacity: 0.5; }
 
   .flash-verb-options, .flash-word-options { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 12px; }
   .flash-radio-row { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13.5px; }
   .flash-radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
   .flash-radio-row input[type="radio"] { accent-color: var(--accent); cursor: pointer; }
 
-  #flash-start-btn { margin-top: 20px; }
+  .flash-start-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 20px; }
+  .flash-deck-count { font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--ink-soft); }
   #flash-setup-msg:empty { margin: 0; }
   #flash-setup-msg { margin: 10px 0 0; }
 
@@ -1516,12 +1499,6 @@
        feedback is enough to navigate by swipe alone on a phone, so the
        buttons would just be redundant chrome underneath the card. */
     .flash-controls { display: none; }
-    table.flash-matrix { font-size: 10.5px; }
-    table.flash-matrix thead tr.mood-row th { font-size: 8.5px; }
-    .flash-matrix-cell { width: 28px; height: 26px; border-radius: 6px; }
-    .flash-matrix-cell.on::after { font-size: 13px; }
-    .flash-matrix-head { padding: 4px 6px; font-size: 10px; border-radius: 6px; }
-    .flash-matrix-toggle-all { padding: 4px 6px; font-size: 9px; border-radius: 6px; }
   }
 
   /* ================= listas compartidas ================= */

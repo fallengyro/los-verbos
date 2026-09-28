@@ -613,12 +613,19 @@
       </div>
 
       <div class="flash-verb-options" id="flash-verb-options">
-        <p class="flash-group-label" data-i18n="flash_group_times">Tiempos, modos y personas</p>
-        <div class="flash-matrix-scroll">
-          <table class="flash-matrix" id="flash-matrix"></table>
+        <!-- Tense/person picker: quick picks + "Personalizar" (one row per
+             tense, persons inline). Built by app.js's renderFlashPicker(). -->
+        <div class="flash-pick-head">
+          <p class="flash-group-label" data-i18n="flash_group_pick">¿Qué querés practicar?</p>
+          <div class="flash-pick-links">
+            <button type="button" class="flash-pick-link" id="flash-pick-all" data-i18n="flash_pick_all">Todo</button>
+            <span aria-hidden="true">·</span>
+            <button type="button" class="flash-pick-link" id="flash-pick-none" data-i18n="flash_pick_none">Nada</button>
+          </div>
         </div>
-        <p class="flash-matrix-hint" data-i18n="flash_matrix_hint">Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.</p>
-        <div class="flash-check-row" id="flash-standalone-toggles"></div>
+        <div class="flash-presets" id="flash-presets"></div>
+        <button type="button" class="flash-custom-toggle" id="flash-custom-toggle" aria-expanded="false" aria-controls="flash-custom"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="flash_custom_toggle">Personalizar tiempos y personas</span></button>
+        <div class="flash-custom" id="flash-custom" hidden></div>
       </div>
 
       <div class="flash-word-options" id="flash-word-options">
@@ -630,7 +637,10 @@
       </div>
 
       <p class="form-msg" id="flash-setup-msg"></p>
-      <button type="button" class="btn-primary" id="flash-start-btn" data-i18n="flash_start_btn">Empezar</button>
+      <div class="flash-start-row">
+        <button type="button" class="btn-primary" id="flash-start-btn" data-i18n="flash_start_btn">Empezar</button>
+        <span class="flash-deck-count" id="flash-deck-count" aria-live="polite"></span>
+      </div>
     </div>
   </section>
 

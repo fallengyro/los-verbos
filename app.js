@@ -187,6 +187,20 @@
       flash_title: "Modo tarjetas",
       flash_setup_note: "Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos, Vocabulario y Frases.",
       flash_group_times: "Tiempos, modos y personas",
+      flash_group_pick: "¿Qué querés practicar?",
+      flash_pick_all: "Todo",
+      flash_pick_none: "Nada",
+      flash_preset_presente: "Presente",
+      flash_preset_pasados: "Pasados",
+      flash_preset_futuro: "Futuro",
+      flash_preset_condicional: "Condicional",
+      flash_preset_subjuntivo: "Subjuntivo",
+      flash_preset_imperativo: "Imperativo",
+      flash_preset_nonpersonal: "Gerundio y participio",
+      flash_custom_toggle: "Personalizar tiempos y personas",
+      flash_custom_persons: "Personas (en los tiempos elegidos)",
+      flash_deck_count: "{n} tarjetas",
+      flash_deck_count_1: "1 tarjeta",
       flash_matrix_hint: "Tocá una celda para esa combinación, o un encabezado para toda la fila o columna.",
       flash_group_direction: "Dirección de la tarjeta",
       flash_dir_def2word: "Definición → palabra",
@@ -471,6 +485,20 @@
       flash_title: "Flashcard mode",
       flash_setup_note: "Flashcards are built from whatever is currently filtered in the Verbs, Vocabulary and Phrases tabs.",
       flash_group_times: "Tenses, moods and persons",
+      flash_group_pick: "What do you want to practice?",
+      flash_pick_all: "All",
+      flash_pick_none: "None",
+      flash_preset_presente: "Present",
+      flash_preset_pasados: "Past tenses",
+      flash_preset_futuro: "Future",
+      flash_preset_condicional: "Conditional",
+      flash_preset_subjuntivo: "Subjunctive",
+      flash_preset_imperativo: "Imperative",
+      flash_preset_nonpersonal: "Gerund & participle",
+      flash_custom_toggle: "Customize tenses and persons",
+      flash_custom_persons: "Persons (in the chosen tenses)",
+      flash_deck_count: "{n} cards",
+      flash_deck_count_1: "1 card",
       flash_matrix_hint: "Tap a cell for that combination, or a header for the whole row or column.",
       flash_group_direction: "Card direction",
       flash_dir_def2word: "Definition → word",
@@ -1456,8 +1484,12 @@
     flashPhraseCount: document.getElementById("flash-phrase-count"),
     flashVerbOptions: document.getElementById("flash-verb-options"),
     flashWordOptions: document.getElementById("flash-word-options"),
-    flashMatrix: document.getElementById("flash-matrix"),
-    flashStandaloneToggles: document.getElementById("flash-standalone-toggles"),
+    flashPresets: document.getElementById("flash-presets"),
+    flashCustomToggle: document.getElementById("flash-custom-toggle"),
+    flashCustom: document.getElementById("flash-custom"),
+    flashPickAll: document.getElementById("flash-pick-all"),
+    flashPickNone: document.getElementById("flash-pick-none"),
+    flashDeckCount: document.getElementById("flash-deck-count"),
     flashDirDef: document.getElementById("flash-dir-def"),
     flashDirWord: document.getElementById("flash-dir-word"),
     flashSetupMsg: document.getElementById("flash-setup-msg"),
@@ -3169,166 +3201,203 @@
   }
 
   // ================= flashcards =================
-  // The tense/person picker is a clickable grid shaped like the conjugation
-  // table itself (persons as rows, tenses as columns, imperativo as a 6th
-  // column) rather than two long checkbox lists — a row/column header
-  // toggles everyone in that row/column in one click, and the corner button
-  // toggles the whole grid, so picking e.g. "just presente and pretérito"
-  // takes 2 clicks instead of unchecking 8 boxes one at a time.
-  function refreshFlashMatrixVisuals() {
-    var cellButtons = el.flashMatrix.querySelectorAll(".flash-matrix-cell");
-    cellButtons.forEach(function (btn) {
-      btn.classList.toggle("on", activeFlashCells.has(btn.getAttribute("data-cell")));
-    });
-    // The gerundio/participio chips sit outside the grid (they have no
-    // person or tense) but are part of "everything" as far as the corner
-    // Todo/Ninguno button is concerned — bug fix 2026-09-28 (mason: Todo/
-    // Ninguno left them untouched).
-    if (el.flashStandaloneToggles) {
-      el.flashStandaloneToggles.querySelectorAll(".chip[data-key]").forEach(function (btn) {
-        btn.classList.toggle("active", activeFlashStandalone.has(btn.getAttribute("data-key")));
-      });
-    }
-    var toggleAllBtn = el.flashMatrix.querySelector(".flash-matrix-toggle-all");
-    if (toggleAllBtn) toggleAllBtn.textContent = flashEverythingOn() ? "Ninguno" : "Todo";
-  }
+  // Tense/person picker (2026-09-28 redesign, option "D" from a mockup
+  // comparison mason picked): quick picks first — the choices you'd usually
+  // make ("Presente", "Pasados", "Condicional"…) — with the full per-cell
+  // control one tap away under "Personalizar", laid out as one row per
+  // tense with the five persons inline. Replaces the old persons × tenses
+  // grid, which on a phone only fit 3 of its 8 columns (the rest hid behind
+  // a sideways scroll) and read as a wall of 39 filled checkboxes.
+  // mason's one change to the mockup: Futuro and Condicional as separate
+  // picks, "those are taught at different times and in rioplatense it
+  // feels like future tense is used less than the simple ir a +
+  // infinitivo, whereas conditionals are common."
+  //
+  // The underlying selection model is unchanged — activeFlashCells holds
+  // "tenseKey|personKey" keys, activeFlashStandalone holds gerundio/
+  // participio — so buildFlashDeck() and everything downstream of it is
+  // untouched.
 
   var FLASH_STANDALONE_KEYS = ["gerundio", "participio"];
-  function flashEverythingOn() {
-    return flashAllCellKeys().every(function (k) { return activeFlashCells.has(k); }) &&
-      FLASH_STANDALONE_KEYS.every(function (k) { return activeFlashStandalone.has(k); });
+  var FLASH_PRESETS = [
+    { i18n: "flash_preset_presente", tenses: ["presente"] },
+    { i18n: "flash_preset_pasados", tenses: ["preterito", "imperfecto"] },
+    { i18n: "flash_preset_futuro", tenses: ["futuro"] },
+    { i18n: "flash_preset_condicional", tenses: ["condicional"] },
+    { i18n: "flash_preset_subjuntivo", tenses: [SUBJ_KEY, SUBJ_PAST_KEY] },
+    { i18n: "flash_preset_imperativo", tenses: ["imperativo"] },
+    { i18n: "flash_preset_nonpersonal", standalone: FLASH_STANDALONE_KEYS }
+  ];
+  // Pronoun labels are Spanish in both UI languages; short forms so five
+  // fit beside a tense name on a phone. In the imperativo row the él/ellos
+  // slots are really usted/ustedes commands (see IMPERATIVO_FORM_KEY).
+  var FLASH_PERSON_SHORT = { yo: "yo", vos: "vos", el: "él", nosotros: "nos.", ellos: "ellos" };
+  var FLASH_IMPERATIVO_SHORT = { vos: "vos", el: "ud.", nosotros: "nos.", ellos: "uds." };
+  var flashCustomOpen = false;
+
+  function flashKeysState(keys, set) {
+    var n = keys.filter(function (k) { return set.has(k); }).length;
+    return n === 0 ? "none" : (n === keys.length ? "all" : "some");
+  }
+  function flashToggleKeys(keys, set) {
+    var turnOn = flashKeysState(keys, set) !== "all";
+    keys.forEach(function (k) { if (turnOn) set.add(k); else set.delete(k); });
+  }
+  function flashPresetCellKeys(preset) {
+    var keys = [];
+    (preset.tenses || []).forEach(function (tk) { keys = keys.concat(flashColumnCellKeys(tk)); });
+    return keys;
+  }
+  function flashPresetState(preset) {
+    return preset.standalone
+      ? flashKeysState(preset.standalone, activeFlashStandalone)
+      : flashKeysState(flashPresetCellKeys(preset), activeFlashCells);
+  }
+  // A person chip in "Personalizar" acts on the tenses you've already
+  // chosen (any tense with at least one person on), not on every tense —
+  // otherwise picking "Pasados" and then tapping "vos" would silently add
+  // vos in presente, subjuntivo, etc. With nothing chosen yet it covers
+  // every tense.
+  function flashPersonScopeKeys(personKey) {
+    var inPlay = FLASH_MATRIX_COLUMNS.filter(function (c) { return flashTenseHasAnySelected(c.key); });
+    var cols = inPlay.length ? inPlay : FLASH_MATRIX_COLUMNS;
+    return cols.filter(function (c) { return flashCellSelectable(c.key, personKey); })
+      .map(function (c) { return flashCellKey(c.key, personKey); });
+  }
+  function flashAriaPressed(state) { return state === "all" ? "true" : (state === "some" ? "mixed" : "false"); }
+
+  function flashPickChip(label, state, onClick, title) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (state === "all" ? " active" : (state === "some" ? " partial" : ""));
+    b.textContent = label;
+    b.setAttribute("aria-pressed", flashAriaPressed(state));
+    if (title) b.title = title;
+    b.addEventListener("click", onClick);
+    return b;
   }
 
-  function buildFlashMatrix() {
-    var table = el.flashMatrix;
-    table.innerHTML = "";
-
-    var thead = document.createElement("thead");
-
-    // Mood row: groups the tense/imperativo columns exactly like the real
-    // conjugation table's own two-row header (#detail table.conj-tenses,
-    // see the "mood-row"/"tense-row" rows and their .mood-row CSS) — so
-    // indicative "Presente" and subjunctive "Presente" (etc.) read as
-    // members of different groups instead of looking like duplicate
-    // columns. The corner toggle-all cell gets rowspan="2" so it spans
-    // down through both header rows.
-    var moodRow = document.createElement("tr");
-    moodRow.className = "mood-row";
-    var cornerTh = document.createElement("th");
-    cornerTh.className = "flash-matrix-corner";
-    cornerTh.rowSpan = 2;
-    var cornerBtn = document.createElement("button");
-    cornerBtn.type = "button";
-    cornerBtn.className = "flash-matrix-toggle-all";
-    cornerBtn.addEventListener("click", function () {
-      if (flashEverythingOn()) {
-        activeFlashCells.clear();
-        activeFlashStandalone.clear();
-      } else {
-        flashAllCellKeys().forEach(function (k) { activeFlashCells.add(k); });
-        FLASH_STANDALONE_KEYS.forEach(function (k) { activeFlashStandalone.add(k); });
-      }
-      refreshFlashMatrixVisuals();
+  function renderFlashPicker() {
+    // Quick picks. A pick that's only partly on (after customizing) shows a
+    // dashed outline; tapping it then turns the whole pick on.
+    el.flashPresets.innerHTML = "";
+    FLASH_PRESETS.forEach(function (preset) {
+      el.flashPresets.appendChild(flashPickChip(t(preset.i18n), flashPresetState(preset), function () {
+        if (preset.standalone) flashToggleKeys(preset.standalone, activeFlashStandalone);
+        else flashToggleKeys(flashPresetCellKeys(preset), activeFlashCells);
+        renderFlashPicker();
+      }));
     });
-    cornerTh.appendChild(cornerBtn);
-    moodRow.appendChild(cornerTh);
 
-    var indicativoTh = document.createElement("th");
-    indicativoTh.colSpan = TENSES.length;
-    indicativoTh.textContent = t("mood_indicativo");
-    moodRow.appendChild(indicativoTh);
+    el.flashCustomToggle.setAttribute("aria-expanded", flashCustomOpen ? "true" : "false");
+    el.flashCustomToggle.classList.toggle("open", flashCustomOpen);
+    el.flashCustom.hidden = !flashCustomOpen;
+    if (flashCustomOpen) renderFlashCustom();
+    updateFlashDeckCount();
+  }
 
-    var subjuntivoTh = document.createElement("th");
-    subjuntivoTh.colSpan = SUBJ_TENSES.length;
-    subjuntivoTh.textContent = t("mood_subjuntivo");
-    moodRow.appendChild(subjuntivoTh);
+  // "Personalizar": one row per tense, grouped by mood, persons inline —
+  // every combination the old grid allowed, with no sideways scrolling.
+  function renderFlashCustom() {
+    var box = el.flashCustom;
+    box.innerHTML = "";
 
-    var imperativoMoodTh = document.createElement("th");
-    imperativoMoodTh.className = "imp-head";
-    imperativoMoodTh.textContent = t("mood_imperativo");
-    moodRow.appendChild(imperativoMoodTh);
-
-    thead.appendChild(moodRow);
-
-    var headRow = document.createElement("tr");
-    headRow.className = "tense-row";
-
-    FLASH_MATRIX_COLUMNS.forEach(function (col) {
-      var th = document.createElement("th");
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "flash-matrix-head";
-      btn.textContent = col.label;
-      btn.addEventListener("click", function () {
-        var keys = flashColumnCellKeys(col.key);
-        var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
-        keys.forEach(function (k) { if (allOn) activeFlashCells.delete(k); else activeFlashCells.add(k); });
-        refreshFlashMatrixVisuals();
-      });
-      th.appendChild(btn);
-      headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    var tbody = document.createElement("tbody");
+    var cols = document.createElement("div");
+    cols.className = "flash-custom-cols";
+    var colsLabel = document.createElement("span");
+    colsLabel.className = "flash-custom-cols-label";
+    colsLabel.textContent = t("flash_custom_persons");
+    cols.appendChild(colsLabel);
     PERSONS.forEach(function (p) {
-      var tr = document.createElement("tr");
-      var rowTh = document.createElement("th");
-      var rowBtn = document.createElement("button");
-      rowBtn.type = "button";
-      rowBtn.className = "flash-matrix-head flash-matrix-row-head";
-      rowBtn.textContent = p.label;
-      rowBtn.addEventListener("click", function () {
-        var keys = flashRowCellKeys(p.key);
-        var allOn = keys.every(function (k) { return activeFlashCells.has(k); });
-        keys.forEach(function (k) { if (allOn) activeFlashCells.delete(k); else activeFlashCells.add(k); });
-        refreshFlashMatrixVisuals();
-      });
-      rowTh.appendChild(rowBtn);
-      tr.appendChild(rowTh);
-
-      FLASH_MATRIX_COLUMNS.forEach(function (col) {
-        var td = document.createElement("td");
-        if (!flashCellSelectable(col.key, p.key)) {
-          td.className = "flash-matrix-na";
-        } else {
-          var key = flashCellKey(col.key, p.key);
-          var cellBtn = document.createElement("button");
-          cellBtn.type = "button";
-          cellBtn.className = "flash-matrix-cell";
-          cellBtn.setAttribute("data-cell", key);
-          cellBtn.setAttribute("aria-label", p.label + " · " + col.label);
-          cellBtn.addEventListener("click", function () {
-            if (activeFlashCells.has(key)) activeFlashCells.delete(key); else activeFlashCells.add(key);
-            refreshFlashMatrixVisuals();
-          });
-          td.appendChild(cellBtn);
-        }
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
+      var keys = flashPersonScopeKeys(p.key);
+      cols.appendChild(flashPickChip(FLASH_PERSON_SHORT[p.key], flashKeysState(keys, activeFlashCells), function () {
+        flashToggleKeys(keys, activeFlashCells);
+        renderFlashPicker();
+      }, p.label));
     });
-    table.appendChild(tbody);
+    box.appendChild(cols);
 
-    refreshFlashMatrixVisuals();
+    [
+      { label: t("mood_indicativo"), cols: TENSES },
+      { label: t("mood_subjuntivo"), cols: SUBJ_TENSES },
+      { label: null, cols: FLASH_MATRIX_COLUMNS.filter(function (c) { return c.key === "imperativo"; }) }
+    ].forEach(function (group) {
+      var block = document.createElement("div");
+      block.className = "flash-custom-block";
+      if (group.label) {
+        var mood = document.createElement("p");
+        mood.className = "flash-custom-mood";
+        mood.textContent = group.label;
+        block.appendChild(mood);
+      }
+      group.cols.forEach(function (col) {
+        var row = document.createElement("div");
+        row.className = "flash-custom-row";
+        var keys = flashColumnCellKeys(col.key);
+        var state = flashKeysState(keys, activeFlashCells);
+
+        var name = document.createElement("button");
+        name.type = "button";
+        name.className = "flash-custom-name " + state;
+        name.setAttribute("aria-pressed", flashAriaPressed(state));
+        var box2 = document.createElement("span");
+        box2.className = "flash-custom-box";
+        box2.setAttribute("aria-hidden", "true");
+        name.appendChild(box2);
+        name.appendChild(document.createTextNode(col.label));
+        name.addEventListener("click", function () { flashToggleKeys(keys, activeFlashCells); renderFlashPicker(); });
+        row.appendChild(name);
+
+        var persons = document.createElement("div");
+        persons.className = "flash-custom-persons";
+        PERSONS.forEach(function (p) {
+          if (!flashCellSelectable(col.key, p.key)) {
+            var na = document.createElement("span");
+            na.className = "flash-custom-p na";
+            na.textContent = "—";
+            na.setAttribute("aria-hidden", "true");
+            persons.appendChild(na);
+            return;
+          }
+          var cellKey = flashCellKey(col.key, p.key);
+          var on = activeFlashCells.has(cellKey);
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "flash-custom-p" + (on ? " on" : "");
+          b.textContent = col.key === "imperativo" ? FLASH_IMPERATIVO_SHORT[p.key] : FLASH_PERSON_SHORT[p.key];
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+          b.setAttribute("aria-label", col.label + " · " + (col.key === "imperativo" ? IMPERATIVO_DISPLAY[p.key] : p.label));
+          b.addEventListener("click", function () {
+            if (activeFlashCells.has(cellKey)) activeFlashCells.delete(cellKey); else activeFlashCells.add(cellKey);
+            renderFlashPicker();
+          });
+          persons.appendChild(b);
+        });
+        row.appendChild(persons);
+        block.appendChild(row);
+      });
+      box.appendChild(block);
+    });
   }
 
-  function buildFlashStandaloneToggles() {
-    el.flashStandaloneToggles.innerHTML = "";
-    [{ key: "gerundio", i18nKey: "tile_gerundio" }, { key: "participio", i18nKey: "tile_participio" }].forEach(function (item) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "chip";
-      btn.textContent = t(item.i18nKey);
-      btn.setAttribute("data-key", item.key);
-      btn.classList.toggle("active", activeFlashStandalone.has(item.key));
-      btn.addEventListener("click", function () {
-        if (activeFlashStandalone.has(item.key)) activeFlashStandalone.delete(item.key); else activeFlashStandalone.add(item.key);
-        refreshFlashMatrixVisuals(); // syncs this chip and the corner Todo/Ninguno label
-      });
-      el.flashStandaloneToggles.appendChild(btn);
-    });
+  function setFlashPickAll(on) {
+    if (on) {
+      flashAllCellKeys().forEach(function (k) { activeFlashCells.add(k); });
+      FLASH_STANDALONE_KEYS.forEach(function (k) { activeFlashStandalone.add(k); });
+    } else {
+      activeFlashCells.clear();
+      activeFlashStandalone.clear();
+    }
+    renderFlashPicker();
+  }
+
+  // How many cards Empezar would deal right now — the real deck (verbs ×
+  // selected forms, plus words and phrases, after every tab's filters and
+  // Sabido chips), so the number always matches what you get.
+  function updateFlashDeckCount() {
+    if (!el.flashDeckCount) return;
+    var n = buildFlashDeck().length;
+    el.flashDeckCount.textContent = t(n === 1 ? "flash_deck_count_1" : "flash_deck_count", { n: n });
   }
 
   // A tense column counts as "in play" for an impersonal verb (llover,
@@ -3356,6 +3425,7 @@
     el.flashVerbCount.textContent = "(" + filtered.length + ")";
     el.flashWordCount.textContent = "(" + filteredWords.length + ")";
     el.flashPhraseCount.textContent = "(" + filteredPhrases.length + ")";
+    updateFlashDeckCount();
   }
 
   function renderFlashSetup() {
@@ -3370,6 +3440,7 @@
     var noSource = !activeFlashSources.verbs && !activeFlashSources.words && !activeFlashSources.phrases;
     el.flashStartBtn.disabled = noSource;
     el.flashSetupMsg.textContent = noSource ? t("flash_no_source") : "";
+    renderFlashPicker(); // relabels on a language switch; also refreshes the deck count
   }
 
   // ================= English per conjugated form (verb-gloss) =================
@@ -6638,8 +6709,10 @@
   buildConjFormTable();
   buildImperativoFormRow();
   buildTenseHeader();
-  buildFlashMatrix();
-  buildFlashStandaloneToggles();
+  renderFlashPicker();
+  el.flashCustomToggle.addEventListener("click", function () { flashCustomOpen = !flashCustomOpen; renderFlashPicker(); });
+  el.flashPickAll.addEventListener("click", function () { setFlashPickAll(true); });
+  el.flashPickNone.addEventListener("click", function () { setFlashPickAll(false); });
 
   (function restoreMainTab() {
     var saved = null;
