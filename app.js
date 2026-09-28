@@ -205,6 +205,10 @@
       known_toggle_aria_on: "Sabido — tocá para desmarcar",
       known_toggle_aria_off: "Marcar como sabido",
       known_mark_aria: "Sabido",
+      known_form_title: "Marcaste esta forma como sabida",
+      conj_legend_known: "formas que marcaste como sabidas en las tarjetas",
+      flash_done_title: "¡Listo!",
+      flash_done_text: "No quedan tarjetas para otra ronda: tu filtro de Sabido las sacó a todas.",
       tts_play_aria: "Escuchar pronunciación",
       tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
       tts_voice_elena_aria: "Voz: Elena",
@@ -485,6 +489,10 @@
       known_toggle_aria_on: "Known — tap to unmark",
       known_toggle_aria_off: "Mark as known",
       known_mark_aria: "Known",
+      known_form_title: "You marked this form as known",
+      conj_legend_known: "forms you marked as known on flashcards",
+      flash_done_title: "All done!",
+      flash_done_text: "No cards left for another round — your Sabido filter has removed them all.",
       tts_play_aria: "Hear pronunciation",
       tts_error: "Couldn't play the audio. Try again.",
       tts_voice_elena_aria: "Voice: Elena",
@@ -1318,6 +1326,7 @@
     dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
     dConjLegend: document.getElementById("d-conj-legend"),
     dGustarLegend: document.getElementById("d-gustar-legend"),
+    dKnownLegend: document.getElementById("d-known-legend"),
     dGustarTabs: document.getElementById("d-gustar-tabs"),
     dGustarTabPersonal: document.getElementById("d-gustar-tab-personal"),
     dGustarTabDativo: document.getElementById("d-gustar-tab-dativo"),
@@ -1457,6 +1466,7 @@
     flashOverlay: document.getElementById("flash-overlay"),
     flashCloseBtn: document.getElementById("flash-close-btn"),
     flashProgress: document.getElementById("flash-progress"),
+    flashDoneClose: document.getElementById("flash-done-close"),
     flashCard: document.getElementById("flash-card"),
     flashFrontMain: document.getElementById("flash-front-main"),
     flashFrontSub: document.getElementById("flash-front-sub"),
@@ -2065,11 +2075,13 @@
       if (personKey === "vos") {
         td.textContent = imper.vos || "—";
         if (imper.vos) td.classList.add("speakable");
+        td.dataset.formKey = flashCellKey("imperativo", "vos");
         return td;
       }
       if (personKey === "nosotros") {
         td.textContent = imper.nosotros || "—";
         if (imper.nosotros) td.classList.add("speakable");
+        td.dataset.formKey = flashCellKey("imperativo", "nosotros");
         return td;
       }
       var realVal = personKey === "el" ? imper.usted : imper.ustedes;
@@ -2086,6 +2098,7 @@
       // the full "— / — / <real>" td.textContent — see the tap-to-hear
       // click handler below, which special-cases td.imp-col for this.
       if (realVal) td.classList.add("speakable");
+      td.dataset.formKey = flashCellKey("imperativo", personKey);
       return td;
     }
 
@@ -2114,6 +2127,7 @@
           if (isCellIrregular(data, t.key, p.key, val)) td.classList.add("irreg");
           if (val) td.classList.add("speakable");
         }
+        td.dataset.formKey = flashCellKey(t.key, p.key); // see paintVerbFormMarks()
         tr.appendChild(td);
       });
       SUBJ_TENSES.forEach(function (t) {
@@ -2128,6 +2142,7 @@
           if (isCellIrregular(data, t.key, p.key, subjVal)) tdSubj.classList.add("irreg");
           if (subjVal) tdSubj.classList.add("speakable");
         }
+        tdSubj.dataset.formKey = flashCellKey(t.key, p.key);
         tr.appendChild(tdSubj);
       });
       tr.appendChild(imperativoCell(p.key));
@@ -2150,12 +2165,14 @@
         var td = document.createElement("td");
         td.textContent = imp[t.key] || "—";
         if (imp[t.key]) td.classList.add("speakable");
+        td.dataset.formKey = flashCellKey(t.key, "impersonal");
         impTr.appendChild(td);
       });
       SUBJ_TENSES.forEach(function (t) {
         var impTdSubj = document.createElement("td");
         impTdSubj.textContent = imp[t.key] || "—";
         if (imp[t.key]) impTdSubj.classList.add("speakable");
+        impTdSubj.dataset.formKey = flashCellKey(t.key, "impersonal");
         impTr.appendChild(impTdSubj);
       });
       // impersonal verbs (llover, nevar) have no imperativo at all
@@ -2170,6 +2187,7 @@
     el.dGerundio.classList.toggle("speakable", !!forms.gerundio);
     el.dParticipio.textContent = forms.participio || "—";
     el.dParticipio.classList.toggle("speakable", !!forms.participio);
+    paintVerbFormMarks(data); // per-form Sabido checks (tiles carry data-form-key in index.html)
 
     el.detail.hidden = false;
     el.detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -2461,6 +2479,7 @@
         gustar_like: !!row.gustar_like,
         also_personal_use: !!row.also_personal_use,
         known: !!row.known,
+        known_forms: row.known_forms || {},
         forms: row.forms || {}
       }
     };
@@ -3343,7 +3362,7 @@
     var deck = [];
 
     if (activeFlashSources.verbs) {
-      filtered.forEach(function (v) {
+      verbFlashSource().forEach(function (v) {
         var data = v.data;
         var forms = data.forms || {};
         var def = data.definition || "";
@@ -3363,7 +3382,7 @@
               frontLabel = p.label;
             }
             deck.push({
-              kind: "verb", data: data,
+              kind: "verb", data: data, formKey: flashCellKey(t.key, p.key),
               frontMain: inf, frontSub: frontLabel + " · " + t.label.toLowerCase(),
               backMain: val, backSub: def ? "(" + def + ")" : "",
               frontSpeak: inf, backSpeak: val
@@ -3379,7 +3398,7 @@
           var val = imp[t.key] || "";
           if (!val) return;
           deck.push({
-            kind: "verb", data: data,
+            kind: "verb", data: data, formKey: flashCellKey(t.key, "impersonal"),
             frontMain: inf, frontSub: "impersonal · " + t.label.toLowerCase(),
             backMain: val, backSub: def ? "(" + def + ")" : "",
             frontSpeak: inf, backSpeak: val
@@ -3392,7 +3411,7 @@
             var val = forms.imperativo[IMPERATIVO_FORM_KEY[personKey]] || "";
             if (!val) return;
             deck.push({
-              kind: "verb", data: data,
+              kind: "verb", data: data, formKey: flashCellKey("imperativo", personKey),
               frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · " + t("mood_imperativo").toLowerCase(),
               backMain: val, backSub: def ? "(" + def + ")" : "",
               frontSpeak: inf, backSpeak: val
@@ -3405,7 +3424,7 @@
           var val = forms[item.key] || "";
           if (!val) return;
           deck.push({
-            kind: "verb", data: data,
+            kind: "verb", data: data, formKey: item.key,
             frontMain: inf, frontSub: t(item.i18nKey),
             backMain: val, backSub: def ? "(" + def + ")" : "",
             frontSpeak: inf, backSpeak: val
@@ -3445,7 +3464,9 @@
       });
     }
 
-    return deck;
+    // Sabido chips apply per CARD here (per form, for verbs) — see
+    // cardPassesKnownFilter()/verbFlashSource().
+    return deck.filter(cardPassesKnownFilter);
   }
 
   function flashBackBadges(card) {
@@ -4133,7 +4154,7 @@
     // aloud in an Argentine Spanish voice would just be noise.
     el.flashFrontSpeak.hidden = !card.frontSpeak;
     el.flashBackSpeak.hidden = !card.backSpeak;
-    setKnownToggleState(el.flashKnownToggle, !!card.data.known);
+    setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
     el.flashTtsMsg.textContent = "";
     // Quietly start downloading both faces' audio as soon as this card
     // becomes the current one — most cards sit on screen for a moment
@@ -4172,6 +4193,7 @@
     }
     el.flashSetupMsg.textContent = "";
     flashIndex = 0;
+    el.flashOverlay.classList.remove("is-done");
     // only the card itself flips to the opposite theme — the overlay's
     // background, topbar, and controls stay in the app's actual theme.
     el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
@@ -4180,9 +4202,16 @@
   }
 
   function nextFlashCard() {
+    if (!flashDeck.length) return;
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
-      flashDeck = shuffleArray(flashDeck.slice());
+      // End of a pass. Cards marked (or un-marked) Sabido during it stay put
+      // until here — so going back within a pass still works — and only now
+      // drop out if their tab's Sabido chip says so (mason, 2026-09-28: mark
+      // tener · yo on the second pass, and the third pass leaves it out).
+      var nextPass = flashDeck.filter(cardPassesKnownFilter);
+      if (!nextPass.length) { showFlashDone(); return; }
+      flashDeck = shuffleArray(nextPass);
       flashIndex = 0;
     }
     renderFlashCard();
@@ -4196,6 +4225,7 @@
 
   function closeFlashcards() {
     el.flashOverlay.hidden = true;
+    el.flashOverlay.classList.remove("is-done");
   }
 
   function toggleFlashFlip() {
@@ -4262,6 +4292,143 @@
     return !!f && (f.include.has("known") || f.exclude.has("known"));
   }
 
+  // ---- Per-form Sabido marks (verbs) ----
+  // A verb flashcard is one conjugated form (tener · yo · presente), so its
+  // Sabido toggle marks just that form, stored in verbs.known_forms as
+  // { "<formKey>": true }. Form keys reuse the flashcard setup matrix's own
+  // naming (flashCellKey): "presente|yo", "subjPasado|ellos",
+  // "presente|impersonal", "imperativo|vos", plus "gerundio"/"participio".
+  // This is independent of the verb-level `known` (the detail-page pill,
+  // mason's choice 2026-09-28): a card counts as known if EITHER its own form
+  // or its whole verb is marked.
+
+  function knownFilterMode(filters) {
+    var f = filters.flag;
+    if (!f) return null;
+    if (f.include.has("known")) return "include";
+    if (f.exclude.has("known")) return "exclude";
+    return null;
+  }
+
+  function cardFormKnown(card) {
+    return card.kind === "verb" && !!card.formKey && !!((card.data.known_forms || {})[card.formKey]);
+  }
+
+  function cardShowsKnown(card) {
+    return !!card.data.known || cardFormKnown(card);
+  }
+
+  // Whether a card belongs in the deck under its own tab's Sabido chip:
+  // chip excluding → only not-yet cards; chip including → only known cards;
+  // chip neutral → everything.
+  function cardPassesKnownFilter(card) {
+    var filters = card.kind === "verb" ? activeVerbFilters : (card.kind === "word" ? activeWordFilters : activePhraseFilters);
+    var mode = knownFilterMode(filters);
+    if (!mode) return true;
+    var known = cardShowsKnown(card);
+    return mode === "include" ? known : !known;
+  }
+
+  // The verbs a flashcard deck draws from. Normally just the Verbos tab's
+  // own filtered list — but when a Sabido chip is active there, that list
+  // is filtered at the WHOLE-VERB level, while for flashcards the chip has to
+  // apply per card (per form). So the deck starts from every verb passing
+  // all the OTHER facets (and the search box), with the Sabido chip
+  // temporarily set aside, and cardPassesKnownFilter() then applies it card
+  // by card. Without this, "include" would miss forms marked on verbs that
+  // aren't whole-marked.
+  function verbFlashSource() {
+    var f = activeVerbFilters.flag;
+    var inc = f.include.has("known"), exc = f.exclude.has("known");
+    if (!inc && !exc) return filtered;
+    f.include.delete("known");
+    f.exclude.delete("known");
+    try {
+      var q = norm(el.search.value);
+      return allVerbs.filter(function (v) {
+        return (!q || norm(v.data.infinitive || v.id).indexOf(q) !== -1) && verbPassesFacets(v, false);
+      });
+    } finally {
+      if (inc) f.include.add("known");
+      if (exc) f.exclude.add("known");
+    }
+  }
+
+  // Every form key this verb actually has a value for — the same cells
+  // buildFlashDeck() can make cards from (ignoring the setup matrix).
+  function allVerbFormKeys(data) {
+    var forms = data.forms || {};
+    var keys = [];
+    FLASH_PERSONAL_TENSES.forEach(function (tn) {
+      PERSONS.forEach(function (p) {
+        var val = data.gustar_like ? gustarCellText(forms, tn.key, p.key) : ((forms[tn.key] && forms[tn.key][p.key]) || "");
+        if (val && val !== "—") keys.push(flashCellKey(tn.key, p.key));
+      });
+      if ((forms.impersonal || {})[tn.key]) keys.push(flashCellKey(tn.key, "impersonal"));
+    });
+    Object.keys(IMPERATIVO_FORM_KEY).forEach(function (pk) {
+      if ((forms.imperativo || {})[IMPERATIVO_FORM_KEY[pk]]) keys.push(flashCellKey("imperativo", pk));
+    });
+    if (forms.gerundio) keys.push("gerundio");
+    if (forms.participio) keys.push("participio");
+    return keys;
+  }
+
+  // Marks/un-marks one form of a verb. Special case: un-marking a form of a
+  // verb that's marked known as a WHOLE turns that whole-verb mark into
+  // per-form marks on every other form — "I know all of it except this one"
+  // — rather than silently losing what the whole-verb mark meant.
+  function setVerbFormKnown(data, formKey, known) {
+    var id = findItemId("verb", data);
+    var prevForms = data.known_forms || {};
+    var prevKnown = !!data.known;
+    var next = Object.assign({}, prevForms);
+    var patch = {};
+    if (!known && prevKnown) {
+      allVerbFormKeys(data).forEach(function (k) { next[k] = true; });
+      delete next[formKey];
+      data.known = false;
+      patch.known = false;
+    } else if (known) {
+      next[formKey] = true;
+    } else {
+      delete next[formKey];
+    }
+    data.known_forms = next;
+    patch.known_forms = next;
+    refreshKnownUi("verb", id);
+    if (!id) return;
+    supabaseClient.from("verbs").update(patch).eq("id", id).then(function (res) {
+      if (!res.error) return;
+      data.known_forms = prevForms;
+      data.known = prevKnown;
+      refreshKnownUi("verb", id);
+      showBanner(t("msg_error_guardar", { msg: res.error.message }));
+    });
+  }
+
+  // Small check on each marked cell/tile of the verb detail page (cells and
+  // tiles carry data-form-key, set in selectVerb() / index.html), plus the
+  // legend line under the table, shown only when something is marked.
+  function paintVerbFormMarks(data) {
+    var kf = data.known_forms || {};
+    var any = false;
+    el.detail.querySelectorAll("[data-form-key]").forEach(function (n) {
+      var on = !!kf[n.dataset.formKey];
+      n.classList.toggle("form-known", on);
+      if (on) { any = true; n.setAttribute("title", t("known_form_title")); }
+      else n.removeAttribute("title");
+    });
+    if (el.dKnownLegend) el.dKnownLegend.hidden = !any;
+  }
+
+  function showFlashDone() {
+    flashDeck = [];
+    flashIndex = -1;
+    el.flashProgress.textContent = "";
+    el.flashOverlay.classList.add("is-done");
+  }
+
   // Brings every on-screen reflection of one item's known state up to date.
   // With a Sabido chip active on that item's tab, the whole list re-renders,
   // since the item may now fall on the other side of the filter. Otherwise
@@ -4286,8 +4453,9 @@
     var selected = kind === "verb" ? selectedId : (kind === "word" ? selectedWordId : selectedPhraseId);
     var toggle = kind === "verb" ? el.dKnown : (kind === "word" ? el.wdKnown : el.pdKnown);
     if (id && selected === id) setKnownToggleState(toggle, known);
+    if (kind === "verb" && id && selected === id && entry) paintVerbFormMarks(entry.data);
     var card = flashDeck[flashIndex];
-    if (card && entry && card.data === entry.data) setKnownToggleState(el.flashKnownToggle, known);
+    if (card && entry && card.data === entry.data) setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
   }
 
   // Updates the shared in-memory data object right away (the UI never waits
@@ -4461,6 +4629,7 @@
   function listSnapshot(data) {
     var copy = Object.assign({}, data);
     delete copy.known;
+    delete copy.known_forms; // per-form marks are per-person progress too
     return copy;
   }
 
@@ -6215,8 +6384,11 @@
   el.flashKnownToggle.addEventListener("click", function () {
     var card = flashDeck[flashIndex];
     if (!card) return;
-    setItemKnown(card.kind, card.data, !card.data.known);
-    setKnownToggleState(el.flashKnownToggle, !!card.data.known);
+    // A verb card is one form, so it marks just that form (setVerbFormKnown);
+    // words/phrases mark the item itself.
+    if (card.kind === "verb" && card.formKey) setVerbFormKnown(card.data, card.formKey, !cardShowsKnown(card));
+    else setItemKnown(card.kind, card.data, !card.data.known);
+    setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
     popKnownToggle(el.flashKnownToggle);
   });
   el.dKnown.addEventListener("click", function () {
@@ -6237,6 +6409,7 @@
     setItemKnown("phrase", entry.data, !entry.data.known);
     popKnownToggle(el.pdKnown);
   });
+  el.flashDoneClose.addEventListener("click", closeFlashcards);
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
   el.flashCard.addEventListener("touchmove", handleFlashTouchMove, { passive: false });

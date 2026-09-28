@@ -26,6 +26,7 @@ create table if not exists public.verbs (
   auxiliar boolean not null default false,
   gustar_like boolean not null default false,
   known boolean not null default false,
+  known_forms jsonb not null default '{}'::jsonb,
   forms jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -371,6 +372,14 @@ alter table public.verbs add column if not exists known boolean not null default
 alter table public.words add column if not exists known boolean not null default false;
 alter table public.phrases add column if not exists known boolean not null default false;
 
+-- Per-form marks for verbs (2026-09-28, same day): a verb flashcard is one
+-- conjugated form, so its Sabido toggle marks just that form, stored here as
+-- { "<formKey>": true } — e.g. {"presente|yo": true, "imperativo|vos": true,
+-- "gerundio": true}. Independent of `known` above (the whole-verb mark); a
+-- card counts as known if either is set. Per-person progress like `known`,
+-- so also stripped from list snapshots (app.js listSnapshot()).
+alter table public.verbs add column if not exists known_forms jsonb not null default '{}'::jsonb;
+
 -- One-time cleanup (safe to re-run — matches nothing once clean): remove
 -- "known" from any list snapshot that captured it. `data - 'known'` drops
 -- that one key from the jsonb and leaves everything else untouched. Must run
@@ -380,7 +389,8 @@ alter table public.phrases add column if not exists known boolean not null defau
 do $$
 begin
   if to_regclass('public.list_items') is not null then
-    update public.list_items set data = data - 'known' where data ? 'known';
+    update public.list_items set data = data - 'known' - 'known_forms'
+      where data ? 'known' or data ? 'known_forms';
   end if;
 end $$;
 

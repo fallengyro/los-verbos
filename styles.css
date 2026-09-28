@@ -1393,6 +1393,31 @@
   @keyframes known-pop { 0% { transform: scale(1); } 40% { transform: scale(1.1); } 100% { transform: scale(1); } }
   .known-toggle.pop { animation: known-pop 0.22s ease-out; }
   @media (prefers-reduced-motion: reduce) { .known-toggle.pop { animation: none; } }
+  /* Per-form Sabido marks on the verb detail page (2026-09-28): a small
+     check in the top-right corner of each conjugation cell / gerundio-
+     participio tile marked known on a flashcard. ::before, because
+     .tts-active's ring already owns ::after on these same cells. Sits in
+     the cell's right padding, so it never overlaps the form's text and
+     never changes column widths. */
+  table.conj tbody td.form-known { position: relative; }
+  table.conj tbody td.form-known::before, .nonpersonal .tile.form-known::before {
+    content: "\2713"; position: absolute; top: 2px; right: 3px; pointer-events: none;
+    font-family: "Public Sans", sans-serif; font-size: 9px; font-weight: 700; line-height: 1;
+    color: var(--accent);
+  }
+  .nonpersonal .tile.form-known::before { top: 7px; right: 9px; font-size: 11px; }
+  .conj-legend .known-legend-mark { width: 12px; text-align: center; flex: none; color: var(--accent); font-weight: 700; font-size: 12px; }
+
+  /* End-of-deck state: replaces the card, Sabido row, hint and controls
+     when a pass ends with no cards left for the next (see showFlashDone()). */
+  .flash-done { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; padding: 0 20px; }
+  .flash-overlay:not(.is-done) .flash-done { display: none; }
+  .flash-overlay.is-done .flash-stage, .flash-overlay.is-done .flash-known-row,
+  .flash-overlay.is-done .flash-hint, .flash-overlay.is-done .flash-controls,
+  .flash-overlay.is-done .flash-tts-msg { display: none; }
+  .flash-done-title { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 30px; margin: 0; color: var(--ink); }
+  .flash-done-text { color: var(--ink-soft); font-size: 15px; margin: 0 0 12px; max-width: 320px; line-height: 1.45; }
+
   /* Small filled check after a known item's name in the verb/word/phrase
      lists, so progress is visible while browsing. Lives inside .inf so it
      stays next to the word when .card-row wraps on mobile. */

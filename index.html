@@ -206,10 +206,11 @@
     </div>
     <p class="conj-legend" id="d-conj-legend"><span class="swatch"></span> <span data-i18n="conj_legend_irregular">se aparta del patrón regular</span></p>
     <p class="conj-legend gustar-legend" id="d-gustar-legend"><span class="swatch gustar"></span> <span data-i18n="conj_legend_gustar">a quién le pasa (no quién actúa) — la forma cambia solo si lo que gusta/afecta es singular o plural</span></p>
+    <p class="conj-legend known-legend" id="d-known-legend" hidden><span class="known-legend-mark" aria-hidden="true">&#10003;</span> <span data-i18n="conj_legend_known">formas que marcaste como sabidas en las tarjetas</span></p>
 
     <div class="nonpersonal">
-      <div class="tile"><span class="label" data-i18n="tile_gerundio">Gerundio</span><span class="val" id="d-gerundio"></span></div>
-      <div class="tile"><span class="label" data-i18n="tile_participio">Participio</span><span class="val" id="d-participio"></span></div>
+      <div class="tile" data-form-key="gerundio"><span class="label" data-i18n="tile_gerundio">Gerundio</span><span class="val" id="d-gerundio"></span></div>
+      <div class="tile" data-form-key="participio"><span class="label" data-i18n="tile_participio">Participio</span><span class="val" id="d-participio"></span></div>
     </div>
     <p class="form-msg detail-tts-msg" id="d-tts-msg"></p>
 
@@ -856,6 +857,14 @@
       </div>
     </div>
     <button type="button" class="flash-arrow flash-arrow-next" id="flash-arrow-next" data-i18n-aria-label="flash_arrow_next_aria" aria-label="Siguiente">&rsaquo;</button>
+  </div>
+  <!-- Shown instead of the card once a pass ends with nothing left for the
+       next one (every card removed by its tab's Sabido chip). See
+       nextFlashCard()/showFlashDone() in app.js. -->
+  <div class="flash-done" id="flash-done">
+    <p class="flash-done-title" data-i18n="flash_done_title">¡Listo!</p>
+    <p class="flash-done-text" data-i18n="flash_done_text">No quedan tarjetas para otra ronda: tu filtro de Sabido las sacó a todas.</p>
+    <button type="button" class="btn-primary" id="flash-done-close" data-i18n="close">Cerrar</button>
   </div>
   <!-- "Sabido" toggle — deliberately OUTSIDE .flash-card: same spot on every
        card and both faces, never flips the card, never advances. See
