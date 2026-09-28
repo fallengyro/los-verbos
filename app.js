@@ -222,7 +222,8 @@
       known_form_title: "Marcaste esta forma como sabida",
       conj_legend_known: "formas que marcaste como sabidas en las tarjetas",
       flash_done_title: "¡Listo!",
-      flash_done_text: "No quedan tarjetas para otra ronda: tu filtro de Sabido las sacó a todas.",
+      flash_done_text: "Marcaste todas las tarjetas como sabidas.",
+      flash_done_text_review: "No quedan tarjetas sabidas para repasar.",
       tts_play_aria: "Escuchar pronunciación",
       tts_error: "No se pudo reproducir el audio. Probá de nuevo.",
       tts_voice_elena_aria: "Voz: Elena",
@@ -520,7 +521,8 @@
       known_form_title: "You marked this form as known",
       conj_legend_known: "forms you marked as known on flashcards",
       flash_done_title: "All done!",
-      flash_done_text: "No cards left for another round — your Sabido filter has removed them all.",
+      flash_done_text: "You've marked every card as known.",
+      flash_done_text_review: "No known cards left to review.",
       tts_play_aria: "Hear pronunciation",
       tts_error: "Couldn't play the audio. Try again.",
       tts_voice_elena_aria: "Voice: Elena",
@@ -1499,6 +1501,7 @@
     flashCloseBtn: document.getElementById("flash-close-btn"),
     flashProgress: document.getElementById("flash-progress"),
     flashDoneClose: document.getElementById("flash-done-close"),
+    flashDoneText: document.getElementById("flash-done-text"),
     flashCard: document.getElementById("flash-card"),
     flashFrontMain: document.getElementById("flash-front-main"),
     flashFrontSub: document.getElementById("flash-front-sub"),
@@ -2529,7 +2532,10 @@
         saveCache("verbs", res.data || []);
         markOnline("verbs");
         clearBanner();
+        var prevById = {};
+        allVerbs.forEach(function (v) { prevById[v.id] = v.data; });
         allVerbs = (res.data || []).map(rowToVerb);
+        carryOverVerbGlosses(prevById, allVerbs);
         renderList();
         queueVerbGlosses(); // fills in English for any verb that's missing/outdated — see verb-gloss section
         if (selectedId) {
@@ -2559,6 +2565,7 @@
     query.then(function (res) {
       if (res.error) { el.formMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
       var savedId = res.data.id;
+      verbGlossPriorityId = savedId;
       closeForm();
       loadVerbs().then(function () { selectVerb(savedId); });
     });
@@ -3540,6 +3547,38 @@
     return card.backSub || "";
   }
 
+  // If a flashcard is open when its English arrives, update its answer line
+  // in place (mason, 2026-09-28: a just-added verb's card kept showing the
+  // definition until a refresh, even though the console showed the English
+  // had been generated).
+  function refreshOpenFlashCardSub() {
+    if (el.flashOverlay.hidden) return;
+    var card = flashDeck[flashIndex];
+    if (!card || card.kind !== "verb") return;
+    var sub = cardBackSub(card);
+    el.flashBackSub.textContent = sub;
+    el.flashBackSub.style.display = sub ? "" : "none";
+  }
+
+  // A verbs reload that was already in flight when English was saved can
+  // land afterwards with the row as it was before — and the queue won't
+  // retry a (verb, fingerprint) it has already done this session, so the
+  // English stayed missing until a refresh. loadVerbs() calls this to keep
+  // the in-memory English whenever the reloaded row lacks it but still has
+  // the same forms. The database already has it; this only fixes what's on
+  // screen.
+  function carryOverVerbGlosses(prevById, entries) {
+    entries.forEach(function (v) {
+      var old = prevById[v.id];
+      if (!old || !old.forms_en_sig) return;
+      var sig = verbGlossSig(v.data);
+      if (v.data.forms_en_sig !== sig && old.forms_en_sig === sig) {
+        v.data.forms_en = old.forms_en;
+        v.data.forms_en_sig = old.forms_en_sig;
+      }
+    });
+  }
+
   // Background queue: one verb at a time, never more than one attempt per
   // (verb, fingerprint) per page load, and it switches itself off for the
   // session after two consecutive failures (function not deployed yet,
@@ -3550,15 +3589,15 @@
   var verbGlossRunning = false;
   var verbGlossDisabled = false;
   var verbGlossFailures = 0;
+  var verbGlossPriorityId = null; // a verb just saved in the form jumps the queue
 
   function queueVerbGlosses() {
     if (verbGlossRunning || verbGlossDisabled || !currentUser) return;
     verbGlossRunning = true;
     (function step() {
       if (verbGlossDisabled) { verbGlossRunning = false; return; }
-      var next = allVerbs.find(function (v) {
-        return verbNeedsGloss(v.data) && !verbGlossAttempted.has(v.id + ":" + verbGlossSig(v.data));
-      });
+      var pending = function (v) { return verbNeedsGloss(v.data) && !verbGlossAttempted.has(v.id + ":" + verbGlossSig(v.data)); };
+      var next = allVerbs.find(function (v) { return v.id === verbGlossPriorityId && pending(v); }) || allVerbs.find(pending);
       if (!next) { verbGlossRunning = false; return; }
       verbGlossAttempted.add(next.id + ":" + verbGlossSig(next.data));
       generateVerbGloss(next).then(function () { setTimeout(step, 250); });
@@ -3599,6 +3638,7 @@
         [data, current && current.data].forEach(function (d) {
           if (d && verbGlossSig(d) === sig) { d.forms_en = glosses; d.forms_en_sig = sig; }
         });
+        refreshOpenFlashCardSub(); // the card on screen shows it right away
         var d = res.data;
         console.info("[verb-gloss] " + data.infinitive + ": " + Object.keys(glosses).length + "/" + entries.length + " forms in " + (Date.now() - started) + " ms" +
           (typeof d.cached === "number" ? " (" + d.cached + " from the shared cache, " + (d.generated || 0) + " newly generated)" : ""));
@@ -4465,10 +4505,9 @@
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
       // until here — so going back within a pass still works — and only now
-      // drop out if their tab's Sabido chip says so (mason, 2026-09-28: mark
-      // tener · yo on the second pass, and the third pass leaves it out).
-      var nextPass = flashDeck.filter(cardPassesKnownFilter);
-      if (!nextPass.length) { showFlashDone(); return; }
+      // leave the deck: see cardStaysForNextPass().
+      var nextPass = flashDeck.filter(cardStaysForNextPass);
+      if (!nextPass.length) { showFlashDone(flashDeck.some(cardInReviewMode)); return; }
       flashDeck = shuffleArray(nextPass);
       flashIndex = 0;
     }
@@ -4559,6 +4598,24 @@
   // This is independent of the verb-level `known` (the detail-page pill,
   // mason's choice 2026-09-28): a card counts as known if EITHER its own form
   // or its whole verb is marked.
+
+  // Which cards carry over into the next pass (called at the end of each
+  // pass). Normal drilling: a card you know leaves — mason, 2026-09-28: "if
+  // i filter to just 4 phrases, on my first time through them i mark two of
+  // the phrases as 'sabido'... i would only have 2 cards in the next
+  // shuffle", with no Sabido chip involved. (The first version only did
+  // this when that tab's chip excluded known cards.) Review mode — the
+  // card's tab has its Sabido chip on "only known" — is the mirror image:
+  // cards you un-mark leave. The chip still decides what's in the deck
+  // when Empezar is pressed (cardPassesKnownFilter()).
+  function cardInReviewMode(card) {
+    var filters = card.kind === "verb" ? activeVerbFilters : (card.kind === "word" ? activeWordFilters : activePhraseFilters);
+    return knownFilterMode(filters) === "include";
+  }
+  function cardStaysForNextPass(card) {
+    var known = cardShowsKnown(card);
+    return cardInReviewMode(card) ? known : !known;
+  }
 
   function knownFilterMode(filters) {
     var f = filters.flag;
@@ -4667,10 +4724,11 @@
     if (el.dKnownLegend) el.dKnownLegend.hidden = !any;
   }
 
-  function showFlashDone() {
+  function showFlashDone(reviewMode) {
     flashDeck = [];
     flashIndex = -1;
     el.flashProgress.textContent = "";
+    el.flashDoneText.textContent = t(reviewMode ? "flash_done_text_review" : "flash_done_text");
     el.flashOverlay.classList.add("is-done");
   }
 
