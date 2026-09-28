@@ -4505,7 +4505,7 @@
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
       // until here — so going back within a pass still works — and only now
-      // leave the deck: see cardStaysForNextPass().
+      // does the tab's Sabido chip get re-applied: see cardStaysForNextPass().
       var nextPass = flashDeck.filter(cardStaysForNextPass);
       if (!nextPass.length) { showFlashDone(flashDeck.some(cardInReviewMode)); return; }
       flashDeck = shuffleArray(nextPass);
@@ -4600,21 +4600,20 @@
   // or its whole verb is marked.
 
   // Which cards carry over into the next pass (called at the end of each
-  // pass). Normal drilling: a card you know leaves — mason, 2026-09-28: "if
-  // i filter to just 4 phrases, on my first time through them i mark two of
-  // the phrases as 'sabido'... i would only have 2 cards in the next
-  // shuffle", with no Sabido chip involved. (The first version only did
-  // this when that tab's chip excluded known cards.) Review mode — the
-  // card's tab has its Sabido chip on "only known" — is the mirror image:
-  // cards you un-mark leave. The chip still decides what's in the deck
-  // when Empezar is pressed (cardPassesKnownFilter()).
+  // pass): the same rule as the starting deck, cardPassesKnownFilter(), just
+  // re-applied with whatever was marked during the pass. So it follows the
+  // chip on the card's own tab, like every other filter in the app: chip
+  // excluding Sabido → cards marked during the pass leave; chip on "only
+  // Sabido" (review) → cards un-marked leave; chip neutral → nothing leaves,
+  // since a neutral chip includes everything. mason, 2026-09-28, after a
+  // brief detour where known cards always left: "if the token is neutral
+  // going in... leave them in as a neutral chip is still inclusive."
   function cardInReviewMode(card) {
     var filters = card.kind === "verb" ? activeVerbFilters : (card.kind === "word" ? activeWordFilters : activePhraseFilters);
     return knownFilterMode(filters) === "include";
   }
   function cardStaysForNextPass(card) {
-    var known = cardShowsKnown(card);
-    return cardInReviewMode(card) ? known : !known;
+    return cardPassesKnownFilter(card);
   }
 
   function knownFilterMode(filters) {
