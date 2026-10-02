@@ -1413,6 +1413,21 @@
   .flash-prompt-sub { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--accent-deep); }
   .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
   .flash-back-badges { justify-content: center; margin-top: 4px; }
+  /* The item's example sentence, small and quiet under the answer (mason
+     picked it from a mockup, 2026-10-02): the list's sentence, i.e. the
+     part after " / " when an example has two. It's what carries a list's
+     sense of a word to the card — and for verbs the only thing that can,
+     since a verb card's back shows the conjugated form's English. Two
+     lines at most; renderFlashCard() drops it entirely if the face would
+     overflow. */
+  .flash-example {
+    font-family: "Public Sans", sans-serif; font-size: 13.5px; line-height: 1.4; color: var(--ink-soft);
+    max-width: 88%; margin-top: 2px; text-align: center; flex-shrink: 0; /* never squished: either it fits whole or it's dropped */
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .flash-example::before { content: "\201C"; }
+  .flash-example::after { content: "\201D"; }
+  .flash-example[hidden] { display: none; }
   /* ---------- Sabido toggle (2026-09-28, second version) ----------
      One on/off pill, used in two places: under the flashcard (.flash-known-row,
      deliberately outside .flash-card so it sits in the same spot on every card
