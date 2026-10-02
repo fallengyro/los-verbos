@@ -1533,6 +1533,33 @@
 
   // ================= state =================
   var allVerbs = [];      // [{id, data}]
+
+  // Alphabetical order for every content tab (mason, 2026-10-02). The
+  // database's own ORDER BY uses the server's collation, which can put
+  // accented letters and capitals in odd places and sorts "¿Cuánto sale?"
+  // by its "¿". So each loaded array is sorted here instead, the Spanish
+  // way: accents and case ignored (a = á = A), ñ after n, numbers in
+  // numeric order, and leading punctuation (¿ ¡ « " … ( -) skipped.
+  var SORT_COLLATOR = (typeof Intl !== "undefined" && Intl.Collator)
+    ? new Intl.Collator("es", { sensitivity: "base", numeric: true })
+    : null;
+  function sortableText(s) {
+    return String(s || "").replace(/^[\s¿¡«»"'“”‘’(\[\-–—….]+/, "");
+  }
+  function compareText(s, t2) {
+    var x = sortableText(s), y = sortableText(t2);
+    var c = SORT_COLLATOR ? SORT_COLLATOR.compare(x, y) : norm(x).localeCompare(norm(y));
+    if (c) return c;
+    // same letters ignoring accents/case (e.g. "papa" / "papá"): fixed order
+    s = String(s || ""); t2 = String(t2 || "");
+    return s < t2 ? -1 : (s > t2 ? 1 : 0);
+  }
+  function sortByText(entries, field) {
+    return entries.sort(function (a, b) { return compareText(a.data[field], b.data[field]); });
+  }
+  // A list item / shared-list item: {data: {infinitive|word|phrase}}.
+  function itemText(row) { var d = (row && row.data) || {}; return d.infinitive || d.word || d.phrase || ""; }
+  function sortItemRows(rows) { return rows.sort(function (a, b) { return compareText(itemText(a), itemText(b)); }); }
   var filtered = [];
   var selectedId = null;
   var editingId = null;
@@ -2341,9 +2368,7 @@
     var searchOk = function (v) { return !q || norm(v.data.infinitive || v.id).indexOf(q) !== -1; };
     filtered = allVerbs.filter(function (v) { return searchOk(v) && verbPassesFacets(v, false); });
     var wouldShow = allVerbs.filter(function (v) { return searchOk(v) && verbPassesFacets(v, true); });
-    filtered.sort(function (a, b) {
-      return (a.data.infinitive || a.id).localeCompare(b.data.infinitive || b.id, "es");
-    });
+    filtered.sort(function (a, b) { return compareText(a.data.infinitive || a.id, b.data.infinitive || b.id); });
     renderHiddenCount(el.verbHiddenRow, el.verbHiddenText, wouldShow.length - filtered.length);
 
     el.list.innerHTML = "";
@@ -2941,7 +2966,7 @@
         clearBanner();
         var prevById = {};
         allVerbs.forEach(function (v) { prevById[v.id] = v.data; });
-        allVerbs = (res.data || []).map(rowToVerb);
+        allVerbs = sortByText((res.data || []).map(rowToVerb), "infinitive");
         carryOverVerbGlosses(prevById, allVerbs);
         renderList();
         queueVerbGlosses(); // fills in English for any verb that's missing/outdated — see verb-gloss section
@@ -2953,7 +2978,7 @@
       .catch(function (err) {
         var cached = readCache("verbs");
         if (!cached) { showBanner(t("msg_error_cargar_verbos", { msg: (err && err.message) || err })); return; }
-        allVerbs = cached.rows.map(rowToVerb);
+        allVerbs = sortByText(cached.rows.map(rowToVerb), "infinitive");
         markOffline("verbs", cached.savedAt);
         renderList();
       });
@@ -3094,9 +3119,7 @@
     var searchOk = function (v) { return !q || norm(v.data.word || v.id).indexOf(q) !== -1; };
     filteredWords = allWords.filter(function (v) { return searchOk(v) && wordPassesFacets(v, false); });
     var wouldShow = allWords.filter(function (v) { return searchOk(v) && wordPassesFacets(v, true); });
-    filteredWords.sort(function (a, b) {
-      return (a.data.word || a.id).localeCompare(b.data.word || b.id, "es");
-    });
+    filteredWords.sort(function (a, b) { return compareText(a.data.word || a.id, b.data.word || b.id); });
     renderHiddenCount(el.wordHiddenRow, el.wordHiddenText, wouldShow.length - filteredWords.length);
 
     el.wordList.innerHTML = "";
@@ -3241,7 +3264,7 @@
         saveCache("words", res.data || []);
         markOnline("words");
         clearBanner();
-        allWords = (res.data || []).map(rowToWord);
+        allWords = sortByText((res.data || []).map(rowToWord), "word");
         renderWordList();
         if (selectedWordId) {
           var still = allWords.find(function (v) { return v.id === selectedWordId; });
@@ -3251,7 +3274,7 @@
       .catch(function (err) {
         var cached = readCache("words");
         if (!cached) { showBanner(t("msg_error_cargar_vocab", { msg: (err && err.message) || err })); return; }
-        allWords = cached.rows.map(rowToWord);
+        allWords = sortByText(cached.rows.map(rowToWord), "word");
         markOffline("words", cached.savedAt);
         renderWordList();
       });
@@ -3376,9 +3399,7 @@
     var searchOk = function (v) { return !q || norm(v.data.phrase || v.id).indexOf(q) !== -1; };
     filteredPhrases = allPhrases.filter(function (v) { return searchOk(v) && phrasePassesFacets(v, false); });
     var wouldShow = allPhrases.filter(function (v) { return searchOk(v) && phrasePassesFacets(v, true); });
-    filteredPhrases.sort(function (a, b) {
-      return (a.data.phrase || a.id).localeCompare(b.data.phrase || b.id, "es");
-    });
+    filteredPhrases.sort(function (a, b) { return compareText(a.data.phrase || a.id, b.data.phrase || b.id); });
     renderHiddenCount(el.phraseHiddenRow, el.phraseHiddenText, wouldShow.length - filteredPhrases.length);
 
     el.phraseList.innerHTML = "";
@@ -3534,7 +3555,7 @@
         saveCache("phrases", res.data || []);
         markOnline("phrases");
         clearBanner();
-        allPhrases = (res.data || []).map(rowToPhrase);
+        allPhrases = sortByText((res.data || []).map(rowToPhrase), "phrase");
         renderPhraseList();
         if (selectedPhraseId) {
           var still = allPhrases.find(function (v) { return v.id === selectedPhraseId; });
@@ -3544,7 +3565,7 @@
       .catch(function (err) {
         var cached = readCache("phrases");
         if (!cached) { showBanner(t("msg_error_cargar_frases", { msg: (err && err.message) || err })); return; }
-        allPhrases = cached.rows.map(rowToPhrase);
+        allPhrases = sortByText(cached.rows.map(rowToPhrase), "phrase");
         markOffline("phrases", cached.savedAt);
         renderPhraseList();
       });
@@ -5578,7 +5599,7 @@
         saveCache("lists", res.data || []);
         markOnline("lists");
         clearBanner();
-        allLists = rowsToLists(res.data);
+        allLists = sortByText(rowsToLists(res.data), "name");
         rebuildListMembership(res.data);
         renderListsPanel();
         refreshListFilterUI();
@@ -5593,7 +5614,7 @@
       .catch(function (err) {
         var cached = readCache("lists");
         if (!cached) { showBanner(t("msg_error_cargar_listas", { msg: (err && err.message) || err })); return; }
-        allLists = rowsToLists(cached.rows);
+        allLists = sortByText(rowsToLists(cached.rows), "name");
         rebuildListMembership(cached.rows);
         markOffline("lists", cached.savedAt);
         renderListsPanel();
@@ -5716,7 +5737,7 @@
     el.ldPhrasesGroup.hidden = true;
     supabaseClient.from("list_items").select("*").eq("list_id", id).then(function (res) {
       if (res.error) { el.ldShareMsg.textContent = t("msg_error_cargar_items", { msg: res.error.message }); return; }
-      var rows = res.data || [];
+      var rows = sortItemRows(res.data || []);
       var verbRows = rows.filter(function (r) { return r.item_type === "verb"; });
       var wordRows = rows.filter(function (r) { return r.item_type === "word"; });
       var phraseRows = rows.filter(function (r) { return r.item_type === "phrase"; });
@@ -5964,7 +5985,7 @@
         listId: first.list_id,
         listName: first.list_name,
         ownerLabel: first.owner_label || "",
-        items: rows.map(function (r) { return { itemType: r.item_type, data: r.data }; })
+        items: sortItemRows(rows.map(function (r) { return { itemType: r.item_type, data: r.data }; }))
       };
       renderSharePreview();
     });
