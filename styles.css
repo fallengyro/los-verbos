@@ -683,6 +683,49 @@
   .detail-speak-btn svg { width: 18px; height: 18px; }
   .detail-speak-btn:hover, .detail-speak-btn:focus-visible { opacity: 1; border-color: var(--accent); }
   .detail-speak-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* Quiet mode (2026-09-29, mason: "the audio icon [changes] to a version
+     that indicates audio is muted (same icon as now with a circle and
+     diagonal across it... in the same brick red as the excluded chips)").
+     Every speaker SVG carries both groups; html.quiet-mode shrinks the
+     pulse glyph to sit inside a --danger (same token as .chip.exclude)
+     prohibition circle + diagonal. Opacity goes up a little so the red
+     reads at a glance rather than washing out at the usual 0.55. */
+  .tts-mute-mark { display: none; stroke: var(--danger); stroke-width: 1.7; }
+  html.quiet-mode .tts-mute-mark { display: inline; }
+  html.quiet-mode .tts-glyph { transform: scale(0.64); transform-origin: 12.5px 12px; stroke-width: 2.6; }
+  /* A touch larger than the normal 18px icon, so the pulse inside the
+     circle stays about its usual size. */
+  html.quiet-mode .flash-speak-btn svg,
+  html.quiet-mode .detail-speak-btn svg { width: 24px; height: 24px; flex: none; }
+  html.quiet-mode .flash-speak-btn,
+  html.quiet-mode .detail-speak-btn { opacity: 0.8; }
+  .quiet-nudge { animation: quiet-nudge 0.32s ease-in-out; }
+  @keyframes quiet-nudge {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+  /* The nudge is transform-only on purpose: the flashcard speakers sit
+     inside the 3D-flipped card, and opacity/filter there would flatten it
+     (see the .flash-card.no-anim comment) — a transform on the button
+     itself doesn't. */
+  .quiet-toast {
+    position: fixed; left: 16px; right: 16px; margin: 0 auto;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    width: fit-content; max-width: 520px; z-index: 250;
+    display: flex; align-items: center; gap: 12px;
+    background: var(--ink); color: var(--paper);
+    border-radius: 10px; padding: 10px 12px 10px 16px;
+    font-size: 14px; box-shadow: 0 4px 18px var(--shadow);
+  }
+  .quiet-toast[hidden] { display: none; }
+  .quiet-toast-btn {
+    background: transparent; color: inherit; font: inherit; font-weight: 600;
+    border: 1px solid currentColor; border-radius: 6px; padding: 5px 10px;
+    cursor: pointer; white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) { .quiet-nudge { animation: none; } }
   /* Reuses .form-msg's red error-text treatment, same as .flash-tts-msg. */
   .detail-tts-msg { margin: 0 0 10px; min-height: 0; }
   .detail-actions-footer {
@@ -1693,6 +1736,33 @@
   /* settings panel — the app-language toggle is a simple two-button
      segmented control, in keeping with the app's flat bordered-chip look
      rather than a native <select>. */
+  /* Backup / delete / restore (Settings). */
+  .backup-status { font-size: 13.5px; color: var(--ink); margin: 0 0 10px; }
+  .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .backup-actions .btn-secondary { padding: 8px 12px; font-size: 13.5px; }
+  .backup-actions .btn-secondary:disabled { opacity: 0.45; cursor: default; }
+  .backup-danger { color: var(--danger); border-color: var(--danger); }
+  .backup-panel {
+    margin-top: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--paper-sunken); font-size: 13.5px;
+  }
+  .backup-panel.is-danger { border-color: var(--danger); }
+  .backup-panel-text { margin: 0 0 10px; white-space: pre-line; }
+  .backup-choice { display: flex; flex-direction: column; gap: 8px; margin: 0 0 12px; }
+  .backup-choice-opt { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; text-transform: none; letter-spacing: 0; font-size: 13.5px; color: var(--ink); font-weight: 400; }
+  #settings-overlay .field label.backup-choice-opt { display: flex; font-size: 13.5px; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0; font-weight: 400; }
+  .backup-choice-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .backup-choice-sub { display: block; color: var(--ink-soft); font-size: 12.5px; }
+  .backup-typed { margin: 0 0 12px; }
+  #settings-overlay .field .backup-typed label { text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink); }
+  .backup-typed input {
+    width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--paper); color: var(--ink); font: inherit; font-family: "JetBrains Mono", monospace; letter-spacing: 0.08em;
+  }
+  .backup-panel .btn-primary.is-danger { background: var(--danger); }
+  .backup-msg { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; min-height: 0; }
+  .backup-msg.is-error { color: var(--danger); }
+  .backup-msg:empty { display: none; }
   #settings-overlay .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); margin-bottom: 6px; }
   .lang-toggle { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .lang-option {

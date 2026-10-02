@@ -64,6 +64,16 @@
   var ttsActiveEl = null; // whichever button/cell currently has the .tts-active chasing-border ring on it, so a later tap on something else can clear it first — see playTts()
   var ttsPrefetched = {}; // "voiceKey\u0000text" -> true, so prefetchTts() never re-fetches the same clip twice in a session
   var warmTtsCacheRunning = false; // true only while warmTtsCache() is actively driving selectVerb() itself — see prefetchTts()
+  // Quiet mode (2026-09-29): mason, drilling on a plane — a Settings toggle
+  // that mutes all pronunciation audio and swaps the speaker icon for a
+  // muted one. Device-local on purpose (unlike the voice, which is synced
+  // to the account): it's about where this phone is right now, so turning
+  // it on in a plane shouldn't also silence the other person's device.
+  var QUIET_MODE_LOCAL_KEY = "iv-quiet-mode";
+  var quietMode = (function () {
+    try { return localStorage.getItem(QUIET_MODE_LOCAL_KEY) === "1"; } catch (e) { return false; }
+  })();
+  var quietTapCount = 0, quietTapTimer = null, quietToastTimer = null;
 
   var I18N = {
     es: {
@@ -147,7 +157,10 @@
       form_title_add_verb: "Agregar verbo",
       label_infinitivo: "Infinitivo",
       label_definicion: "Definición",
-      label_patron: "Patrón / notas",
+      label_patron: "Patrón de irregularidad",
+      label_notas_verbo: "Notas de uso",
+      placeholder_notas_verbo: "ej. en perfilaje: «correr un perfil» = to run a log",
+      placeholder_ejemplo_verbo: "ej. Corrí diez kilómetros. / Corrimos el perfil a la noche.",
       label_preposicion: "Preposición fija",
       placeholder_preposicion: "ej. en, de, a",
       check_reflexivo: "¿Reflexivo?",
@@ -256,6 +269,47 @@
       settings_lang_note: "Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.",
       settings_voice_label: "Voz de pronunciación",
       settings_voice_note: "La voz que escuchás al tocar el parlante en las flashcards.",
+      settings_quiet_label: "Modo silencio",
+      settings_quiet_off: "Apagado",
+      settings_quiet_on: "Activado",
+      settings_quiet_note: "Silencia toda la pronunciación de la app (por ejemplo, en un avión). Solo en este dispositivo.",
+      settings_backup_label: "Respaldo",
+      settings_backup_note: "Guarda en el servidor una copia de tus verbos, palabras, frases y listas, incluido lo marcado como sabido. Hay un solo respaldo: uno nuevo reemplaza al anterior.",
+      backup_create: "Crear respaldo",
+      backup_restore: "Restaurar…",
+      backup_delete: "Borrar mi contenido…",
+      backup_cancel: "Cancelar",
+      backup_none: "Todavía no hiciste un respaldo.",
+      backup_last: "Último respaldo: {date} — {summary}.",
+      backup_loading: "Buscando tu respaldo…",
+      backup_unavailable: "El respaldo todavía no está disponible (falta actualizar la base de datos).",
+      backup_unit_verb: "verbo|verbos", backup_unit_word: "palabra|palabras", backup_unit_phrase: "frase|frases", backup_unit_list: "lista|listas",
+      backup_and: "y", backup_nothing: "nada",
+      backup_prefer_backup: "Usar el respaldo",
+      backup_prefer_backup_sub: "reemplaza lo que tenés en la app (incluido lo marcado como sabido)",
+      backup_prefer_active: "Conservar lo de la app",
+      backup_prefer_active_sub: "solo agrega lo que falta",
+      backup_replace_text: "Esto reemplaza tu respaldo del {date} ({summary}) con lo que tenés ahora en la app ({current}).",
+      backup_replace_confirm: "Reemplazar respaldo",
+      backup_working: "Un momento…",
+      backup_done: "Listo: respaldo guardado ({summary}).",
+      backup_err_empty: "No hay nada para respaldar: tu cuenta no tiene contenido.",
+      backup_delete_text: "Se van a borrar de la app {current}. Tu respaldo no se toca.",
+      backup_delete_has_backup: "Tu respaldo es del {date} ({summary}).",
+      backup_delete_no_backup: "Ojo: no tenés respaldo, así que no vas a poder recuperarlo.",
+      backup_delete_word: "BORRAR",
+      backup_delete_type: "Escribí BORRAR para confirmar:",
+      backup_delete_confirm: "Borrar todo",
+      backup_deleted: "Se borró tu contenido ({summary}). Podés recuperarlo con «Restaurar…».",
+      backup_restore_text: "Respaldo del {date}: {summary}.",
+      backup_restore_conflicts: "{n} ya están en la app. ¿Qué versión querés?",
+      backup_restore_no_conflicts: "Nada de esto está en la app ahora: se agrega todo.",
+      backup_restore_confirm: "Restaurar",
+      backup_restored: "Restaurado: {ins} agregados, {ovw} reemplazados por el respaldo, {kept} sin cambios.",
+      backup_err_none: "No hay ningún respaldo para restaurar.",
+      quiet_toast_text: "El modo silencio está activado. Podés desactivarlo en Configuración.",
+      quiet_toast_settings: "Configuración",
+      tts_muted_aria: "Audio silenciado (modo silencio)",
       remove_btn: "Quitar",
       empty_no_verbs: "Todavía no hay verbos en tu cuenta.",
       empty_no_verb_match: "Ningún infinitivo coincide con “{q}”.",
@@ -446,7 +500,10 @@
       form_title_add_verb: "Add verb",
       label_infinitivo: "Infinitive",
       label_definicion: "Definition",
-      label_patron: "Pattern / notes",
+      label_patron: "Irregularity pattern",
+      label_notas_verbo: "Usage notes",
+      placeholder_notas_verbo: "e.g. in logging: «correr un perfil» = to run a log",
+      placeholder_ejemplo_verbo: "e.g. Corrí diez kilómetros. / Corrimos el perfil a la noche.",
       label_preposicion: "Fixed preposition",
       placeholder_preposicion: "e.g. en, de, a",
       check_reflexivo: "Reflexive?",
@@ -555,6 +612,47 @@
       settings_lang_note: "This only changes the app's own text — your verbs and vocabulary always stay in Spanish.",
       settings_voice_label: "Pronunciation voice",
       settings_voice_note: "The voice you hear when you tap the speaker on flashcards.",
+      settings_quiet_label: "Quiet mode",
+      settings_quiet_off: "Off",
+      settings_quiet_on: "On",
+      settings_quiet_note: "Mutes all pronunciation audio in the app (on a plane, say). This device only.",
+      settings_backup_label: "Backup",
+      settings_backup_note: "Keeps a copy of your verbs, words, phrases and lists on the server, including what you've marked as known. There's one backup: a new one replaces the old.",
+      backup_create: "Back up now",
+      backup_restore: "Restore…",
+      backup_delete: "Delete my content…",
+      backup_cancel: "Cancel",
+      backup_none: "You haven't made a backup yet.",
+      backup_last: "Last backup: {date} — {summary}.",
+      backup_loading: "Looking for your backup…",
+      backup_unavailable: "Backup isn't available yet (the database still needs updating).",
+      backup_unit_verb: "verb|verbs", backup_unit_word: "word|words", backup_unit_phrase: "phrase|phrases", backup_unit_list: "list|lists",
+      backup_and: "and", backup_nothing: "nothing",
+      backup_prefer_backup: "Use the backup",
+      backup_prefer_backup_sub: "replaces what's in the app (including what's marked as known)",
+      backup_prefer_active: "Keep what's in the app",
+      backup_prefer_active_sub: "only adds what's missing",
+      backup_replace_text: "This replaces your backup from {date} ({summary}) with what's in the app now ({current}).",
+      backup_replace_confirm: "Replace backup",
+      backup_working: "One moment…",
+      backup_done: "Done: backup saved ({summary}).",
+      backup_err_empty: "Nothing to back up: your account has no content.",
+      backup_delete_text: "This deletes {current} from the app. Your backup isn't touched.",
+      backup_delete_has_backup: "Your backup is from {date} ({summary}).",
+      backup_delete_no_backup: "Careful: you have no backup, so this can't be undone.",
+      backup_delete_word: "DELETE",
+      backup_delete_type: "Type DELETE to confirm:",
+      backup_delete_confirm: "Delete everything",
+      backup_deleted: "Your content was deleted ({summary}). You can bring it back with \"Restore…\".",
+      backup_restore_text: "Backup from {date}: {summary}.",
+      backup_restore_conflicts: "{n} of these are already in the app. Which version do you want?",
+      backup_restore_no_conflicts: "None of this is in the app right now: everything gets added.",
+      backup_restore_confirm: "Restore",
+      backup_restored: "Restored: {ins} added, {ovw} replaced by the backup, {kept} left as they were.",
+      backup_err_none: "There's no backup to restore.",
+      quiet_toast_text: "Quiet mode is on. You can turn it off in Settings.",
+      quiet_toast_settings: "Settings",
+      tts_muted_aria: "Audio muted (quiet mode)",
       remove_btn: "Remove",
       empty_no_verbs: "You don't have any verbs yet.",
       empty_no_verb_match: "No infinitive matches “{q}”.",
@@ -779,6 +877,9 @@
     if (el.seedToolbarBtn) el.seedToolbarBtn.textContent = t("seed_verbs_btn");
     if (el.seedWordsToolbarBtn) el.seedWordsToolbarBtn.textContent = t("seed_words_btn");
     if (el.seedPhrasesToolbarBtn) el.seedPhrasesToolbarBtn.textContent = t("seed_phrases_btn");
+    applyQuietMode();
+    // The backup panel's texts are set in code, not via data-i18n.
+    if (el.backupStatus) { renderBackupStatus(); if (backupAction) openBackupPanel(backupAction); }
   }
 
   // ================= settings (app language, tts voice) =================
@@ -808,10 +909,252 @@
     }
   }
 
+  // ---- Quiet mode ----
+  // html.quiet-mode drives the muted icon (styles.css); the speaker
+  // buttons' aria-labels say so too. Called at startup and from
+  // applyI18n() (which would otherwise reset those labels).
+  function applyQuietMode() {
+    document.documentElement.classList.toggle("quiet-mode", quietMode);
+    document.querySelectorAll(".flash-speak-btn, .detail-speak-btn").forEach(function (b) {
+      b.setAttribute("aria-label", t(quietMode ? "tts_muted_aria" : "tts_play_aria"));
+    });
+    if (el.settingsQuietOn) {
+      el.settingsQuietOn.classList.toggle("active", quietMode);
+      el.settingsQuietOff.classList.toggle("active", !quietMode);
+    }
+  }
+
+  // ---- Backup / delete / restore (2026-10-01) ----
+  // mason: back up creates a restorable copy of your content on the server
+  // (Sabido included); delete removes your content from the app but not
+  // the backup; restore brings it back, and when something is already in
+  // the app you choose: the backup's version or the app's. All three run
+  // as SQL functions (schema.sql, "Backup / delete / restore"), each one a
+  // single transaction scoped to the signed-in user by RLS. This only
+  // drives them and redraws.
+  var backupInfo = null;    // last vosea_restore_preview() result
+  var backupAction = null;  // "backup" | "delete" | "restore" while a panel is open
+  var backupBusy = false;
+
+  // "2 verbos, 15 palabras y 1 frase" — zeros left out, singular/plural.
+  function backupCountsText(c) {
+    c = c || {};
+    var parts = [["verbs", "backup_unit_verb"], ["words", "backup_unit_word"], ["phrases", "backup_unit_phrase"], ["lists", "backup_unit_list"]]
+      .filter(function (x) { return (c[x[0]] || 0) > 0; })
+      .map(function (x) { var n = c[x[0]]; var u = t(x[1]).split("|"); return n + " " + (n === 1 ? u[0] : u[1]); });
+    if (!parts.length) return t("backup_nothing");
+    if (parts.length === 1) return parts[0];
+    return parts.slice(0, -1).join(", ") + " " + t("backup_and") + " " + parts[parts.length - 1];
+  }
+  function currentContentCounts() {
+    return { verbs: allVerbs.length, words: allWords.length, phrases: allPhrases.length, lists: allLists.length };
+  }
+  function backupDateText(iso) {
+    try {
+      return new Date(iso).toLocaleString(currentLang === "es" ? "es-AR" : "en-US", { dateStyle: "medium", timeStyle: "short" });
+    } catch (e) { return String(iso || ""); }
+  }
+  function setBackupMsg(text, isError) {
+    el.backupMsg.textContent = text || "";
+    el.backupMsg.classList.toggle("is-error", !!isError);
+  }
+  function backupErrorText(err) {
+    var m = (err && err.message) || String(err || "");
+    if (/nothing_to_backup/.test(m)) return t("backup_err_empty");
+    if (/no_backup/.test(m)) return t("backup_err_none");
+    return t("msg_error_generic", { msg: m });
+  }
+  function renderBackupStatus() {
+    var unavailable = backupInfo && backupInfo.unavailable;
+    if (!backupInfo) el.backupStatus.textContent = t("backup_loading");
+    else if (unavailable) el.backupStatus.textContent = t("backup_unavailable");
+    else if (!backupInfo.exists) el.backupStatus.textContent = t("backup_none");
+    else el.backupStatus.textContent = t("backup_last", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts) });
+    el.backupCreate.disabled = backupBusy || !backupInfo || !!unavailable;
+    el.backupDelete.disabled = backupBusy || !backupInfo || !!unavailable;
+    el.backupRestore.disabled = backupBusy || !backupInfo || !!unavailable || !backupInfo.exists;
+  }
+  function refreshBackupStatus() {
+    if (!currentUser) return Promise.resolve(null);
+    return supabaseClient.rpc("vosea_restore_preview").then(function (res) {
+      backupInfo = res.error ? { unavailable: true, error: res.error } : (res.data || { exists: false });
+      renderBackupStatus();
+      return backupInfo;
+    });
+  }
+  function closeBackupPanel() {
+    backupAction = null;
+    el.backupPanel.hidden = true;
+    el.backupPanel.classList.remove("is-danger");
+    el.backupConfirm.classList.remove("is-danger");
+    el.backupChoice.hidden = true;
+    el.backupTyped.hidden = true;
+    el.backupTypedInput.value = "";
+    el.backupChoice.querySelectorAll("input").forEach(function (r) { r.checked = false; });
+  }
+  function backupConflictTotal() {
+    var c = (backupInfo && backupInfo.conflicts) || {};
+    return (c.verbs || 0) + (c.words || 0) + (c.phrases || 0) + (c.lists || 0);
+  }
+  function updateBackupConfirmState() {
+    var ok = !backupBusy;
+    if (backupAction === "delete") ok = ok && el.backupTypedInput.value.trim().toUpperCase() === t("backup_delete_word");
+    if (backupAction === "restore" && backupConflictTotal() > 0) ok = ok && !!el.backupChoice.querySelector("input:checked");
+    el.backupConfirm.disabled = !ok;
+  }
+  function openBackupPanel(action) {
+    closeBackupPanel();
+    setBackupMsg("");
+    backupAction = action;
+    var cur = backupCountsText(currentContentCounts());
+    var text = "";
+    if (action === "backup") {
+      text = t("backup_replace_text", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts), current: cur });
+      el.backupConfirm.textContent = t("backup_replace_confirm");
+    } else if (action === "delete") {
+      text = t("backup_delete_text", { current: cur }) + "\n" + (backupInfo.exists
+        ? t("backup_delete_has_backup", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts) })
+        : t("backup_delete_no_backup"));
+      el.backupTypedLabel.textContent = t("backup_delete_type");
+      el.backupTyped.hidden = false;
+      el.backupPanel.classList.add("is-danger");
+      el.backupConfirm.classList.add("is-danger");
+      el.backupConfirm.textContent = t("backup_delete_confirm");
+    } else {
+      var n = backupConflictTotal();
+      text = t("backup_restore_text", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts) }) + "\n" +
+        (n > 0 ? t("backup_restore_conflicts", { n: n }) : t("backup_restore_no_conflicts"));
+      el.backupChoice.hidden = n === 0;
+      el.backupConfirm.textContent = t("backup_restore_confirm");
+    }
+    el.backupPanelText.textContent = text;
+    el.backupPanel.hidden = false;
+    updateBackupConfirmState();
+    if (action === "delete") el.backupTypedInput.focus();
+  }
+  // After delete/restore the server's content changed wholesale: drop any
+  // open detail page or flashcard deck that may point at a deleted item,
+  // then reload everything the same way signing in does.
+  function reloadAllContentAfterBackupOp() {
+    deselectVerb();
+    deselectWord();
+    deselectPhrase();
+    if (!el.flashOverlay.hidden) closeFlashcards();
+    loadVerbs();
+    loadWords();
+    loadPhrases();
+    loadLists();
+  }
+  function runBackupOp(promise, onOk) {
+    backupBusy = true;
+    setBackupMsg(t("backup_working"));
+    renderBackupStatus();
+    updateBackupConfirmState();
+    return promise.then(function (res) {
+      backupBusy = false;
+      if (res.error) { setBackupMsg(backupErrorText(res.error), true); renderBackupStatus(); updateBackupConfirmState(); return; }
+      closeBackupPanel();
+      onOk(res.data || {});
+      refreshBackupStatus();
+    }, function (err) {
+      backupBusy = false;
+      setBackupMsg(backupErrorText(err), true);
+      renderBackupStatus();
+      updateBackupConfirmState();
+    });
+  }
+  function doBackupCreate() {
+    runBackupOp(supabaseClient.rpc("vosea_backup_content"), function (d) {
+      setBackupMsg(t("backup_done", { summary: backupCountsText(d) }));
+    });
+  }
+  function onBackupCreateClick() {
+    if (!backupInfo || backupBusy) return;
+    var c = currentContentCounts();
+    if (!(c.verbs + c.words + c.phrases + c.lists)) { closeBackupPanel(); setBackupMsg(t("backup_err_empty"), true); return; }
+    if (backupInfo.exists) openBackupPanel("backup"); else doBackupCreate();
+  }
+  function onBackupRestoreClick() {
+    if (!backupInfo || backupBusy) return;
+    // Fresh numbers: what's "already in the app" may have changed since
+    // Settings opened.
+    refreshBackupStatus().then(function (info) { if (info && info.exists) openBackupPanel("restore"); });
+  }
+  function onBackupConfirm() {
+    if (el.backupConfirm.disabled) return;
+    if (backupAction === "backup") { doBackupCreate(); return; }
+    if (backupAction === "delete") {
+      runBackupOp(supabaseClient.rpc("vosea_delete_content"), function (d) {
+        reloadAllContentAfterBackupOp();
+        setBackupMsg(t("backup_deleted", { summary: backupCountsText(d) }));
+      });
+      return;
+    }
+    if (backupAction === "restore") {
+      var picked = el.backupChoice.querySelector("input:checked");
+      var prefer = backupConflictTotal() > 0 && picked ? picked.value : "active";
+      runBackupOp(supabaseClient.rpc("vosea_restore_content", { p_prefer: prefer }), function (d) {
+        reloadAllContentAfterBackupOp();
+        setBackupMsg(t("backup_restored", { ins: d.inserted || 0, ovw: d.overwritten || 0, kept: d.kept || 0 }));
+      });
+    }
+  }
+
+  function setQuietMode(on) {
+    on = !!on;
+    if (on === quietMode) return;
+    quietMode = on;
+    try { localStorage.setItem(QUIET_MODE_LOCAL_KEY, on ? "1" : "0"); } catch (e) {}
+    if (on) {
+      // Silence anything already playing, and clear its ring.
+      if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} }
+      if (ttsActiveEl) { ttsActiveEl.classList.remove("tts-active"); ttsActiveEl = null; }
+    } else {
+      hideQuietToast();
+    }
+    quietTapCount = 0;
+    applyQuietMode();
+  }
+
+  // A tap on anything that would speak, while quiet mode is on. First tap:
+  // a small shake of the icon. Second tap within a few seconds: a toast
+  // saying quiet mode is on, with a shortcut to Settings (mason: "If a user
+  // clicks/taps an audio icon a couple of times maybe a banner or pop up
+  // displays that the quiet mode is active and can be disabled in the
+  // configuration"). A toast rather than the page's status banner, since
+  // that one sits under the flashcard overlay.
+  function noteQuietTap(btn) {
+    if (btn) {
+      btn.classList.remove("quiet-nudge");
+      void btn.offsetWidth;
+      btn.classList.add("quiet-nudge");
+    }
+    quietTapCount++;
+    clearTimeout(quietTapTimer);
+    quietTapTimer = setTimeout(function () { quietTapCount = 0; }, 6000);
+    if (quietTapCount >= 2) { quietTapCount = 0; showQuietToast(); }
+  }
+
+  function showQuietToast() {
+    el.quietToast.hidden = false;
+    clearTimeout(quietToastTimer);
+    quietToastTimer = setTimeout(hideQuietToast, 5000);
+  }
+  function hideQuietToast() {
+    clearTimeout(quietToastTimer);
+    if (el.quietToast) el.quietToast.hidden = true;
+  }
+
   function openSettings() {
     el.settingsMsg.textContent = "";
     renderLangButtons();
     renderVoiceButtons();
+    applyQuietMode();
+    closeBackupPanel();
+    setBackupMsg("");
+    backupInfo = null;
+    renderBackupStatus();
+    refreshBackupStatus();
     el.settingsOverlay.hidden = false;
   }
 
@@ -1332,6 +1675,23 @@
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
     settingsClose: document.getElementById("settings-close"),
+    settingsQuietOn: document.getElementById("settings-quiet-on"),
+    settingsQuietOff: document.getElementById("settings-quiet-off"),
+    quietToast: document.getElementById("quiet-toast"),
+    quietToastSettings: document.getElementById("quiet-toast-settings"),
+    backupStatus: document.getElementById("backup-status"),
+    backupCreate: document.getElementById("backup-create"),
+    backupRestore: document.getElementById("backup-restore"),
+    backupDelete: document.getElementById("backup-delete"),
+    backupPanel: document.getElementById("backup-panel"),
+    backupPanelText: document.getElementById("backup-panel-text"),
+    backupChoice: document.getElementById("backup-choice"),
+    backupTyped: document.getElementById("backup-typed"),
+    backupTypedLabel: document.getElementById("backup-typed-label"),
+    backupTypedInput: document.getElementById("backup-typed-input"),
+    backupConfirm: document.getElementById("backup-confirm"),
+    backupCancel: document.getElementById("backup-cancel"),
+    backupMsg: document.getElementById("backup-msg"),
     langEs: document.getElementById("lang-es"),
     langEn: document.getElementById("lang-en"),
     settingsVoiceElena: document.getElementById("settings-voice-elena"),
@@ -1351,6 +1711,8 @@
     dBadges: document.getElementById("d-badges"),
     dPattern: document.getElementById("d-pattern"),
     dPreposicion: document.getElementById("d-preposicion"),
+    dNotes: document.getElementById("d-notes"),
+    dExample: document.getElementById("d-example"),
     dTenseRow: document.getElementById("d-tense-row"),
     dConjBody: document.getElementById("d-conj-body"),
     dConjPronounBody: document.getElementById("d-conj-pronoun-body"),
@@ -1375,6 +1737,8 @@
     fDefinition: document.getElementById("f-definition"),
     fType: document.getElementById("f-type"),
     fPattern: document.getElementById("f-pattern"),
+    fNotes: document.getElementById("f-notes"),
+    fExample: document.getElementById("f-example"),
     fIrregularity: document.getElementById("f-irregularity"),
     fTransitivity: document.getElementById("f-transitivity"),
     fPreposicion: document.getElementById("f-preposicion"),
@@ -2118,6 +2482,12 @@
     el.dPattern.style.display = data.pattern ? "" : "none";
     el.dPreposicion.textContent = data.preposicion ? t("preposicion_note", { prep: data.preposicion }) : "";
     el.dPreposicion.style.display = data.preposicion ? "" : "none";
+    // Usage notes + example (2026-10-01, same treatment as words): the
+    // list-specific sense of a verb lives here, not in its definition.
+    el.dNotes.textContent = data.notes || "";
+    el.dNotes.style.display = data.notes ? "" : "none";
+    el.dExample.textContent = data.example || "";
+    el.dExample.style.display = data.example ? "" : "none";
     el.dTtsMsg.textContent = "";
 
     var imper = forms.imperativo || {};
@@ -2391,6 +2761,8 @@
     el.fDefinition.value = "";
     el.fType.value = "-ar";
     el.fPattern.value = "";
+    el.fNotes.value = "";
+    el.fExample.value = "";
     el.fIrregularity.value = "regular";
     el.fTransitivity.value = "transitivo";
     el.fPreposicion.value = "";
@@ -2422,6 +2794,8 @@
     el.fDefinition.value = data.definition || "";
     el.fType.value = data.type || "-ar";
     el.fPattern.value = data.pattern || "";
+    el.fNotes.value = data.notes || "";
+    el.fExample.value = data.example || "";
     el.fIrregularity.value = data.irregularity || "regular";
     el.fTransitivity.value = data.transitivity || "transitivo";
     el.fPreposicion.value = data.preposicion || "";
@@ -2516,6 +2890,8 @@
       type: el.fType.value,
       irregularity: el.fIrregularity.value,
       pattern: el.fPattern.value.trim(),
+      notes: el.fNotes.value.trim(),
+      example: el.fExample.value.trim(),
       transitivity: el.fTransitivity.value,
       preposicion: el.fPreposicion.value.trim(),
       reflexive: el.fReflexive.checked,
@@ -2536,6 +2912,8 @@
         type: row.type || "-ar",
         irregularity: row.irregularity || "regular",
         pattern: row.pattern || "",
+        notes: row.notes || "",
+        example: row.example || "",
         transitivity: row.transitivity || "transitivo",
         preposicion: row.preposicion || "",
         reflexive: !!row.reflexive,
@@ -2628,6 +3006,8 @@
       type: sv.type || "-ar",
       irregularity: sv.irregularity || "regular",
       pattern: sv.pattern || "",
+      notes: sv.notes || "",
+      example: sv.example || "",
       reflexive: !!sv.reflexive,
       transitivity: sv.transitivity || "transitivo",
       preposicion: sv.preposicion || "",
@@ -3882,8 +4262,10 @@
   // request resolves — since "while the audio is playing" was the other
   // half of what mason asked for.
   function playTts(text, btn, msgEl) {
-    if (!text || ttsInFlight) return;
     if (!msgEl) msgEl = el.flashTtsMsg;
+    // Quiet mode: no request at all; clear a stale "couldn't play" line.
+    if (quietMode) { msgEl.textContent = ""; noteQuietTap(btn); return; }
+    if (!text || ttsInFlight) return;
     ttsInFlight = true;
     msgEl.textContent = "";
     if (btn) {
@@ -4094,6 +4476,7 @@
 
         if (isVerb) {
           if (data.definition && !el.fDefinition.value) el.fDefinition.value = data.definition;
+          if (data.example && !el.fExample.value) el.fExample.value = data.example;
           if (data.transitivity) el.fTransitivity.value = data.transitivity;
           if (data.reflexive) el.fReflexive.checked = true;
           if (data.gerundio) el.fGerundio.value = data.gerundio;
@@ -4191,7 +4574,8 @@
   // infinitive's actual audio bytes as a side effect, which is exactly the
   // bulk-download behavior mason deliberately chose not to build.
   function prefetchTts(text) {
-    if (!text || !currentUser || warmTtsCacheRunning) return;
+    // Quiet mode: nothing will be played, so don't spend data fetching it.
+    if (!text || !currentUser || warmTtsCacheRunning || quietMode) return;
     // Respect the OS/browser's own Data Saver setting where it's exposed
     // (Chrome/Android; not in Safari, where navigator.connection is simply
     // undefined and this just no-ops) — someone who's explicitly asked
@@ -5770,7 +6154,7 @@
   // live reference — if that source document changes, this copy needs to
   // be updated by hand too, since there is no build step tying them
   // together.
-  var IMPORT_FORMAT_SPEC = "# voseá — Custom Content Import Format (v1)\n\nPaste this whole document into your preferred LLM, along with the source\nmaterial you want turned into study content (a webpage, a PDF, your own\nlist of words), and ask it to produce one JSON file matching the shape\nbelow. Then point voseá's import screen at that file.\n\nEverything imported lands in **your own** verbs/words/phrases — never the\napp's shared starter content — the same as adding an item by hand.\n\n## Top-level shape\n\n```json\n{\n  \"version\": 1,\n  \"list_name\": \"Petrofísica y Perfilaje de Pozos\",\n  \"verbs\": [ /* verb objects, see below */ ],\n  \"words\": [ /* word objects, see below */ ],\n  \"phrases\": [ /* phrase objects, see below */ ]\n}\n```\n\n- `version` — always `1` for this format. Lets the app detect and reject a\n  future incompatible format instead of silently importing garbage.\n- `list_name` — optional. If present, every verb/word/phrase below is also\n  added to a list with this exact name (a new list is created if none\n  matches; an existing one with the same name is added to instead of\n  duplicated). Omit this to just add items to your collection without\n  creating a list.\n- `verbs`, `words` and `phrases` are all optional arrays — include\n  whichever you have.\n\n## Verb object shape\n\n```json\n{\n  \"infinitive\": \"escalar\",\n  \"definition\": \"to scale (a log curve)\",\n  \"type\": \"-ar\",\n  \"reflexive\": false,\n  \"irregularity\": \"regular\",\n  \"pattern\": \"\",\n  \"transitivity\": \"transitivo\",\n  \"preposicion\": \"\",\n  \"auxiliar\": false,\n  \"gustar_like\": false,\n  \"forms\": {\n    \"presente\":     { \"yo\": \"escalo\",    \"vos\": \"escalás\",   \"el\": \"escala\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalan\" },\n    \"preterito\":    { \"yo\": \"escalé\",    \"vos\": \"escalaste\", \"el\": \"escaló\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalaron\" },\n    \"imperfecto\":   { \"yo\": \"escalaba\",  \"vos\": \"escalabas\", \"el\": \"escalaba\",  \"nosotros\": \"escalábamos\",  \"ellos\": \"escalaban\" },\n    \"futuro\":       { \"yo\": \"escalaré\",  \"vos\": \"escalarás\", \"el\": \"escalará\",  \"nosotros\": \"escalaremos\",  \"ellos\": \"escalarán\" },\n    \"condicional\":  { \"yo\": \"escalaría\", \"vos\": \"escalarías\",\"el\": \"escalaría\", \"nosotros\": \"escalaríamos\", \"ellos\": \"escalarían\" },\n    \"subjPresente\": { \"yo\": \"escale\",    \"vos\": \"escales\",   \"el\": \"escale\",    \"nosotros\": \"escalemos\",    \"ellos\": \"escalen\" },\n    \"subjPasado\":   { \"yo\": \"escalara\",  \"vos\": \"escalaras\", \"el\": \"escalara\",  \"nosotros\": \"escaláramos\",  \"ellos\": \"escalaran\" },\n    \"imperativo\":   { \"vos\": \"escalá\", \"usted\": \"escale\", \"nosotros\": \"escalemos\", \"ustedes\": \"escalen\" },\n    \"gerundio\": \"escalando\",\n    \"participio\": \"escalado\"\n  }\n}\n```\n\nField notes:\n- `type` — one of `-ar` / `-er` / `-ir`, must match the infinitive's ending.\n- `irregularity` — one of `regular` / `cambio de raíz` / `irregular (yo)` / `irregular (total)`.\n- `pattern` — a short free-text note on what's irregular (e.g. `\"e→i en formas acentuadas\"`), blank if fully regular.\n- `transitivity` — one of `transitivo` / `intransitivo` / `ambos`.\n- `preposicion` — a fixed preposition the verb idiomatically takes (`\"a\"`, `\"de\"`, `\"en\"`...), or `\"\"`.\n- `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.\n- Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `\"forms\": { \"impersonal\": { \"presente\": \"llueve\", \"subjPasado\": \"lloviera\", ... } }` instead — there's no \"yo llueve.\"\n- Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`\"yo\": \"me levanto\"`, NOT just `\"levanto\"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`\"vos\": \"levantate\"`), proclitic on the other three (`\"usted\": \"se levante\"`, `\"nosotros\": \"nos levantemos\"`, `\"ustedes\": \"se levanten\"`).\n\n## Word object shape\n\n```json\n{\n  \"word\": \"porosidad\",\n  \"definition\": \"porosity\",\n  \"part_of_speech\": \"sustantivo\",\n  \"gender\": \"femenino\",\n  \"notes\": \"petrofísica — measured via density or sonic logs\",\n  \"example\": \"\"\n}\n```\n\n- `part_of_speech` — one of `sustantivo` / `adjetivo` / `adverbio` / `pronombre` / `preposición` / `conjunción` / `interjección`.\n- `gender` — one of `masculino` / `femenino` / `neutro` / `\"\"` (blank for anything ungendered, e.g. most adverbs).\n- `notes` and `example` are both optional free text; `example` is a Spanish sentence using the word, if you want one.\n\n## Phrase object shape\n\nShort common phrases/expressions — kept separate from single-word\nvocabulary because a phrase doesn't have one part of speech or gender.\nInstead it has its own two facets: what it's *for* (`function`) and how\nformal/slangy it is (`register`).\n\n```json\n{\n  \"phrase\": \"Dale\",\n  \"definition\": \"okay / sure / sounds good\",\n  \"function\": \"acuerdo\",\n  \"register\": \"coloquial\",\n  \"idiomatic\": true,\n  \"literal\": \"give it / go\",\n  \"notes\": \"\",\n  \"example\": \"\"\n}\n```\n\n- `function` — the phrase's communicative role, one of `saludo` (greeting) / `despedida` (farewell) / `cortesía` (courtesy — please, thanks, excuse me) / `acuerdo` (agreement) / `desacuerdo` (disagreement) / `sorpresa` (surprise/reaction) / `pregunta` (question) / `muletilla` (filler/discourse marker) / `otro` (other).\n- `register` — one of `neutro` (standard, textbook-safe) / `coloquial` (everyday informal) / `lunfardo` (Buenos Aires-specific slang).\n- `idiomatic` — `true` if the meaning isn't guessable word-by-word (e.g. \"ni en pedo\" doesn't mean anything about being drunk), `false` if it's a plain, literal combination of words.\n- `literal` — only meaningful when `idiomatic` is `true`: a short word-by-word gloss, so both the real meaning and the literal words are visible. Leave `\"\"` when `idiomatic` is `false`.\n- `notes` and `example` are both optional free text, same as for words.\n\n## ⚠️ Dialect requirement — this app uses Rioplatense Spanish (voseo)\n\nEvery verb form below MUST use **vos**, never tú. This is the single\nmost common mistake a general-purpose LLM makes here, so check it\ncarefully — a wrong-but-fluent \"tú\" conjugation will look completely\nplausible and still be wrong for this app:\n\n- Present tense **does not diphthongize** for vos, even for stem-changing\n  verbs: **vos podés** (not \"puedés\"), **vos mostrás** (not \"muestrás\"),\n  **vos pedís** (not \"pidís\"), **vos medís** (not \"midís\"). Stress falls\n  on the ending, not the stem — so vos present tense is always the\n  \"regular-looking\" stem plus `-ás`/`-és`/`-ís`.\n- Affirmative vos imperative = the infinitive's stem + its final accented\n  vowel, no `-s`: **hablá, comé, viví, tené, poné, vení, decí** — never\n  the tú-form (habla, ven, di).\n- Preterite, imperfecto, futuro, condicional, and both subjunctives all\n  use the vos-shaped ending shown in the example above (which mirrors\n  \"tú\" minus the final `-s` for most tenses, except present and imperative\n  where the difference is larger).\n- Compounds of irregular verbs keep the irregularity: **obtener → obtengo,\n  obtuve, obtendré** (not a regular pattern), because it's built on\n  \"tener.\" Same logic for any verb built on **poner**, **venir**,\n  **decir**, etc.\n- Phrases should also reflect real rioplatense usage (e.g. \"¿Vos querés\n  algo?\" not \"¿Tú quieres algo?\") — a phrase generated by an LLM defaulting\n  to Spain/Mexico Spanish will read as noticeably foreign here.\n\n## What the app checks before saving anything\n\n- The file must be valid JSON matching this shape, or the whole import is\n  rejected with an error — nothing partial gets written.\n- Every verb's `forms` must have all required tense/person cells filled in.\n- Before you confirm the import, you'll see a preview of every parsed\n  verb/word/phrase. For verbs, any cell that doesn't match the app's own\n  built-in *regular* conjugation pattern is highlighted — same highlight\n  used everywhere else in the app for irregular verbs. If you marked\n  something `\"irregularity\": \"regular\"` and cells still light up, that's\n  the LLM having made a mistake; fix it before confirming.\n- Duplicates are matched by infinitive/word/phrase (case- and\n  accent-insensitive), same as the existing \"add to list\" flow — importing\n  the same file twice won't create duplicate rows.\n";
+  var IMPORT_FORMAT_SPEC = "# voseá — Custom Content Import Format (v1)\n\nPaste this whole document into your preferred LLM, along with the source\nmaterial you want turned into study content (a webpage, a PDF, your own\nlist of words), and ask it to produce one JSON file matching the shape\nbelow. Then point voseá's import screen at that file.\n\nEverything imported lands in **your own** verbs/words/phrases — never the\napp's shared starter content — the same as adding an item by hand.\n\n## Top-level shape\n\n```json\n{\n  \"version\": 1,\n  \"list_name\": \"Petrofísica y Perfilaje de Pozos\",\n  \"verbs\": [ /* verb objects, see below */ ],\n  \"words\": [ /* word objects, see below */ ],\n  \"phrases\": [ /* phrase objects, see below */ ]\n}\n```\n\n- `version` — always `1` for this format. Lets the app detect and reject a\n  future incompatible format instead of silently importing garbage.\n- `list_name` — optional. If present, every verb/word/phrase below is also\n  added to a list with this exact name (a new list is created if none\n  matches; an existing one with the same name is added to instead of\n  duplicated). Omit this to just add items to your collection without\n  creating a list.\n- `verbs`, `words` and `phrases` are all optional arrays — include\n  whichever you have.\n\n## Verb object shape\n\n```json\n{\n  \"infinitive\": \"escalar\",\n  \"definition\": \"to climb; to scale\",\n  \"notes\": \"en perfilaje: escalar una curva = to set a log curve's scale\",\n  \"example\": \"Escalamos el cerro en tres horas. / Escalá la resistividad en logarítmico.\",\n  \"type\": \"-ar\",\n  \"reflexive\": false,\n  \"irregularity\": \"regular\",\n  \"pattern\": \"\",\n  \"transitivity\": \"transitivo\",\n  \"preposicion\": \"\",\n  \"auxiliar\": false,\n  \"gustar_like\": false,\n  \"forms\": {\n    \"presente\":     { \"yo\": \"escalo\",    \"vos\": \"escalás\",   \"el\": \"escala\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalan\" },\n    \"preterito\":    { \"yo\": \"escalé\",    \"vos\": \"escalaste\", \"el\": \"escaló\",    \"nosotros\": \"escalamos\",    \"ellos\": \"escalaron\" },\n    \"imperfecto\":   { \"yo\": \"escalaba\",  \"vos\": \"escalabas\", \"el\": \"escalaba\",  \"nosotros\": \"escalábamos\",  \"ellos\": \"escalaban\" },\n    \"futuro\":       { \"yo\": \"escalaré\",  \"vos\": \"escalarás\", \"el\": \"escalará\",  \"nosotros\": \"escalaremos\",  \"ellos\": \"escalarán\" },\n    \"condicional\":  { \"yo\": \"escalaría\", \"vos\": \"escalarías\",\"el\": \"escalaría\", \"nosotros\": \"escalaríamos\", \"ellos\": \"escalarían\" },\n    \"subjPresente\": { \"yo\": \"escale\",    \"vos\": \"escales\",   \"el\": \"escale\",    \"nosotros\": \"escalemos\",    \"ellos\": \"escalen\" },\n    \"subjPasado\":   { \"yo\": \"escalara\",  \"vos\": \"escalaras\", \"el\": \"escalara\",  \"nosotros\": \"escaláramos\",  \"ellos\": \"escalaran\" },\n    \"imperativo\":   { \"vos\": \"escalá\", \"usted\": \"escale\", \"nosotros\": \"escalemos\", \"ustedes\": \"escalen\" },\n    \"gerundio\": \"escalando\",\n    \"participio\": \"escalado\"\n  }\n}\n```\n\nField notes:\n- `type` — one of `-ar` / `-er` / `-ir`, must match the infinitive's ending.\n- `irregularity` — one of `regular` / `cambio de raíz` / `irregular (yo)` / `irregular (total)`.\n- `pattern` — a short free-text note on what's irregular (e.g. `\"e→i en formas acentuadas\"`), blank if fully regular.\n- `transitivity` — one of `transitivo` / `intransitivo` / `ambos`.\n- `preposicion` — a fixed preposition the verb idiomatically takes (`\"a\"`, `\"de\"`, `\"en\"`...), or `\"\"`.\n- `notes` and `example` — optional free text, same rules as for words (see \"Definitions, notes and examples\" below).\n- `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.\n- Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `\"forms\": { \"impersonal\": { \"presente\": \"llueve\", \"subjPasado\": \"lloviera\", ... } }` instead — there's no \"yo llueve.\"\n- Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`\"yo\": \"me levanto\"`, NOT just `\"levanto\"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`\"vos\": \"levantate\"`), proclitic on the other three (`\"usted\": \"se levante\"`, `\"nosotros\": \"nos levantemos\"`, `\"ustedes\": \"se levanten\"`).\n\n## Word object shape\n\n```json\n{\n  \"word\": \"porosidad\",\n  \"definition\": \"porosity\",\n  \"part_of_speech\": \"sustantivo\",\n  \"gender\": \"femenino\",\n  \"notes\": \"φ; se mide con los perfiles de densidad, neutrón o sónico\",\n  \"example\": \"Esta arenisca tiene buena porosidad.\"\n}\n```\n\n- `part_of_speech` — one of `sustantivo` / `adjetivo` / `adverbio` / `pronombre` / `preposición` / `conjunción` / `interjección`.\n- `gender` — one of `masculino` / `femenino` / `neutro` / `\"\"` (blank for anything ungendered, e.g. most adverbs).\n- `notes` and `example` are both optional free text; `example` is a Spanish sentence using the word, if you want one.\n\n## Phrase object shape\n\nShort common phrases/expressions — kept separate from single-word\nvocabulary because a phrase doesn't have one part of speech or gender.\nInstead it has its own two facets: what it's *for* (`function`) and how\nformal/slangy it is (`register`).\n\n```json\n{\n  \"phrase\": \"Dale\",\n  \"definition\": \"okay / sure / sounds good\",\n  \"function\": \"acuerdo\",\n  \"register\": \"coloquial\",\n  \"idiomatic\": true,\n  \"literal\": \"give it / go\",\n  \"notes\": \"\",\n  \"example\": \"\"\n}\n```\n\n- `function` — the phrase's communicative role, one of `saludo` (greeting) / `despedida` (farewell) / `cortesía` (courtesy — please, thanks, excuse me) / `acuerdo` (agreement) / `desacuerdo` (disagreement) / `sorpresa` (surprise/reaction) / `pregunta` (question) / `muletilla` (filler/discourse marker) / `otro` (other).\n- `register` — one of `neutro` (standard, textbook-safe) / `coloquial` (everyday informal) / `lunfardo` (Buenos Aires-specific slang).\n- `idiomatic` — `true` if the meaning isn't guessable word-by-word (e.g. \"ni en pedo\" doesn't mean anything about being drunk), `false` if it's a plain, literal combination of words.\n- `literal` — only meaningful when `idiomatic` is `true`: a short word-by-word gloss, so both the real meaning and the literal words are visible. Leave `\"\"` when `idiomatic` is `false`.\n- `notes` and `example` are both optional free text, same as for words.\n\n## Definitions, notes and examples (verbs, words and phrases)\n\n- `definition` is the item's **everyday meaning**, never the list's\n  topic: \"carrito\" is \"cart\" (not \"luggage cart\") even in an airport\n  list; \"correr\" is \"to run\" (not \"to run a log\") even in a well-logging\n  list. One item can belong to several lists, and it has only one\n  definition.\n- The list's context goes in `example` and `notes`. `example` gives a\n  typical sentence first; if the list's use is very different from the\n  everyday one, add a second, list-specific sentence after \" / \":\n  `\"Agarrá un carrito en la entrada del súper. / Pusimos las valijas en un carrito.\"`\n- `notes` says what the item means in the list's world when that isn't\n  obvious from the definition: `\"en perfilaje: una carrera = one logging run\"`.\n  Don't use notes for bare topic labels (\"petrofísica\", \"aeropuerto\") —\n  the list itself already says that.\n\n## ⚠️ Dialect requirement — this app uses Rioplatense Spanish (voseo)\n\nEvery verb form below MUST use **vos**, never tú. This is the single\nmost common mistake a general-purpose LLM makes here, so check it\ncarefully — a wrong-but-fluent \"tú\" conjugation will look completely\nplausible and still be wrong for this app:\n\n- Present tense **does not diphthongize** for vos, even for stem-changing\n  verbs: **vos podés** (not \"puedés\"), **vos mostrás** (not \"muestrás\"),\n  **vos pedís** (not \"pidís\"), **vos medís** (not \"midís\"). Stress falls\n  on the ending, not the stem — so vos present tense is always the\n  \"regular-looking\" stem plus `-ás`/`-és`/`-ís`.\n- Affirmative vos imperative = the infinitive's stem + its final accented\n  vowel, no `-s`: **hablá, comé, viví, tené, poné, vení, decí** — never\n  the tú-form (habla, ven, di).\n- Preterite, imperfecto, futuro, condicional, and both subjunctives all\n  use the vos-shaped ending shown in the example above (which mirrors\n  \"tú\" minus the final `-s` for most tenses, except present and imperative\n  where the difference is larger).\n- Compounds of irregular verbs keep the irregularity: **obtener → obtengo,\n  obtuve, obtendré** (not a regular pattern), because it's built on\n  \"tener.\" Same logic for any verb built on **poner**, **venir**,\n  **decir**, etc.\n- Phrases should also reflect real rioplatense usage (e.g. \"¿Vos querés\n  algo?\" not \"¿Tú quieres algo?\") — a phrase generated by an LLM defaulting\n  to Spain/Mexico Spanish will read as noticeably foreign here.\n\n## What the app checks before saving anything\n\n- The file must be valid JSON matching this shape, or the whole import is\n  rejected with an error — nothing partial gets written.\n- Every verb's `forms` must have all required tense/person cells filled in.\n- Before you confirm the import, you'll see a preview of every parsed\n  verb/word/phrase. For verbs, any cell that doesn't match the app's own\n  built-in *regular* conjugation pattern is highlighted — same highlight\n  used everywhere else in the app for irregular verbs. If you marked\n  something `\"irregularity\": \"regular\"` and cells still light up, that's\n  usually the LLM having made a mistake; fix it before confirming. The\n  exception is a spelling-only change (sacar → saqué, llegar → llegue,\n  empezar → empecé, surgir → surjo): those cells light up too, are\n  correct, and stay `\"regular\"` with the change described in `pattern`.\n- Duplicates are matched by infinitive/word/phrase (case- and\n  accent-insensitive), same as the existing \"add to list\" flow — importing\n  the same file twice won't create duplicate rows.\n";
 
   var IMPORT_VALID_TYPES = ["-ar", "-er", "-ir"];
   var IMPORT_VALID_IRREGULARITY = ["regular", "cambio de raíz", "irregular (yo)", "irregular (total)"];
@@ -5970,6 +6354,8 @@
       type: type,
       irregularity: v.irregularity,
       pattern: (typeof v.pattern === "string") ? v.pattern.trim() : "",
+      notes: (typeof v.notes === "string") ? v.notes.trim() : "",
+      example: (typeof v.example === "string") ? v.example.trim() : "",
       transitivity: v.transitivity,
       preposicion: (typeof v.preposicion === "string") ? v.preposicion.trim() : "",
       reflexive: !!v.reflexive,
@@ -6500,6 +6886,21 @@
   el.langEn.addEventListener("click", function () { setLang("en"); });
   el.settingsVoiceElena.addEventListener("click", function () { setTtsVoice("elena"); });
   el.settingsVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
+  el.settingsQuietOn.addEventListener("click", function () { setQuietMode(true); });
+  el.settingsQuietOff.addEventListener("click", function () { setQuietMode(false); });
+  el.quietToastSettings.addEventListener("click", function () { hideQuietToast(); openSettings(); });
+  el.backupCreate.addEventListener("click", onBackupCreateClick);
+  el.backupRestore.addEventListener("click", onBackupRestoreClick);
+  el.backupDelete.addEventListener("click", function () { if (backupInfo && !backupBusy) openBackupPanel("delete"); });
+  el.backupCancel.addEventListener("click", function () { closeBackupPanel(); setBackupMsg(""); });
+  el.backupConfirm.addEventListener("click", onBackupConfirm);
+  el.backupTypedInput.addEventListener("input", updateBackupConfirmState);
+  el.backupTypedInput.addEventListener("keydown", function (e) { if (e.key === "Enter") onBackupConfirm(); });
+  el.backupChoice.addEventListener("change", updateBackupConfirmState);
+  document.querySelectorAll(".flash-speak-btn, .detail-speak-btn").forEach(function (b) {
+    b.addEventListener("animationend", function () { b.classList.remove("quiet-nudge"); });
+  });
+  applyQuietMode();
 
   // The shared Listas facet loads once, before any tab's own filters or
   // trigger — migrateLegacyPerTabListFilters() upgrades old per-tab list

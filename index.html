@@ -164,11 +164,13 @@
         <h2 id="d-infinitive"></h2>
         <p class="definition" id="d-definition"></p>
       </div>
-      <button type="button" class="detail-speak-btn" id="d-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+      <button type="button" class="detail-speak-btn" id="d-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
     </div>
     <div class="badges" id="d-badges"><button type="button" class="known-toggle sm" id="d-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="d-pattern"></p>
     <p class="pattern-note" id="d-preposicion"></p>
+    <p class="pattern-note" id="d-notes"></p>
+    <p class="example-note" id="d-example"></p>
 
     <!-- Only shown for a verb that is gustar_like AND also_personal_use (e.g.
          "parecer") — lets the same stored forms be reinterpreted either
@@ -274,6 +276,14 @@
         <label for="f-preposicion" data-i18n="label_preposicion">Preposición fija</label>
         <input type="text" id="f-preposicion" data-i18n-placeholder="placeholder_preposicion" placeholder="ej. en, de, a" />
       </div>
+      <div class="field field-wide">
+        <label for="f-notes" data-i18n="label_notas_verbo">Notas de uso</label>
+        <input type="text" id="f-notes" data-i18n-placeholder="placeholder_notas_verbo" placeholder="ej. en perfilaje: «correr un perfil» = to run a log" />
+      </div>
+      <div class="field field-wide">
+        <label for="f-example" data-i18n="label_ejemplo">Oración de ejemplo</label>
+        <input type="text" id="f-example" data-i18n-placeholder="placeholder_ejemplo_verbo" placeholder="ej. Corrí diez kilómetros. / Corrimos el perfil a la noche." />
+      </div>
       <div class="field checks">
         <input type="checkbox" id="f-reflexive" />
         <label for="f-reflexive" style="margin:0;" data-i18n="check_reflexivo">¿Reflexivo?</label>
@@ -372,7 +382,7 @@
         <h2 id="wd-word"></h2>
         <p class="definition" id="wd-definition"></p>
       </div>
-      <button type="button" class="detail-speak-btn" id="wd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+      <button type="button" class="detail-speak-btn" id="wd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
     </div>
     <div class="badges" id="wd-badges"><button type="button" class="known-toggle sm" id="wd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="wd-notes"></p>
@@ -502,7 +512,7 @@
         <h2 id="pd-phrase"></h2>
         <p class="definition" id="pd-definition"></p>
       </div>
-      <button type="button" class="detail-speak-btn" id="pd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+      <button type="button" class="detail-speak-btn" id="pd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
     </div>
     <div class="badges" id="pd-badges"><button type="button" class="known-toggle sm" id="pd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="pd-literal"></p>
@@ -762,6 +772,40 @@
       </div>
     </div>
     <p class="flash-setup-note" data-i18n="settings_voice_note">La voz que escuchás al tocar el parlante en las flashcards.</p>
+    <div class="field">
+      <label data-i18n="settings_quiet_label">Modo silencio</label>
+      <div class="lang-toggle">
+        <button type="button" class="lang-option" id="settings-quiet-off" data-i18n="settings_quiet_off">Apagado</button>
+        <button type="button" class="lang-option" id="settings-quiet-on" data-i18n="settings_quiet_on">Activado</button>
+      </div>
+    </div>
+    <p class="flash-setup-note" data-i18n="settings_quiet_note">Silencia toda la pronunciación de la app (por ejemplo, en un avión). Solo en este dispositivo.</p>
+    <div class="field backup-field">
+      <label data-i18n="settings_backup_label">Respaldo</label>
+      <p class="backup-status" id="backup-status"></p>
+      <div class="backup-actions">
+        <button type="button" class="btn-secondary" id="backup-create" data-i18n="backup_create">Crear respaldo</button>
+        <button type="button" class="btn-secondary" id="backup-restore" data-i18n="backup_restore">Restaurar…</button>
+        <button type="button" class="btn-secondary backup-danger" id="backup-delete" data-i18n="backup_delete">Borrar mi contenido…</button>
+      </div>
+      <div class="backup-panel" id="backup-panel" hidden>
+        <p class="backup-panel-text" id="backup-panel-text"></p>
+        <div class="backup-choice" id="backup-choice" role="radiogroup" hidden>
+          <label class="backup-choice-opt"><input type="radio" name="backup-prefer" value="backup" /> <span><strong data-i18n="backup_prefer_backup">Usar el respaldo</strong> <span class="backup-choice-sub" data-i18n="backup_prefer_backup_sub">reemplaza lo que tenés en la app (incluido lo marcado como sabido)</span></span></label>
+          <label class="backup-choice-opt"><input type="radio" name="backup-prefer" value="active" /> <span><strong data-i18n="backup_prefer_active">Conservar lo de la app</strong> <span class="backup-choice-sub" data-i18n="backup_prefer_active_sub">solo agrega lo que falta</span></span></label>
+        </div>
+        <div class="backup-typed" id="backup-typed" hidden>
+          <label for="backup-typed-input" id="backup-typed-label"></label>
+          <input type="text" id="backup-typed-input" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" id="backup-confirm"></button>
+          <button type="button" class="btn-secondary" id="backup-cancel" data-i18n="backup_cancel">Cancelar</button>
+        </div>
+      </div>
+      <p class="backup-msg" id="backup-msg" role="status" aria-live="polite"></p>
+    </div>
+    <p class="flash-setup-note" data-i18n="settings_backup_note">Guarda en el servidor una copia de tus verbos, palabras, frases y listas, incluido lo marcado como sabido. Hay un solo respaldo: uno nuevo reemplaza al anterior.</p>
     <p class="form-msg" id="settings-msg"></p>
     <div class="form-actions">
       <button type="button" class="btn-secondary" id="settings-close" data-i18n="close">Cerrar</button>
@@ -855,12 +899,12 @@
     <button type="button" class="flash-arrow flash-arrow-prev" id="flash-arrow-prev" data-i18n-aria-label="flash_arrow_prev_aria" aria-label="Anterior">&lsaquo;</button>
     <div class="flash-card" id="flash-card">
       <div class="flash-face flash-front">
-        <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+        <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <div class="flash-prompt-main" id="flash-front-main"></div>
         <div class="flash-prompt-sub" id="flash-front-sub"></div>
       </div>
       <div class="flash-face flash-back">
-        <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+        <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <div class="flash-answer" id="flash-back-main"></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
@@ -888,6 +932,11 @@
     <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>
     <button type="button" class="btn-primary" id="flash-next-btn" data-i18n="flash_next">Siguiente &rsaquo;</button>
   </div>
+</div>
+
+<div class="quiet-toast" id="quiet-toast" role="status" aria-live="polite" hidden>
+  <span id="quiet-toast-text" data-i18n="quiet_toast_text">El modo silencio está activado.</span>
+  <button type="button" class="quiet-toast-btn" id="quiet-toast-settings" data-i18n="quiet_toast_settings">Configuración</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
