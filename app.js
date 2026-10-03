@@ -4385,17 +4385,17 @@
       return Math.round(now - t0);
     }
 
-    supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
-      .then(function (res) {
+    // 2026-10-03: no longer calls the Edge Function on every play. Audio
+    // comes from ttsLoadAudio() — already-downloaded bytes when the clip was
+    // prefetched (instant), else the remembered URL, else the Edge Function
+    // — see "TTS audio loading" just below playTts().
+    ttsLoadAudio(text)
+      .then(function (r) {
         var edgeMs = msSince(ttsStartedAt);
-        if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
-        if (res.data.cached) {
-          console.log("%c[tts] cache hit%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#2a8f4f;font-weight:bold", "color:inherit");
-        } else {
-          console.log("%c[tts] AZURE SYNTHESIS (cache miss)%c — edge fn " + edgeMs + "ms — \"" + text + "\"", "color:#c0392b;font-weight:bold", "color:inherit");
-        }
+        console.log("%c[tts] " + r.how + "%c — ready in " + edgeMs + "ms — \"" + text + "\"",
+          r.how === "edge: AZURE SYNTHESIS (cache miss)" ? "color:#c0392b;font-weight:bold" : "color:#2a8f4f;font-weight:bold", "color:inherit");
         if (!ttsAudioEl) ttsAudioEl = new Audio();
-        ttsAudioEl.src = res.data.url;
+        ttsAudioEl.src = r.src;
         // Keeps the chasing-border ring on through the actual playback,
         // not just the fetch — "ended" is the real end of a tap-to-hear
         // interaction from mason's point of view. Reassigning onended
@@ -4416,7 +4416,7 @@
           // (see syncChaseToAudio() above), with no restart and no jump.
           syncChaseToAudio(btn);
           var totalMs = msSince(ttsStartedAt);
-          console.log("[tts] audio started — " + totalMs + "ms total (" + (totalMs - edgeMs) + "ms fetching/decoding the audio itself) — \"" + text + "\"");
+          console.log("[tts] audio started — " + totalMs + "ms after the tap — \"" + text + "\"");
         });
       })
       .catch(function (err) {
@@ -4430,6 +4430,111 @@
         ttsInFlight = false;
         if (btn) { btn.disabled = false; }
       });
+  }
+
+  // ================= TTS audio loading (2026-10-03) =================
+  // mason: "the audio takes about a second or two to play. Are these
+  // prefetching correctly?" Only half: prefetchTts() used to call the Edge
+  // Function and then fetch() the clip to warm the browser's HTTP cache —
+  // but every PLAY called the Edge Function again (a network round trip
+  // plus the function's own existence check: most of that second), and
+  // Safari's <audio> doesn't reliably reuse fetch()'s cache anyway. On top
+  // of that, auto-play fired 200 ms after a card appeared, before the
+  // card's own prefetch had finished, so it did its own full round trip.
+  //
+  // Now there's one loader, shared by prefetch and play, that keeps:
+  //  - the clip's URL per (voice, text), remembered on the device
+  //    (localStorage) — clips are content-addressed and never change, so
+  //    once known, the Edge Function is never asked again;
+  //  - the clip's bytes as an in-memory blob: URL, so a prefetched clip
+  //    plays with no network at all;
+  //  - any load already in flight, so a play that arrives mid-prefetch
+  //    waits for that same load instead of starting another.
+  // Flashcards also prefetch the next two cards, not just the current one.
+  var TTS_URL_LOCAL_KEY = "iv-tts-urls";
+  var TTS_URL_MAX = 3000;
+  var TTS_BLOB_MAX = 80;
+  var ttsUrlMemo = (function () {
+    try { var m = JSON.parse(localStorage.getItem(TTS_URL_LOCAL_KEY) || "{}"); return (m && typeof m === "object") ? m : {}; } catch (e) { return {}; }
+  })();
+  var ttsUrlSaveTimer = null;
+  var ttsBlobUrls = {};   // key -> blob: URL
+  var ttsBlobOrder = [];  // keys, oldest first (for trimming)
+  var ttsLoading = {};    // key -> Promise of {src, how}
+
+  function ttsKey(text) { return TTS_VOICES[ttsVoiceKey] + "\u0000" + String(text || "").trim(); }
+
+  function saveTtsUrlMemo() {
+    clearTimeout(ttsUrlSaveTimer);
+    ttsUrlSaveTimer = setTimeout(function () {
+      var keys = Object.keys(ttsUrlMemo);
+      if (keys.length > TTS_URL_MAX) keys.slice(0, keys.length - TTS_URL_MAX).forEach(function (k) { delete ttsUrlMemo[k]; });
+      try { localStorage.setItem(TTS_URL_LOCAL_KEY, JSON.stringify(ttsUrlMemo)); } catch (e) {}
+    }, 500);
+  }
+
+  // The clip's public URL: remembered, or asked of the Edge Function (which
+  // synthesizes it first if nobody has heard this text in this voice yet).
+  function ttsResolveUrl(text, force) {
+    var key = ttsKey(text);
+    if (!force && ttsUrlMemo[key]) return Promise.resolve({ url: ttsUrlMemo[key], how: "url remembered" });
+    return supabaseClient.functions.invoke("tts", { body: { text: String(text).trim(), voice: TTS_VOICES[ttsVoiceKey] } })
+      .then(function (res) {
+        if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
+        ttsUrlMemo[key] = res.data.url;
+        saveTtsUrlMemo();
+        return { url: res.data.url, how: res.data.cached ? "edge: cache hit" : "edge: AZURE SYNTHESIS (cache miss)" };
+      });
+  }
+
+  function rememberTtsBlob(key, src) {
+    ttsBlobUrls[key] = src;
+    ttsBlobOrder.push(key);
+    while (ttsBlobOrder.length > TTS_BLOB_MAX) {
+      var old = ttsBlobOrder.shift();
+      var oldSrc = ttsBlobUrls[old];
+      if (!oldSrc) continue;
+      if (ttsAudioEl && ttsAudioEl.src === oldSrc) { ttsBlobOrder.push(old); break; } // never pull the clip that's playing
+      delete ttsBlobUrls[old];
+      try { URL.revokeObjectURL(oldSrc); } catch (e) {}
+    }
+  }
+
+  function ttsFetchBlob(url) {
+    return fetch(url).then(function (resp) {
+      if (!resp.ok) { var e = new Error("http_" + resp.status); e.status = resp.status; throw e; }
+      return resp.blob();
+    }).then(function (blob) { return URL.createObjectURL(blob); });
+  }
+
+  // Resolves to {src, how}: src is a blob: URL when the bytes could be
+  // downloaded, or the plain public URL as a fallback (the <audio> element
+  // then streams it itself).
+  function ttsLoadAudio(text) {
+    var key = ttsKey(text);
+    if (ttsBlobUrls[key]) return Promise.resolve({ src: ttsBlobUrls[key], how: "already downloaded" });
+    if (ttsLoading[key]) return ttsLoading[key];
+    var p = ttsResolveUrl(text).then(function (r) {
+      return ttsFetchBlob(r.url).then(function (src) {
+        rememberTtsBlob(key, src);
+        return { src: src, how: r.how };
+      }, function (err) {
+        // A remembered URL that's gone (e.g. the cache bucket was cleared):
+        // forget it and ask the Edge Function once more.
+        if (r.how === "url remembered" && err && err.status) {
+          delete ttsUrlMemo[key]; saveTtsUrlMemo();
+          return ttsResolveUrl(text, true).then(function (r2) {
+            return ttsFetchBlob(r2.url).then(function (src) { rememberTtsBlob(key, src); return { src: src, how: r2.how }; },
+              function () { return { src: r2.url, how: r2.how }; });
+          });
+        }
+        return { src: r.url, how: r.how + " (streamed)" };
+      });
+    });
+    ttsLoading[key] = p;
+    var clear = function () { if (ttsLoading[key] === p) delete ttsLoading[key]; };
+    p.then(clear, clear);
+    return p;
   }
 
   // Powers the "Buscar en RAE" shortcut on the add-verb and add-word forms
@@ -4648,15 +4753,10 @@
     // their device to use less data shouldn't have this quietly working
     // against that.
     if (window.navigator && navigator.connection && navigator.connection.saveData) return;
-    var key = ttsVoiceKey + "\u0000" + text;
-    if (ttsPrefetched[key]) return;
-    ttsPrefetched[key] = true;
-    supabaseClient.functions.invoke("tts", { body: { text: text, voice: TTS_VOICES[ttsVoiceKey] } })
-      .then(function (res) {
-        if (res.error || !res.data || !res.data.url) return;
-        return fetch(res.data.url).catch(function () {});
-      })
-      .catch(function () {});
+    // 2026-10-03: downloads the clip's bytes through the same loader that
+    // playTts() uses, so a later play is instant and never re-asks the Edge
+    // Function — see "TTS audio loading" below playTts().
+    ttsLoadAudio(text).catch(function () {});
   }
 
   // The merged usted/ustedes imperativo cell ("— / — / <real>", td.imp-col)
@@ -4953,6 +5053,13 @@
     // land before it's needed. See prefetchTts() above.
     prefetchTts(card.frontSpeak);
     prefetchTts(card.backSpeak);
+    prefetchTts(card.audio);
+    // ...and the next two cards, so their audio is ready before you get there.
+    [1, 2].forEach(function (k) {
+      var c = flashDeck[flashIndex + k];
+      if (!c) return;
+      prefetchTts(c.frontSpeak); prefetchTts(c.backSpeak); prefetchTts(c.audio);
+    });
     // Auto-play: a listening card's audio, or (Leer + switch on) the front's
     // Spanish. A short delay lets the card swap in first.
     var token = ++flashAutoToken;
