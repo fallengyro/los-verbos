@@ -622,6 +622,17 @@
         </label>
       </div>
 
+      <!-- Leer / Escuchar (2026-10-03): how the cards are drilled, for
+           verbs, words and phrases alike. See renderFlashModeControls(). -->
+      <div class="flash-mode-options" id="flash-mode-options">
+        <p class="flash-group-label" data-i18n="flash_group_mode">Cómo practicar</p>
+        <div class="lang-toggle flash-mode-toggle">
+          <button type="button" class="lang-option" id="flash-mode-read" data-i18n="flash_mode_read">Leer</button>
+          <button type="button" class="lang-option" id="flash-mode-listen" data-i18n="flash_mode_listen">Escuchar</button>
+        </div>
+        <p class="flash-mode-note" id="flash-mode-note"></p>
+      </div>
+
       <div class="flash-verb-options" id="flash-verb-options">
         <!-- Tense/person picker: quick picks + "Personalizar" (one row per
              tense, persons inline). Built by app.js's renderFlashPicker(). -->
@@ -644,6 +655,17 @@
           <label><input type="radio" name="flash-direction" id="flash-dir-def" value="def2word" checked /> <span data-i18n="flash_dir_def2word">Definición &rarr; palabra</span></label>
           <label><input type="radio" name="flash-direction" id="flash-dir-word" value="word2def" /> <span data-i18n="flash_dir_word2def">Palabra &rarr; definición</span></label>
         </div>
+      </div>
+
+      <div class="flash-autoplay-row">
+        <label class="switch-row" id="flash-autoplay-label">
+          <span class="switch">
+            <input type="checkbox" id="flash-autoplay" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </span>
+          <span data-i18n="flash_autoplay">Reproducir el audio solo</span>
+        </label>
+        <p class="flash-autoplay-note" id="flash-autoplay-note"></p>
       </div>
 
       <p class="form-msg" id="flash-setup-msg"></p>
@@ -902,10 +924,14 @@
         <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <div class="flash-prompt-main" id="flash-front-main"></div>
         <div class="flash-prompt-sub" id="flash-front-sub"></div>
+        <!-- Escuchar mode: the front is audio only. -->
+        <button type="button" class="flash-listen-btn" id="flash-listen-btn" data-i18n-aria-label="flash_listen_aria" aria-label="Escuchar otra vez" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+        <div class="flash-listen-hint" id="flash-listen-hint" data-i18n="flash_listen_hint" hidden>Escuchá y pensá qué es</div>
       </div>
       <div class="flash-face flash-back">
         <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <div class="flash-answer" id="flash-back-main"></div>
+        <div class="flash-prompt-sub" id="flash-back-meta" hidden></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
         <div class="flash-example" id="flash-back-example"></div>

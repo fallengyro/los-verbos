@@ -269,6 +269,18 @@
       settings_lang_note: "Esto solo cambia el texto de la app — tus verbos y vocabulario siempre quedan en español.",
       settings_voice_label: "Voz de pronunciación",
       settings_voice_note: "La voz que escuchás al tocar el parlante en las flashcards.",
+      flash_group_mode: "Cómo practicar",
+      flash_mode_read: "Leer",
+      flash_mode_listen: "Escuchar",
+      flash_mode_note_read: "Leés el frente y das vuelta para ver la respuesta.",
+      flash_mode_note_listen: "El frente es solo audio: escuchás la palabra (o la forma del verbo) y das vuelta para verla escrita, con su significado.",
+      flash_mode_note_quiet: "El modo silencio está activado, así que «Escuchar» no está disponible. Podés desactivarlo en Configuración.",
+      flash_autoplay: "Reproducir el audio solo",
+      flash_autoplay_note: "El español suena apenas aparece (al frente, o al dar vuelta).",
+      flash_autoplay_note_listen: "En «Escuchar» siempre suena.",
+      flash_autoplay_note_quiet: "Silenciado por el modo silencio.",
+      flash_listen_hint: "Escuchá y pensá qué es",
+      flash_listen_aria: "Escuchar otra vez",
       settings_quiet_label: "Modo silencio",
       settings_quiet_off: "Apagado",
       settings_quiet_on: "Activado",
@@ -612,6 +624,18 @@
       settings_lang_note: "This only changes the app's own text — your verbs and vocabulary always stay in Spanish.",
       settings_voice_label: "Pronunciation voice",
       settings_voice_note: "The voice you hear when you tap the speaker on flashcards.",
+      flash_group_mode: "How to practise",
+      flash_mode_read: "Read",
+      flash_mode_listen: "Listen",
+      flash_mode_note_read: "Read the front, then flip for the answer.",
+      flash_mode_note_listen: "The front is audio only: listen to the word (or the verb form), then flip to see it written, with its meaning.",
+      flash_mode_note_quiet: "Quiet mode is on, so Listen isn't available. You can turn it off in Settings.",
+      flash_autoplay: "Play the audio automatically",
+      flash_autoplay_note: "The Spanish plays as soon as it appears (on the front, or when you flip).",
+      flash_autoplay_note_listen: "In Listen it always plays.",
+      flash_autoplay_note_quiet: "Muted by quiet mode.",
+      flash_listen_hint: "Listen and think what it is",
+      flash_listen_aria: "Play again",
       settings_quiet_label: "Quiet mode",
       settings_quiet_off: "Off",
       settings_quiet_on: "On",
@@ -922,6 +946,7 @@
       el.settingsQuietOn.classList.toggle("active", quietMode);
       el.settingsQuietOff.classList.toggle("active", !quietMode);
     }
+    if (el.flashModeRead) renderFlashModeControls();
   }
 
   // ---- Backup / delete / restore (2026-10-01) ----
@@ -1681,6 +1706,14 @@
   // gerundio/participio have no person axis, so they're plain on/off toggles.
   var activeFlashStandalone = new Set(["gerundio", "participio"]);
   var flashDirection = "def2word"; // or "word2def"
+  // Leer / Escuchar and auto-play (2026-10-03). Both remembered per device,
+  // like quiet mode. "Escuchar" can't be used while quiet mode is on — see
+  // effectiveFlashMode().
+  var FLASH_MODE_LOCAL_KEY = "iv-flash-mode";
+  var FLASH_AUTOPLAY_LOCAL_KEY = "iv-flash-autoplay";
+  var flashMode = (function () { try { return localStorage.getItem(FLASH_MODE_LOCAL_KEY) === "escuchar" ? "escuchar" : "leer"; } catch (e) { return "leer"; } })();
+  var flashAutoPlay = (function () { try { return localStorage.getItem(FLASH_AUTOPLAY_LOCAL_KEY) === "1"; } catch (e) { return false; } })();
+  var flashAutoToken = 0; // bumps on every card render, so a late auto-play for an old card is dropped
   var flashDeck = [];
   var flashIndex = -1;
 
@@ -1897,6 +1930,15 @@
     flashFrontMain: document.getElementById("flash-front-main"),
     flashFrontSub: document.getElementById("flash-front-sub"),
     flashFrontSpeak: document.getElementById("flash-front-speak"),
+    flashListenBtn: document.getElementById("flash-listen-btn"),
+    flashListenHint: document.getElementById("flash-listen-hint"),
+    flashBackMeta: document.getElementById("flash-back-meta"),
+    flashModeRead: document.getElementById("flash-mode-read"),
+    flashModeListen: document.getElementById("flash-mode-listen"),
+    flashModeNote: document.getElementById("flash-mode-note"),
+    flashAutoplay: document.getElementById("flash-autoplay"),
+    flashAutoplayLabel: document.getElementById("flash-autoplay-label"),
+    flashAutoplayNote: document.getElementById("flash-autoplay-note"),
     flashBackMain: document.getElementById("flash-back-main"),
     flashBackSub: document.getElementById("flash-back-sub"),
     flashBackSpeak: document.getElementById("flash-back-speak"),
@@ -3875,7 +3917,8 @@
     // plain front/back cards (no tense/person matrix), so one direction
     // toggle covers both rather than duplicating the same two radio buttons
     // a second time for phrases.
-    el.flashWordOptions.hidden = !activeFlashSources.words && !activeFlashSources.phrases;
+    el.flashWordOptions.hidden = (!activeFlashSources.words && !activeFlashSources.phrases) || effectiveFlashMode() === "escuchar";
+    renderFlashModeControls();
 
     var noSource = !activeFlashSources.verbs && !activeFlashSources.words && !activeFlashSources.phrases;
     el.flashStartBtn.disabled = noSource;
@@ -4283,8 +4326,9 @@
   // playing (ttsAudioEl's "ended", below) — not just once the network
   // request resolves — since "while the audio is playing" was the other
   // half of what mason asked for.
-  function playTts(text, btn, msgEl) {
+  function playTts(text, btn, msgEl, opts) {
     if (!msgEl) msgEl = el.flashTtsMsg;
+    var silentErrors = !!(opts && opts.silent);
     // Quiet mode: no request at all; clear a stale "couldn't play" line.
     if (quietMode) { msgEl.textContent = ""; noteQuietTap(btn); return; }
     if (!text || ttsInFlight) return;
@@ -4378,7 +4422,7 @@
       .catch(function (err) {
         var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
-        msgEl.textContent = t("tts_error");
+        if (!silentErrors) msgEl.textContent = t("tts_error");
         if (btn) btn.classList.remove("tts-active");
         if (ttsActiveEl === btn) ttsActiveEl = null;
       })
@@ -4873,13 +4917,21 @@
     // card's answer face before settling back on its front.
     el.flashCard.classList.add("no-anim");
     el.flashCard.classList.remove("flipped");
+    var listen = !!card.listen;
+    el.flashCard.classList.toggle("is-listen", listen);
     el.flashFrontMain.textContent = card.frontMain;
+    el.flashFrontMain.style.display = listen ? "none" : "";
     el.flashFrontSub.textContent = card.frontSub || "";
-    el.flashFrontSub.style.display = card.frontSub ? "" : "none";
+    el.flashFrontSub.style.display = card.frontSub && !listen ? "" : "none";
+    el.flashListenBtn.hidden = !listen;
+    el.flashListenHint.hidden = !listen;
     el.flashBackMain.textContent = card.backMain;
+    el.flashBackMeta.textContent = card.backMeta || "";
+    el.flashBackMeta.hidden = !card.backMeta;
     var backSub = cardBackSub(card); // a verb form's own English when available — see verbFormGloss()
     el.flashBackSub.textContent = backSub;
     el.flashBackSub.style.display = backSub ? "" : "none";
+    el.flashBackSub.classList.toggle("listen-def", listen && card.kind !== "verb");
     el.flashBackBadges.innerHTML = "";
     el.flashBackBadges.appendChild(flashBackBadges(card));
     var ex = flashExampleText(card.data);
@@ -4901,6 +4953,14 @@
     // land before it's needed. See prefetchTts() above.
     prefetchTts(card.frontSpeak);
     prefetchTts(card.backSpeak);
+    // Auto-play: a listening card's audio, or (Leer + switch on) the front's
+    // Spanish. A short delay lets the card swap in first.
+    var token = ++flashAutoToken;
+    if (listen) {
+      setTimeout(function () { autoPlayFlash(card.audio, el.flashListenBtn, token); }, 200);
+    } else if (flashAutoPlayOn() && card.frontSpeak) {
+      setTimeout(function () { autoPlayFlash(card.frontSpeak, el.flashFrontSpeak, token); }, 200);
+    }
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
     el.flashPrevBtn.disabled = flashIndex === 0;
     el.flashArrowPrev.disabled = flashIndex === 0;
@@ -4951,8 +5011,90 @@
     return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
   }
 
+  // ---- Leer / Escuchar + audio automático (2026-10-03) ----
+  // mason picked both from a mockup: "Escuchar" cards whose front is audio
+  // only (hear the word or the conjugated form, flip to see it written with
+  // its meaning), and a switch that plays the Spanish by itself in normal
+  // (Leer) cards. Quiet mode wins over both.
+  function effectiveFlashMode() { return quietMode ? "leer" : flashMode; }
+  function flashAutoPlayOn() { return !quietMode && (effectiveFlashMode() === "escuchar" || flashAutoPlay); }
+
+  function renderFlashModeControls() {
+    if (!el.flashModeRead) return;
+    var mode = effectiveFlashMode();
+    el.flashModeRead.classList.toggle("active", mode === "leer");
+    el.flashModeListen.classList.toggle("active", mode === "escuchar");
+    el.flashModeListen.disabled = quietMode;
+    el.flashModeNote.textContent = t(quietMode ? "flash_mode_note_quiet" : (mode === "escuchar" ? "flash_mode_note_listen" : "flash_mode_note_read"));
+    el.flashModeNote.classList.toggle("is-warn", quietMode);
+    var locked = quietMode || mode === "escuchar";
+    el.flashAutoplay.checked = flashAutoPlayOn();
+    el.flashAutoplay.disabled = locked;
+    el.flashAutoplayLabel.classList.toggle("is-disabled", locked);
+    el.flashAutoplayNote.textContent = t(quietMode ? "flash_autoplay_note_quiet" : (mode === "escuchar" ? "flash_autoplay_note_listen" : "flash_autoplay_note"));
+    if (el.flashWordOptions) el.flashWordOptions.hidden = (!activeFlashSources.words && !activeFlashSources.phrases) || mode === "escuchar";
+  }
+
+  function setFlashMode(mode) {
+    if (mode === "escuchar" && quietMode) return;
+    flashMode = mode === "escuchar" ? "escuchar" : "leer";
+    try { localStorage.setItem(FLASH_MODE_LOCAL_KEY, flashMode); } catch (e) {}
+    renderFlashModeControls();
+  }
+
+  // Listening cards are the ordinary cards (built "palabra → definición"
+  // so every word/phrase card knows its Spanish and its meaning), turned
+  // around: the front is audio only, the back shows the Spanish written
+  // with its meaning — for verbs, the form plus which verb, person and
+  // tense it is, and the form's English.
+  function buildListenDeck() {
+    var saved = flashDirection;
+    flashDirection = "word2def";
+    var deck;
+    try { deck = buildFlashDeck(); } finally { flashDirection = saved; }
+    return deck.map(function (c) {
+      var out = Object.assign({}, c, { listen: true, frontMain: "", frontSub: "", frontSpeak: "" });
+      if (c.kind === "verb") {
+        out.audio = c.backSpeak || c.backMain;
+        out.backMeta = (c.frontMain || "") + (c.frontSub ? " · " + c.frontSub : "");
+      } else {
+        out.audio = c.frontSpeak || c.frontMain;
+        out.backMain = c.frontMain;
+        out.backSub = c.backMain && c.backMain !== "—" ? c.backMain : "";
+        out.backSpeak = out.audio;
+      }
+      return out;
+    });
+  }
+
+  // iOS only lets a page start audio from a tap; playing one silent clip on
+  // the shared <audio> element during the Empezar tap "unlocks" it, so the
+  // automatic plays that follow (after a fetch, not inside a tap) work.
+  var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+  function unlockTtsAudio() {
+    try {
+      if (!ttsAudioEl) ttsAudioEl = new Audio();
+      ttsAudioEl.src = SILENT_WAV;
+      var pr = ttsAudioEl.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    } catch (e) {}
+  }
+
+  // Plays a card's Spanish by itself. Waits briefly if an earlier clip is
+  // still being fetched; gives up quietly if the card has moved on, quiet
+  // mode is on, or the audio fails (the speaker button is still there).
+  function autoPlayFlash(text, btn, token, tries) {
+    if (!text || quietMode || token !== flashAutoToken || el.flashOverlay.hidden) return;
+    if (ttsInFlight) {
+      if ((tries || 0) < 8) setTimeout(function () { autoPlayFlash(text, btn, token, (tries || 0) + 1); }, 250);
+      return;
+    }
+    playTts(text, btn, el.flashTtsMsg, { silent: true });
+  }
+
   function startFlashcards() {
-    flashDeck = shuffleArray(buildFlashDeck());
+    if (flashAutoPlayOn()) unlockTtsAudio();
+    flashDeck = shuffleArray(effectiveFlashMode() === "escuchar" ? buildListenDeck() : buildFlashDeck());
     if (flashDeck.length === 0) {
       el.flashSetupMsg.textContent = t("flash_no_cards");
       return;
@@ -4995,6 +5137,12 @@
 
   function toggleFlashFlip() {
     el.flashCard.classList.toggle("flipped");
+    // Leer + audio automático: the back's Spanish plays as it turns over
+    // (Escuchar already played it on the front; its back has a speaker).
+    var card = flashDeck[flashIndex];
+    if (card && !card.listen && el.flashCard.classList.contains("flipped") && flashAutoPlayOn() && card.backSpeak) {
+      autoPlayFlash(card.backSpeak, el.flashBackSpeak, flashAutoToken);
+    }
   }
 
   // ================= Sabido (self-assessed "I know this one") =================
@@ -7159,6 +7307,19 @@
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
     if (card) playTts(card.frontSpeak, el.flashFrontSpeak);
+  });
+  el.flashListenBtn.addEventListener("click", function (evt) {
+    evt.stopPropagation();
+    var card = flashDeck[flashIndex];
+    if (card) playTts(card.audio, el.flashListenBtn);
+  });
+  el.flashModeRead.addEventListener("click", function () { setFlashMode("leer"); renderFlashSetup(); });
+  el.flashModeListen.addEventListener("click", function () { setFlashMode("escuchar"); renderFlashSetup(); });
+  el.flashAutoplay.addEventListener("change", function () {
+    if (el.flashAutoplay.disabled) return;
+    flashAutoPlay = el.flashAutoplay.checked;
+    try { localStorage.setItem(FLASH_AUTOPLAY_LOCAL_KEY, flashAutoPlay ? "1" : "0"); } catch (e) {}
+    renderFlashModeControls();
   });
   el.flashBackSpeak.addEventListener("click", function (evt) {
     evt.stopPropagation();

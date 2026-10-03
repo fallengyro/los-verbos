@@ -1413,6 +1413,34 @@
   .flash-prompt-sub { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--accent-deep); }
   .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
   .flash-back-badges { justify-content: center; margin-top: 4px; }
+
+  /* ---- Leer / Escuchar + audio automático (2026-10-03, from a mockup) ---- */
+  .flash-mode-options { margin: 0 0 16px; }
+  .flash-mode-toggle { max-width: 280px; margin: 0 0 8px; }
+  .flash-mode-toggle .lang-option:disabled { opacity: 0.4; cursor: default; }
+  .flash-mode-note { font-size: 13px; color: var(--ink-soft); font-style: italic; margin: 0; }
+  .flash-mode-note.is-warn { color: var(--danger); font-style: normal; }
+  .flash-autoplay-row { margin: 14px 0 8px; }
+  .flash-autoplay-note { font-size: 12.5px; color: var(--ink-soft); margin: 3px 0 0 52px; }
+  .flash-autoplay-row .switch-row.is-disabled { opacity: 0.5; cursor: default; }
+  /* Listening front: one big replay button and a hint, no text to read. */
+  .flash-listen-btn {
+    position: relative; /* containing block for .tts-active's ring */
+    width: 84px; height: 84px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--paper); color: var(--accent-deep);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .flash-listen-btn svg { width: 38px; height: 38px; }
+  .flash-listen-btn[hidden], .flash-listen-hint[hidden], #flash-back-meta[hidden] { display: none; }
+  .flash-listen-hint { font-family: "Public Sans", sans-serif; font-size: 13.5px; color: var(--ink-soft); }
+  /* Same rule as the corner speakers: the front's button must not show or
+     take taps through the back face once the card is flipped. */
+  .flash-front .flash-listen-btn { transition: visibility 0s linear 0s; }
+  .flash-card.flipped .flash-front .flash-listen-btn { visibility: hidden; pointer-events: none; transition: visibility 0s linear 0.16s; }
+  /* Listening back of a word/phrase: the meaning as a plain line under
+     the Spanish, not the italic aside style. */
+  .flash-sub.listen-def { font-style: normal; font-size: 15.5px; color: var(--ink); }
   /* The item's example sentence, small and quiet under the answer (mason
      picked it from a mockup, 2026-10-02): the list's sentence, i.e. the
      part after " / " when an example has two. It's what carries a list's
