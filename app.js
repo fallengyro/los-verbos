@@ -230,6 +230,9 @@
       flash_arrow_next_aria: "Siguiente",
       known_toggle: "Sabido",
       grade_otra: "Otra vez",
+      update_toast_text: "Hay una versión nueva de voseá.",
+      update_toast_btn: "Actualizar",
+      update_toast_later: "Más tarde",
       grade_bien: "Bien",
       grade_group_aria: "Cómo te fue con esta tarjeta",
       flash_tally: "{b} bien · {o} otra vez",
@@ -680,6 +683,9 @@
       flash_arrow_next_aria: "Next",
       known_toggle: "Known",
       grade_otra: "Again",
+      update_toast_text: "A new version of voseá is ready.",
+      update_toast_btn: "Update",
+      update_toast_later: "Later",
       grade_bien: "Got it",
       grade_group_aria: "How this card went",
       flash_tally: "{b} got it · {o} again",
@@ -8843,11 +8849,44 @@
 
   // PWA: register the service worker (app-shell caching for offline/
   // fast-load use). Feature-detected — no-ops in browsers without support.
-  if ("serviceWorker" in navigator) {
+  //
+  // "Nueva versión" (2026-10-04): the service worker serves the saved copy
+  // first and installs a new release in the background, so a new version
+  // used to show up only on the NEXT start — and an installed iPhone app
+  // often isn't restarted at all, just resumed. Now:
+  //   - the app also checks for a new version whenever it comes back to the
+  //     foreground, and every 30 minutes while open;
+  //   - when a new version has taken over (controllerchange), a small toast
+  //     offers "Actualizar", which reloads into it. Never automatic, so a
+  //     deck in progress is never yanked away (and the practice log parks
+  //     the card on screen on reload anyway — see practiceOnHide()).
+  // The first-ever install also fires controllerchange; that one is ignored.
+  function watchForAppUpdates() {
+    if (!("serviceWorker" in navigator)) return;
+    var hadController = !!navigator.serviceWorker.controller;
+    var reg = null;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController) { hadController = true; return; }
+      showUpdateToast();
+    });
+    function check() { if (reg) reg.update().catch(function () {}); }
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js").catch(function (err) {
+      navigator.serviceWorker.register("sw.js").then(function (r) { reg = r; }).catch(function (err) {
         console.warn("No se pudo registrar el service worker:", err);
       });
     });
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) check(); });
+    setInterval(check, 30 * 60 * 1000);
   }
+  function showUpdateToast() {
+    var toast = document.getElementById("update-toast");
+    if (toast) toast.hidden = false;
+  }
+  (function wireUpdateToast() {
+    var btn = document.getElementById("update-toast-btn");
+    var close = document.getElementById("update-toast-close");
+    if (btn) btn.addEventListener("click", function () { window.location.reload(); });
+    if (close) close.addEventListener("click", function () { document.getElementById("update-toast").hidden = true; });
+  })();
+  watchForAppUpdates();
 })();

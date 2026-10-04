@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<title>voseá · prueba de Hablar</title>
+<link rel="stylesheet" href="styles.css" />
+<!--
+  Hablar test page (2026-10-04). Not linked from the app on purpose: open
+  vosea.fallengyro.rocks/hablar-prueba.html on the phone (already signed in
+  to voseá in the same browser / home-screen app).
+
+  Each item: tap to record, say it, tap to stop. The recording is turned
+  into a 16 kHz WAV here, sent to the "stt" Edge Function (see
+  supabase/functions/stt/index.ts), and Azure's answer is shown in full:
+  what it heard (as Argentine Spanish), plus pronunciation scores against
+  the expected text in es-AR / es-ES / es-MX where Azure supports them.
+  Nothing is stored. "Copiar resultados" puts a text summary on the
+  clipboard to paste back to Claude.
+-->
+<style>
+  body { background: var(--paper); color: var(--ink); margin: 0; }
+  .hp { max-width: 640px; margin: 0 auto; padding: 18px 16px calc(40px + env(safe-area-inset-bottom, 0px)); }
+  .hp h1 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 28px; color: var(--accent); margin: 0; }
+  .hp .lede { color: var(--ink-soft); font-size: 14px; line-height: 1.5; margin: 6px 0 14px; }
+  .hp .who { display: flex; gap: 10px; align-items: center; margin: 0 0 6px; font-size: 14px; }
+  .hp .who input { flex: 1; min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-raised); color: var(--ink); }
+  .hp .account { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
+  .hp .warn { color: var(--danger); }
+  .item { border: 1px solid var(--line); border-radius: 14px; background: var(--paper-raised); padding: 12px 14px; margin: 0 0 10px; }
+  .item-top { display: flex; align-items: center; gap: 12px; }
+  .item-text { flex: 1; min-width: 0; }
+  .item-text .say { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 20px; }
+  .item-text .why { font-size: 12.5px; color: var(--ink-soft); }
+  .item-text input { width: 100%; box-sizing: border-box; font: inherit; font-size: 17px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); }
+  .rec { flex: none; width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); color: var(--accent-deep); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; position: relative; }
+  .rec svg { width: 26px; height: 26px; }
+  .rec.on { background: var(--danger); border-color: var(--danger); color: var(--paper); box-shadow: 0 0 0 6px color-mix(in srgb, var(--danger) 22%, transparent); }
+  .rec:disabled { opacity: 0.5; cursor: default; }
+  .rec .t { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .res { margin-top: 10px; font-size: 14px; line-height: 1.45; }
+  .res:empty { display: none; }
+  .heard { font-size: 15.5px; }
+  .heard b { font-weight: 600; }
+  .ok { color: var(--teal); font-weight: 700; }
+  .no { color: var(--danger); font-weight: 700; }
+  .alts { font-size: 12.5px; color: var(--ink-soft); }
+  .pa { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 6px; }
+  .pa-row { margin: 4px 0; }
+  .pa-row .loc { display: inline-block; min-width: 44px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft); }
+  .pa-row .big { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pa-row .small { font-size: 12.5px; color: var(--ink-soft); }
+  .pa-row .na { font-size: 12.5px; color: var(--ink-soft); font-style: italic; }
+  .words { font-size: 12.5px; color: var(--ink-soft); margin-left: 48px; }
+  .words .bad { color: var(--danger); }
+  .play { margin-top: 6px; background: none; border: 0; padding: 0; font: inherit; font-size: 13px; color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .actions { margin: 18px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .actions .btn-primary { width: 100%; }
+  #copy-msg { font-size: 13px; color: var(--ink-soft); text-align: center; min-height: 1em; }
+  #copy-fallback { width: 100%; min-height: 160px; box-sizing: border-box; font: 12px "JetBrains Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="hp">
+  <h1>voseá · prueba de Hablar</h1>
+  <p class="lede">Tocá el micrófono, decí la palabra como la dirías normalmente y tocá de nuevo para parar (corta solo a los 6 segundos). Vas a ver qué entendió Azure y cómo puntúa la pronunciación. No se guarda nada. Al final, «Copiar resultados» y pegáselos a Claude.</p>
+  <div class="who"><label for="who">¿Quién habla?</label><input id="who" type="text" placeholder="ej. mason" autocomplete="off" /></div>
+  <p class="account" id="account">Comprobando la sesión…</p>
+  <div id="items"></div>
+  <div class="actions">
+    <button type="button" class="btn-primary" id="copy-btn">Copiar resultados</button>
+    <p id="copy-msg"></p>
+    <textarea id="copy-fallback" hidden readonly></textarea>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  "use strict";
+  // What each item checks. Rioplatense features first: ll/y as "sh"/"zh",
+  // aspirated or dropped s, voseo stress, then everyday app vocabulary,
+  // very short words (the hardest case for recognition) and a phrase.
+  var ITEMS = [
+    ["yo", "ll/y: «sho»"],
+    ["llamar", "ll: «shamar»"],
+    ["calle", "ll: «cashe»"],
+    ["ayer", "y entre vocales"],
+    ["lluvia", "ll al principio"],
+    ["pollo", "ll en el medio"],
+    ["vos sos", "voseo"],
+    ["¿Qué hacés?", "voseo, acento final"],
+    ["tenés", "voseo, acento final"],
+    ["decime", "imperativo de vos"],
+    ["vení", "imperativo de vos"],
+    ["las mismas cosas", "s aspirada o muda"],
+    ["despachamos", "verbo conjugado"],
+    ["cabotaje", "vocabulario del aeropuerto"],
+    ["valija", "j"],
+    ["demorado", "d suave entre vocales"],
+    ["¿Cuánto sale?", "frase corta"],
+    ["mesa", "palabra corta"],
+    ["pibe", "lunfardo"],
+    ["laburo", "lunfardo"]
+  ];
+  var MAX_MS = 6000;
+  var MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
+  var STOP = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>';
+
+  var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var results = {};    // index -> { text, data, ms } for "Copiar resultados"
+  var recording = null; // the one recording in progress
+
+  var whoEl = document.getElementById("who");
+  try { whoEl.value = localStorage.getItem("iv-hablar-who") || ""; } catch (e) {}
+  whoEl.addEventListener("input", function () { try { localStorage.setItem("iv-hablar-who", whoEl.value); } catch (e) {} });
+
+  client.auth.getSession().then(function (res) {
+    var s = res.data && res.data.session;
+    var acc = document.getElementById("account");
+    if (s) acc.textContent = "Sesión: " + (s.user.email || "iniciada") + ".";
+    else { acc.innerHTML = ""; acc.appendChild(document.createTextNode("No hay sesión. Abrí voseá en este mismo navegador, iniciá sesión y volvé a esta página.")); acc.className = "account warn"; }
+  });
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    var acc2 = document.getElementById("account");
+    acc2.textContent = "Este navegador no permite grabar audio desde una página web.";
+    acc2.className = "account warn";
+  }
+
+  // ---- normalising + matching ----
+  function norm(s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/[¿?¡!.,;:«»"()]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function matches(expected, heard) {
+    var e = norm(expected), h = norm(heard);
+    if (!h) return false;
+    if (e === h) return true;
+    // "vos tenés" for "tenés", or a trailing filler — the expected words in order
+    return (" " + h + " ").indexOf(" " + e + " ") !== -1;
+  }
+
+  // ---- recording → 16 kHz mono WAV ----
+  function encodeWav(samples, rate) {
+    var buf = new ArrayBuffer(44 + samples.length * 2);
+    var v = new DataView(buf);
+    function str(o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); str(8, "WAVE");
+    str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    str(36, "data"); v.setUint32(40, samples.length * 2, true);
+    for (var i = 0; i < samples.length; i++) {
+      var x = Math.max(-1, Math.min(1, samples[i]));
+      v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true);
+    }
+    return new Uint8Array(buf);
+  }
+  function toWav16k(blob) {
+    return blob.arrayBuffer().then(function (ab) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AC();
+      return new Promise(function (resolve, reject) { ctx.decodeAudioData(ab, resolve, reject); }).then(function (decoded) {
+        try { ctx.close(); } catch (e) {}
+        var rate = 16000;
+        var off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * rate)), rate);
+        var src = off.createBufferSource();
+        src.buffer = decoded;
+        src.connect(off.destination);
+        src.start();
+        return off.startRendering().then(function (rendered) { return encodeWav(rendered.getChannelData(0), rate); });
+      });
+    });
+  }
+  function bytesToBase64(bytes) {
+    var bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+
+  function startRecording(idx, btn, onDone) {
+    navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (stream) {
+      var chunks = [];
+      var mr = new MediaRecorder(stream);
+      var started = Date.now();
+      var tick = setInterval(function () { setTimer(btn, ((Date.now() - started) / 1000).toFixed(1) + " s"); }, 100);
+      var auto = setTimeout(stop, MAX_MS);
+      function stop() { if (mr.state !== "inactive") mr.stop(); }
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = function () {
+        clearInterval(tick); clearTimeout(auto);
+        stream.getTracks().forEach(function (tr) { tr.stop(); });
+        recording = null;
+        btn.classList.remove("on"); btn.innerHTML = MIC; setTimer(btn, "");
+        onDone(new Blob(chunks, { type: mr.mimeType || "audio/webm" }), Date.now() - started);
+      };
+      recording = { idx: idx, stop: stop };
+      btn.classList.add("on"); btn.innerHTML = STOP; setTimer(btn, "0.0 s");
+      mr.start();
+    }).catch(function (err) {
+      showError(idx, "No se pudo usar el micrófono: " + (err && err.message ? err.message : err));
+    });
+  }
+  function setTimer(btn, text) {
+    var t = btn.querySelector(".t");
+    if (!t) { t = document.createElement("span"); t.className = "t"; btn.appendChild(t); }
+    t.textContent = text;
+  }
+
+  // ---- results ----
+  function resEl(idx) { return document.querySelector('.item[data-idx="' + idx + '"] .res'); }
+  function showError(idx, msg) { var r = resEl(idx); r.innerHTML = ""; var p = document.createElement("p"); p.className = "no"; p.textContent = msg; r.appendChild(p); }
+
+  function render(idx, text, data, audioUrl) {
+    var r = resEl(idx);
+    r.innerHTML = "";
+    var h = data.heard || {};
+    var heardText = h.lexical || h.display || "";
+    var p = document.createElement("div");
+    p.className = "heard";
+    if (h.ok) {
+      p.innerHTML = "Escuché: <b></b> ";
+      p.querySelector("b").textContent = "«" + (h.display || heardText) + "»";
+      var mark = document.createElement("span");
+      var good = matches(text, heardText);
+      mark.className = good ? "ok" : "no";
+      mark.textContent = good ? "✓ coincide" : "✗ no coincide";
+      p.appendChild(mark);
+    } else {
+      p.textContent = "No entendió nada (" + (h.recognitionStatus || h.error || "error") + ").";
+      p.className = "heard no";
+    }
+    r.appendChild(p);
+    if (h.alternatives && h.alternatives.length) {
+      var alts = document.createElement("div");
+      alts.className = "alts";
+      alts.textContent = "También pensó en: " + h.alternatives.join(" · ");
+      r.appendChild(alts);
+    }
+    var pa = document.createElement("div");
+    pa.className = "pa";
+    (data.assessments || []).forEach(function (a) {
+      var row = document.createElement("div");
+      row.className = "pa-row";
+      var loc = document.createElement("span"); loc.className = "loc"; loc.textContent = a.locale; row.appendChild(loc);
+      if (!a.ok || !a.scores || a.scores.pron == null) {
+        var na = document.createElement("span"); na.className = "na";
+        na.textContent = a.ok ? "sin puntaje" : "no disponible" + (a.error ? " (" + String(a.error).slice(0, 80) + ")" : "");
+        row.appendChild(na);
+        pa.appendChild(row);
+        return;
+      }
+      var big = document.createElement("span"); big.className = "big"; big.textContent = Math.round(a.scores.pron) + " ";
+      row.appendChild(big);
+      var small = document.createElement("span"); small.className = "small";
+      small.textContent = "precisión " + Math.round(a.scores.accuracy) + " · fluidez " + Math.round(a.scores.fluency) + " · completo " + Math.round(a.scores.completeness) + (a.lexical ? " · oyó «" + a.lexical + "»" : "");
+      row.appendChild(small);
+      pa.appendChild(row);
+      if (a.words && a.words.length) {
+        var w = document.createElement("div"); w.className = "words";
+        a.words.forEach(function (wd, i) {
+          var s = document.createElement("span");
+          var low = (wd.phonemes || []).filter(function (ph) { return ph.accuracy != null && ph.accuracy < 60; }).map(function (ph) { return ph.p + " " + Math.round(ph.accuracy); });
+          s.textContent = (i ? " · " : "") + wd.word + " " + (wd.accuracy == null ? "—" : Math.round(wd.accuracy)) + (wd.error && wd.error !== "None" ? " (" + wd.error + ")" : "") + (low.length ? " [" + low.join(", ") + "]" : "");
+          if (wd.error && wd.error !== "None") s.className = "bad";
+          w.appendChild(s);
+        });
+        pa.appendChild(w);
+      }
+    });
+    r.appendChild(pa);
+    if (audioUrl) {
+      var play = document.createElement("button");
+      play.type = "button"; play.className = "play"; play.textContent = "▶ Escuchar mi grabación";
+      play.addEventListener("click", function () { new Audio(audioUrl).play().catch(function () {}); });
+      r.appendChild(play);
+    }
+  }
+
+  function analyse(idx, text, blob, ms, btn) {
+    var r = resEl(idx);
+    r.textContent = "Analizando…";
+    btn.disabled = true;
+    var audioUrl = URL.createObjectURL(blob);
+    toWav16k(blob).then(function (wav) {
+      return client.functions.invoke("stt", { body: { text: text, audio: bytesToBase64(wav) } });
+    }).then(function (res) {
+      btn.disabled = false;
+      if (res.error) {
+        var msg = res.error.message || String(res.error);
+        if (/not found|404/i.test(msg)) msg += " — ¿ya se publicó la función «stt» en Supabase?";
+        showError(idx, "Error: " + msg);
+        return;
+      }
+      results[idx] = { text: text, data: res.data, ms: ms };
+      render(idx, text, res.data, audioUrl);
+    }).catch(function (err) {
+      btn.disabled = false;
+      showError(idx, "Error: " + (err && err.message ? err.message : err));
+    });
+  }
+
+  // ---- the list ----
+  var list = document.getElementById("items");
+  ITEMS.concat([[null, "tu propia palabra o frase"]]).forEach(function (it, idx) {
+    var box = document.createElement("div");
+    box.className = "item";
+    box.setAttribute("data-idx", String(idx));
+    var top = document.createElement("div"); top.className = "item-top";
+    var txt = document.createElement("div"); txt.className = "item-text";
+    var input = null;
+    if (it[0] === null) {
+      input = document.createElement("input");
+      input.type = "text"; input.placeholder = "Escribí algo para decir…"; input.setAttribute("aria-label", "Tu propia palabra o frase");
+      txt.appendChild(input);
+    } else {
+      var say = document.createElement("div"); say.className = "say"; say.textContent = it[0]; txt.appendChild(say);
+    }
+    var why = document.createElement("div"); why.className = "why"; why.textContent = it[1]; txt.appendChild(why);
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "rec"; btn.innerHTML = MIC;
+    btn.setAttribute("aria-label", "Grabar");
+    btn.addEventListener("click", function () {
+      if (recording && recording.idx === idx) { recording.stop(); return; }
+      if (recording) return; // one at a time
+      var text = input ? input.value.trim() : it[0];
+      if (!text) { showError(idx, "Escribí primero qué vas a decir."); return; }
+      startRecording(idx, btn, function (blob, ms) { analyse(idx, text, blob, ms, btn); });
+    });
+    top.appendChild(txt); top.appendChild(btn);
+    box.appendChild(top);
+    var res = document.createElement("div"); res.className = "res"; res.setAttribute("aria-live", "polite");
+    box.appendChild(res);
+    list.appendChild(box);
+  });
+
+  // ---- "Copiar resultados" ----
+  function summary() {
+    var lines = ["voseá · prueba de Hablar", "Quién: " + (whoEl.value || "?") + " · " + new Date().toLocaleString("es-AR") + " · " + navigator.userAgent, ""];
+    Object.keys(results).sort(function (a, b) { return a - b; }).forEach(function (k) {
+      var x = results[k], h = x.data.heard || {};
+      var heard = h.ok ? (h.lexical || h.display) : "(" + (h.recognitionStatus || h.error || "nada") + ")";
+      lines.push("«" + x.text + "» → oyó «" + heard + "» " + (h.ok && matches(x.text, h.lexical || h.display) ? "OK" : "NO") +
+        (h.alternatives && h.alternatives.length ? " | alt: " + h.alternatives.join(" / ") : "") + " | " + (x.ms / 1000).toFixed(1) + " s");
+      (x.data.assessments || []).forEach(function (a) {
+        if (!a.ok || !a.scores || a.scores.pron == null) { lines.push("   " + a.locale + ": n/d" + (a.error ? " (" + String(a.error).slice(0, 60).replace(/\s+/g, " ") + ")" : "")); return; }
+        lines.push("   " + a.locale + ": " + Math.round(a.scores.pron) + " (prec " + Math.round(a.scores.accuracy) + ", flu " + Math.round(a.scores.fluency) + ", comp " + Math.round(a.scores.completeness) + ") oyó «" + a.lexical + "» " +
+          (a.words || []).map(function (w) {
+            var low = (w.phonemes || []).filter(function (ph) { return ph.accuracy != null && ph.accuracy < 60; }).map(function (ph) { return ph.p + Math.round(ph.accuracy); });
+            return w.word + ":" + (w.accuracy == null ? "-" : Math.round(w.accuracy)) + (w.error !== "None" ? "/" + w.error : "") + (low.length ? "[" + low.join(",") + "]" : "");
+          }).join(" "));
+      });
+    });
+    return lines.join("\n");
+  }
+  document.getElementById("copy-btn").addEventListener("click", function () {
+    var text = summary();
+    var msg = document.getElementById("copy-msg");
+    var fb = document.getElementById("copy-fallback");
+    if (!Object.keys(results).length) { msg.textContent = "Todavía no grabaste nada."; return; }
+    (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
+      msg.textContent = "Copiado. Pegalo en el chat con Claude.";
+      fb.hidden = true;
+    }, function () {
+      msg.textContent = "No se pudo copiar solo: seleccioná el texto de abajo y copialo.";
+      fb.hidden = false; fb.value = text; fb.focus(); fb.select();
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1005,6 +1005,14 @@
   </div>
 </div>
 
+<!-- "Nueva versión" (2026-10-04): shown when a newer app version has just
+     been installed in the background (see app.js's watchForAppUpdates()). -->
+<div class="quiet-toast update-toast" id="update-toast" role="status" aria-live="polite" hidden>
+  <span data-i18n="update_toast_text">Hay una versión nueva de voseá.</span>
+  <button type="button" class="quiet-toast-btn" id="update-toast-btn" data-i18n="update_toast_btn">Actualizar</button>
+  <button type="button" class="update-toast-close" id="update-toast-close" data-i18n-aria-label="update_toast_later" aria-label="Más tarde">&times;</button>
+</div>
+
 <div class="quiet-toast" id="quiet-toast" role="status" aria-live="polite" hidden>
   <span id="quiet-toast-text" data-i18n="quiet_toast_text">El modo silencio está activado.</span>
   <button type="button" class="quiet-toast-btn" id="quiet-toast-settings" data-i18n="quiet_toast_settings">Configuración</button>

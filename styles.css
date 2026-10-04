@@ -720,6 +720,12 @@
     font-size: 14px; box-shadow: 0 4px 18px var(--shadow);
   }
   .quiet-toast[hidden] { display: none; }
+  /* Sits above the flashcard overlay (z 100) and the quiet toast. */
+  .update-toast { z-index: 260; }
+  .update-toast-close {
+    background: none; border: 0; color: inherit; font: inherit; font-size: 20px; line-height: 1;
+    padding: 2px 4px; margin-left: -4px; cursor: pointer; opacity: 0.75;
+  }
   .quiet-toast-btn {
     background: transparent; color: inherit; font: inherit; font-weight: 600;
     border: 1px solid currentColor; border-radius: 6px; padding: 5px 10px;

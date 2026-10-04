@@ -12,7 +12,7 @@
 // from cache immediately if we have it (fast, works offline), and in the
 // background fetch a fresh copy to store for next time.
 
-var CACHE_NAME = "iv-shell-v62";
+var CACHE_NAME = "iv-shell-v63";
 
 var SHELL_FILES = [
   "./",
@@ -35,7 +35,11 @@ self.addEventListener("install", function (event) {
       // skipped instead of taking the rest of the app shell down with it.
       return Promise.all(
         SHELL_FILES.map(function (url) {
-          return cache.add(url).catch(function (err) {
+          // cache: "reload" skips the browser's own HTTP cache, so a new
+          // version never precaches a stale copy of a file the browser
+          // fetched a few minutes earlier (GitHub Pages lets browsers keep
+          // files for up to 10 minutes).
+          return cache.add(new Request(url, { cache: "reload" })).catch(function (err) {
             console.warn("No se pudo precachear " + url + ":", err);
           });
         })
