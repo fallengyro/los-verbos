@@ -1025,3 +1025,11 @@ create policy "delete own practice" on public.practice_log
 
 create index if not exists practice_log_user_shown_idx on public.practice_log (user_id, shown_at desc);
 create index if not exists practice_log_user_item_idx on public.practice_log (user_id, item_kind, item_key);
+
+-- Hablar (2026-10-04): details of a spoken answer, on rows with
+-- mode = 'hablar' — what Azure heard, its es-AR pronunciation scores, the
+-- grade the app suggested and by which rule, recording length and wait.
+-- Combined with `grade` (what you ended up with) and `grade_auto` (whether
+-- you left the suggestion as it was), this is what the Bien/Otra vez
+-- thresholds get re-tuned from. Never contains audio.
+alter table public.practice_log add column if not exists speech jsonb;

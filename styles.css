@@ -1444,6 +1444,28 @@
      take taps through the back face once the card is flipped. */
   .flash-front .flash-listen-btn { transition: visibility 0s linear 0s; }
   .flash-card.flipped .flash-front .flash-listen-btn { visibility: hidden; pointer-events: none; transition: visibility 0s linear 0.16s; }
+  /* Hablar (2026-10-04): the front's mic. Same look as the listening
+     button; red while recording (mic glyph swaps to a stop square), a slow
+     pulse while the recording is being checked. */
+  .flash-speak-mic { margin-top: 6px; }
+  .flash-speak-mic .stop-glyph { display: none; }
+  .flash-speak-mic.is-recording { background: var(--danger); border-color: var(--danger); color: var(--paper); box-shadow: 0 0 0 7px color-mix(in srgb, var(--danger) 22%, transparent); }
+  .flash-speak-mic.is-recording .mic-glyph { display: none; }
+  .flash-speak-mic.is-recording .stop-glyph { display: inline; }
+  .flash-speak-mic.is-busy { animation: speak-busy 1s ease-in-out infinite; cursor: default; }
+  @keyframes speak-busy { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  @media (prefers-reduced-motion: reduce) { .flash-speak-mic.is-busy { animation: none; opacity: 0.6; } }
+  .flash-speak-mic .speak-timer { position: absolute; bottom: -20px; left: 0; right: 0; text-align: center; font-family: "Public Sans", sans-serif; font-size: 11.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .flash-speak-mic.is-recording .speak-timer { color: var(--ink-soft); }
+  .flash-speak-hint { margin-top: 24px; text-align: center; }
+  .flash-speak-hint.is-warn { color: var(--danger); }
+  .flash-speak-hint[hidden], .flash-heard[hidden] { display: none; }
+  .flash-card.flipped .flash-front .flash-speak-hint { visibility: hidden; }
+  /* the back's "Escuché «…» · coincide" line */
+  .flash-heard { font-family: "Public Sans", sans-serif; font-size: 14px; color: var(--ink-soft); text-align: center; max-width: 90%; }
+  .flash-heard.is-bien::before { content: "\2713\00a0"; color: var(--teal); font-weight: 700; }
+  .flash-heard.is-otra::before { content: "\2260\00a0"; color: var(--danger); font-weight: 700; }
+  .flash-heard.is-none { font-style: italic; }
   /* Listening back of a word/phrase: the meaning as a plain line under
      the Spanish, not the italic aside style. */
   .flash-sub.listen-def { font-style: normal; font-size: 15.5px; color: var(--ink); }

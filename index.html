@@ -657,6 +657,7 @@
         <div class="lang-toggle flash-mode-toggle">
           <button type="button" class="lang-option" id="flash-mode-read" data-i18n="flash_mode_read">Leer</button>
           <button type="button" class="lang-option" id="flash-mode-listen" data-i18n="flash_mode_listen">Escuchar</button>
+          <button type="button" class="lang-option" id="flash-mode-speak" data-i18n="flash_mode_speak">Hablar</button>
         </div>
         <p class="flash-mode-note" id="flash-mode-note"></p>
       </div>
@@ -963,6 +964,9 @@
         <!-- Escuchar mode: the front is audio only. -->
         <button type="button" class="flash-listen-btn" id="flash-listen-btn" data-i18n-aria-label="flash_listen_aria" aria-label="Escuchar otra vez" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <div class="flash-listen-hint" id="flash-listen-hint" data-i18n="flash_listen_hint" hidden>Escuchá y pensá qué es</div>
+        <!-- Hablar mode (2026-10-04): say the answer; see app.js's "Hablar" section. -->
+        <button type="button" class="flash-listen-btn flash-speak-mic" id="flash-speak-mic" data-i18n-aria-label="speak_mic_aria" aria-label="Grabar tu respuesta" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="mic-glyph"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></g><g class="stop-glyph"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></g></svg><span class="speak-timer" id="flash-speak-timer"></span></button>
+        <div class="flash-listen-hint flash-speak-hint" id="flash-speak-hint" hidden></div>
       </div>
       <div class="flash-face flash-back">
         <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
@@ -970,6 +974,7 @@
         <div class="flash-prompt-sub" id="flash-back-meta" hidden></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
+        <div class="flash-heard" id="flash-back-heard" hidden></div>
         <div class="flash-example" id="flash-back-example"></div>
       </div>
     </div>

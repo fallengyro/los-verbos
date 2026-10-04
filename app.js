@@ -230,6 +230,24 @@
       flash_arrow_next_aria: "Siguiente",
       known_toggle: "Sabido",
       grade_otra: "Otra vez",
+      flash_mode_speak: "Hablar",
+      flash_mode_note_speak: "Ves el significado y lo decís en español: tocá el micrófono, hablá y tocá de nuevo. La tarjeta se da vuelta sola con lo que escuchó y una nota sugerida, que podés cambiar.",
+      flash_autoplay_note_speak: "Si está prendido, la respuesta suena cuando la tarjeta se da vuelta.",
+      speak_unsupported: "Este navegador no puede grabar audio, así que «Hablar» no funciona acá.",
+      speak_mic_aria: "Grabar tu respuesta",
+      speak_stop_aria: "Terminar de grabar",
+      speak_hint: "Tocá el micrófono y decilo en español",
+      speak_recording: "Escuchando… tocá para terminar",
+      speak_analyzing: "Analizando…",
+      speak_again: "Tocá el micrófono para intentar de nuevo",
+      speak_mic_denied: "No hay permiso para el micrófono. Habilitalo en la configuración del navegador.",
+      speak_mic_error: "No se pudo usar el micrófono.",
+      speak_heard: "Escuché «{text}»",
+      speak_why_match: "coincide",
+      speak_why_score: "pronunciación {n}",
+      speak_why_no: "no coincide",
+      speak_nothing: "No te escuché bien — marcalo vos.",
+      speak_error: "No se pudo analizar — marcalo vos.",
       update_toast_text: "Hay una versión nueva de voseá.",
       update_toast_btn: "Actualizar",
       update_toast_later: "Más tarde",
@@ -372,7 +390,7 @@
       flash_mode_listen: "Escuchar",
       flash_mode_note_read: "Leés el frente y das vuelta para ver la respuesta.",
       flash_mode_note_listen: "El frente es solo audio: escuchás la palabra (o la forma del verbo) y das vuelta para verla escrita, con su significado.",
-      flash_mode_note_quiet: "El modo silencio está activado, así que «Escuchar» no está disponible. Podés desactivarlo en Configuración.",
+      flash_mode_note_quiet: "El modo silencio está activado, así que «Escuchar» y «Hablar» no están disponibles. Podés desactivarlo en Configuración.",
       flash_autoplay: "Reproducir el audio solo",
       flash_autoplay_note: "El español suena apenas aparece (al frente, o al dar vuelta).",
       flash_autoplay_note_listen: "En «Escuchar» siempre suena.",
@@ -683,6 +701,24 @@
       flash_arrow_next_aria: "Next",
       known_toggle: "Known",
       grade_otra: "Again",
+      flash_mode_speak: "Speak",
+      flash_mode_note_speak: "You see the meaning and say it in Spanish: tap the mic, speak, tap again. The card turns over by itself with what it heard and a suggested grade you can change.",
+      flash_autoplay_note_speak: "When on, the answer plays as the card turns over.",
+      speak_unsupported: "This browser can't record audio, so Speak won't work here.",
+      speak_mic_aria: "Record your answer",
+      speak_stop_aria: "Stop recording",
+      speak_hint: "Tap the mic and say it in Spanish",
+      speak_recording: "Listening… tap to finish",
+      speak_analyzing: "Checking…",
+      speak_again: "Tap the mic to try again",
+      speak_mic_denied: "No microphone permission. Allow it in your browser settings.",
+      speak_mic_error: "Couldn't use the microphone.",
+      speak_heard: "Heard «{text}»",
+      speak_why_match: "matches",
+      speak_why_score: "pronunciation {n}",
+      speak_why_no: "doesn't match",
+      speak_nothing: "Didn't catch that — grade it yourself.",
+      speak_error: "Couldn't check it — grade it yourself.",
       update_toast_text: "A new version of voseá is ready.",
       update_toast_btn: "Update",
       update_toast_later: "Later",
@@ -825,7 +861,7 @@
       flash_mode_listen: "Listen",
       flash_mode_note_read: "Read the front, then flip for the answer.",
       flash_mode_note_listen: "The front is audio only: listen to the word (or the verb form), then flip to see it written, with its meaning.",
-      flash_mode_note_quiet: "Quiet mode is on, so Listen isn't available. You can turn it off in Settings.",
+      flash_mode_note_quiet: "Quiet mode is on, so Listen and Speak aren't available. You can turn it off in Settings.",
       flash_autoplay: "Play the audio automatically",
       flash_autoplay_note: "The Spanish plays as soon as it appears (on the front, or when you flip).",
       flash_autoplay_note_listen: "In Listen it always plays.",
@@ -1908,7 +1944,7 @@
   // effectiveFlashMode().
   var FLASH_MODE_LOCAL_KEY = "iv-flash-mode";
   var FLASH_AUTOPLAY_LOCAL_KEY = "iv-flash-autoplay";
-  var flashMode = (function () { try { return localStorage.getItem(FLASH_MODE_LOCAL_KEY) === "escuchar" ? "escuchar" : "leer"; } catch (e) { return "leer"; } })();
+  var flashMode = (function () { try { var m = localStorage.getItem(FLASH_MODE_LOCAL_KEY); return m === "escuchar" || m === "hablar" ? m : "leer"; } catch (e) { return "leer"; } })();
   var flashAutoPlay = (function () { try { return localStorage.getItem(FLASH_AUTOPLAY_LOCAL_KEY) === "1"; } catch (e) { return false; } })();
   var flashAutoToken = 0; // bumps on every card render, so a late auto-play for an old card is dropped
   var flashDeck = [];
@@ -2132,6 +2168,7 @@
     flashBackMeta: document.getElementById("flash-back-meta"),
     flashModeRead: document.getElementById("flash-mode-read"),
     flashModeListen: document.getElementById("flash-mode-listen"),
+    flashModeSpeak: document.getElementById("flash-mode-speak"),
     flashModeNote: document.getElementById("flash-mode-note"),
     flashAutoplay: document.getElementById("flash-autoplay"),
     flashAutoplayLabel: document.getElementById("flash-autoplay-label"),
@@ -2141,6 +2178,10 @@
     flashBackSpeak: document.getElementById("flash-back-speak"),
     flashBackBadges: document.getElementById("flash-back-badges"),
     flashBackExample: document.getElementById("flash-back-example"),
+    flashBackHeard: document.getElementById("flash-back-heard"),
+    flashSpeakMic: document.getElementById("flash-speak-mic"),
+    flashSpeakHint: document.getElementById("flash-speak-hint"),
+    flashSpeakTimer: document.getElementById("flash-speak-timer"),
     flashKnownToggle: document.getElementById("flash-known-toggle"),
     flashGrade: document.getElementById("flash-grade"),
     flashGradeOtra: document.getElementById("flash-grade-otra"),
@@ -5270,6 +5311,8 @@
     setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
     renderFlashGrade(card);
     renderFlashTally();
+    renderSpeakState();
+    renderHeard(card);
     el.flashTtsMsg.textContent = "";
     // Quietly start downloading both faces' audio as soon as this card
     // becomes the current one — most cards sit on screen for a moment
@@ -5289,7 +5332,7 @@
     var token = ++flashAutoToken;
     if (listen) {
       setTimeout(function () { autoPlayFlash(card.audio, el.flashListenBtn, token); }, 200);
-    } else if (flashAutoPlayOn() && card.frontSpeak) {
+    } else if (flashAutoPlayOn() && card.frontSpeak && !card.speak) {
       setTimeout(function () { autoPlayFlash(card.frontSpeak, el.flashFrontSpeak, token); }, 200);
     }
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
@@ -5356,19 +5399,23 @@
     el.flashModeRead.classList.toggle("active", mode === "leer");
     el.flashModeListen.classList.toggle("active", mode === "escuchar");
     el.flashModeListen.disabled = quietMode;
-    el.flashModeNote.textContent = t(quietMode ? "flash_mode_note_quiet" : (mode === "escuchar" ? "flash_mode_note_listen" : "flash_mode_note_read"));
+    if (el.flashModeSpeak) {
+      el.flashModeSpeak.classList.toggle("active", mode === "hablar");
+      el.flashModeSpeak.disabled = quietMode;
+    }
+    el.flashModeNote.textContent = t(quietMode ? "flash_mode_note_quiet" : (mode === "escuchar" ? "flash_mode_note_listen" : (mode === "hablar" ? (hablarSupported() ? "flash_mode_note_speak" : "speak_unsupported") : "flash_mode_note_read")));
     el.flashModeNote.classList.toggle("is-warn", quietMode);
     var locked = quietMode || mode === "escuchar";
     el.flashAutoplay.checked = flashAutoPlayOn();
     el.flashAutoplay.disabled = locked;
     el.flashAutoplayLabel.classList.toggle("is-disabled", locked);
-    el.flashAutoplayNote.textContent = t(quietMode ? "flash_autoplay_note_quiet" : (mode === "escuchar" ? "flash_autoplay_note_listen" : "flash_autoplay_note"));
-    if (el.flashWordOptions) el.flashWordOptions.hidden = (!activeFlashSources.words && !activeFlashSources.phrases) || mode === "escuchar";
+    el.flashAutoplayNote.textContent = t(quietMode ? "flash_autoplay_note_quiet" : (mode === "escuchar" ? "flash_autoplay_note_listen" : (mode === "hablar" ? "flash_autoplay_note_speak" : "flash_autoplay_note")));
+    if (el.flashWordOptions) el.flashWordOptions.hidden = (!activeFlashSources.words && !activeFlashSources.phrases) || mode === "escuchar" || mode === "hablar";
   }
 
   function setFlashMode(mode) {
-    if (mode === "escuchar" && quietMode) return;
-    flashMode = mode === "escuchar" ? "escuchar" : "leer";
+    if ((mode === "escuchar" || mode === "hablar") && quietMode) return;
+    flashMode = mode === "escuchar" || mode === "hablar" ? mode : "leer";
     try { localStorage.setItem(FLASH_MODE_LOCAL_KEY, flashMode); } catch (e) {}
     renderFlashModeControls();
   }
@@ -5428,7 +5475,8 @@
   }
 
   function startFlashcards() {
-    var cards = effectiveFlashMode() === "escuchar" ? buildListenDeck() : buildFlashDeck();
+    var mode = effectiveFlashMode();
+    var cards = mode === "escuchar" ? buildListenDeck() : (mode === "hablar" ? buildSpeakDeck() : buildFlashDeck());
     if (cards.length === 0) {
       el.flashSetupMsg.textContent = t("flash_no_cards");
       return;
@@ -5445,6 +5493,7 @@
     if (!cards.length) return false;
     flashDeckSource = source || "setup";
     if (flashAutoPlayOn()) unlockTtsAudio();
+    if (cards.some(function (c) { return c.speak; })) hablarPrepareMic(); // inside the tap, so iOS asks for the mic here
     flashDeck = shuffleArray(cards);
     flashIndex = 0;
     el.flashOverlay.classList.remove("is-done");
@@ -5460,6 +5509,7 @@
 
   function nextFlashCard() {
     if (!flashDeck.length) return;
+    hablarAbort();
     practiceCloseView();
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
@@ -5481,6 +5531,7 @@
 
   function prevFlashCard() {
     if (flashIndex <= 0) return;
+    hablarAbort();
     practiceCloseView();
     flashIndex--;
     renderFlashCard();
@@ -5488,6 +5539,7 @@
   }
 
   function closeFlashcards() {
+    hablarRelease();
     practiceCloseView();
     practiceSession = null;
     practiceFlush();
@@ -5497,6 +5549,7 @@
   }
 
   function toggleFlashFlip() {
+    if (hablarRec && hablarRec.card === flashDeck[flashIndex]) { hablarStop(); return; }
     el.flashCard.classList.toggle("flipped");
     practiceNoteFlip(el.flashCard.classList.contains("flipped"));
     // Leer + audio automático: the back's Spanish plays as it turns over
@@ -5582,7 +5635,7 @@
   function practiceStartSession() {
     practiceSession = { id: practiceUuid(), pass: 1, position: 0, seen: {} };
     practiceTallyBase = { bien: 0, otra: 0 };
-    flashDeck.forEach(function (c) { c._grade = null; });
+    flashDeck.forEach(function (c) { c._grade = null; c._gradeTouched = false; c._speech = null; });
     practiceView = null;
   }
 
@@ -5592,6 +5645,8 @@
     flashDeck.forEach(function (c) {
       if (c._grade) practiceTallyBase[c._grade]++;
       c._grade = null;
+      c._gradeTouched = false;
+      c._speech = null;
     });
     practiceSession.pass++;
     practiceSession.seen = {};
@@ -5615,8 +5670,8 @@
         item_id: findItemId(card.kind, card.data),
         item_key: practiceNorm(d.infinitive || d.word || d.phrase),
         form_key: card.formKey || null,
-        mode: card.listen ? "escuchar" : "leer",
-        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : flashDirection),
+        mode: card.listen ? "escuchar" : (card.speak ? "hablar" : "leer"),
+        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : (card.speak ? "def2word" : flashDirection)),
         pass: practiceSession.pass,
         position: practiceSession.position,
         revisit: !!practiceSession.seen[key],
@@ -5659,6 +5714,8 @@
     var v = practiceView;
     practiceTick();
     v.row.grade = v.card._grade || null;
+    // Hablar: did the final grade come from the automatic suggestion, untouched?
+    if (v.row.speech) v.row.grade_auto = !!(v.row.speech.auto_grade && v.row.grade === v.row.speech.auto_grade && !v.card._gradeTouched);
     v.row.known_after = cardShowsKnown(v.card);
     if (!v.row.user_id && currentUser) v.row.user_id = currentUser.id;
     return v.row;
@@ -5678,7 +5735,11 @@
     if (practiceFlushing || !currentUser || !practiceQueue.length) return;
     var mine = practiceQueue.filter(function (r) { return r.user_id === currentUser.id; });
     if (!mine.length) return;
-    var batch = mine.slice(0, PRACTICE_BATCH);
+    // Rows without Hablar details go first, in their own batch: if the
+    // practice_log.speech column isn't there yet (pending SQL not run),
+    // only the Hablar rows wait.
+    var plain = mine.filter(function (r) { return !r.speech; });
+    var batch = (plain.length ? plain : mine).slice(0, PRACTICE_BATCH);
     practiceFlushing = true;
     supabaseClient.from("practice_log").upsert(batch, { onConflict: "id", ignoreDuplicates: true }).then(function (res) {
       practiceFlushing = false;
@@ -5723,6 +5784,7 @@
     var card = flashDeck[flashIndex];
     if (!card) return;
     card._grade = card._grade === grade ? null : grade; // tapping the lit one clears it
+    card._gradeTouched = true;
     if (practiceView && practiceView.card === card) practiceView.row.grade_changes++;
     renderFlashGrade(card);
     renderFlashTally();
@@ -5764,6 +5826,267 @@
   // Test/debug hook: what's waiting to be sent.
   window.vosePracticeQueue = function () { return practiceQueue.slice(); };
 
+
+
+  // ================= Hablar (2026-10-04) =================
+  // The third "Cómo practicar" mode: the front shows the meaning (or the
+  // verb + person + tense), you tap the mic and SAY the Spanish, and the
+  // card turns over by itself showing what Azure heard and a suggested
+  // Bien / Otra vez in the grade switch — which you can always change.
+  //
+  // The grading rule comes from the two test rounds on hablar-prueba.html
+  // (64 recordings, mason + Alexa; see the roadmap doc):
+  //   A. what it heard matches the answer (no accents, spaces ignored, extra
+  //      words like "vos" or "la" allowed) → Bien. In testing a wrong answer
+  //      never matched (0/24), so this is safe.
+  //   B. otherwise, Azure's es-AR pronunciation check against the answer:
+  //      accuracy ≥ HABLAR_MIN_ACCURACY, no single sound below
+  //      HABLAR_MIN_PHONEME and no word flagged → Bien. This rescues correct
+  //      single words the recogniser misheard ("vale hija" for valija).
+  //   C. otherwise → Otra vez. Nothing heard at all → no suggestion.
+  // Those two numbers are first guesses; every Hablar card logs what was
+  // heard, the scores, the suggestion and whether you changed it
+  // (practice_log.speech), so they can be re-tuned from real practice.
+  // Audio is never stored: it goes to the "stt" Edge Function and back.
+  var HABLAR_MAX_MS = 6000;
+  var HABLAR_MIN_ACCURACY = 90;
+  var HABLAR_MIN_PHONEME = 60;
+  var hablarStream = null;
+  var hablarStreamPromise = null;
+  var hablarRec = null;      // the recording in progress: { card, mr, chunks, started, tick, auto, cancelled }
+  var hablarBusyCard = null; // the card whose recording is being analysed
+  var hablarHintOverride = null; // { card, text } — a one-off message (mic refused, ...)
+
+  function hablarSupported() {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  }
+
+  // One microphone stream for the whole deck (asked for during the Empezar
+  // tap, so the permission prompt comes up there, not mid-deck); released
+  // when the deck closes or the app goes to the background.
+  function hablarGetStream() {
+    if (hablarStream && hablarStream.getAudioTracks().some(function (tr) { return tr.readyState === "live"; })) return Promise.resolve(hablarStream);
+    if (hablarStreamPromise) return hablarStreamPromise;
+    hablarStreamPromise = navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (s) {
+      hablarStream = s; hablarStreamPromise = null; return s;
+    }, function (err) { hablarStreamPromise = null; throw err; });
+    return hablarStreamPromise;
+  }
+  function hablarPrepareMic() {
+    if (!hablarSupported()) return;
+    hablarGetStream().catch(function () {});
+  }
+  function hablarRelease() {
+    hablarAbort();
+    if (hablarStream) { hablarStream.getTracks().forEach(function (tr) { tr.stop(); }); hablarStream = null; }
+  }
+  document.addEventListener("visibilitychange", function () { if (document.hidden) hablarRelease(); });
+
+  // What the card expects, for matching: gustar-mode cells hold two
+  // answers ("me gusta / me gustan").
+  function speakAnswers(card) {
+    return String(card.backMain || "").split(/\s*\/\s*/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+  function speakCard(c) { return Object.assign({}, c, { speak: true }); }
+  function buildSpeakDeck() {
+    // Always prompt → Spanish: the meaning on the front for words/phrases.
+    var saved = flashDirection;
+    flashDirection = "def2word";
+    var deck;
+    try { deck = buildFlashDeck(); } finally { flashDirection = saved; }
+    return deck.map(speakCard);
+  }
+
+  function speechNorm(s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/[¿?¡!.,;:«»"()]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function speechMatches(expected, heard) {
+    var e = speechNorm(expected), h = speechNorm(heard);
+    if (!e || !h) return false;
+    if (e === h) return true;
+    if (e.replace(/ /g, "") === h.replace(/ /g, "")) return true; // "de morado" = demorado
+    return (" " + h + " ").indexOf(" " + e + " ") !== -1;          // "vos tenés", "la valija"
+  }
+
+  function hablarJudge(card, data) {
+    var h = (data && data.heard) || {};
+    var heard = h.ok ? (h.lexical || h.display || "") : "";
+    var a = ((data && data.assessments) || [])[0] || {};
+    var scored = !!(a.ok && a.scores && a.scores.accuracy != null);
+    var minPh = null, wordErr = false;
+    (a.words || []).forEach(function (w) {
+      if (w.error && w.error !== "None") wordErr = true;
+      (w.phonemes || []).forEach(function (ph) { if (ph.accuracy != null && (minPh === null || ph.accuracy < minPh)) minPh = ph.accuracy; });
+    });
+    var res = {
+      heard: heard,
+      heard_display: h.display || "",
+      recognition: h.recognitionStatus || (h.error ? "error" : null),
+      accuracy: scored ? a.scores.accuracy : null,
+      pron: scored ? a.scores.pron : null,
+      min_phoneme: minPh,
+      word_error: wordErr
+    };
+    if (heard && speakAnswers(card).some(function (ans) { return speechMatches(ans, heard); })) {
+      res.auto_grade = "bien"; res.rule = "transcript";
+    } else if (scored && res.accuracy >= HABLAR_MIN_ACCURACY && (minPh === null || minPh >= HABLAR_MIN_PHONEME) && !wordErr) {
+      res.auto_grade = "bien"; res.rule = "score";
+    } else if (!heard && (!scored || res.accuracy < 30)) {
+      res.auto_grade = null; res.rule = "nothing";
+    } else {
+      res.auto_grade = "otra"; res.rule = "none";
+    }
+    return res;
+  }
+
+  // ---- recording ----
+  function hablarToggle() {
+    var card = flashDeck[flashIndex];
+    if (!card || !card.speak) return;
+    if (hablarRec) { if (hablarRec.card === card) hablarStop(); return; }
+    if (hablarBusyCard === card) return;
+    if (!hablarSupported()) { hablarHint(card, t("speak_unsupported")); return; }
+    if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } // don't record our own voice
+    hablarGetStream().then(function (stream) {
+      if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden || hablarRec) return;
+      var mr;
+      try { mr = new MediaRecorder(stream); } catch (e) { hablarHint(card, t("speak_unsupported")); return; }
+      var rec = { card: card, mr: mr, chunks: [], started: Date.now(), cancelled: false };
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) rec.chunks.push(e.data); };
+      mr.onstop = function () {
+        clearInterval(rec.tick); clearTimeout(rec.auto);
+        if (hablarRec === rec) hablarRec = null;
+        if (!rec.cancelled) hablarAnalyse(card, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
+        renderSpeakState();
+      };
+      rec.tick = setInterval(renderSpeakTimer, 100);
+      rec.auto = setTimeout(hablarStop, HABLAR_MAX_MS);
+      hablarRec = rec;
+      hablarHintOverride = null;
+      mr.start();
+      renderSpeakState();
+    }, function (err) {
+      hablarHint(card, t(err && (err.name === "NotAllowedError" || err.name === "SecurityError") ? "speak_mic_denied" : "speak_mic_error"));
+    });
+  }
+  function hablarStop() { if (hablarRec && hablarRec.mr.state !== "inactive") hablarRec.mr.stop(); }
+  function hablarAbort() { if (hablarRec) { hablarRec.cancelled = true; hablarStop(); } }
+
+  function hablarAnalyse(card, blob, recMs) {
+    hablarBusyCard = card;
+    var t0 = Date.now();
+    var answers = speakAnswers(card);
+    speechToWav16k(blob).then(function (wav) {
+      return supabaseClient.functions.invoke("stt", { body: { text: answers[0] || card.backMain, audio: speechBytesToBase64(wav), assess: ["es-AR"] } });
+    }).then(function (res) {
+      if (res.error) {
+        var ctx = res.error.context;
+        var status = ctx && ctx.status;
+        throw new Error(status ? "HTTP " + status : (res.error.message || "error"));
+      }
+      return hablarJudge(card, res.data);
+    }).then(finish, function (err) {
+      console.warn("[hablar] couldn't analyse the recording:", err && err.message);
+      finish({ heard: "", recognition: "error", error: String((err && err.message) || err).slice(0, 120), auto_grade: null, rule: "error" });
+    });
+    function finish(result) {
+      if (hablarBusyCard === card) hablarBusyCard = null;
+      result.rec_ms = recMs;
+      result.latency_ms = Date.now() - t0;
+      result.attempt = ((card._speech && card._speech.attempt) || 0) + 1;
+      card._speech = result;
+      if (result.auto_grade && !card._gradeTouched) card._grade = result.auto_grade;
+      if (practiceView && practiceView.card === card) practiceView.row.speech = Object.assign({}, result);
+      if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden) return;
+      renderSpeakState();
+      renderHeard(card);
+      renderFlashGrade(card);
+      renderFlashTally();
+      if (!el.flashCard.classList.contains("flipped")) toggleFlashFlip();
+    }
+  }
+
+  // ---- recording → 16 kHz mono 16-bit WAV (what Azure's REST API takes) ----
+  function speechEncodeWav(samples, rate) {
+    var buf = new ArrayBuffer(44 + samples.length * 2);
+    var v = new DataView(buf);
+    function str(o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); str(8, "WAVE");
+    str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    str(36, "data"); v.setUint32(40, samples.length * 2, true);
+    for (var i = 0; i < samples.length; i++) {
+      var x = Math.max(-1, Math.min(1, samples[i]));
+      v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true);
+    }
+    return new Uint8Array(buf);
+  }
+  function speechToWav16k(blob) {
+    return blob.arrayBuffer().then(function (ab) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AC();
+      return new Promise(function (resolve, reject) { ctx.decodeAudioData(ab, resolve, reject); }).then(function (decoded) {
+        try { ctx.close(); } catch (e) {}
+        var rate = 16000;
+        var off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * rate)), rate);
+        var src = off.createBufferSource();
+        src.buffer = decoded;
+        src.connect(off.destination);
+        src.start();
+        return off.startRendering().then(function (rendered) { return speechEncodeWav(rendered.getChannelData(0), rate); });
+      });
+    });
+  }
+  function speechBytesToBase64(bytes) {
+    var bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+
+  // ---- on screen ----
+  function hablarHint(card, text) { hablarHintOverride = { card: card, text: text }; renderSpeakState(); }
+  function renderSpeakTimer() {
+    if (!el.flashSpeakTimer) return;
+    el.flashSpeakTimer.textContent = hablarRec ? ((Date.now() - hablarRec.started) / 1000).toFixed(1) + " s" : "";
+  }
+  function renderSpeakState() {
+    if (!el.flashSpeakMic) return;
+    var card = flashDeck[flashIndex];
+    var speak = !!(card && card.speak) && !el.flashOverlay.classList.contains("is-done");
+    el.flashSpeakMic.hidden = !speak;
+    el.flashSpeakHint.hidden = !speak;
+    el.flashCard.classList.toggle("is-speak", speak);
+    if (!speak) return;
+    var recording = !!(hablarRec && hablarRec.card === card);
+    var busy = hablarBusyCard === card;
+    el.flashSpeakMic.classList.toggle("is-recording", recording);
+    el.flashSpeakMic.classList.toggle("is-busy", busy);
+    el.flashSpeakMic.setAttribute("aria-label", t(recording ? "speak_stop_aria" : "speak_mic_aria"));
+    var warn = hablarHintOverride && hablarHintOverride.card === card;
+    el.flashSpeakHint.classList.toggle("is-warn", !!warn);
+    el.flashSpeakHint.textContent = warn ? hablarHintOverride.text
+      : t(recording ? "speak_recording" : (busy ? "speak_analyzing" : (card._speech ? "speak_again" : "speak_hint")));
+    renderSpeakTimer();
+  }
+  // The line on the back: what it heard, and why the suggestion.
+  function renderHeard(card) {
+    if (!el.flashBackHeard) return;
+    var sp = card && card.speak ? card._speech : null;
+    el.flashBackHeard.hidden = !sp;
+    el.flashBackHeard.className = "flash-heard";
+    if (!sp) { el.flashBackHeard.textContent = ""; return; }
+    if (sp.rule === "error") { el.flashBackHeard.textContent = t("speak_error"); el.flashBackHeard.classList.add("is-none"); return; }
+    if (sp.rule === "nothing") { el.flashBackHeard.textContent = t("speak_nothing"); el.flashBackHeard.classList.add("is-none"); return; }
+    var why = sp.rule === "transcript" ? t("speak_why_match")
+      : (sp.rule === "score" ? t("speak_why_score", { n: Math.round(sp.accuracy) }) : t("speak_why_no"));
+    el.flashBackHeard.textContent = t("speak_heard", { text: sp.heard_display || sp.heard || "…" }) + " · " + why;
+    el.flashBackHeard.classList.add(sp.auto_grade === "bien" ? "is-bien" : "is-otra");
+  }
+  el.flashSpeakMic.addEventListener("click", function (evt) { evt.stopPropagation(); hablarToggle(); });
+
+  // Test/debug hooks.
+  window.voseHablarJudge = function (backMain, data) { return hablarJudge({ backMain: backMain }, data); };
 
   // ================= Progreso + Tu historial (2026-10-03) =================
   // Everything here is computed on the device from the practice log (see
@@ -5932,10 +6255,17 @@
   // The flashcard(s) for some units, in the current Leer/Escuchar mode and
   // word direction. Units whose item (or verb form) no longer exists are
   // skipped.
+  function progModeDirection() {
+    var m = effectiveFlashMode();
+    return m === "escuchar" ? "word2def" : (m === "hablar" ? "def2word" : flashDirection);
+  }
+  function progModeCards(cards) {
+    var m = effectiveFlashMode();
+    return m === "escuchar" ? cards.map(listenCard) : (m === "hablar" ? cards.map(speakCard) : cards);
+  }
   function cardsForUnits(units) {
     var idx = progContentIndex();
-    var listen = effectiveFlashMode() === "escuchar";
-    var dir = listen ? "word2def" : flashDirection;
+    var dir = progModeDirection();
     var cards = [];
     var byVerb = {};
     units.forEach(function (u) {
@@ -5952,7 +6282,7 @@
       var b = byVerb[k];
       Array.prototype.push.apply(cards, verbCards(b.data, function (fk) { return !!b.keys[fk]; }));
     });
-    return listen ? cards.map(listenCard) : cards;
+    return progModeCards(cards);
   }
 
   function startPracticeDeck(cards) {
@@ -6183,8 +6513,7 @@
         btn.addEventListener("click", function () {
           var cards = [];
           allVerbs.forEach(function (v) { Array.prototype.push.apply(cards, verbCards(v.data, function (k) { return k === fk; })); });
-          if (effectiveFlashMode() === "escuchar") cards = cards.map(listenCard);
-          startPracticeDeck(cards);
+          startPracticeDeck(progModeCards(cards));
         });
         grid.appendChild(btn);
       });
@@ -6278,8 +6607,7 @@
   }
   function cardsForListItems(items) {
     var idx = progContentIndex();
-    var listen = effectiveFlashMode() === "escuchar";
-    var dir = listen ? "word2def" : flashDirection;
+    var dir = progModeDirection();
     var cards = [];
     items.forEach(function (it) {
       var entry = (idx[it.type] || {})[it.key];
@@ -6288,7 +6616,7 @@
       else if (it.type === "word") cards.push(wordCard(entry.data, dir));
       else cards.push(phraseCard(entry.data, dir));
     });
-    return listen ? cards.map(listenCard) : cards;
+    return progModeCards(cards);
   }
 
   function drawListBars(P, idx) {
@@ -8691,6 +9019,7 @@
   });
   el.flashModeRead.addEventListener("click", function () { setFlashMode("leer"); renderFlashSetup(); });
   el.flashModeListen.addEventListener("click", function () { setFlashMode("escuchar"); renderFlashSetup(); });
+  el.flashModeSpeak.addEventListener("click", function () { setFlashMode("hablar"); renderFlashSetup(); });
   el.flashAutoplay.addEventListener("change", function () {
     if (el.flashAutoplay.disabled) return;
     flashAutoPlay = el.flashAutoplay.checked;
