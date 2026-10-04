@@ -244,7 +244,8 @@
       speak_mic_error: "No se pudo usar el micrófono.",
       speak_heard: "Escuché «{text}»",
       speak_why_match: "coincide",
-      speak_why_score: "pronunciación {n}",
+      speak_why_score: "sonó bien",
+      speak_why_unsure: "no estoy seguro: marcalo vos",
       speak_why_no: "no coincide",
       speak_nothing: "No te escuché bien — marcalo vos.",
       speak_error: "No se pudo analizar — marcalo vos.",
@@ -715,7 +716,8 @@
       speak_mic_error: "Couldn't use the microphone.",
       speak_heard: "Heard «{text}»",
       speak_why_match: "matches",
-      speak_why_score: "pronunciation {n}",
+      speak_why_score: "sounded right",
+      speak_why_unsure: "not sure: grade it yourself",
       speak_why_no: "doesn't match",
       speak_nothing: "Didn't catch that — grade it yourself.",
       speak_error: "Couldn't check it — grade it yourself.",
@@ -5843,7 +5845,14 @@
   //      accuracy ≥ HABLAR_MIN_ACCURACY, no single sound below
   //      HABLAR_MIN_PHONEME and no word flagged → Bien. This rescues correct
   //      single words the recogniser misheard ("vale hija" for valija).
-  //   C. otherwise → Otra vez. Nothing heard at all → no suggestion.
+  //   C. not sure (2026-10-04, mason): no match, and the score is in the
+  //      in-between band — accuracy ≥ HABLAR_UNSURE_FLOOR but not a clean
+  //      B (a weak sound or a flagged word) — → NO suggestion; you grade it.
+  //      In testing that band held most near-miss wrong answers (comemos
+  //      for comimos 76, despachaste 82–85, polo 93 with one sound at 32)
+  //      but also a correct "lluvia" at 82. Logged as rule "unsure" so the
+  //      band itself can be tuned.
+  //   D. otherwise (clearly low) → Otra vez. Nothing heard → no suggestion.
   // Those two numbers are first guesses; every Hablar card logs what was
   // heard, the scores, the suggestion and whether you changed it
   // (practice_log.speech), so they can be re-tuned from real practice.
@@ -5851,6 +5860,7 @@
   var HABLAR_MAX_MS = 6000;
   var HABLAR_MIN_ACCURACY = 90;
   var HABLAR_MIN_PHONEME = 60;
+  var HABLAR_UNSURE_FLOOR = 75;
   var hablarStream = null;
   var hablarStreamPromise = null;
   var hablarRec = null;      // the recording in progress: { card, mr, chunks, started, tick, auto, cancelled }
@@ -5934,6 +5944,8 @@
       res.auto_grade = "bien"; res.rule = "score";
     } else if (!heard && (!scored || res.accuracy < 30)) {
       res.auto_grade = null; res.rule = "nothing";
+    } else if (scored && res.accuracy >= HABLAR_UNSURE_FLOOR) {
+      res.auto_grade = null; res.rule = "unsure";
     } else {
       res.auto_grade = "otra"; res.rule = "none";
     }
@@ -6078,10 +6090,12 @@
     if (!sp) { el.flashBackHeard.textContent = ""; return; }
     if (sp.rule === "error") { el.flashBackHeard.textContent = t("speak_error"); el.flashBackHeard.classList.add("is-none"); return; }
     if (sp.rule === "nothing") { el.flashBackHeard.textContent = t("speak_nothing"); el.flashBackHeard.classList.add("is-none"); return; }
+    // What it heard, in words — never the score (mason: "the number means
+    // nothing to a user").
     var why = sp.rule === "transcript" ? t("speak_why_match")
-      : (sp.rule === "score" ? t("speak_why_score", { n: Math.round(sp.accuracy) }) : t("speak_why_no"));
-    el.flashBackHeard.textContent = t("speak_heard", { text: sp.heard_display || sp.heard || "…" }) + " · " + why;
-    el.flashBackHeard.classList.add(sp.auto_grade === "bien" ? "is-bien" : "is-otra");
+      : (sp.rule === "score" ? t("speak_why_score") : (sp.rule === "unsure" ? t("speak_why_unsure") : t("speak_why_no")));
+    el.flashBackHeard.textContent = (sp.heard ? t("speak_heard", { text: sp.heard_display || sp.heard }) + " · " : "") + why;
+    el.flashBackHeard.classList.add(sp.rule === "unsure" ? "is-unsure" : (sp.auto_grade === "bien" ? "is-bien" : "is-otra"));
   }
   el.flashSpeakMic.addEventListener("click", function (evt) { evt.stopPropagation(); hablarToggle(); });
 
