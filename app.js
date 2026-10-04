@@ -233,6 +233,97 @@
       grade_bien: "Bien",
       grade_group_aria: "Cómo te fue con esta tarjeta",
       flash_tally: "{b} bien · {o} otra vez",
+      nav_progress: "Progreso",
+      flash_done_text_practice: "¡Listo! Todas salieron bien.",
+      msg_nada_para_practicar: "No hay nada para practicar ahí.",
+      prog_loading: "Cargando tu historial…",
+      prog_error: "No se pudo cargar tu historial del servidor; por ahora se ve solo lo de este dispositivo.",
+      prog_intro_title: "Tu progreso",
+      prog_intro_text: "Todavía no hay tarjetas calificadas. Cuando practiques, dale vuelta a cada tarjeta y marcá «Bien» u «Otra vez»: con eso, acá vas a ver qué te toca repasar, qué te cuesta y cómo vas avanzando.",
+      prog_due_title: "Para repasar hoy",
+      prog_card_1: "tarjeta",
+      prog_card_n: "tarjetas",
+      prog_due_missed: "{n} que fallaste la última vez",
+      prog_due_time: "unos {n} min a tu ritmo",
+      prog_due_btn: "Repasar ahora",
+      prog_due_none: "Nada para repasar hoy. Lo que califiques vuelve acá cuando le toque.",
+      prog_week_title: "Esta semana",
+      prog_week_goal: "Meta: {goal} días · vas {n}",
+      prog_days: "L,M,M,J,V,S,D",
+      prog_stat_cards: "tarjetas",
+      prog_stat_min: "practicando",
+      prog_stat_bien: "bien",
+      prog_stat_resp: "en dar vuelta",
+      prog_struggle_title: "Te cuestan",
+      prog_struggle_sub: "Las que más fallaste en las últimas dos semanas · la más reciente a la derecha",
+      prog_struggle_btn: "Practicar estas {n}",
+      prog_struggle_save: "Guardar como lista",
+      prog_struggle_list_name: "Me cuestan · {date}",
+      prog_struggle_saved: "Creaste la lista «{name}» con {n} ítems.",
+      prog_x_of_y: "{b} de {n}",
+      prog_grid_title: "Verbos por tiempo y persona",
+      prog_grid_sub: "% bien en todos tus verbos (últimos 60 días) · tocá una celda para practicarla",
+      prog_grid_none: "sin practicar",
+      prog_grid_cell_aria: "{tense}, {person}: {pct}% bien en {n} respuestas",
+      prog_grid_cell_none: "{tense}, {person}: sin practicar",
+      prog_person_yo: "yo",
+      prog_person_vos: "vos",
+      prog_person_el: "él",
+      prog_person_nosotros: "nos.",
+      prog_person_ellos: "ellos",
+      prog_tense_presente: "Presente",
+      prog_tense_preterito: "Pretérito",
+      prog_tense_imperfecto: "Imperfecto",
+      prog_tense_futuro: "Futuro",
+      prog_tense_condicional: "Condicional",
+      prog_tense_subjPresente: "Subj. presente",
+      prog_tense_subjPasado: "Subj. pasado",
+      prog_tense_imperativo: "Imperativo",
+      prog_learned_title: "Lo que ya aprendiste",
+      prog_learned_sub: "Aprendida = salió bien en repasos espaciados (no solo hoy)",
+      prog_learned_words: "palabras",
+      prog_learned_forms: "formas verbales",
+      prog_learned_phrases: "frases",
+      prog_learned_new: "En verde: nuevas esta semana",
+      prog_spark_from: "hace 8 semanas",
+      prog_spark_to: "hoy · {n}",
+      prog_spark_aria: "Aprendidas en las últimas 8 semanas: de {a} a {b}",
+      prog_lists_title: "Listas",
+      prog_lists_sub: "Tocá una lista para practicar lo que te falta",
+      prog_lists_count: "{l} de {n} aprendidas",
+      prog_lists_done: "¡Ya aprendiste toda esta lista!",
+      prog_key_learned: "aprendidas",
+      prog_key_progress: "en camino",
+      prog_known_title: "¿Todavía sabidas?",
+      prog_known_sub: "Las marcaste como sabidas, pero la última vez salieron «Otra vez»",
+      prog_known_btn: "Revisarlas",
+      last_session_title: "Última sesión · {when}",
+      last_session_today: "hoy {time}",
+      last_session_yesterday: "ayer {time}",
+      last_session_cards: "{n} tarjetas",
+      last_session_cards_1: "1 tarjeta",
+      last_session_min: "{n} min",
+      last_session_bien: "{n} bien",
+      last_session_otra: "{n} otra vez",
+      last_session_btn: "Repasar las {n} que costaron",
+      last_session_btn_1: "Repasar la que costó",
+      history_toggle: "Tu historial",
+      history_none: "Todavía no aparece en tus tarjetas.",
+      history_seen: "{n} veces",
+      history_seen_1: "1 vez",
+      history_seen_sub: "en tarjetas, en {d} días",
+      history_seen_sub_1: "en tarjetas, en 1 día",
+      history_grade_sub: "bien",
+      history_no_grades: "sin calificar todavía",
+      history_flip_sub: "tardás en dar vuelta (promedio)",
+      history_next_sub: "próximo repaso",
+      history_next_today: "hoy",
+      history_next_tomorrow: "mañana",
+      history_next_days: "en {n} días",
+      history_forms_sub: "formas aprendidas (de las practicadas)",
+      history_last: "últimas {n} · la más reciente a la derecha",
+      list_meta_learned: " · {n} aprendidos",
+      list_meta_learned_1: " · 1 aprendido",
       known_toggle_aria_on: "Sabido — tocá para desmarcar",
       known_toggle_aria_off: "Marcar como sabido",
       known_mark_aria: "Sabido",
@@ -592,6 +683,97 @@
       grade_bien: "Got it",
       grade_group_aria: "How this card went",
       flash_tally: "{b} got it · {o} again",
+      nav_progress: "Progress",
+      flash_done_text_practice: "Done! You got every card.",
+      msg_nada_para_practicar: "Nothing to practice there.",
+      prog_loading: "Loading your history…",
+      prog_error: "Couldn't load your history from the server; for now this only shows what's on this device.",
+      prog_intro_title: "Your progress",
+      prog_intro_text: "No graded cards yet. When you practice, flip each card and mark it \"Got it\" or \"Again\" — then this is where you'll see what's due for review, what's giving you trouble, and how you're doing.",
+      prog_due_title: "Due for review today",
+      prog_card_1: "card",
+      prog_card_n: "cards",
+      prog_due_missed: "{n} you missed last time",
+      prog_due_time: "about {n} min at your pace",
+      prog_due_btn: "Review now",
+      prog_due_none: "Nothing due today. Whatever you grade comes back here when it's due.",
+      prog_week_title: "This week",
+      prog_week_goal: "Goal: {goal} days · {n} so far",
+      prog_days: "M,T,W,T,F,S,S",
+      prog_stat_cards: "cards",
+      prog_stat_min: "practicing",
+      prog_stat_bien: "got it",
+      prog_stat_resp: "to flip",
+      prog_struggle_title: "Giving you trouble",
+      prog_struggle_sub: "The ones you missed most in the last two weeks · most recent on the right",
+      prog_struggle_btn: "Practice these {n}",
+      prog_struggle_save: "Save as a list",
+      prog_struggle_list_name: "Trouble words · {date}",
+      prog_struggle_saved: "Created the list \"{name}\" with {n} items.",
+      prog_x_of_y: "{b} of {n}",
+      prog_grid_title: "Verbs by tense and person",
+      prog_grid_sub: "% got it across all your verbs (last 60 days) · tap a cell to practice it",
+      prog_grid_none: "not practiced",
+      prog_grid_cell_aria: "{tense}, {person}: {pct}% got it over {n} answers",
+      prog_grid_cell_none: "{tense}, {person}: not practiced",
+      prog_person_yo: "yo",
+      prog_person_vos: "vos",
+      prog_person_el: "él",
+      prog_person_nosotros: "nos.",
+      prog_person_ellos: "ellos",
+      prog_tense_presente: "Present",
+      prog_tense_preterito: "Preterite",
+      prog_tense_imperfecto: "Imperfect",
+      prog_tense_futuro: "Future",
+      prog_tense_condicional: "Conditional",
+      prog_tense_subjPresente: "Subj. present",
+      prog_tense_subjPasado: "Subj. past",
+      prog_tense_imperativo: "Imperative",
+      prog_learned_title: "What you've learned",
+      prog_learned_sub: "Learned = got it across spaced reviews (not just today)",
+      prog_learned_words: "words",
+      prog_learned_forms: "verb forms",
+      prog_learned_phrases: "phrases",
+      prog_learned_new: "In green: new this week",
+      prog_spark_from: "8 weeks ago",
+      prog_spark_to: "today · {n}",
+      prog_spark_aria: "Learned over the last 8 weeks: from {a} to {b}",
+      prog_lists_title: "Lists",
+      prog_lists_sub: "Tap a list to practice what's left",
+      prog_lists_count: "{l} of {n} learned",
+      prog_lists_done: "You've learned this whole list!",
+      prog_key_learned: "learned",
+      prog_key_progress: "on the way",
+      prog_known_title: "Still known?",
+      prog_known_sub: "You marked these Known, but last time you graded them \"Again\"",
+      prog_known_btn: "Review them",
+      last_session_title: "Last session · {when}",
+      last_session_today: "today {time}",
+      last_session_yesterday: "yesterday {time}",
+      last_session_cards: "{n} cards",
+      last_session_cards_1: "1 card",
+      last_session_min: "{n} min",
+      last_session_bien: "{n} got it",
+      last_session_otra: "{n} again",
+      last_session_btn: "Review the {n} you missed",
+      last_session_btn_1: "Review the one you missed",
+      history_toggle: "Your history",
+      history_none: "Not in your flashcards yet.",
+      history_seen: "{n} times",
+      history_seen_1: "once",
+      history_seen_sub: "on flashcards, over {d} days",
+      history_seen_sub_1: "on flashcards, on 1 day",
+      history_grade_sub: "got it",
+      history_no_grades: "not graded yet",
+      history_flip_sub: "to flip, on average",
+      history_next_sub: "next review",
+      history_next_today: "today",
+      history_next_tomorrow: "tomorrow",
+      history_next_days: "in {n} days",
+      history_forms_sub: "forms learned (of those practiced)",
+      history_last: "last {n} · most recent on the right",
+      list_meta_learned: " · {n} learned",
+      list_meta_learned_1: " · 1 learned",
       known_toggle_aria_on: "Known — tap to unmark",
       known_toggle_aria_off: "Mark as known",
       known_mark_aria: "Known",
@@ -1237,6 +1419,7 @@
     if (!el.flashcardsPanel.hidden) renderFlashSetup();
     if (!el.flashOverlay.hidden) renderFlashCard();
     renderLangButtons();
+    refreshPracticeViews();
   }
 
   function setLang(lang) {
@@ -1967,6 +2150,10 @@
     flashArrowNext: document.getElementById("flash-arrow-next"),
 
     tabLists: document.getElementById("tab-lists"),
+    tabProgress: document.getElementById("tab-progress"),
+    progressPanel: document.getElementById("progress-panel"),
+    progressBody: document.getElementById("progress-body"),
+    lastSession: document.getElementById("last-session"),
     listsPanel: document.getElementById("lists-panel"),
     listsList: document.getElementById("lists-list"),
     listsEmptyMsg: document.getElementById("lists-empty-msg"),
@@ -2713,6 +2900,7 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(syncConjRowHeights);
     });
+    renderItemHistory("verb");
   }
 
   // The pronoun column is its own small <table> beside the scrolling tense
@@ -3120,13 +3308,19 @@
     el.tabPhrases.classList.toggle("active", tab === "phrases");
     el.tabFlashcards.classList.toggle("active", tab === "flashcards");
     el.tabLists.classList.toggle("active", tab === "lists");
+    el.tabProgress.classList.toggle("active", tab === "progress");
+    el.progressPanel.hidden = tab !== "progress";
     el.verbsPanel.hidden = tab !== "verbs";
     el.wordsPanel.hidden = tab !== "words";
     el.phrasesPanel.hidden = tab !== "phrases";
     el.flashcardsPanel.hidden = tab !== "flashcards";
     el.listsPanel.hidden = tab !== "lists";
-    if (tab === "flashcards") renderFlashSetup();
-    if (tab === "lists") loadLists();
+    if (tab === "flashcards") { renderFlashSetup(); renderLastSession(); }
+    if (tab === "lists") {
+      loadLists();
+      loadPracticeHistory(false).then(function () { if (!el.listsPanel.hidden) decorateListRows(); });
+    }
+    if (tab === "progress") renderProgress();
     try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
   }
 
@@ -3243,6 +3437,7 @@
 
     el.wordDetail.hidden = false;
     el.wordDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    renderItemHistory("word");
   }
 
   function clearWordForm() {
@@ -3524,6 +3719,7 @@
 
     el.phraseDetail.hidden = false;
     el.phraseDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    renderItemHistory("phrase");
   }
 
   function clearPhraseForm() {
@@ -4143,112 +4339,120 @@
   // Spanish (infinitive, conjugated form), while a word/phrase card only has one Spanish side,
   // depending on flashDirection; the other side is left undefined so renderFlashCard hides that
   // face's speaker button rather than reading an English definition in an Argentine accent.
+  // A verb's cards, one per form, for the forms want(formKey, tenseKey, tag)
+  // accepts (tag: "personal" | "impersonal" | "imperativo" | "standalone").
+  // Split out of buildFlashDeck() (2026-10-03) so the Progreso tab can build
+  // decks of specific forms ("repasar hoy", a tense×person cell, ...).
+  function verbCards(data, want) {
+    var deck = [];
+    var forms = data.forms || {};
+    var def = data.definition || "";
+    var inf = data.infinitive || "";
+
+    FLASH_PERSONAL_TENSES.forEach(function (t) {
+      PERSONS.forEach(function (p) {
+        if (!want(flashCellKey(t.key, p.key), t.key, "personal")) return;
+        var frontLabel, val;
+        if (data.gustar_like) {
+          val = gustarCellText(forms, t.key, p.key);
+          if (val === "—") return;
+          frontLabel = GUSTAR_LIKE_PERSON[p.key].label;
+        } else {
+          val = (forms[t.key] && forms[t.key][p.key]) || "";
+          if (!val) return;
+          frontLabel = p.label;
+        }
+        deck.push({
+          kind: "verb", data: data, formKey: flashCellKey(t.key, p.key),
+          frontMain: inf, frontSub: frontLabel + " · " + t.label.toLowerCase(),
+          backMain: val, backSub: def ? "(" + def + ")" : "",
+          frontSpeak: inf, backSpeak: val
+        });
+      });
+    });
+
+    // impersonal verbs (llover, nevar, haber's "hay"...) have no person —
+    // same idea as the extra row the conjugation table shows for them.
+    var imp = forms.impersonal || {};
+    FLASH_PERSONAL_TENSES.forEach(function (t) {
+      if (!want(flashCellKey(t.key, "impersonal"), t.key, "impersonal")) return;
+      var val = imp[t.key] || "";
+      if (!val) return;
+      deck.push({
+        kind: "verb", data: data, formKey: flashCellKey(t.key, "impersonal"),
+        frontMain: inf, frontSub: "impersonal · " + t.label.toLowerCase(),
+        backMain: val, backSub: def ? "(" + def + ")" : "",
+        frontSpeak: inf, backSpeak: val
+      });
+    });
+
+    if (forms.imperativo) {
+      Object.keys(IMPERATIVO_FORM_KEY).forEach(function (personKey) {
+        if (!want(flashCellKey("imperativo", personKey), "imperativo", "imperativo")) return;
+        var val = forms.imperativo[IMPERATIVO_FORM_KEY[personKey]] || "";
+        if (!val) return;
+        deck.push({
+          kind: "verb", data: data, formKey: flashCellKey("imperativo", personKey),
+          frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · " + t("mood_imperativo").toLowerCase(),
+          backMain: val, backSub: def ? "(" + def + ")" : "",
+          frontSpeak: inf, backSpeak: val
+        });
+      });
+    }
+
+    [{ key: "gerundio", i18nKey: "tile_gerundio" }, { key: "participio", i18nKey: "tile_participio" }].forEach(function (item) {
+      if (!want(item.key, item.key, "standalone")) return;
+      var val = forms[item.key] || "";
+      if (!val) return;
+      deck.push({
+        kind: "verb", data: data, formKey: item.key,
+        frontMain: inf, frontSub: t(item.i18nKey),
+        backMain: val, backSub: def ? "(" + def + ")" : "",
+        frontSpeak: inf, backSpeak: val
+      });
+    });
+    return deck;
+  }
+
+  // The forms picked in the flashcard setup (quick picks / Personalizar).
+  function setupVerbWant(formKey, tenseKey, tag) {
+    if (tag === "impersonal") return flashTenseHasAnySelected(tenseKey);
+    if (tag === "standalone") return activeFlashStandalone.has(formKey);
+    return activeFlashCells.has(formKey);
+  }
+
+  function wordCard(data, direction) {
+    var word = data.word || "";
+    var def = data.definition || "";
+    // Front is the Spanish word (speakable); back is the English
+    // definition, which a Rioplatense voice would just mangle — no
+    // backSpeak there.
+    if (direction === "word2def") return { kind: "word", data: data, frontMain: word, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: word };
+    return { kind: "word", data: data, frontMain: def || word, frontSub: "", backMain: word, backSub: "", backSpeak: word };
+  }
+
+  // Same shared flashDirection as words — "word2def" here reads as
+  // "phrase → definition".
+  function phraseCard(data, direction) {
+    var phrase = data.phrase || "";
+    var def = data.definition || "";
+    if (direction === "word2def") return { kind: "phrase", data: data, frontMain: phrase, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: phrase };
+    return { kind: "phrase", data: data, frontMain: def || phrase, frontSub: "", backMain: phrase, backSub: "", backSpeak: phrase };
+  }
+
   function buildFlashDeck() {
     var deck = [];
-
     if (activeFlashSources.verbs) {
       verbFlashSource().forEach(function (v) {
-        var data = v.data;
-        var forms = data.forms || {};
-        var def = data.definition || "";
-        var inf = data.infinitive || v.id;
-
-        FLASH_PERSONAL_TENSES.forEach(function (t) {
-          PERSONS.forEach(function (p) {
-            if (!activeFlashCells.has(flashCellKey(t.key, p.key))) return;
-            var frontLabel, val;
-            if (data.gustar_like) {
-              val = gustarCellText(forms, t.key, p.key);
-              if (val === "—") return;
-              frontLabel = GUSTAR_LIKE_PERSON[p.key].label;
-            } else {
-              val = (forms[t.key] && forms[t.key][p.key]) || "";
-              if (!val) return;
-              frontLabel = p.label;
-            }
-            deck.push({
-              kind: "verb", data: data, formKey: flashCellKey(t.key, p.key),
-              frontMain: inf, frontSub: frontLabel + " · " + t.label.toLowerCase(),
-              backMain: val, backSub: def ? "(" + def + ")" : "",
-              frontSpeak: inf, backSpeak: val
-            });
-          });
-        });
-
-        // impersonal verbs (llover, nevar, haber's "hay"...) have no person —
-        // same idea as the extra row the conjugation table shows for them.
-        var imp = forms.impersonal || {};
-        FLASH_PERSONAL_TENSES.forEach(function (t) {
-          if (!flashTenseHasAnySelected(t.key)) return;
-          var val = imp[t.key] || "";
-          if (!val) return;
-          deck.push({
-            kind: "verb", data: data, formKey: flashCellKey(t.key, "impersonal"),
-            frontMain: inf, frontSub: "impersonal · " + t.label.toLowerCase(),
-            backMain: val, backSub: def ? "(" + def + ")" : "",
-            frontSpeak: inf, backSpeak: val
-          });
-        });
-
-        if (forms.imperativo) {
-          Object.keys(IMPERATIVO_FORM_KEY).forEach(function (personKey) {
-            if (!activeFlashCells.has(flashCellKey("imperativo", personKey))) return;
-            var val = forms.imperativo[IMPERATIVO_FORM_KEY[personKey]] || "";
-            if (!val) return;
-            deck.push({
-              kind: "verb", data: data, formKey: flashCellKey("imperativo", personKey),
-              frontMain: inf, frontSub: IMPERATIVO_DISPLAY[personKey] + " · " + t("mood_imperativo").toLowerCase(),
-              backMain: val, backSub: def ? "(" + def + ")" : "",
-              frontSpeak: inf, backSpeak: val
-            });
-          });
-        }
-
-        [{ key: "gerundio", i18nKey: "tile_gerundio" }, { key: "participio", i18nKey: "tile_participio" }].forEach(function (item) {
-          if (!activeFlashStandalone.has(item.key)) return;
-          var val = forms[item.key] || "";
-          if (!val) return;
-          deck.push({
-            kind: "verb", data: data, formKey: item.key,
-            frontMain: inf, frontSub: t(item.i18nKey),
-            backMain: val, backSub: def ? "(" + def + ")" : "",
-            frontSpeak: inf, backSpeak: val
-          });
-        });
+        Array.prototype.push.apply(deck, verbCards(v.data, setupVerbWant));
       });
     }
-
     if (activeFlashSources.words) {
-      filteredWords.forEach(function (w) {
-        var data = w.data;
-        var word = data.word || w.id;
-        var def = data.definition || "";
-        if (flashDirection === "word2def") {
-          // Front is the Spanish word (speakable); back is the English
-          // definition, which a Rioplatense voice would just mangle — no
-          // backSpeak here.
-          deck.push({ kind: "word", data: data, frontMain: word, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: word });
-        } else {
-          deck.push({ kind: "word", data: data, frontMain: def || word, frontSub: "", backMain: word, backSub: "", backSpeak: word });
-        }
-      });
+      filteredWords.forEach(function (w) { deck.push(wordCard(w.data, flashDirection)); });
     }
-
     if (activeFlashSources.phrases) {
-      filteredPhrases.forEach(function (ph) {
-        var data = ph.data;
-        var phrase = data.phrase || ph.id;
-        var def = data.definition || "";
-        // Same shared flashDirection as words above (see renderFlashSetup's
-        // comment) — "word2def" here reads as "phrase → definition".
-        if (flashDirection === "word2def") {
-          deck.push({ kind: "phrase", data: data, frontMain: phrase, frontSub: "", backMain: def || "—", backSub: "", frontSpeak: phrase });
-        } else {
-          deck.push({ kind: "phrase", data: data, frontMain: def || phrase, frontSub: "", backMain: phrase, backSub: "", backSpeak: phrase });
-        }
-      });
+      filteredPhrases.forEach(function (ph) { deck.push(phraseCard(ph.data, flashDirection)); });
     }
-
     // Sabido chips apply per CARD here (per form, for verbs) — see
     // cardPassesKnownFilter()/verbFlashSource().
     return deck.filter(cardPassesKnownFilter);
@@ -5173,19 +5377,23 @@
     flashDirection = "word2def";
     var deck;
     try { deck = buildFlashDeck(); } finally { flashDirection = saved; }
-    return deck.map(function (c) {
-      var out = Object.assign({}, c, { listen: true, frontMain: "", frontSub: "", frontSpeak: "" });
-      if (c.kind === "verb") {
-        out.audio = c.backSpeak || c.backMain;
-        out.backMeta = (c.frontMain || "") + (c.frontSub ? " · " + c.frontSub : "");
-      } else {
-        out.audio = c.frontSpeak || c.frontMain;
-        out.backMain = c.frontMain;
-        out.backSub = c.backMain && c.backMain !== "—" ? c.backMain : "";
-        out.backSpeak = out.audio;
-      }
-      return out;
-    });
+    return deck.map(listenCard);
+  }
+
+  // One ordinary card turned into a listening card. Words/phrases must be
+  // built "word2def" (Spanish on the front) before this.
+  function listenCard(c) {
+    var out = Object.assign({}, c, { listen: true, frontMain: "", frontSub: "", frontSpeak: "" });
+    if (c.kind === "verb") {
+      out.audio = c.backSpeak || c.backMain;
+      out.backMeta = (c.frontMain || "") + (c.frontSub ? " · " + c.frontSub : "");
+    } else {
+      out.audio = c.frontSpeak || c.frontMain;
+      out.backMain = c.frontMain;
+      out.backSub = c.backMain && c.backMain !== "—" ? c.backMain : "";
+      out.backSpeak = out.audio;
+    }
+    return out;
   }
 
   // iOS only lets a page start audio from a tap; playing one silent clip on
@@ -5214,13 +5422,24 @@
   }
 
   function startFlashcards() {
-    if (flashAutoPlayOn()) unlockTtsAudio();
-    flashDeck = shuffleArray(effectiveFlashMode() === "escuchar" ? buildListenDeck() : buildFlashDeck());
-    if (flashDeck.length === 0) {
+    var cards = effectiveFlashMode() === "escuchar" ? buildListenDeck() : buildFlashDeck();
+    if (cards.length === 0) {
       el.flashSetupMsg.textContent = t("flash_no_cards");
       return;
     }
     el.flashSetupMsg.textContent = "";
+    openFlashDeck(cards, "setup");
+  }
+
+  // "setup": the deck built from the Tarjetas setup (passes follow the tabs'
+  // Sabido chips). "practice": a deck started from Progreso or the last-
+  // session card — it repeats until every card has been marked Bien.
+  var flashDeckSource = "setup";
+  function openFlashDeck(cards, source) {
+    if (!cards.length) return false;
+    flashDeckSource = source || "setup";
+    if (flashAutoPlayOn()) unlockTtsAudio();
+    flashDeck = shuffleArray(cards);
     flashIndex = 0;
     el.flashOverlay.classList.remove("is-done");
     // only the card itself flips to the opposite theme — the overlay's
@@ -5230,6 +5449,7 @@
     practiceStartSession();
     renderFlashCard();
     practiceOpenView(flashDeck[flashIndex]);
+    return true;
   }
 
   function nextFlashCard() {
@@ -5240,9 +5460,11 @@
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
       // until here — so going back within a pass still works — and only now
       // does the tab's Sabido chip get re-applied: see cardStaysForNextPass().
-      var nextPass = flashDeck.filter(cardStaysForNextPass);
+      var practiceDeck = flashDeckSource === "practice";
+      var nextPass = flashDeck.filter(practiceDeck ? function (c) { return c._grade !== "bien"; } : cardStaysForNextPass);
+      var reviewMode = !practiceDeck && flashDeck.some(cardInReviewMode);
       practiceEndPass();
-      if (!nextPass.length) { showFlashDone(flashDeck.some(cardInReviewMode)); practiceFlush(); return; }
+      if (!nextPass.length) { showFlashDone(reviewMode, practiceDeck ? "flash_done_text_practice" : null); practiceFlush(); return; }
       flashDeck = shuffleArray(nextPass);
       flashIndex = 0;
       practiceFlush();
@@ -5265,6 +5487,7 @@
     practiceFlush();
     el.flashOverlay.hidden = true;
     el.flashOverlay.classList.remove("is-done");
+    refreshPracticeViews();
   }
 
   function toggleFlashFlip() {
@@ -5456,6 +5679,7 @@
       if (res && res.error) { console.warn("[practice] not saved yet (will retry):", res.error.message); return; }
       var sent = {};
       batch.forEach(function (r) { sent[r.id] = true; });
+      practiceNoteSent(batch);
       practiceQueue = practiceQueue.filter(function (r) { return !sent[r.id]; });
       savePracticeQueue();
       if (practiceQueue.some(function (r) { return r.user_id === currentUser.id; })) practiceFlush();
@@ -5533,6 +5757,756 @@
 
   // Test/debug hook: what's waiting to be sent.
   window.vosePracticeQueue = function () { return practiceQueue.slice(); };
+
+
+  // ================= Progreso + Tu historial (2026-10-03) =================
+  // Everything here is computed on the device from the practice log (see
+  // "Practice log" above): the server's rows, plus whatever is still queued
+  // on this device. Mockups mason approved: maqueta_progreso/*.png.
+  //
+  // Spaced review is a plain Leitner scheme, easy to explain:
+  //   - A "unit" is one card's content: a word, a phrase, or ONE verb form
+  //     (tener · vos · presente). Direction and Leer/Escuchar are pooled.
+  //   - Each unit sits in a box 0–5. Box b comes up for review
+  //     PROG_INTERVAL_DAYS[b] days after it last moved.
+  //   - "Otra vez" → back to box 0 (due again right away).
+  //   - "Bien" when the unit is due → up one box. "Bien" before it's due
+  //     (drilling the same card twice in a day) doesn't move it.
+  //   - Box 3+ = "aprendida": it held up through reviews spread over days.
+  //   - Within one pass of one deck only the last grade of a card counts
+  //     (going back to a card and changing your mind isn't two answers).
+  // Units never graded aren't "due" — they're simply new.
+
+  var PROG_INTERVAL_DAYS = [0, 1, 3, 7, 21, 60];
+  var PROG_LEARNED_BOX = 3;
+  var PROG_WEEK_GOAL = 5;
+  var PROG_STRUGGLE_DAYS = 14;
+  var PROG_GRID_DAYS = 60;
+  var PROG_DECK_MAX = 40;
+  var HISTORY_OPEN_KEY = "iv-history-open";
+  var PROG_COLS = "id,session_id,shown_at,item_kind,item_key,form_key,mode,direction,pass,grade,flipped,ms_to_flip,ms_front,ms_back";
+  var PROG_GRID_TENSES = ["presente", "preterito", "imperfecto", "futuro", "condicional", "subjPresente", "subjPasado", "imperativo"];
+  var PROG_GRID_PERSONS = ["yo", "vos", "el", "nosotros", "ellos"];
+
+  var practiceHistory = { rows: null, userId: null, loadedAt: 0, loading: null, error: null };
+  var historyOpen = false;
+  try { historyOpen = localStorage.getItem(HISTORY_OPEN_KEY) === "1"; } catch (e) {}
+
+  // ---- loading ----
+  function loadPracticeHistory(force) {
+    if (!currentUser) return Promise.resolve([]);
+    var fresh = practiceHistory.rows && practiceHistory.userId === currentUser.id && (Date.now() - practiceHistory.loadedAt < 5 * 60 * 1000);
+    if (fresh && !force) return Promise.resolve(practiceAllRows());
+    if (practiceHistory.loading) return practiceHistory.loading;
+    var uid = currentUser.id;
+    var collected = [];
+    var PAGE = 1000;
+    function page(from) {
+      return supabaseClient.from("practice_log").select(PROG_COLS).order("shown_at", { ascending: true }).range(from, from + PAGE - 1).then(function (res) {
+        if (res.error) throw res.error;
+        var rows = res.data || [];
+        Array.prototype.push.apply(collected, rows);
+        if (rows.length === PAGE && from < 200 * PAGE) return page(from + PAGE);
+        return collected;
+      });
+    }
+    practiceHistory.loading = page(0).then(function (rows) {
+      practiceHistory.rows = rows;
+      practiceHistory.userId = uid;
+      practiceHistory.loadedAt = Date.now();
+      practiceHistory.error = null;
+      practiceHistory.loading = null;
+      return practiceAllRows();
+    }, function (err) {
+      console.warn("[progreso] couldn't load the practice log:", err && err.message);
+      practiceHistory.error = (err && err.message) || String(err);
+      if (!practiceHistory.rows || practiceHistory.userId !== uid) { practiceHistory.rows = []; practiceHistory.userId = uid; }
+      practiceHistory.loadedAt = Date.now();
+      practiceHistory.loading = null;
+      return practiceAllRows();
+    });
+    return practiceHistory.loading;
+  }
+
+  // Server rows + rows still waiting on this device (+ the rows sent since
+  // the last load, which practiceFlush() appends), without duplicates.
+  function practiceAllRows() {
+    var uid = currentUser ? currentUser.id : null;
+    var seen = {};
+    var out = [];
+    function add(r) { if (!r || seen[r.id]) return; seen[r.id] = true; out.push(r); }
+    if (practiceHistory.rows && practiceHistory.userId === uid) practiceHistory.rows.forEach(add);
+    practiceQueue.forEach(function (r) { if (r.user_id === uid) add(r); });
+    out.sort(function (a, b) { return progTime(a) - progTime(b); });
+    return out;
+  }
+  function practiceNoteSent(rows) {
+    if (!practiceHistory.rows || !currentUser || practiceHistory.userId !== currentUser.id) return;
+    Array.prototype.push.apply(practiceHistory.rows, rows);
+  }
+
+  // ---- dates (local time) ----
+  // Server rows say "...+00:00", rows from this device "...Z" — compare as
+  // times, never as strings.
+  // (Cached in a WeakMap, not on the row: queued rows are sent to the server
+  // as they are, and an extra property would be an unknown column there.)
+  var progTimeCache = new WeakMap();
+  function progTime(r) {
+    var v = progTimeCache.get(r);
+    if (v === undefined) { v = Date.parse(r.shown_at) || 0; progTimeCache.set(r, v); }
+    return v;
+  }
+  function progDayNum(d) {
+    var x = d instanceof Date ? d : new Date(d);
+    return Math.floor(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate()) / 86400000);
+  }
+  function progToday() { return progDayNum(new Date()); }
+  function progWeekStartDay() { // Monday
+    var now = new Date();
+    var dow = (now.getDay() + 6) % 7; // Mon=0
+    return progDayNum(now) - dow;
+  }
+  function progNum(n, digits) {
+    return Number(n).toLocaleString(currentLang === "es" ? "es-AR" : "en-US", { maximumFractionDigits: digits || 0, minimumFractionDigits: digits || 0 });
+  }
+
+  // ---- the model ----
+  function unitKey(kind, key, formKey) { return kind + "|" + key + "|" + (formKey || ""); }
+
+  function computeProgress(rows) {
+    var today = progToday();
+    var units = {};   // unitKey -> state
+    var items = {};   // kind|key -> {rows: [...]}
+    var graded = {};  // session|pass|unitKey -> last graded row
+    rows.forEach(function (r) {
+      var ik = r.item_kind + "|" + r.item_key;
+      (items[ik] || (items[ik] = { kind: r.item_kind, key: r.item_key, rows: [] })).rows.push(r);
+      if (r.grade !== "bien" && r.grade !== "otra") return;
+      var gk = r.session_id + "|" + r.pass + "|" + unitKey(r.item_kind, r.item_key, r.form_key);
+      graded[gk] = r; // rows are in time order, so the last one wins
+    });
+    var events = Object.keys(graded).map(function (k) { return graded[k]; });
+    events.sort(function (a, b) { return progTime(a) - progTime(b); });
+    var learnedMoves = []; // {day, delta}
+    events.forEach(function (r) {
+      var uk = unitKey(r.item_kind, r.item_key, r.form_key);
+      var u = units[uk] || (units[uk] = { key: uk, kind: r.item_kind, itemKey: r.item_key, formKey: r.form_key || null, box: 0, anchor: null, events: [], learnedSince: null });
+      var day = progDayNum(r.shown_at);
+      var wasLearned = u.box >= PROG_LEARNED_BOX;
+      if (r.grade === "otra") {
+        u.box = 0; u.anchor = day;
+      } else if (u.anchor === null || day - u.anchor >= PROG_INTERVAL_DAYS[u.box]) {
+        u.box = Math.min(u.box + 1, PROG_INTERVAL_DAYS.length - 1); u.anchor = day;
+      }
+      var isLearned = u.box >= PROG_LEARNED_BOX;
+      if (isLearned && !wasLearned) { learnedMoves.push({ day: day, delta: 1 }); u.learnedSince = day; }
+      if (!isLearned && wasLearned) { learnedMoves.push({ day: day, delta: -1 }); u.learnedSince = null; }
+      u.events.push({ day: day, at: progTime(r), grade: r.grade });
+    });
+    Object.keys(units).forEach(function (k) {
+      var u = units[k];
+      u.dueDay = u.anchor + PROG_INTERVAL_DAYS[u.box];
+      u.due = u.dueDay <= today;
+      u.learned = u.box >= PROG_LEARNED_BOX;
+      u.last = u.events[u.events.length - 1];
+    });
+    return { rows: rows, units: units, items: items, events: events, learnedMoves: learnedMoves, today: today };
+  }
+
+  // ---- content lookups ----
+  function progContentIndex() {
+    var idx = { verb: {}, word: {}, phrase: {} };
+    allVerbs.forEach(function (v) { idx.verb[practiceNorm(v.data.infinitive)] = v; });
+    allWords.forEach(function (w) { idx.word[practiceNorm(w.data.word)] = w; });
+    allPhrases.forEach(function (ph) { idx.phrase[practiceNorm(ph.data.phrase)] = ph; });
+    return idx;
+  }
+  function progUnitItem(idx, u) { return (idx[u.kind] || {})[u.itemKey] || null; }
+
+  // The flashcard(s) for some units, in the current Leer/Escuchar mode and
+  // word direction. Units whose item (or verb form) no longer exists are
+  // skipped.
+  function cardsForUnits(units) {
+    var idx = progContentIndex();
+    var listen = effectiveFlashMode() === "escuchar";
+    var dir = listen ? "word2def" : flashDirection;
+    var cards = [];
+    var byVerb = {};
+    units.forEach(function (u) {
+      var item = progUnitItem(idx, u);
+      if (!item) return;
+      if (u.kind === "verb") {
+        if (!u.formKey) return;
+        var b = byVerb[u.itemKey] || (byVerb[u.itemKey] = { data: item.data, keys: {} });
+        b.keys[u.formKey] = true;
+      } else if (u.kind === "word") cards.push(wordCard(item.data, dir));
+      else cards.push(phraseCard(item.data, dir));
+    });
+    Object.keys(byVerb).forEach(function (k) {
+      var b = byVerb[k];
+      Array.prototype.push.apply(cards, verbCards(b.data, function (fk) { return !!b.keys[fk]; }));
+    });
+    return listen ? cards.map(listenCard) : cards;
+  }
+
+  function startPracticeDeck(cards) {
+    if (!cards.length) { showBanner(t("msg_nada_para_practicar")); return; }
+    if (cards.length > PROG_DECK_MAX) cards = shuffleArray(cards).slice(0, PROG_DECK_MAX);
+    openFlashDeck(cards, "practice");
+  }
+
+  function unitIsSabido(idx, u) {
+    var item = progUnitItem(idx, u);
+    if (!item) return false;
+    if (item.data.known) return true;
+    return u.kind === "verb" && !!u.formKey && !!((item.data.known_forms || {})[u.formKey]);
+  }
+
+  // What a unit is called in a list: the word/phrase, or the verb form with
+  // which verb + person + tense it is.
+  function unitLabel(idx, u) {
+    var item = progUnitItem(idx, u);
+    if (u.kind !== "verb") return { main: item ? (item.data.word || item.data.phrase) : u.itemKey, sub: "" };
+    var cards = item && u.formKey ? verbCards(item.data, function (fk) { return fk === u.formKey; }) : [];
+    if (!cards.length) return { main: item ? item.data.infinitive : u.itemKey, sub: "" };
+    return { main: cards[0].backMain, sub: cards[0].frontMain + " · " + cards[0].frontSub };
+  }
+
+  // ---- shared bits of markup ----
+  function progEl(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = text;
+    return n;
+  }
+  function progCard(title, sub) {
+    var c = progEl("div", "prog-card");
+    c.appendChild(progEl("h3", null, title));
+    if (sub) c.appendChild(progEl("p", "prog-sub", sub));
+    return c;
+  }
+  function progButton(text, primary, onClick) {
+    var b = progEl("button", primary ? "btn-primary" : "btn-secondary", text);
+    b.type = "button";
+    b.addEventListener("click", onClick);
+    return b;
+  }
+  function progDots(grades) {
+    var d = progEl("span", "prog-dots");
+    d.setAttribute("aria-hidden", "true");
+    grades.forEach(function (g) { d.appendChild(progEl("i", g === "bien" ? "b" : "o")); });
+    return d;
+  }
+
+  // ---- the Progreso tab ----
+  function renderProgress() {
+    if (!el.progressBody || el.progressPanel.hidden) return;
+    if (!currentUser) { el.progressBody.innerHTML = ""; return; }
+    if (!practiceHistory.rows || practiceHistory.userId !== currentUser.id) {
+      el.progressBody.innerHTML = "";
+      el.progressBody.appendChild(progEl("p", "prog-loading", t("prog_loading")));
+    }
+    loadPracticeHistory(false).then(function (rows) {
+      if (el.progressPanel.hidden) return;
+      drawProgress(computeProgress(rows));
+    });
+  }
+
+  function drawProgress(P) {
+    var body = el.progressBody;
+    body.innerHTML = "";
+    var idx = progContentIndex();
+    if (practiceHistory.error) body.appendChild(progEl("p", "prog-note", t("prog_error")));
+    var unitList = Object.keys(P.units).map(function (k) { return P.units[k]; }).filter(function (u) { return !!progUnitItem(idx, u); });
+
+    if (!P.events.length) {
+      var intro = progCard(t("prog_intro_title"));
+      intro.appendChild(progEl("p", "prog-text", t("prog_intro_text")));
+      body.appendChild(intro);
+      if (P.rows.length) body.appendChild(drawWeek(P));
+      var lb = drawListBars(P, idx);
+      if (lb) body.appendChild(lb);
+      return;
+    }
+    body.appendChild(drawDue(P, unitList));
+    body.appendChild(drawWeek(P));
+    var st = drawStruggles(P, unitList, idx);
+    if (st) body.appendChild(st);
+    var grid = drawVerbGrid(P);
+    if (grid) body.appendChild(grid);
+    body.appendChild(drawLearned(P, unitList));
+    var lists = drawListBars(P, idx);
+    if (lists) body.appendChild(lists);
+    var still = drawStillKnown(P, unitList, idx);
+    if (still) body.appendChild(still);
+  }
+
+  function drawDue(P, unitList) {
+    var due = unitList.filter(function (u) { return u.due; });
+    var c = progCard(t("prog_due_title"));
+    c.classList.add("prog-due");
+    if (!due.length) {
+      c.appendChild(progEl("p", "prog-text", t("prog_due_none")));
+      return c;
+    }
+    var hero = progEl("div", "prog-hero");
+    hero.appendChild(progEl("span", "n", String(due.length)));
+    hero.appendChild(progEl("span", "u", t(due.length === 1 ? "prog_card_1" : "prog_card_n")));
+    c.appendChild(hero);
+    var parts = [];
+    var missed = due.filter(function (u) { return u.last && u.last.grade === "otra"; }).length;
+    if (missed) parts.push(t("prog_due_missed", { n: missed }));
+    var recent = P.rows.slice(-200).map(function (r) { return (r.ms_front || 0) + (r.ms_back || 0); }).filter(function (ms) { return ms > 0; }).sort(function (a, b) { return a - b; });
+    if (recent.length >= 5) {
+      var med = recent[Math.floor(recent.length / 2)];
+      parts.push(t("prog_due_time", { n: Math.max(1, Math.round(med * Math.min(due.length, PROG_DECK_MAX) / 60000)) }));
+    }
+    if (parts.length) c.appendChild(progEl("p", "prog-sub", parts.join(" · ")));
+    c.appendChild(progButton(t("prog_due_btn"), true, function () { startPracticeDeck(cardsForUnits(due)); }));
+    return c;
+  }
+
+  function drawWeek(P) {
+    var c = progCard(t("prog_week_title"));
+    var start = progWeekStartDay();
+    var today = P.today;
+    var rows = P.rows.filter(function (r) { return progDayNum(r.shown_at) >= start; });
+    var days = {};
+    rows.forEach(function (r) { days[progDayNum(r.shown_at)] = true; });
+    var nDays = Object.keys(days).length;
+    c.appendChild(progEl("p", "prog-sub", t("prog_week_goal", { goal: PROG_WEEK_GOAL, n: nDays })));
+    var week = progEl("div", "prog-week");
+    var letters = t("prog_days").split(",");
+    for (var i = 0; i < 7; i++) {
+      var d = progEl("div", "prog-day" + (days[start + i] ? " on" : "") + (start + i === today ? " today" : ""));
+      d.appendChild(progEl("i"));
+      d.appendChild(progEl("span", null, letters[i]));
+      week.appendChild(d);
+    }
+    c.appendChild(week);
+    var ev = P.events.filter(function (r) { return progDayNum(r.shown_at) >= start; });
+    var bien = ev.filter(function (r) { return r.grade === "bien"; }).length;
+    var ms = rows.reduce(function (sum, r) { return sum + (r.ms_front || 0) + (r.ms_back || 0); }, 0);
+    var flips = rows.filter(function (r) { return r.flipped && r.ms_to_flip != null; }).map(function (r) { return r.ms_to_flip; }).sort(function (a, b) { return a - b; });
+    var stats = progEl("div", "prog-stats");
+    [[String(rows.length), t("prog_stat_cards")],
+     [progNum(Math.round(ms / 60000)) + " min", t("prog_stat_min")],
+     [ev.length ? Math.round(100 * bien / ev.length) + "%" : "—", t("prog_stat_bien")],
+     [flips.length ? progNum(flips[Math.floor(flips.length / 2)] / 1000, 1) + " s" : "—", t("prog_stat_resp")]
+    ].forEach(function (s) {
+      var x = progEl("div");
+      x.appendChild(progEl("b", null, s[0]));
+      x.appendChild(progEl("span", null, s[1]));
+      stats.appendChild(x);
+    });
+    c.appendChild(stats);
+    return c;
+  }
+
+  function drawStruggles(P, unitList, idx) {
+    var since = P.today - PROG_STRUGGLE_DAYS + 1;
+    var rowsOut = [];
+    unitList.forEach(function (u) {
+      if (u.learned) return;
+      var recent = u.events.filter(function (e) { return e.day >= since; });
+      var misses = recent.filter(function (e) { return e.grade === "otra"; }).length;
+      if (!misses) return;
+      rowsOut.push({ u: u, recent: recent, misses: misses, last: recent[recent.length - 1].at });
+    });
+    if (!rowsOut.length) return null;
+    rowsOut.sort(function (a, b) { return b.misses - a.misses || b.last - a.last; });
+    var c = progCard(t("prog_struggle_title"), t("prog_struggle_sub"));
+    var ul = progEl("ul", "prog-rows");
+    rowsOut.slice(0, 5).forEach(function (x) {
+      var li = progEl("li");
+      var lab = unitLabel(idx, x.u);
+      var w = progEl("span", "w", lab.main);
+      if (lab.sub) w.appendChild(progEl("span", "f", lab.sub));
+      li.appendChild(w);
+      var r = progEl("span", "r");
+      r.appendChild(progDots(x.recent.slice(-6).map(function (e) { return e.grade; })));
+      var b = x.recent.filter(function (e) { return e.grade === "bien"; }).length;
+      r.appendChild(document.createTextNode(t("prog_x_of_y", { b: b, n: x.recent.length })));
+      li.appendChild(r);
+      ul.appendChild(li);
+    });
+    c.appendChild(ul);
+    var units = rowsOut.map(function (x) { return x.u; });
+    c.appendChild(progButton(t("prog_struggle_btn", { n: Math.min(units.length, PROG_DECK_MAX) }), false, function () { startPracticeDeck(cardsForUnits(units)); }));
+    var save = progEl("button", "prog-link", t("prog_struggle_save"));
+    save.type = "button";
+    save.addEventListener("click", function () { saveUnitsAsList(units, save); });
+    c.appendChild(save);
+    return c;
+  }
+
+  function drawVerbGrid(P) {
+    var since = P.today - PROG_GRID_DAYS + 1;
+    var cells = {};
+    var any = false;
+    P.events.forEach(function (r) {
+      if (r.item_kind !== "verb" || !r.form_key || progDayNum(r.shown_at) < since) return;
+      var c = cells[r.form_key] || (cells[r.form_key] = { b: 0, n: 0 });
+      c.n++; if (r.grade === "bien") c.b++;
+      any = true;
+    });
+    if (!any) return null;
+    var card = progCard(t("prog_grid_title"), t("prog_grid_sub"));
+    var grid = progEl("div", "prog-grid");
+    grid.appendChild(progEl("div"));
+    PROG_GRID_PERSONS.forEach(function (p) { grid.appendChild(progEl("div", "h", t("prog_person_" + p))); });
+    PROG_GRID_TENSES.forEach(function (tk) {
+      grid.appendChild(progEl("div", "t", t("prog_tense_" + tk)));
+      PROG_GRID_PERSONS.forEach(function (pk) {
+        if (tk === "imperativo" && pk === "yo") { grid.appendChild(progEl("div", "c na", "—")); return; }
+        var fk = flashCellKey(tk, pk);
+        var c = cells[fk];
+        var btn = progEl("button", "c");
+        btn.type = "button";
+        if (!c) {
+          btn.classList.add("none");
+          btn.setAttribute("aria-label", t("prog_grid_cell_none", { tense: t("prog_tense_" + tk), person: t("prog_person_" + pk) }));
+        } else {
+          var pct = Math.round(100 * c.b / c.n);
+          var step = pct >= 85 ? 5 : pct >= 70 ? 4 : pct >= 55 ? 3 : pct >= 40 ? 2 : 1;
+          btn.classList.add("s" + step);
+          btn.textContent = String(pct);
+          btn.setAttribute("aria-label", t("prog_grid_cell_aria", { tense: t("prog_tense_" + tk), person: t("prog_person_" + pk), pct: pct, n: c.n }));
+          btn.title = t("prog_grid_cell_aria", { tense: t("prog_tense_" + tk), person: t("prog_person_" + pk), pct: pct, n: c.n });
+        }
+        btn.addEventListener("click", function () {
+          var cards = [];
+          allVerbs.forEach(function (v) { Array.prototype.push.apply(cards, verbCards(v.data, function (k) { return k === fk; })); });
+          if (effectiveFlashMode() === "escuchar") cards = cards.map(listenCard);
+          startPracticeDeck(cards);
+        });
+        grid.appendChild(btn);
+      });
+    });
+    card.appendChild(grid);
+    var legend = progEl("div", "prog-legend");
+    legend.appendChild(progEl("span", null, t("prog_grid_none")));
+    legend.appendChild(progEl("i", "none-swatch"));
+    legend.appendChild(progEl("span", "gap", "0%"));
+    var ramp = progEl("span", "ramp");
+    for (var s = 1; s <= 5; s++) ramp.appendChild(progEl("i", "s" + s));
+    legend.appendChild(ramp);
+    legend.appendChild(progEl("span", null, "100%"));
+    card.appendChild(legend);
+    return card;
+  }
+
+  function drawLearned(P, unitList) {
+    var c = progCard(t("prog_learned_title"), t("prog_learned_sub"));
+    var weekAgo = P.today - 6;
+    var tiles = progEl("div", "prog-tiles");
+    [["word", "prog_learned_words"], ["verb", "prog_learned_forms"], ["phrase", "prog_learned_phrases"]].forEach(function (k) {
+      var mine = unitList.filter(function (u) { return u.kind === k[0] && u.learned; });
+      var fresh = mine.filter(function (u) { return u.learnedSince !== null && u.learnedSince >= weekAgo; }).length;
+      var tile = progEl("div", "prog-tile");
+      tile.appendChild(progEl("b", null, String(mine.length)));
+      tile.appendChild(progEl("span", null, t(k[1])));
+      if (fresh) tile.appendChild(progEl("em", null, "+" + fresh));
+      tiles.appendChild(tile);
+    });
+    c.appendChild(tiles);
+    c.appendChild(progEl("p", "prog-sub prog-tight", t("prog_learned_new")));
+    // learned over the last 8 weeks (only once there's more than a week of it)
+    var first = P.learnedMoves.length ? P.learnedMoves[0].day : null;
+    if (first !== null && P.today - first >= 7) {
+      var pts = [];
+      for (var w = 8; w >= 0; w--) {
+        var end = P.today - w * 7;
+        pts.push(P.learnedMoves.reduce(function (s, m) { return m.day <= end ? s + m.delta : s; }, 0));
+      }
+      var max = Math.max.apply(null, pts.concat([1]));
+      var W = 340, H = 70;
+      var xy = pts.map(function (v, i) { return [Math.round(i * W / (pts.length - 1)), Math.round(H - 4 - (v / max) * (H - 10))]; });
+      var ns = "http://www.w3.org/2000/svg";
+      var svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", "-6 -6 " + (W + 12) + " " + (H + 12));
+      svg.setAttribute("class", "prog-spark");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", t("prog_spark_aria", { a: pts[0], b: pts[pts.length - 1] }));
+      var path = document.createElementNS(ns, "path");
+      path.setAttribute("d", "M" + xy.map(function (q) { return q.join(","); }).join(" L"));
+      svg.appendChild(path);
+      var dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", xy[xy.length - 1][0]); dot.setAttribute("cy", xy[xy.length - 1][1]); dot.setAttribute("r", "4");
+      svg.appendChild(dot);
+      c.appendChild(svg);
+      var axis = progEl("div", "prog-axis");
+      axis.appendChild(progEl("span", null, t("prog_spark_from")));
+      axis.appendChild(progEl("span", null, t("prog_spark_to", { n: pts[pts.length - 1] })));
+      c.appendChild(axis);
+    }
+    return c;
+  }
+
+  // A list item's status from its units: "learned", "progress" or "new".
+  // A verb counts as learned once at least 3 of its forms are, and at least
+  // half of the forms you've practiced.
+  function listItemStatus(P, item) {
+    if (item.type !== "verb") {
+      var u = P.units[unitKey(item.type, item.key, null)];
+      return !u ? "new" : (u.learned ? "learned" : "progress");
+    }
+    var practiced = 0, learned = 0;
+    Object.keys(P.units).forEach(function (k) {
+      var u = P.units[k];
+      if (u.kind !== "verb" || u.itemKey !== item.key) return;
+      practiced++; if (u.learned) learned++;
+    });
+    if (!practiced) return "new";
+    return (learned >= 3 && learned * 2 >= practiced) ? "learned" : "progress";
+  }
+  function listProgress(P, l) {
+    var items = l.data.items || [];
+    var out = { total: items.length, learned: 0, progress: 0, todo: [] };
+    items.forEach(function (it) {
+      var st = listItemStatus(P, it);
+      if (st === "learned") out.learned++;
+      else { if (st === "progress") out.progress++; out.todo.push(it); }
+    });
+    return out;
+  }
+  function cardsForListItems(items) {
+    var idx = progContentIndex();
+    var listen = effectiveFlashMode() === "escuchar";
+    var dir = listen ? "word2def" : flashDirection;
+    var cards = [];
+    items.forEach(function (it) {
+      var entry = (idx[it.type] || {})[it.key];
+      if (!entry) return;
+      if (it.type === "verb") Array.prototype.push.apply(cards, verbCards(entry.data, setupVerbWant));
+      else if (it.type === "word") cards.push(wordCard(entry.data, dir));
+      else cards.push(phraseCard(entry.data, dir));
+    });
+    return listen ? cards.map(listenCard) : cards;
+  }
+
+  function drawListBars(P, idx) {
+    var lists = allLists.filter(function (l) { return (l.data.items || []).length; });
+    if (!lists.length) return null;
+    var c = progCard(t("prog_lists_title"), t("prog_lists_sub"));
+    lists.forEach(function (l) {
+      var lp = listProgress(P, l);
+      var row = progEl("button", "prog-bar");
+      row.type = "button";
+      var top = progEl("div", "prog-bar-top");
+      top.appendChild(progEl("span", "name", l.data.name));
+      top.appendChild(progEl("span", "count", t("prog_lists_count", { l: lp.learned, n: lp.total })));
+      row.appendChild(top);
+      row.appendChild(progTrack(lp));
+      row.addEventListener("click", function () {
+        if (!lp.todo.length) { showBanner(t("prog_lists_done")); return; }
+        startPracticeDeck(cardsForListItems(lp.todo));
+      });
+      c.appendChild(row);
+    });
+    var keys = progEl("div", "prog-keys");
+    var k1 = progEl("span"); k1.appendChild(progEl("i", "l")); k1.appendChild(document.createTextNode(t("prog_key_learned")));
+    var k2 = progEl("span"); k2.appendChild(progEl("i", "p")); k2.appendChild(document.createTextNode(t("prog_key_progress")));
+    keys.appendChild(k1); keys.appendChild(k2);
+    c.appendChild(keys);
+    return c;
+  }
+  function progTrack(lp) {
+    var track = progEl("span", "prog-track");
+    var a = progEl("i", "l"); a.style.width = (lp.total ? 100 * lp.learned / lp.total : 0) + "%";
+    var b = progEl("i", "p"); b.style.width = (lp.total ? 100 * lp.progress / lp.total : 0) + "%";
+    if (lp.learned) track.appendChild(a);
+    if (lp.progress) track.appendChild(b);
+    return track;
+  }
+
+  function drawStillKnown(P, unitList, idx) {
+    var units = unitList.filter(function (u) { return u.last && u.last.grade === "otra" && unitIsSabido(idx, u); });
+    if (!units.length) return null;
+    var c = progCard(t("prog_known_title"), t("prog_known_sub"));
+    var chips = progEl("div", "prog-chips");
+    units.slice(0, 8).forEach(function (u) { chips.appendChild(progEl("span", "chip", unitLabel(idx, u).main)); });
+    c.appendChild(chips);
+    c.appendChild(progButton(t("prog_known_btn"), false, function () { startPracticeDeck(cardsForUnits(units)); }));
+    return c;
+  }
+
+  // "Guardar como lista" under Te cuestan: a new list with those items
+  // (whole verbs, since lists hold items, not forms).
+  function saveUnitsAsList(units, btn) {
+    var idx = progContentIndex();
+    var seen = {};
+    var rows = [];
+    units.forEach(function (u) {
+      var item = progUnitItem(idx, u);
+      if (!item) return;
+      var k = u.kind + "|" + u.itemKey;
+      if (seen[k]) return;
+      seen[k] = true;
+      rows.push({ item_type: u.kind, data: listSnapshot(item.data) });
+    });
+    if (!rows.length) return;
+    var d = new Date();
+    var name = t("prog_struggle_list_name", { date: d.toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { day: "numeric", month: "short" }) });
+    btn.disabled = true;
+    supabaseClient.from("lists").insert({ name: name, owner_label: currentUser ? currentUser.email : "" }).select().single().then(function (res) {
+      if (res.error) { btn.disabled = false; showBanner(t("msg_error_crear", { msg: res.error.message })); return; }
+      var listId = res.data.id;
+      supabaseClient.from("list_items").insert(rows.map(function (r) { return { list_id: listId, item_type: r.item_type, data: r.data }; })).then(function (res2) {
+        btn.disabled = false;
+        if (res2.error) { showBanner(t("msg_error_generic", { msg: res2.error.message })); return; }
+        showBanner(t("prog_struggle_saved", { name: name, n: rows.length }));
+        loadLists();
+      });
+    });
+  }
+
+  // ---- Última sesión (top of the Tarjetas setup) ----
+  function renderLastSession() {
+    if (!el.lastSession) return;
+    if (!currentUser) { el.lastSession.hidden = true; return; }
+    var rows = practiceAllRows();
+    var last = null;
+    for (var i = rows.length - 1; i >= 0; i--) { if (rows[i].session_id) { last = rows[i].session_id; break; } }
+    if (!last) { el.lastSession.hidden = true; return; }
+    var mine = rows.filter(function (r) { return r.session_id === last; });
+    var when = new Date(mine[mine.length - 1].shown_at);
+    var dayDiff = progToday() - progDayNum(when);
+    if (dayDiff > 1) { el.lastSession.hidden = true; return; }
+    var P = computeProgress(mine);
+    var bien = P.events.filter(function (r) { return r.grade === "bien"; }).length;
+    // "the ones that were hard": any card marked Otra vez at some point in
+    // that session, even if a later pass got it right.
+    var otraUnits = Object.keys(P.units).map(function (k) { return P.units[k]; }).filter(function (u) { return u.events.some(function (e) { return e.grade === "otra"; }); });
+    var otra = P.events.length - bien;
+    var ms = mine.reduce(function (s, r) { return s + (r.ms_front || 0) + (r.ms_back || 0); }, 0);
+    var time = currentLang === "es"
+      ? when.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })
+      : when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    el.lastSession.innerHTML = "";
+    el.lastSession.appendChild(progEl("p", "last-session-h", t("last_session_title", { when: t(dayDiff ? "last_session_yesterday" : "last_session_today", { time: time }) })));
+    var nums = progEl("div", "last-session-nums");
+    nums.appendChild(progEl("span", null, t(mine.length === 1 ? "last_session_cards_1" : "last_session_cards", { n: mine.length })));
+    nums.appendChild(progEl("span", null, t("last_session_min", { n: Math.max(1, Math.round(ms / 60000)) })));
+    if (P.events.length) {
+      nums.appendChild(progEl("span", "b", t("last_session_bien", { n: bien })));
+      nums.appendChild(progEl("span", "o", t("last_session_otra", { n: otra })));
+    }
+    el.lastSession.appendChild(nums);
+    if (otraUnits.length) {
+      el.lastSession.appendChild(progButton(t(otraUnits.length === 1 ? "last_session_btn_1" : "last_session_btn", { n: otraUnits.length }), false, function () {
+        startPracticeDeck(cardsForUnits(otraUnits));
+      }));
+    }
+    el.lastSession.hidden = false;
+  }
+
+  // ---- Tu historial (detail pages) ----
+  function historyBlocks() { return document.querySelectorAll(".item-history"); }
+  function renderItemHistory(kind) {
+    historyBlocks().forEach(function (block) {
+      var k = block.getAttribute("data-history-kind");
+      if (kind && k !== kind) return;
+      var toggle = block.querySelector(".item-history-toggle");
+      var bodyEl = block.querySelector(".item-history-body");
+      block.hidden = !currentUser;
+      toggle.classList.toggle("open", historyOpen);
+      toggle.setAttribute("aria-expanded", historyOpen ? "true" : "false");
+      bodyEl.hidden = !historyOpen;
+      if (!historyOpen) return;
+      var data = historySelectedData(k);
+      if (!data) return;
+      if (!practiceHistory.rows || practiceHistory.userId !== (currentUser && currentUser.id)) {
+        bodyEl.textContent = t("prog_loading");
+        loadPracticeHistory(false).then(function () { if (historyOpen) drawItemHistory(bodyEl, k, historySelectedData(k)); });
+        return;
+      }
+      drawItemHistory(bodyEl, k, data);
+    });
+  }
+  function historySelectedData(kind) {
+    var coll = kind === "verb" ? allVerbs : (kind === "word" ? allWords : allPhrases);
+    var id = kind === "verb" ? selectedId : (kind === "word" ? selectedWordId : selectedPhraseId);
+    var entry = id ? coll.find(function (x) { return x.id === id; }) : null;
+    return entry ? entry.data : null;
+  }
+  function drawItemHistory(bodyEl, kind, data) {
+    bodyEl.innerHTML = "";
+    if (!data) return;
+    var key = practiceNorm(data.infinitive || data.word || data.phrase);
+    var rows = practiceAllRows().filter(function (r) { return r.item_kind === kind && r.item_key === key; });
+    if (!rows.length) { bodyEl.appendChild(progEl("p", "prog-text", t("history_none"))); return; }
+    var P = computeProgress(rows);
+    var days = {};
+    rows.forEach(function (r) { days[progDayNum(r.shown_at)] = true; });
+    var nDays = Object.keys(days).length;
+    var bien = P.events.filter(function (r) { return r.grade === "bien"; }).length;
+    var flips = rows.filter(function (r) { return r.flipped && r.ms_to_flip != null; });
+    var avgFlip = flips.length ? flips.reduce(function (s, r) { return s + r.ms_to_flip; }, 0) / flips.length : null;
+    var units = Object.keys(P.units).map(function (k) { return P.units[k]; });
+    var nextDue = units.length ? Math.min.apply(null, units.map(function (u) { return u.dueDay; })) : null;
+    var nextText = "—";
+    if (nextDue !== null) {
+      var dd = nextDue - P.today;
+      nextText = dd <= 0 ? t("history_next_today") : (dd === 1 ? t("history_next_tomorrow") : t("history_next_days", { n: dd }));
+    }
+    var grid = progEl("div", "history-grid");
+    function stat(big, small) {
+      var x = progEl("div");
+      x.appendChild(progEl("b", null, big));
+      x.appendChild(progEl("span", null, small));
+      grid.appendChild(x);
+    }
+    stat(t(rows.length === 1 ? "history_seen_1" : "history_seen", { n: rows.length }), t(nDays === 1 ? "history_seen_sub_1" : "history_seen_sub", { d: nDays }));
+    if (P.events.length) stat(t("prog_x_of_y", { b: bien, n: P.events.length }), t("history_grade_sub"));
+    else stat("—", t("history_no_grades"));
+    stat(avgFlip !== null ? progNum(avgFlip / 1000, 1) + " s" : "—", t("history_flip_sub"));
+    stat(nextText, t("history_next_sub"));
+    if (kind === "verb") {
+      var learned = units.filter(function (u) { return u.learned; }).length;
+      stat(t("prog_x_of_y", { b: learned, n: units.length }), t("history_forms_sub"));
+    }
+    bodyEl.appendChild(grid);
+    var lastTen = P.events.slice(-10).map(function (r) { return r.grade; });
+    if (lastTen.length) {
+      var line = progEl("div", "history-last");
+      line.appendChild(progDots(lastTen));
+      line.appendChild(progEl("span", null, t("history_last", { n: lastTen.length })));
+      bodyEl.appendChild(line);
+    }
+  }
+  function toggleHistoryOpen() {
+    historyOpen = !historyOpen;
+    try { localStorage.setItem(HISTORY_OPEN_KEY, historyOpen ? "1" : "0"); } catch (e) {}
+    renderItemHistory(null);
+  }
+  document.querySelectorAll(".item-history-toggle").forEach(function (b) { b.addEventListener("click", toggleHistoryOpen); });
+
+  // ---- list bars on the Listas tab ----
+  function decorateListRows() {
+    if (!currentUser || !practiceHistory.rows || practiceHistory.userId !== currentUser.id) return;
+    var P = computeProgress(practiceAllRows());
+    if (!P.events.length) return;
+    allLists.forEach(function (l) {
+      var row = el.listsList.querySelector('.list-row[data-list-id="' + l.id + '"]');
+      if (!row || !(l.data.items || []).length) return;
+      var lp = listProgress(P, l);
+      var main = row.querySelector(".list-row-main");
+      var count = main && main.querySelector(".def");
+      if (count && !count.querySelector(".list-learned")) count.appendChild(progEl("span", "list-learned", t(lp.learned === 1 ? "list_meta_learned_1" : "list_meta_learned", { n: lp.learned })));
+      if (main && !main.querySelector(".prog-track")) { main.appendChild(progTrack(lp)); row.classList.add("has-track"); }
+    });
+  }
+
+  // Called when practice data changes on this device (a deck closed) or the
+  // language changes.
+  function refreshPracticeViews() {
+    renderLastSession();
+    if (el.progressPanel && !el.progressPanel.hidden) renderProgress();
+    if (selectedId) renderItemHistory("verb");
+    if (selectedWordId) renderItemHistory("word");
+    if (selectedPhraseId) renderItemHistory("phrase");
+  }
 
   // ================= Sabido (self-assessed "I know this one") =================
   // "known" is one person's own progress, not a property of the content. It
@@ -5728,11 +6702,11 @@
     if (el.dKnownLegend) el.dKnownLegend.hidden = !any;
   }
 
-  function showFlashDone(reviewMode) {
+  function showFlashDone(reviewMode, textKey) {
     flashDeck = [];
     flashIndex = -1;
     el.flashProgress.textContent = "";
-    el.flashDoneText.textContent = t(reviewMode ? "flash_done_text_review" : "flash_done_text");
+    el.flashDoneText.textContent = t(textKey || (reviewMode ? "flash_done_text_review" : "flash_done_text"));
     el.flashOverlay.classList.add("is-done");
   }
 
@@ -5972,6 +6946,11 @@
     return (rows || []).map(function (row) {
       var entry = rowToList(row);
       entry.data.itemCount = (row.list_items && row.list_items.length) || 0;
+      // Just what the progress bars need: each item's type + normalised text.
+      entry.data.items = (row.list_items || []).map(function (it) {
+        var d = it.data || {};
+        return { type: it.item_type, key: practiceNorm(d.infinitive || d.word || d.phrase) };
+      });
       return entry;
     });
   }
@@ -6207,6 +7186,7 @@
       // flow exactly as they did when the whole row was one <button>.
       var wrap = document.createElement("div");
       wrap.className = "card-row list-row";
+      wrap.dataset.listId = l.id;
 
       var btn = document.createElement("button");
       btn.type = "button";
@@ -6255,6 +7235,7 @@
       li.appendChild(wrap);
       el.listsList.appendChild(li);
     });
+    decorateListRows();
   }
 
   function listItemRow(row) {
@@ -7760,6 +8741,7 @@
   el.flashArrowPrev.addEventListener("click", prevFlashCard);
 
   el.tabLists.addEventListener("click", function () { setMainTab("lists"); });
+  el.tabProgress.addEventListener("click", function () { setMainTab("progress"); });
   el.toggleAddList.addEventListener("click", openListForm);
   el.listFormCancel.addEventListener("click", closeListForm);
   el.listForm.addEventListener("submit", handleListSubmit);
@@ -7815,6 +8797,7 @@
     else if (saved === "phrases") setMainTab("phrases");
     else if (saved === "flashcards") setMainTab("flashcards");
     else if (saved === "lists") setMainTab("lists");
+    else if (saved === "progress") setMainTab("progress");
   })();
 
   // A ?share=TOKEN link opens the share preview via the public get_shared_list
@@ -7830,11 +8813,13 @@
     currentUser = session ? session.user : null;
     renderAuthState();
     practiceFlush();
+    refreshPracticeViews();
   });
   supabaseClient.auth.getSession().then(function (res) {
     currentUser = (res.data && res.data.session) ? res.data.session.user : null;
     renderAuthState();
     practiceFlush();
+    refreshPracticeViews();
   });
 
   // The conjugation table's row-height sync (see syncConjRowHeights) runs

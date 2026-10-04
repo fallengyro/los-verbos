@@ -101,6 +101,7 @@
       <button type="button" class="main-tab" id="tab-words" data-i18n="nav_words">Vocabulario</button>
       <button type="button" class="main-tab" id="tab-phrases" data-i18n="nav_phrases">Frases</button>
       <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
+      <button type="button" class="main-tab" id="tab-progress" data-i18n="nav_progress">Progreso</button>
       <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
     </div>
   </div>
@@ -215,6 +216,14 @@
       <div class="tile" data-form-key="participio"><span class="label" data-i18n="tile_participio">Participio</span><span class="val" id="d-participio"></span></div>
     </div>
     <p class="form-msg detail-tts-msg" id="d-tts-msg"></p>
+
+    <!-- Tu historial (2026-10-03): this item's practice history, folded
+         behind the same disclosure as "Personalizar tiempos y personas".
+         Open/closed is one app-wide setting — see renderItemHistory(). -->
+    <div class="item-history" data-history-kind="verb">
+      <button type="button" class="flash-custom-toggle item-history-toggle" aria-expanded="false"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="history_toggle">Tu historial</span></button>
+      <div class="flash-custom item-history-body" hidden></div>
+    </div>
 
     <div class="detail-actions-footer">
       <button class="icon-btn" id="d-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
@@ -389,6 +398,14 @@
     <p class="example-note" id="wd-example"></p>
     <p class="form-msg detail-tts-msg" id="wd-tts-msg"></p>
 
+    <!-- Tu historial (2026-10-03): this item's practice history, folded
+         behind the same disclosure as "Personalizar tiempos y personas".
+         Open/closed is one app-wide setting — see renderItemHistory(). -->
+    <div class="item-history" data-history-kind="word">
+      <button type="button" class="flash-custom-toggle item-history-toggle" aria-expanded="false"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="history_toggle">Tu historial</span></button>
+      <div class="flash-custom item-history-body" hidden></div>
+    </div>
+
     <div class="detail-actions-footer">
       <button class="icon-btn" id="wd-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
       <button class="icon-btn" id="wd-edit" type="button" data-i18n="btn_edit">Editar</button>
@@ -520,6 +537,14 @@
     <p class="example-note" id="pd-example"></p>
     <p class="form-msg detail-tts-msg" id="pd-tts-msg"></p>
 
+    <!-- Tu historial (2026-10-03): this item's practice history, folded
+         behind the same disclosure as "Personalizar tiempos y personas".
+         Open/closed is one app-wide setting — see renderItemHistory(). -->
+    <div class="item-history" data-history-kind="phrase">
+      <button type="button" class="flash-custom-toggle item-history-toggle" aria-expanded="false"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="history_toggle">Tu historial</span></button>
+      <div class="flash-custom item-history-body" hidden></div>
+    </div>
+
     <div class="detail-actions-footer">
       <button class="icon-btn" id="pd-add-to-list" type="button" data-i18n="btn_add_to_list">Agregar a lista</button>
       <button class="icon-btn" id="pd-edit" type="button" data-i18n="btn_edit">Editar</button>
@@ -596,6 +621,9 @@
   <section id="flashcards-panel" hidden>
     <div class="flash-setup">
       <h2 data-i18n="flash_title">Modo tarjetas</h2>
+      <!-- Última sesión (2026-10-03): how the last deck went, with a button to
+           drill just the cards marked Otra vez. See renderLastSession(). -->
+      <div class="last-session" id="last-session" hidden></div>
       <p class="flash-setup-note" data-i18n="flash_setup_note">Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.</p>
 
       <div class="flash-source-toggle">
@@ -674,6 +702,13 @@
         <span class="flash-deck-count" id="flash-deck-count" aria-live="polite"></span>
       </div>
     </div>
+  </section>
+
+  <!-- Progreso (2026-10-03): built from the practice log (schema.sql's
+       practice_log). Every section ends in something to practice. Rendered
+       by app.js's renderProgress(). -->
+  <section id="progress-panel" class="progress-panel" hidden>
+    <div id="progress-body" class="prog"></div>
   </section>
 
   <section id="lists-panel" hidden>

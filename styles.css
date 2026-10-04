@@ -1855,3 +1855,103 @@
   .share-body h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 28px; margin: 6px 0 2px; }
   .share-actions { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
   .share-actions .flash-setup-note { margin: 0 0 10px; }
+
+  /* ================= Progreso + Tu historial (2026-10-03) =================
+     From the approved mockups (maqueta_progreso). One sequential hue (the
+     accent) for the verb grid, light → dark = 0 → 100% bien; dashed = not
+     practiced. Bien/Otra vez dots reuse the grade switch's teal/danger. */
+  .progress-panel { margin-top: 4px; }
+  .prog { display: flex; flex-direction: column; gap: 14px; }
+  .prog-loading, .prog-note { color: var(--ink-soft); font-size: 13.5px; font-style: italic; margin: 4px 2px; }
+  .prog-card { border: 1px solid var(--line); border-radius: 14px; background: var(--paper-raised); padding: 16px 16px 14px; }
+  .prog-card h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 19px; margin: 0 0 2px; color: var(--ink); }
+  .prog-sub { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; line-height: 1.4; }
+  .prog-sub.prog-tight { margin: -4px 0 6px; }
+  .prog-text { font-size: 14.5px; color: var(--ink); line-height: 1.5; margin: 6px 0 2px; }
+  .prog-card .btn-primary, .prog-card .btn-secondary { width: 100%; margin-top: 4px; }
+  .prog-hero { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 2px; }
+  .prog-hero .n { font-family: "Fraunces", Georgia, serif; font-size: 52px; font-weight: 600; line-height: 1; color: var(--accent-deep); }
+  .prog-hero .u { font-size: 16px; color: var(--ink); }
+  .prog-week { display: flex; justify-content: space-between; margin: 4px 0 12px; }
+  .prog-day { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11.5px; color: var(--ink-soft); }
+  .prog-day i { width: 30px; height: 30px; border-radius: 50%; border: 1.5px dashed var(--line); display: block; box-sizing: border-box; }
+  .prog-day.on i { background: var(--accent); border: 1.5px solid var(--accent); }
+  .prog-day.today i { box-shadow: 0 0 0 3px var(--paper-raised), 0 0 0 5px var(--accent); }
+  .prog-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+  .prog-stats b { display: block; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .prog-stats span { font-size: 11.5px; color: var(--ink-soft); }
+  .prog-rows { list-style: none; margin: 0 0 10px; padding: 0; border-top: 1px solid var(--line); }
+  .prog-rows li { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .prog-rows .w { font-family: "Fraunces", Georgia, serif; font-weight: 600; color: var(--ink); min-width: 0; }
+  .prog-rows .f { font-size: 12.5px; color: var(--ink-soft); font-family: "Public Sans", sans-serif; font-weight: 400; margin-left: 6px; }
+  .prog-rows .r { font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .prog-dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: 6px; }
+  .prog-dots i { width: 7px; height: 7px; border-radius: 50%; display: block; }
+  .prog-dots i.b { background: var(--teal); }
+  .prog-dots i.o { background: var(--danger); }
+  .prog-link { display: block; margin: 10px auto 0; background: none; border: 0; padding: 2px 4px; font: inherit; font-size: 14px; color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .prog-link:disabled { opacity: 0.5; cursor: default; }
+  .prog-grid { display: grid; grid-template-columns: minmax(84px, auto) repeat(5, 1fr); gap: 3px; font-size: 11.5px; margin: 0 0 8px; }
+  .prog-grid .h { text-align: center; color: var(--ink-soft); font-weight: 600; padding-bottom: 2px; }
+  .prog-grid .t { color: var(--ink); display: flex; align-items: center; font-size: 12.5px; padding-right: 4px; }
+  .prog-grid .c { height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font: inherit; font-size: 11px; font-variant-numeric: tabular-nums; border: 0; padding: 0; cursor: pointer; color: var(--ink); -webkit-tap-highlight-color: transparent; }
+  .prog-grid .c.none { border: 1px dashed var(--line); background: transparent; color: var(--ink-soft); }
+  .prog-grid .c.na { background: transparent; color: var(--line); cursor: default; }
+  .prog-grid .c:not(.na):hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .s1 { background: color-mix(in srgb, var(--accent) 20%, var(--paper-raised)); }
+  .s2 { background: color-mix(in srgb, var(--accent) 40%, var(--paper-raised)); }
+  .s3 { background: color-mix(in srgb, var(--accent) 60%, var(--paper-raised)); }
+  .s4 { background: color-mix(in srgb, var(--accent) 80%, var(--paper-raised)); }
+  .s5 { background: var(--accent); }
+  .prog-grid .c.s3, .prog-grid .c.s4, .prog-grid .c.s5 { color: var(--paper); }
+  .prog-legend { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-soft); flex-wrap: wrap; }
+  .prog-legend .none-swatch { width: 18px; height: 10px; border: 1px dashed var(--line); border-radius: 3px; display: block; }
+  .prog-legend .gap { margin-left: 8px; }
+  .prog-legend .ramp { display: flex; gap: 2px; }
+  .prog-legend .ramp i { width: 18px; height: 10px; border-radius: 3px; display: block; }
+  .prog-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 12px; }
+  .prog-tile { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; }
+  .prog-tile b { display: block; font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .prog-tile span { font-size: 11.5px; color: var(--ink-soft); display: block; line-height: 1.3; }
+  .prog-tile em { font-style: normal; font-size: 12px; color: var(--teal); font-weight: 600; }
+  .prog-spark { width: 100%; height: auto; display: block; }
+  .prog-spark path { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .prog-spark circle { fill: var(--accent); stroke: var(--paper-raised); stroke-width: 2; }
+  .prog-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .prog-bar { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; margin: 0 0 11px; font: inherit; color: inherit; cursor: pointer; }
+  .prog-bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; margin-bottom: 5px; color: var(--ink); }
+  .prog-bar-top .count { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .prog-track { height: 8px; border-radius: 4px; background: var(--paper-sunken); overflow: hidden; display: flex; gap: 2px; width: 100%; }
+  .prog-track i { display: block; height: 100%; border-radius: 4px; }
+  .prog-track i.l, .prog-keys i.l { background: var(--accent); }
+  .prog-track i.p, .prog-keys i.p { background: color-mix(in srgb, var(--accent) 35%, var(--paper-sunken)); }
+  .prog-keys { display: flex; gap: 14px; font-size: 11.5px; color: var(--ink-soft); }
+  .prog-keys i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .prog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .prog-chips .chip { cursor: default; }
+
+  /* Última sesión, at the top of the Tarjetas setup */
+  .last-session { border: 1px solid var(--line); border-radius: 12px; background: var(--paper); padding: 12px 14px; margin: 0 0 14px; }
+  .last-session-h { font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+  .last-session-nums { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14.5px; color: var(--ink); }
+  .last-session-nums .b { color: var(--teal); font-weight: 600; }
+  .last-session-nums .o { color: var(--danger); font-weight: 600; }
+  .last-session .btn-secondary { width: 100%; margin-top: 10px; }
+
+  /* Tu historial on detail pages: the Personalizar disclosure + inset box */
+  .item-history { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 4px; }
+  .item-history[hidden] { display: none; }
+  .item-history .flash-custom-toggle { margin-top: 4px; }
+  .item-history-body { padding: 12px 12px 10px; }
+  .history-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin: 0 0 10px; }
+  .history-grid b { display: block; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .history-grid span { font-size: 12px; color: var(--ink-soft); }
+  .history-last { font-size: 12.5px; color: var(--ink-soft); display: flex; align-items: center; flex-wrap: wrap; gap: 4px 0; }
+  .history-last .prog-dots i { width: 9px; height: 9px; }
+
+  /* Listas tab: a thin mastery bar under each list's count */
+  /* .list-row-main is display: contents, so the track is a flex item of the
+     row itself: pushed after the filter toggle onto a line of its own. */
+  .list-row.has-track { flex-wrap: wrap; }
+  .list-row-main .prog-track { height: 5px; order: 10; flex: 0 0 100%; margin-top: -2px; }
+  .list-row-main .list-learned { white-space: nowrap; }
