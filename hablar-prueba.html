@@ -111,6 +111,7 @@
 
   var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var results = {};    // index -> { text, data, ms } for "Copiar resultados"
+  var errors = {};     // index -> { text, error } — copied too, for debugging
   var recording = null; // the one recording in progress
 
   var whoEl = document.getElementById("who");
@@ -283,21 +284,36 @@
     r.textContent = "Analizando…";
     btn.disabled = true;
     var audioUrl = URL.createObjectURL(blob);
+    var info = "grabación " + (blob.type || "?") + ", " + Math.round(blob.size / 1024) + " KB";
     toWav16k(blob).then(function (wav) {
+      info += " → WAV " + Math.round(wav.length / 1024) + " KB";
       return client.functions.invoke("stt", { body: { text: text, audio: bytesToBase64(wav) } });
     }).then(function (res) {
       btn.disabled = false;
       if (res.error) {
+        // supabase-js only says "non-2xx status code"; the function's own
+        // answer (status + {"error": ...}) is on error.context, a Response.
         var msg = res.error.message || String(res.error);
-        if (/not found|404/i.test(msg)) msg += " — ¿ya se publicó la función «stt» en Supabase?";
-        showError(idx, "Error: " + msg);
+        var ctx = res.error.context;
+        var detail = ctx && typeof ctx.text === "function"
+          ? ctx.text().then(function (body) { return "HTTP " + ctx.status + ": " + String(body || "").slice(0, 300); }, function () { return "HTTP " + ctx.status; })
+          : Promise.resolve("");
+        detail.then(function (d) {
+          var full = "Error: " + msg + (d ? " — " + d : "") + " (" + info + ")";
+          if (/404|not found/i.test(d || msg)) full += " — ¿ya se publicó la función «stt» en Supabase?";
+          errors[idx] = { text: text, error: full };
+          showError(idx, full);
+        });
         return;
       }
+      delete errors[idx];
       results[idx] = { text: text, data: res.data, ms: ms };
       render(idx, text, res.data, audioUrl);
     }).catch(function (err) {
       btn.disabled = false;
-      showError(idx, "Error: " + (err && err.message ? err.message : err));
+      var full = "Error: " + (err && err.message ? err.message : err) + " (" + info + ")";
+      errors[idx] = { text: text, error: full };
+      showError(idx, full);
     });
   }
 
@@ -352,13 +368,17 @@
           }).join(" "));
       });
     });
+    Object.keys(errors).sort(function (a, b) { return a - b; }).forEach(function (k) {
+      if (results[k]) return;
+      lines.push("«" + errors[k].text + "» → " + errors[k].error);
+    });
     return lines.join("\n");
   }
   document.getElementById("copy-btn").addEventListener("click", function () {
     var text = summary();
     var msg = document.getElementById("copy-msg");
     var fb = document.getElementById("copy-fallback");
-    if (!Object.keys(results).length) { msg.textContent = "Todavía no grabaste nada."; return; }
+    if (!Object.keys(results).length && !Object.keys(errors).length) { msg.textContent = "Todavía no grabaste nada."; return; }
     (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
       msg.textContent = "Copiado. Pegalo en el chat con Claude.";
       fb.hidden = true;
