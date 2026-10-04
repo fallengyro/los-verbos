@@ -57,6 +57,12 @@
   .play { margin-top: 6px; background: none; border: 0; padding: 0; font: inherit; font-size: 13px; color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
   .actions { margin: 18px 0 0; display: flex; flex-direction: column; gap: 8px; }
   .actions .btn-primary { width: 100%; }
+  .hp-tabs { margin: 0 0 12px; }
+  .hp-tabs .lang-option { flex: 1; }
+  .tab-note { font-size: 13.5px; color: var(--ink-soft); line-height: 1.45; margin: 0 0 12px; }
+  .item-text .instead { font-size: 15px; color: var(--danger); font-weight: 600; margin-top: 2px; }
+  .item-text .pair { display: flex; flex-direction: column; gap: 6px; }
+  .verdict { display: block; margin-top: 2px; }
   #copy-msg { font-size: 13px; color: var(--ink-soft); text-align: center; min-height: 1em; }
   #copy-fallback { width: 100%; min-height: 160px; box-sizing: border-box; font: 12px "JetBrains Mono", monospace; }
 </style>
@@ -64,10 +70,21 @@
 <body>
 <div class="hp">
   <h1>voseá · prueba de Hablar</h1>
-  <p class="lede">Tocá el micrófono, decí la palabra como la dirías normalmente y tocá de nuevo para parar (corta solo a los 6 segundos). Vas a ver qué entendió Azure y cómo puntúa la pronunciación. No se guarda nada. Al final, «Copiar resultados» y pegáselos a Claude.</p>
+  <p class="lede">Tocá el micrófono, decí la palabra y tocá de nuevo para parar (corta solo a los 6 segundos). Vas a ver qué entendió Azure y cómo puntúa la pronunciación. No se guarda nada. Al final, «Copiar resultados» (copia las dos pestañas) y pegáselos a Claude.</p>
   <div class="who"><label for="who">¿Quién habla?</label><input id="who" type="text" placeholder="ej. mason" autocomplete="off" /></div>
   <p class="account" id="account">Comprobando la sesión…</p>
-  <div id="items"></div>
+  <div class="lang-toggle hp-tabs" role="tablist">
+    <button type="button" class="lang-option active" id="tab-bien" role="tab" aria-selected="true">1 · Decilo bien</button>
+    <button type="button" class="lang-option" id="tab-mal" role="tab" aria-selected="false">2 · Decilo mal</button>
+  </div>
+  <div id="pane-bien">
+    <p class="tab-note">Decí cada palabra bien, como la dirías normalmente.</p>
+    <div id="items-bien"></div>
+  </div>
+  <div id="pane-mal" hidden>
+    <p class="tab-note">Ahora a propósito decí <b>lo que está en rojo</b>, no la palabra de la tarjeta: es un error típico (otro tiempo, otra persona, una vocal). Queremos ver si Azure se da cuenta.</p>
+    <div id="items-mal"></div>
+  </div>
   <div class="actions">
     <button type="button" class="btn-primary" id="copy-btn">Copiar resultados</button>
     <p id="copy-msg"></p>
@@ -105,12 +122,29 @@
     ["pibe", "lunfardo"],
     ["laburo", "lunfardo"]
   ];
+  // "Decilo mal": [what the card expects, what to say instead, what kind
+  // of mistake it is] — near-misses a learner actually makes.
+  var WRONG = [
+    ["tenés", "tenías", "otro tiempo"],
+    ["despachamos", "despachaste", "otra persona"],
+    ["comimos", "comemos", "presente en vez de pretérito"],
+    ["tengo", "tenga", "subjuntivo en vez de indicativo"],
+    ["hablás", "hablas", "tú en vez de vos (solo el acento)"],
+    ["vos sos", "vos estás", "otro verbo"],
+    ["decime", "decile", "otro pronombre"],
+    ["¿Qué hacés?", "¿Qué hiciste?", "otro tiempo, en una frase"],
+    ["mesa", "misa", "una vocal"],
+    ["pollo", "polo", "ll en vez de l"],
+    ["valija", "valijas", "plural"],
+    ["cabotaje", "garaje", "otra palabra parecida"]
+  ];
   var MAX_MS = 6000;
   var MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
   var STOP = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>';
 
   var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  var results = {};    // index -> { text, data, ms } for "Copiar resultados"
+  var results = {};    // item id -> { text, said, data, ms } for "Copiar resultados"
+  var order = [];      // item ids, in page order (both tabs)
   var errors = {};     // index -> { text, error } — copied too, for debugging
   var recording = null; // the one recording in progress
 
@@ -139,6 +173,8 @@
     var e = norm(expected), h = norm(heard);
     if (!h) return false;
     if (e === h) return true;
+    // "de morado" for "demorado": the recogniser splitting one word in two
+    if (e.replace(/ /g, "") === h.replace(/ /g, "")) return true;
     // "vos tenés" for "tenés", or a trailing filler — the expected words in order
     return (" " + h + " ").indexOf(" " + e + " ") !== -1;
   }
@@ -213,7 +249,14 @@
   function resEl(idx) { return document.querySelector('.item[data-idx="' + idx + '"] .res'); }
   function showError(idx, msg) { var r = resEl(idx); r.innerHTML = ""; var p = document.createElement("p"); p.className = "no"; p.textContent = msg; r.appendChild(p); }
 
-  function render(idx, text, data, audioUrl) {
+  // For a "Decilo mal" item: did it hear what you actually said, or did
+  // it "hear" the card's answer anyway?
+  function wrongVerdict(expected, said, heard) {
+    if (matches(said, heard)) return "said";
+    if (matches(expected, heard)) return "expected";
+    return "other";
+  }
+  function render(idx, text, data, audioUrl, said) {
     var r = resEl(idx);
     r.innerHTML = "";
     var h = data.heard || {};
@@ -224,9 +267,15 @@
       p.innerHTML = "Escuché: <b></b> ";
       p.querySelector("b").textContent = "«" + (h.display || heardText) + "»";
       var mark = document.createElement("span");
-      var good = matches(text, heardText);
-      mark.className = good ? "ok" : "no";
-      mark.textContent = good ? "✓ coincide" : "✗ no coincide";
+      if (said) {
+        var v = wrongVerdict(text, said, heardText);
+        mark.className = "verdict " + (v === "expected" ? "no" : "ok");
+        mark.textContent = v === "said" ? "✓ oyó lo que dijiste" : (v === "expected" ? "✗ creyó que dijiste «" + text + "»" : "≈ oyó otra cosa (tampoco la de la tarjeta)");
+      } else {
+        var good = matches(text, heardText);
+        mark.className = good ? "ok" : "no";
+        mark.textContent = good ? "✓ coincide" : "✗ no coincide";
+      }
       p.appendChild(mark);
     } else {
       p.textContent = "No entendió nada (" + (h.recognitionStatus || h.error || "error") + ").";
@@ -241,6 +290,11 @@
     }
     var pa = document.createElement("div");
     pa.className = "pa";
+    if (said) {
+      var note = document.createElement("div"); note.className = "alts";
+      note.textContent = "Puntaje contra la palabra de la tarjeta, «" + text + "» (bajo = se dio cuenta):";
+      pa.appendChild(note);
+    }
     (data.assessments || []).forEach(function (a) {
       var row = document.createElement("div");
       row.className = "pa-row";
@@ -279,7 +333,7 @@
     }
   }
 
-  function analyse(idx, text, blob, ms, btn) {
+  function analyse(idx, text, blob, ms, btn, said) {
     var r = resEl(idx);
     r.textContent = "Analizando…";
     btn.disabled = true;
@@ -307,8 +361,8 @@
         return;
       }
       delete errors[idx];
-      results[idx] = { text: text, data: res.data, ms: ms };
-      render(idx, text, res.data, audioUrl);
+      results[idx] = { text: text, said: said || null, data: res.data, ms: ms };
+      render(idx, text, res.data, audioUrl, said);
     }).catch(function (err) {
       btn.disabled = false;
       var full = "Error: " + (err && err.message ? err.message : err) + " (" + info + ")";
@@ -317,47 +371,89 @@
     });
   }
 
-  // ---- the list ----
-  var list = document.getElementById("items");
-  ITEMS.concat([[null, "tu propia palabra o frase"]]).forEach(function (it, idx) {
+  // ---- the lists (one per tab) ----
+  // it: { id, text, said (Decilo mal only), why, custom: "one" | "pair" }
+  function buildItem(container, it) {
+    order.push(it.id);
+    var idx = it.id;
     var box = document.createElement("div");
     box.className = "item";
-    box.setAttribute("data-idx", String(idx));
+    box.setAttribute("data-idx", idx);
     var top = document.createElement("div"); top.className = "item-top";
     var txt = document.createElement("div"); txt.className = "item-text";
-    var input = null;
-    if (it[0] === null) {
+    var input = null, inputSaid = null;
+    if (it.custom === "one") {
       input = document.createElement("input");
       input.type = "text"; input.placeholder = "Escribí algo para decir…"; input.setAttribute("aria-label", "Tu propia palabra o frase");
       txt.appendChild(input);
+    } else if (it.custom === "pair") {
+      var pair = document.createElement("div"); pair.className = "pair";
+      input = document.createElement("input");
+      input.type = "text"; input.placeholder = "La tarjeta espera… (ej. tenés)"; input.setAttribute("aria-label", "Lo que espera la tarjeta");
+      inputSaid = document.createElement("input");
+      inputSaid.type = "text"; inputSaid.placeholder = "Vas a decir… (ej. tenías)"; inputSaid.setAttribute("aria-label", "Lo que vas a decir");
+      pair.appendChild(input); pair.appendChild(inputSaid);
+      txt.appendChild(pair);
     } else {
-      var say = document.createElement("div"); say.className = "say"; say.textContent = it[0]; txt.appendChild(say);
+      var say = document.createElement("div"); say.className = "say"; say.textContent = it.text; txt.appendChild(say);
+      if (it.said) { var inst = document.createElement("div"); inst.className = "instead"; inst.textContent = "Decí: «" + it.said + "»"; txt.appendChild(inst); }
     }
-    var why = document.createElement("div"); why.className = "why"; why.textContent = it[1]; txt.appendChild(why);
+    var why = document.createElement("div"); why.className = "why"; why.textContent = it.why; txt.appendChild(why);
     var btn = document.createElement("button");
     btn.type = "button"; btn.className = "rec"; btn.innerHTML = MIC;
     btn.setAttribute("aria-label", "Grabar");
     btn.addEventListener("click", function () {
       if (recording && recording.idx === idx) { recording.stop(); return; }
       if (recording) return; // one at a time
-      var text = input ? input.value.trim() : it[0];
-      if (!text) { showError(idx, "Escribí primero qué vas a decir."); return; }
-      startRecording(idx, btn, function (blob, ms) { analyse(idx, text, blob, ms, btn); });
+      var text = input ? input.value.trim() : it.text;
+      var said = inputSaid ? inputSaid.value.trim() : (it.said || null);
+      if (!text || (inputSaid && !said)) { showError(idx, "Escribí primero qué vas a decir."); return; }
+      startRecording(idx, btn, function (blob, ms) { analyse(idx, text, blob, ms, btn, said); });
     });
     top.appendChild(txt); top.appendChild(btn);
     box.appendChild(top);
     var res = document.createElement("div"); res.className = "res"; res.setAttribute("aria-live", "polite");
     box.appendChild(res);
-    list.appendChild(box);
-  });
+    container.appendChild(box);
+  }
+  var listBien = document.getElementById("items-bien");
+  ITEMS.forEach(function (it, i) { buildItem(listBien, { id: "b" + i, text: it[0], why: it[1] }); });
+  buildItem(listBien, { id: "b-custom", custom: "one", why: "tu propia palabra o frase" });
+  var listMal = document.getElementById("items-mal");
+  WRONG.forEach(function (it, i) { buildItem(listMal, { id: "m" + i, text: it[0], said: it[1], why: it[2] }); });
+  buildItem(listMal, { id: "m-custom", custom: "pair", why: "tu propio error" });
+
+  // ---- tabs ----
+  function showTab(name) {
+    var bien = name !== "mal";
+    document.getElementById("pane-bien").hidden = !bien;
+    document.getElementById("pane-mal").hidden = bien;
+    var tb = document.getElementById("tab-bien"), tm = document.getElementById("tab-mal");
+    tb.classList.toggle("active", bien); tm.classList.toggle("active", !bien);
+    tb.setAttribute("aria-selected", bien ? "true" : "false"); tm.setAttribute("aria-selected", bien ? "false" : "true");
+    try { localStorage.setItem("iv-hablar-tab", bien ? "bien" : "mal"); } catch (e) {}
+  }
+  document.getElementById("tab-bien").addEventListener("click", function () { showTab("bien"); });
+  document.getElementById("tab-mal").addEventListener("click", function () { showTab("mal"); });
+  try { showTab(localStorage.getItem("iv-hablar-tab") || "bien"); } catch (e) { showTab("bien"); }
 
   // ---- "Copiar resultados" ----
   function summary() {
     var lines = ["voseá · prueba de Hablar", "Quién: " + (whoEl.value || "?") + " · " + new Date().toLocaleString("es-AR") + " · " + navigator.userAgent, ""];
-    Object.keys(results).sort(function (a, b) { return a - b; }).forEach(function (k) {
+    var lastTab = null;
+    order.filter(function (k) { return results[k]; }).forEach(function (k) {
       var x = results[k], h = x.data.heard || {};
+      var tab = k.charAt(0) === "m" ? "mal" : "bien";
+      if (tab !== lastTab) { lines.push(tab === "mal" ? "— 2 · DECILO MAL (a propósito) —" : "— 1 · DECILO BIEN —"); lastTab = tab; }
       var heard = h.ok ? (h.lexical || h.display) : "(" + (h.recognitionStatus || h.error || "nada") + ")";
-      lines.push("«" + x.text + "» → oyó «" + heard + "» " + (h.ok && matches(x.text, h.lexical || h.display) ? "OK" : "NO") +
+      var verdict;
+      if (x.said) {
+        var v = h.ok ? wrongVerdict(x.text, x.said, h.lexical || h.display) : "nada";
+        verdict = v === "said" ? "OYÓ LO DICHO" : (v === "expected" ? "CREYÓ LA DE LA TARJETA" : (v === "nada" ? "NADA" : "OTRA COSA"));
+      } else {
+        verdict = h.ok && matches(x.text, h.lexical || h.display) ? "OK" : "NO";
+      }
+      lines.push("«" + x.text + "»" + (x.said ? " (dijo «" + x.said + "»)" : "") + " → oyó «" + heard + "» " + verdict +
         (h.alternatives && h.alternatives.length ? " | alt: " + h.alternatives.join(" / ") : "") + " | " + (x.ms / 1000).toFixed(1) + " s");
       (x.data.assessments || []).forEach(function (a) {
         if (!a.ok || !a.scores || a.scores.pron == null) { lines.push("   " + a.locale + ": n/d" + (a.error ? " (" + String(a.error).slice(0, 60).replace(/\s+/g, " ") + ")" : "")); return; }
@@ -368,7 +464,7 @@
           }).join(" "));
       });
     });
-    Object.keys(errors).sort(function (a, b) { return a - b; }).forEach(function (k) {
+    order.filter(function (k) { return errors[k]; }).forEach(function (k) {
       if (results[k]) return;
       lines.push("«" + errors[k].text + "» → " + errors[k].error);
     });
