@@ -1417,6 +1417,12 @@
     font-size: clamp(22px, 6vw, 34px); color: var(--ink); word-break: break-word;
   }
   .flash-prompt-sub { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--accent-deep); }
+  /* Long prompts step down (2026-10-05). */
+  .flash-prompt-main.is-long { font-size: clamp(19px, 5vw, 27px); }
+  .flash-prompt-main.is-longer { font-size: clamp(16px, 4.3vw, 21px); line-height: 1.25; }
+  /* The blanked-out context sentence under a definition. */
+  .flash-cloze { font-family: "Public Sans", sans-serif; font-size: 14px; line-height: 1.4; color: var(--ink-soft); max-width: 92%; }
+  .flash-cloze[hidden] { display: none; }
   .flash-sub { color: var(--ink-soft); font-style: italic; font-family: "Public Sans", sans-serif; font-size: 14px; }
   .flash-back-badges { justify-content: center; margin-top: 4px; }
 
@@ -1447,7 +1453,10 @@
   /* Hablar (2026-10-04): the front's mic. Same look as the listening
      button; red while recording (mic glyph swaps to a stop square), a slow
      pulse while the recording is being checked. */
-  .flash-speak-mic { margin-top: 6px; }
+  /* A bit smaller than the listening button (2026-10-05) so a long
+     definition + context + mic fit on a phone-sized card. */
+  .flash-speak-mic { width: 64px; height: 64px; margin-top: 4px; flex: none; }
+  .flash-speak-mic svg { width: 30px; height: 30px; }
   .flash-speak-mic .stop-glyph { display: none; }
   .flash-speak-mic.is-recording { background: var(--danger); border-color: var(--danger); color: var(--paper); box-shadow: 0 0 0 7px color-mix(in srgb, var(--danger) 22%, transparent); }
   .flash-speak-mic.is-recording .mic-glyph { display: none; }
@@ -1455,18 +1464,18 @@
   .flash-speak-mic.is-busy { animation: speak-busy 1s ease-in-out infinite; cursor: default; }
   @keyframes speak-busy { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
   @media (prefers-reduced-motion: reduce) { .flash-speak-mic.is-busy { animation: none; opacity: 0.6; } }
-  .flash-speak-mic .speak-timer { position: absolute; bottom: -20px; left: 0; right: 0; text-align: center; font-family: "Public Sans", sans-serif; font-size: 11.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .flash-speak-mic.is-recording .speak-timer { color: var(--ink-soft); }
-  .flash-speak-hint { margin-top: 24px; text-align: center; }
+  .flash-speak-hint { margin-top: 2px; text-align: center; }
   .flash-speak-hint.is-warn { color: var(--danger); }
   .flash-speak-hint[hidden], .flash-heard[hidden] { display: none; }
   .flash-card.flipped .flash-front .flash-speak-hint { visibility: hidden; }
   /* the back's "Escuché «…» · coincide" line */
-  .flash-heard { font-family: "Public Sans", sans-serif; font-size: 14px; color: var(--ink-soft); text-align: center; max-width: 90%; }
+  /* More prominent (2026-10-05): it read as easy to miss. */
+  .flash-heard { font-family: "Public Sans", sans-serif; font-size: 17px; color: var(--ink); text-align: center; max-width: 92%; line-height: 1.35; }
+  .flash-heard .heard-text { font-weight: 600; }
   .flash-heard.is-bien::before { content: "\2713\00a0"; color: var(--teal); font-weight: 700; }
   .flash-heard.is-otra::before { content: "\2260\00a0"; color: var(--danger); font-weight: 700; }
   .flash-heard.is-unsure::before { content: "?\00a0"; color: var(--ink-soft); font-weight: 700; }
-  .flash-heard.is-none { font-style: italic; }
+  .flash-heard.is-none { font-style: italic; color: var(--ink-soft); font-size: 15px; }
   /* Listening back of a word/phrase: the meaning as a plain line under
      the Spanish, not the italic aside style. */
   .flash-sub.listen-def { font-style: normal; font-size: 15.5px; color: var(--ink); }

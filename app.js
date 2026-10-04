@@ -242,13 +242,9 @@
       speak_again: "Tocá el micrófono para intentar de nuevo",
       speak_mic_denied: "No hay permiso para el micrófono. Habilitalo en la configuración del navegador.",
       speak_mic_error: "No se pudo usar el micrófono.",
-      speak_heard: "Escuché «{text}»",
-      speak_why_match: "coincide",
-      speak_why_score: "sonó bien",
-      speak_why_unsure: "no estoy seguro: marcalo vos",
-      speak_why_no: "no coincide",
-      speak_nothing: "No te escuché bien — marcalo vos.",
-      speak_error: "No se pudo analizar — marcalo vos.",
+      speak_why_score: "Sonó bien",
+      speak_nothing: "No se escuchó nada",
+      speak_error: "No se pudo analizar",
       update_toast_text: "Hay una versión nueva de voseá.",
       update_toast_btn: "Actualizar",
       update_toast_later: "Más tarde",
@@ -714,13 +710,9 @@
       speak_again: "Tap the mic to try again",
       speak_mic_denied: "No microphone permission. Allow it in your browser settings.",
       speak_mic_error: "Couldn't use the microphone.",
-      speak_heard: "Heard «{text}»",
-      speak_why_match: "matches",
-      speak_why_score: "sounded right",
-      speak_why_unsure: "not sure: grade it yourself",
-      speak_why_no: "doesn't match",
-      speak_nothing: "Didn't catch that — grade it yourself.",
-      speak_error: "Couldn't check it — grade it yourself.",
+      speak_why_score: "Sounded right",
+      speak_nothing: "Nothing heard",
+      speak_error: "Couldn't check it",
       update_toast_text: "A new version of voseá is ready.",
       update_toast_btn: "Update",
       update_toast_later: "Later",
@@ -2183,7 +2175,7 @@
     flashBackHeard: document.getElementById("flash-back-heard"),
     flashSpeakMic: document.getElementById("flash-speak-mic"),
     flashSpeakHint: document.getElementById("flash-speak-hint"),
-    flashSpeakTimer: document.getElementById("flash-speak-timer"),
+    flashFrontCloze: document.getElementById("flash-front-cloze"),
     flashKnownToggle: document.getElementById("flash-known-toggle"),
     flashGrade: document.getElementById("flash-grade"),
     flashGradeOtra: document.getElementById("flash-grade-otra"),
@@ -5286,6 +5278,14 @@
     el.flashCard.classList.toggle("is-listen", listen);
     el.flashFrontMain.textContent = card.frontMain;
     el.flashFrontMain.style.display = listen ? "none" : "";
+    // Long prompts (definitions) step down in size so the card's other
+    // contents — the mic in Hablar — keep their room.
+    var mainLen = String(card.frontMain || "").length;
+    el.flashFrontMain.classList.toggle("is-long", mainLen > 26 && mainLen <= 48);
+    el.flashFrontMain.classList.toggle("is-longer", mainLen > 48);
+    var cloze = flashCloze(card);
+    el.flashFrontCloze.textContent = cloze;
+    el.flashFrontCloze.hidden = !cloze;
     el.flashFrontSub.textContent = card.frontSub || "";
     el.flashFrontSub.style.display = card.frontSub && !listen ? "" : "none";
     el.flashListenBtn.hidden = !listen;
@@ -5315,6 +5315,7 @@
     renderFlashTally();
     renderSpeakState();
     renderHeard(card);
+    fitFlashFront();
     el.flashTtsMsg.textContent = "";
     // Quietly start downloading both faces' audio as soon as this card
     // becomes the current one — most cards sit on screen for a moment
@@ -5357,6 +5358,72 @@
     var parts = ex.split(" / ").map(function (s) { return s.trim(); }).filter(Boolean);
     return parts.length ? parts[parts.length - 1] : "";
   }
+  // Context for a definition → Spanish card (2026-10-05, mason: "the
+  // definitions belong to the general use case, not the context"): the
+  // list example under the definition, with the answer blanked out —
+  // «Agarré un ___ para las valijas.» Only for words/phrases whose front is
+  // the meaning (Leer definición → palabra, and Hablar); not for verbs
+  // (their example usually contains the very form being asked for) or
+  // listening cards. Inflected forms count as the word (valija → valijas,
+  // demorado → demorada); if the answer isn't found in the sentence, the
+  // sentence is shown as is — it can't give anything away.
+  function clozeStrip(s) {
+    // lower case, accents off, SAME length as the input (so indexes line up)
+    return Array.prototype.map.call(String(s || ""), function (ch) { return ch.normalize("NFD").charAt(0).toLowerCase(); }).join("");
+  }
+  function flashCloze(card) {
+    if (!card || card.listen || card.kind === "verb" || !card.backSpeak || card.frontSpeak) return "";
+    var ex = flashExampleText(card.data);
+    if (!ex) return "";
+    var answer = String(card.backSpeak || "").trim();
+    var sStrip = clozeStrip(ex);
+    var aStrip = clozeStrip(answer).replace(/^[¿¡]+|[?!.]+$/g, "").trim();
+    var out = ex;
+    if (aStrip.indexOf(" ") !== -1) {
+      var at = sStrip.indexOf(aStrip);
+      if (at !== -1) out = ex.slice(0, at) + "___" + ex.slice(at + aStrip.length);
+    } else if (aStrip) {
+      var stem = aStrip;
+      for (var k = 0; k < 2 && stem.length > 4 && /[aeos]$/.test(stem); k++) stem = stem.slice(0, -1);
+      var re = /[a-zñ]+/g, m, pieces = [], last = 0;
+      while ((m = re.exec(sStrip))) {
+        var tok = m[0];
+        if (tok === aStrip || (tok.indexOf(stem) === 0 && Math.abs(tok.length - aStrip.length) <= 3)) {
+          pieces.push(ex.slice(last, m.index), "___");
+          last = m.index + tok.length;
+        }
+      }
+      if (pieces.length) out = pieces.join("") + ex.slice(last);
+    }
+    return "«" + out + "»";
+  }
+
+  // Front-face fit (2026-10-05): if a long prompt + context + mic don't fit
+  // the card, drop the least important pieces first — the Hablar hint, then
+  // the context sentence.
+  function flashFaceOverflows(face) {
+    if (!face || !face.clientHeight) return false;
+    var cs = getComputedStyle(face);
+    var gap = parseFloat(cs.rowGap || cs.gap) || 0;
+    var total = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    var n = 0;
+    Array.prototype.forEach.call(face.children, function (ch) {
+      if (ch.classList.contains("flash-speak-btn") || ch.hidden || getComputedStyle(ch).display === "none") return;
+      total += ch.offsetHeight; n++;
+    });
+    total += gap * Math.max(0, n - 1);
+    return total > face.clientHeight + 1;
+  }
+  function fitFlashFront() {
+    var face = el.flashFrontMain && el.flashFrontMain.parentNode;
+    if (!face) return;
+    el.flashSpeakHint.style.display = "";
+    el.flashFrontCloze.style.display = "";
+    if (!flashFaceOverflows(face)) return;
+    if (!el.flashSpeakHint.hidden) { el.flashSpeakHint.style.display = "none"; if (!flashFaceOverflows(face)) return; }
+    if (!el.flashFrontCloze.hidden) el.flashFrontCloze.style.display = "none";
+  }
+
   // Whether the back face's content is taller than the card (a long
   // definition on a short phone screen). Layout sizes, so the card's 3D
   // rotation doesn't matter.
@@ -5967,12 +6034,11 @@
       var rec = { card: card, mr: mr, chunks: [], started: Date.now(), cancelled: false };
       mr.ondataavailable = function (e) { if (e.data && e.data.size) rec.chunks.push(e.data); };
       mr.onstop = function () {
-        clearInterval(rec.tick); clearTimeout(rec.auto);
+        clearTimeout(rec.auto);
         if (hablarRec === rec) hablarRec = null;
         if (!rec.cancelled) hablarAnalyse(card, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
         renderSpeakState();
       };
-      rec.tick = setInterval(renderSpeakTimer, 100);
       rec.auto = setTimeout(hablarStop, HABLAR_MAX_MS);
       hablarRec = rec;
       hablarHintOverride = null;
@@ -6058,10 +6124,6 @@
 
   // ---- on screen ----
   function hablarHint(card, text) { hablarHintOverride = { card: card, text: text }; renderSpeakState(); }
-  function renderSpeakTimer() {
-    if (!el.flashSpeakTimer) return;
-    el.flashSpeakTimer.textContent = hablarRec ? ((Date.now() - hablarRec.started) / 1000).toFixed(1) + " s" : "";
-  }
   function renderSpeakState() {
     if (!el.flashSpeakMic) return;
     var card = flashDeck[flashIndex];
@@ -6079,22 +6141,36 @@
     el.flashSpeakHint.classList.toggle("is-warn", !!warn);
     el.flashSpeakHint.textContent = warn ? hablarHintOverride.text
       : t(recording ? "speak_recording" : (busy ? "speak_analyzing" : (card._speech ? "speak_again" : "speak_hint")));
-    renderSpeakTimer();
+    fitFlashFront();
   }
-  // The line on the back: what it heard, and why the suggestion.
+  // The line on the back (2026-10-05, mason): short, no "I" voice, no
+  // numbers. ✓ «what it heard» when it matched; ✓ Sonó bien when it was
+  // graded on pronunciation (showing a mismatched transcript next to a ✓
+  // was confusing); ≠ «…» for Otra vez; ? «…» when it isn't sure (nothing
+  // selected — you choose).
   function renderHeard(card) {
     if (!el.flashBackHeard) return;
     var sp = card && card.speak ? card._speech : null;
     el.flashBackHeard.hidden = !sp;
     el.flashBackHeard.className = "flash-heard";
-    if (!sp) { el.flashBackHeard.textContent = ""; return; }
-    if (sp.rule === "error") { el.flashBackHeard.textContent = t("speak_error"); el.flashBackHeard.classList.add("is-none"); return; }
-    if (sp.rule === "nothing") { el.flashBackHeard.textContent = t("speak_nothing"); el.flashBackHeard.classList.add("is-none"); return; }
-    // What it heard, in words — never the score (mason: "the number means
-    // nothing to a user").
-    var why = sp.rule === "transcript" ? t("speak_why_match")
-      : (sp.rule === "score" ? t("speak_why_score") : (sp.rule === "unsure" ? t("speak_why_unsure") : t("speak_why_no")));
-    el.flashBackHeard.textContent = (sp.heard ? t("speak_heard", { text: sp.heard_display || sp.heard }) + " · " : "") + why;
+    el.flashBackHeard.textContent = "";
+    if (!sp) return;
+    if (sp.rule === "error" || sp.rule === "nothing") {
+      el.flashBackHeard.textContent = t(sp.rule === "error" ? "speak_error" : "speak_nothing");
+      el.flashBackHeard.classList.add("is-none");
+      return;
+    }
+    var span = document.createElement("span");
+    span.className = "heard-text";
+    if (sp.rule === "score") span.textContent = t("speak_why_score");
+    else {
+      var shown = (sp.heard_display || sp.heard || "…").replace(/[.。]+$/, "");
+      // Azure capitalises like a sentence ("Revoque."); match the card's case.
+      var ans = String(card.backMain || "");
+      if (ans && ans.charAt(0) === ans.charAt(0).toLowerCase()) shown = shown.charAt(0).toLowerCase() + shown.slice(1);
+      span.textContent = "«" + shown + "»";
+    }
+    el.flashBackHeard.appendChild(span);
     el.flashBackHeard.classList.add(sp.rule === "unsure" ? "is-unsure" : (sp.auto_grade === "bien" ? "is-bien" : "is-otra"));
   }
   el.flashSpeakMic.addEventListener("click", function (evt) { evt.stopPropagation(); hablarToggle(); });
