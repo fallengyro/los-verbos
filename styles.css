@@ -1465,7 +1465,32 @@
      node, because applyI18n() sets textContent on [data-i18n] elements — same
      precedent as .chip.active::before. Off = outline with a faint check;
      on = filled accent, like an included filter chip. */
-  .flash-known-row { display: flex; justify-content: center; margin-top: 14px; }
+  .flash-known-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 14px; }
+  /* Otra vez | Bien (2026-10-03, "option B" from the progress mockups): a
+     small two-way switch beside Sabido that only marks how the card went —
+     never flips or advances. Kept in the layout (visibility, not display)
+     while hidden on the front, so nothing in the row jumps when it appears
+     after the flip. Glyph via ::before for the same applyI18n() reason as
+     .known-toggle. Bien uses --teal, Otra vez --danger: neither is the
+     accent Sabido uses, so the two marks never read as the same thing. */
+  .flash-grade {
+    display: inline-flex; border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
+    background: var(--paper-sunken); transition: opacity 0.18s ease, visibility 0.18s;
+  }
+  .flash-grade.is-hidden { visibility: hidden; opacity: 0; }
+  .flash-grade-opt {
+    font-family: inherit; font-size: 14px; line-height: 1.4; color: var(--ink-soft);
+    padding: 7px 14px; border: 0; background: transparent; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s;
+  }
+  .flash-grade-opt + .flash-grade-opt { border-left: 1px solid var(--line); }
+  .flash-grade-opt.otra::before { content: "\21BA\00a0"; }
+  .flash-grade-opt:hover { color: var(--ink); }
+  .flash-grade-opt.otra[aria-pressed="true"] { background: var(--danger); color: var(--paper); font-weight: 600; }
+  .flash-grade-opt.bien[aria-pressed="true"] { background: var(--teal); color: var(--paper); font-weight: 600; }
+  .flash-tally { margin-left: auto; margin-right: 12px; font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .flash-tally .tally-bien { color: var(--teal); }
+  .flash-tally .tally-otra { color: var(--danger); }
   .known-toggle {
     position: relative;
     background: var(--paper-sunken); border: 1px solid var(--line); border-radius: 20px;

@@ -229,6 +229,10 @@
       flash_arrow_prev_aria: "Anterior",
       flash_arrow_next_aria: "Siguiente",
       known_toggle: "Sabido",
+      grade_otra: "Otra vez",
+      grade_bien: "Bien",
+      grade_group_aria: "Cómo te fue con esta tarjeta",
+      flash_tally: "{b} bien · {o} otra vez",
       known_toggle_aria_on: "Sabido — tocá para desmarcar",
       known_toggle_aria_off: "Marcar como sabido",
       known_mark_aria: "Sabido",
@@ -584,6 +588,10 @@
       flash_arrow_prev_aria: "Previous",
       flash_arrow_next_aria: "Next",
       known_toggle: "Known",
+      grade_otra: "Again",
+      grade_bien: "Got it",
+      grade_group_aria: "How this card went",
+      flash_tally: "{b} got it · {o} again",
       known_toggle_aria_on: "Known — tap to unmark",
       known_toggle_aria_off: "Mark as known",
       known_mark_aria: "Known",
@@ -1945,6 +1953,10 @@
     flashBackBadges: document.getElementById("flash-back-badges"),
     flashBackExample: document.getElementById("flash-back-example"),
     flashKnownToggle: document.getElementById("flash-known-toggle"),
+    flashGrade: document.getElementById("flash-grade"),
+    flashGradeOtra: document.getElementById("flash-grade-otra"),
+    flashGradeBien: document.getElementById("flash-grade-bien"),
+    flashTally: document.getElementById("flash-tally"),
     dKnown: document.getElementById("d-known"),
     wdKnown: document.getElementById("wd-known"),
     pdKnown: document.getElementById("pd-known"),
@@ -5046,6 +5058,8 @@
     el.flashFrontSpeak.hidden = !card.frontSpeak;
     el.flashBackSpeak.hidden = !card.backSpeak;
     setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
+    renderFlashGrade(card);
+    renderFlashTally();
     el.flashTtsMsg.textContent = "";
     // Quietly start downloading both faces' audio as soon as this card
     // becomes the current one — most cards sit on screen for a moment
@@ -5213,37 +5227,49 @@
     // background, topbar, and controls stay in the app's actual theme.
     el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
     el.flashOverlay.hidden = false;
+    practiceStartSession();
     renderFlashCard();
+    practiceOpenView(flashDeck[flashIndex]);
   }
 
   function nextFlashCard() {
     if (!flashDeck.length) return;
+    practiceCloseView();
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
       // until here — so going back within a pass still works — and only now
       // does the tab's Sabido chip get re-applied: see cardStaysForNextPass().
       var nextPass = flashDeck.filter(cardStaysForNextPass);
-      if (!nextPass.length) { showFlashDone(flashDeck.some(cardInReviewMode)); return; }
+      practiceEndPass();
+      if (!nextPass.length) { showFlashDone(flashDeck.some(cardInReviewMode)); practiceFlush(); return; }
       flashDeck = shuffleArray(nextPass);
       flashIndex = 0;
+      practiceFlush();
     }
     renderFlashCard();
+    practiceOpenView(flashDeck[flashIndex]);
   }
 
   function prevFlashCard() {
     if (flashIndex <= 0) return;
+    practiceCloseView();
     flashIndex--;
     renderFlashCard();
+    practiceOpenView(flashDeck[flashIndex]);
   }
 
   function closeFlashcards() {
+    practiceCloseView();
+    practiceSession = null;
+    practiceFlush();
     el.flashOverlay.hidden = true;
     el.flashOverlay.classList.remove("is-done");
   }
 
   function toggleFlashFlip() {
     el.flashCard.classList.toggle("flipped");
+    practiceNoteFlip(el.flashCard.classList.contains("flipped"));
     // Leer + audio automático: the back's Spanish plays as it turns over
     // (Escuchar already played it on the front; its back has a speaker).
     var card = flashDeck[flashIndex];
@@ -5251,6 +5277,262 @@
       autoPlayFlash(card.backSpeak, el.flashBackSpeak, flashAutoToken);
     }
   }
+
+
+  // ================= Practice log (2026-10-03) =================
+  // One row per card shown in a deck, saved to public.practice_log (see the
+  // end of schema.sql). It is the history the Progreso tab and the "Tu
+  // historial" panels will be built from, so it records more than any
+  // screen shows today: how you graded the card (the Otra vez | Bien switch
+  // under it — mason's "option B": it only marks, swiping still moves on),
+  // how long until you flipped it and how long you spent on each face,
+  // speaker taps, whether you came back to it in the same pass, and
+  // whether its Sabido mark changed.
+  //
+  // Rows queue up on the device (localStorage, so nothing is lost offline
+  // or if the app is closed mid-deck) and go to the server in small
+  // batches: every PRACTICE_FLUSH_AT cards, at the end of each pass, when
+  // the deck closes, when the app goes to the background, and after
+  // signing in. Each row carries a client-made id, so re-sending a batch
+  // after a dropped connection can't create duplicates.
+
+  var PRACTICE_QUEUE_KEY = "iv-practice-queue";
+  var PRACTICE_OPEN_KEY = "iv-practice-open";
+  var PRACTICE_QUEUE_MAX = 1500;
+  var PRACTICE_FLUSH_AT = 20;
+  var PRACTICE_BATCH = 100;
+  var PRACTICE_FACE_MAX_MS = 10 * 60 * 1000; // a card left open for ages counts as 10 minutes
+  var practiceQueue = [];
+  var practiceSession = null; // { id, pass, position, seen: {cardKey: true} } while a deck is open
+  var practiceView = null;    // the card on screen: { card, row, face: "front"|"back", since, paused }
+  var practiceFlushing = false;
+  var practiceTallyBase = { bien: 0, otra: 0 }; // grades from earlier passes of this deck
+  var practiceDeviceType = null;
+
+  try { practiceQueue = JSON.parse(localStorage.getItem(PRACTICE_QUEUE_KEY) || "[]") || []; } catch (e) { practiceQueue = []; }
+  if (!Array.isArray(practiceQueue)) practiceQueue = [];
+  // A card that was on screen when the app was last closed from the background.
+  try {
+    var practiceOrphan = JSON.parse(localStorage.getItem(PRACTICE_OPEN_KEY) || "null");
+    if (practiceOrphan && practiceOrphan.id) practiceQueue.push(practiceOrphan);
+    localStorage.removeItem(PRACTICE_OPEN_KEY);
+  } catch (e) {}
+
+  function savePracticeQueue() {
+    if (practiceQueue.length > PRACTICE_QUEUE_MAX) practiceQueue = practiceQueue.slice(practiceQueue.length - PRACTICE_QUEUE_MAX);
+    try { localStorage.setItem(PRACTICE_QUEUE_KEY, JSON.stringify(practiceQueue)); } catch (e) {}
+  }
+
+  function practiceUuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    var b = new Uint8Array(16);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(b);
+    else for (var i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+    b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+    var h = Array.prototype.map.call(b, function (x) { return (x + 0x100).toString(16).slice(1); }).join("");
+    return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+  }
+
+  function practiceDevice() {
+    if (practiceDeviceType) return practiceDeviceType;
+    var coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+    var short = Math.min(window.screen ? screen.width : 0, window.screen ? screen.height : 0) || window.innerWidth;
+    practiceDeviceType = !coarse ? "desktop" : (short >= 600 ? "tablet" : "phone");
+    return practiceDeviceType;
+  }
+
+  // Same normalisation as schema.sql's vosea_norm(): no accents, lower case.
+  function practiceNorm(s) {
+    return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+  }
+  function practiceCardKey(card) {
+    var d = card.data || {};
+    return card.kind + "|" + practiceNorm(d.infinitive || d.word || d.phrase) + "|" + (card.formKey || "");
+  }
+
+  function practiceStartSession() {
+    practiceSession = { id: practiceUuid(), pass: 1, position: 0, seen: {} };
+    practiceTallyBase = { bien: 0, otra: 0 };
+    flashDeck.forEach(function (c) { c._grade = null; });
+    practiceView = null;
+  }
+
+  // Grades belong to a card for one pass; the next pass starts ungraded.
+  function practiceEndPass() {
+    if (!practiceSession) return;
+    flashDeck.forEach(function (c) {
+      if (c._grade) practiceTallyBase[c._grade]++;
+      c._grade = null;
+    });
+    practiceSession.pass++;
+    practiceSession.seen = {};
+  }
+
+  function practiceOpenView(card) {
+    practiceCloseView();
+    if (!practiceSession || !card) return;
+    var key = practiceCardKey(card);
+    var d = card.data || {};
+    practiceSession.position++;
+    var known = cardShowsKnown(card);
+    practiceView = {
+      card: card, face: "front", since: Date.now(), paused: document.hidden,
+      row: {
+        id: practiceUuid(),
+        user_id: currentUser ? currentUser.id : null,
+        session_id: practiceSession.id,
+        shown_at: new Date().toISOString(),
+        item_kind: card.kind,
+        item_id: findItemId(card.kind, card.data),
+        item_key: practiceNorm(d.infinitive || d.word || d.phrase),
+        form_key: card.formKey || null,
+        mode: card.listen ? "escuchar" : "leer",
+        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : flashDirection),
+        pass: practiceSession.pass,
+        position: practiceSession.position,
+        revisit: !!practiceSession.seen[key],
+        grade: null, grade_auto: false, grade_changes: 0,
+        flipped: false, flips: 0, ms_to_flip: null, ms_front: 0, ms_back: 0,
+        audio_plays: 0,
+        known_before: known, known_after: known,
+        device: practiceDevice()
+      }
+    };
+    practiceSession.seen[key] = true;
+  }
+
+  // Adds the time since the last face change (or resume) to the face on screen.
+  function practiceTick() {
+    var v = practiceView;
+    if (!v || v.paused) return;
+    var now = Date.now();
+    var ms = Math.min(Math.max(0, now - v.since), PRACTICE_FACE_MAX_MS);
+    if (v.face === "back") v.row.ms_back += ms; else v.row.ms_front += ms;
+    v.since = now;
+  }
+
+  function practiceNoteFlip(flipped) {
+    var v = practiceView;
+    if (!v) return;
+    practiceTick();
+    v.row.flips++;
+    if (flipped && !v.row.flipped) {
+      v.row.flipped = true;
+      v.row.ms_to_flip = v.row.ms_front;
+    }
+    v.face = flipped ? "back" : "front";
+    renderFlashGrade(v.card);
+  }
+
+  function practiceNoteAudio() { if (practiceView) practiceView.row.audio_plays++; }
+
+  function practiceFinishRow() {
+    var v = practiceView;
+    practiceTick();
+    v.row.grade = v.card._grade || null;
+    v.row.known_after = cardShowsKnown(v.card);
+    if (!v.row.user_id && currentUser) v.row.user_id = currentUser.id;
+    return v.row;
+  }
+
+  function practiceCloseView() {
+    if (!practiceView) return;
+    var row = practiceFinishRow();
+    practiceView = null;
+    if (!row.user_id) return; // not signed in — nothing to save it under
+    practiceQueue.push(row);
+    savePracticeQueue();
+    if (practiceQueue.length >= PRACTICE_FLUSH_AT) practiceFlush();
+  }
+
+  function practiceFlush() {
+    if (practiceFlushing || !currentUser || !practiceQueue.length) return;
+    var mine = practiceQueue.filter(function (r) { return r.user_id === currentUser.id; });
+    if (!mine.length) return;
+    var batch = mine.slice(0, PRACTICE_BATCH);
+    practiceFlushing = true;
+    supabaseClient.from("practice_log").upsert(batch, { onConflict: "id", ignoreDuplicates: true }).then(function (res) {
+      practiceFlushing = false;
+      if (res && res.error) { console.warn("[practice] not saved yet (will retry):", res.error.message); return; }
+      var sent = {};
+      batch.forEach(function (r) { sent[r.id] = true; });
+      practiceQueue = practiceQueue.filter(function (r) { return !sent[r.id]; });
+      savePracticeQueue();
+      if (practiceQueue.some(function (r) { return r.user_id === currentUser.id; })) practiceFlush();
+    }, function (err) {
+      practiceFlushing = false;
+      console.warn("[practice] not saved yet (will retry):", err && err.message);
+    });
+  }
+
+  // Going to the background (switching apps, locking the phone) pauses the
+  // clock and sends what's queued; the card on screen is parked so it isn't
+  // lost if the app is closed from there. Coming back resumes the same card.
+  function practiceOnHide() {
+    if (practiceView && !practiceView.paused) {
+      practiceTick();
+      practiceView.paused = true;
+      try {
+        var draft = Object.assign({}, practiceView.row, { grade: practiceView.card._grade || null, known_after: cardShowsKnown(practiceView.card) });
+        if (draft.user_id) localStorage.setItem(PRACTICE_OPEN_KEY, JSON.stringify(draft));
+      } catch (e) {}
+    }
+    practiceFlush();
+  }
+  function practiceOnShow() {
+    try { localStorage.removeItem(PRACTICE_OPEN_KEY); } catch (e) {}
+    if (practiceView && practiceView.paused) { practiceView.paused = false; practiceView.since = Date.now(); }
+    practiceFlush();
+  }
+  document.addEventListener("visibilitychange", function () { if (document.hidden) practiceOnHide(); else practiceOnShow(); });
+  window.addEventListener("pagehide", practiceOnHide);
+  window.addEventListener("online", practiceFlush);
+
+  // ---- the Otra vez | Bien switch ----
+  function setFlashGrade(grade) {
+    var card = flashDeck[flashIndex];
+    if (!card) return;
+    card._grade = card._grade === grade ? null : grade; // tapping the lit one clears it
+    if (practiceView && practiceView.card === card) practiceView.row.grade_changes++;
+    renderFlashGrade(card);
+    renderFlashTally();
+  }
+
+  function renderFlashGrade(card) {
+    if (!el.flashGrade) return;
+    var g = card ? card._grade : null;
+    var shown = !!g || !!(practiceView && practiceView.card === card && practiceView.row.flipped) || el.flashCard.classList.contains("flipped");
+    el.flashGrade.classList.toggle("is-hidden", !shown);
+    el.flashGradeOtra.setAttribute("aria-pressed", g === "otra" ? "true" : "false");
+    el.flashGradeBien.setAttribute("aria-pressed", g === "bien" ? "true" : "false");
+    el.flashGradeOtra.tabIndex = shown ? 0 : -1;
+    el.flashGradeBien.tabIndex = shown ? 0 : -1;
+  }
+
+  // "5 bien · 1 otra vez" in the top bar, for this deck so far; hidden until
+  // the first grade.
+  function renderFlashTally() {
+    if (!el.flashTally) return;
+    var b = practiceTallyBase.bien, o = practiceTallyBase.otra;
+    flashDeck.forEach(function (c) { if (c._grade === "bien") b++; else if (c._grade === "otra") o++; });
+    el.flashTally.hidden = !(b || o);
+    el.flashTally.innerHTML = "";
+    if (!(b || o)) return;
+    var parts = t("flash_tally").split(/(\{b\}|\{o\})/);
+    parts.forEach(function (part) {
+      if (part === "{b}" || part === "{o}") {
+        var n = document.createElement("b");
+        n.className = part === "{b}" ? "tally-bien" : "tally-otra";
+        n.textContent = String(part === "{b}" ? b : o);
+        el.flashTally.appendChild(n);
+      } else if (part) {
+        el.flashTally.appendChild(document.createTextNode(part));
+      }
+    });
+  }
+
+  // Test/debug hook: what's waiting to be sent.
+  window.vosePracticeQueue = function () { return practiceQueue.slice(); };
 
   // ================= Sabido (self-assessed "I know this one") =================
   // "known" is one person's own progress, not a property of the content. It
@@ -7413,12 +7695,12 @@
   el.flashFrontSpeak.addEventListener("click", function (evt) {
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
-    if (card) playTts(card.frontSpeak, el.flashFrontSpeak);
+    if (card) { practiceNoteAudio(); playTts(card.frontSpeak, el.flashFrontSpeak); }
   });
   el.flashListenBtn.addEventListener("click", function (evt) {
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
-    if (card) playTts(card.audio, el.flashListenBtn);
+    if (card) { practiceNoteAudio(); playTts(card.audio, el.flashListenBtn); }
   });
   el.flashModeRead.addEventListener("click", function () { setFlashMode("leer"); renderFlashSetup(); });
   el.flashModeListen.addEventListener("click", function () { setFlashMode("escuchar"); renderFlashSetup(); });
@@ -7431,7 +7713,7 @@
   el.flashBackSpeak.addEventListener("click", function (evt) {
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
-    if (card) playTts(card.backSpeak, el.flashBackSpeak);
+    if (card) { practiceNoteAudio(); playTts(card.backSpeak, el.flashBackSpeak); }
   });
   // Sabido toggles — see setItemKnown(). The flashcard one sits outside
   // .flash-card, so unlike the speaker buttons it needs no stopPropagation
@@ -7464,6 +7746,8 @@
     setItemKnown("phrase", entry.data, !entry.data.known);
     popKnownToggle(el.pdKnown);
   });
+  el.flashGradeOtra.addEventListener("click", function () { setFlashGrade("otra"); });
+  el.flashGradeBien.addEventListener("click", function () { setFlashGrade("bien"); });
   el.flashDoneClose.addEventListener("click", closeFlashcards);
   el.flashCard.addEventListener("click", toggleFlashFlip);
   el.flashCard.addEventListener("touchstart", handleFlashTouchStart, { passive: true });
@@ -7545,10 +7829,12 @@
   supabaseClient.auth.onAuthStateChange(function (_event, session) {
     currentUser = session ? session.user : null;
     renderAuthState();
+    practiceFlush();
   });
   supabaseClient.auth.getSession().then(function (res) {
     currentUser = (res.data && res.data.session) ? res.data.session.user : null;
     renderAuthState();
+    practiceFlush();
   });
 
   // The conjugation table's row-height sync (see syncConjRowHeights) runs

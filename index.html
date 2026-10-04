@@ -915,6 +915,7 @@
     <!-- Which Azure Rioplatense voice the speaker buttons below use is now
          picked in Settings (id="settings-voice-elena"/"-tomas") rather than
          here — see app.js's setTtsVoice()/TTS_VOICES. -->
+    <span class="flash-tally" id="flash-tally" hidden></span>
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
@@ -951,6 +952,14 @@
        card and both faces, never flips the card, never advances. See
        app.js's setItemKnown(). -->
   <div class="flash-known-row">
+    <!-- Otra vez | Bien (2026-10-03, mason's "option B"): how this card went.
+         Only marks the card — it never flips or advances (swiping still does
+         that). Hidden until the card has been turned over. Recorded in the
+         practice log; see app.js's "Practice log" section. -->
+    <span class="flash-grade is-hidden" id="flash-grade" role="group" data-i18n-aria-label="grade_group_aria" aria-label="Cómo te fue">
+      <button type="button" class="flash-grade-opt otra" id="flash-grade-otra" aria-pressed="false" data-i18n="grade_otra">Otra vez</button>
+      <button type="button" class="flash-grade-opt bien" id="flash-grade-bien" aria-pressed="false" data-i18n="grade_bien">Bien</button>
+    </span>
     <button type="button" class="known-toggle" id="flash-known-toggle" aria-pressed="false" data-i18n="known_toggle">Sabido</button>
   </div>
   <p class="form-msg flash-tts-msg" id="flash-tts-msg"></p>

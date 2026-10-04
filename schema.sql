@@ -393,6 +393,14 @@ alter table public.verbs add column if not exists known_forms jsonb not null def
 alter table public.verbs add column if not exists forms_en jsonb not null default '{}'::jsonb;
 alter table public.verbs add column if not exists forms_en_sig text not null default '';
 
+-- Usage notes + an example sentence for verbs (added 2026-10-01), the same
+-- two optional fields words and phrases already have. mason: verbs need a
+-- note/example "to help indicate alternative usage as with the
+-- vocabulary" — a verb's definition is its everyday meaning, and the
+-- sense a list uses it in (correr un perfil, picar topes) goes here.
+alter table public.verbs add column if not exists notes text default '';
+alter table public.verbs add column if not exists example text default '';
+
 -- Shared, app-wide "truth" for verb English (2026-09-28, mason: "the first
 -- instance of a verb on the server is truth and the translated
 -- conjugations use that version of the infinitive definition (even if the
@@ -666,3 +674,354 @@ create policy "update own settings" on public.user_settings
 insert into storage.buckets (id, name, public)
 values ('tts-cache', 'tts-cache', true)
 on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Backup / delete / restore of a person's own content (added 2026-10-01,
+-- mason: "If the user backs up it creates a restorable version of their
+-- content on the server including 'known' tags. If they delete then it
+-- deletes their content in the app but not their restore. If they restore
+-- and they have content in the app that is redundant then the user has to
+-- choose if it should overwrite with the restore or prefer the 'active'
+-- content.") Settings → Respaldo in the app calls the four functions below.
+--
+-- One backup per person (a new backup replaces the old one). It holds that
+-- person's verbs, words, phrases and lists (with their items), including
+-- Sabido (known / known_forms) and the stored English per form — unlike a
+-- shared list, which never carries known. Settings (language, voice) are
+-- not content and are left out. Everything runs in SQL, so each operation
+-- is a single transaction: a restore that fails halfway changes nothing.
+--
+-- The functions are SECURITY INVOKER: they run as the signed-in caller, so
+-- the normal per-user RLS policies still apply to every row they touch,
+-- and auth.uid() scopes each statement to that person.
+--
+-- "Redundant" = same infinitive / word / phrase, matched the way the app's
+-- import does (case-, accent- and surrounding-space-insensitive, see
+-- vosea_norm). Lists are matched by name the same way.
+--
+-- If a column is ever added to verbs/words/phrases/lists, add it to the
+-- column lists in vosea_restore_content() too (backups store whole rows,
+-- so older backups simply lack the new key and get its default).
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.content_backups (
+  user_id uuid primary key default auth.uid() references auth.users(id) on delete cascade,
+  data jsonb not null,
+  counts jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table public.content_backups enable row level security;
+
+drop policy if exists "select own backup" on public.content_backups;
+create policy "select own backup" on public.content_backups
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own backup" on public.content_backups;
+create policy "insert own backup" on public.content_backups
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "update own backup" on public.content_backups;
+create policy "update own backup" on public.content_backups
+  for update using (auth.uid() = user_id);
+
+drop policy if exists "delete own backup" on public.content_backups;
+create policy "delete own backup" on public.content_backups
+  for delete using (auth.uid() = user_id);
+
+create or replace function public.vosea_norm(s text)
+returns text
+language sql
+immutable
+as $$
+  select lower(btrim(translate(coalesce(s, ''),
+    'ÁÀÄÂÃÉÈËÊÍÌÏÎÓÒÖÔÕÚÙÜÛÑÇáàäâãéèëêíìïîóòöôõúùüûñç',
+    'AAAAAEEEEIIIIOOOOOUUUUNCaaaaaeeeeiiiiooooouuuunc')));
+$$;
+
+-- Current content, as jsonb rows without id / user_id / created_at.
+create or replace function public.vosea_backup_content()
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  v jsonb; w jsonb; p jsonb; l jsonb; c jsonb;
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  select coalesce(jsonb_agg(to_jsonb(x) - 'id' - 'user_id' - 'created_at' order by x.created_at), '[]') into v from public.verbs x where x.user_id = uid;
+  select coalesce(jsonb_agg(to_jsonb(x) - 'id' - 'user_id' - 'created_at' order by x.created_at), '[]') into w from public.words x where x.user_id = uid;
+  select coalesce(jsonb_agg(to_jsonb(x) - 'id' - 'user_id' - 'created_at' order by x.created_at), '[]') into p from public.phrases x where x.user_id = uid;
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'name', x.name, 'owner_label', x.owner_label, 'share_token', x.share_token, 'share_enabled', x.share_enabled,
+      'items', coalesce((select jsonb_agg(jsonb_build_object('item_type', i.item_type, 'data', i.data) order by i.created_at)
+                         from public.list_items i where i.list_id = x.id), '[]'))
+      order by x.created_at), '[]') into l from public.lists x where x.user_id = uid;
+  c := jsonb_build_object('verbs', jsonb_array_length(v), 'words', jsonb_array_length(w),
+                          'phrases', jsonb_array_length(p), 'lists', jsonb_array_length(l));
+  -- Never replace a backup with an empty one (e.g. backing up right after
+  -- deleting everything would otherwise wipe out the only copy).
+  if (c->>'verbs')::int + (c->>'words')::int + (c->>'phrases')::int + (c->>'lists')::int = 0 then
+    raise exception 'nothing_to_backup';
+  end if;
+  insert into public.content_backups (user_id, data, counts, created_at)
+  values (uid, jsonb_build_object('version', 1, 'verbs', v, 'words', w, 'phrases', p, 'lists', l), c, now())
+  on conflict (user_id) do update set data = excluded.data, counts = excluded.counts, created_at = excluded.created_at;
+  return c || jsonb_build_object('created_at', now());
+end;
+$$;
+
+-- Deletes the caller's verbs, words, phrases and lists (list items go with
+-- their lists). The backup is NOT touched.
+create or replace function public.vosea_delete_content()
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  nv int; nw int; np int; nl int;
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  delete from public.lists where user_id = uid;   get diagnostics nl = row_count;
+  delete from public.verbs where user_id = uid;   get diagnostics nv = row_count;
+  delete from public.words where user_id = uid;   get diagnostics nw = row_count;
+  delete from public.phrases where user_id = uid; get diagnostics np = row_count;
+  return jsonb_build_object('verbs', nv, 'words', nw, 'phrases', np, 'lists', nl);
+end;
+$$;
+
+-- What a restore would do: the backup's date and counts, plus how many of
+-- its items already exist in the app (the ones the person must decide on).
+create or replace function public.vosea_restore_preview()
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  b record;
+  cv int; cw int; cp int; cl int;
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  select * into b from public.content_backups where user_id = uid;
+  if not found then return jsonb_build_object('exists', false); end if;
+  select count(*) into cv from jsonb_array_elements(b.data->'verbs') r
+    where exists (select 1 from public.verbs x where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(r->>'infinitive'));
+  select count(*) into cw from jsonb_array_elements(b.data->'words') r
+    where exists (select 1 from public.words x where x.user_id = uid and vosea_norm(x.word) = vosea_norm(r->>'word'));
+  select count(*) into cp from jsonb_array_elements(b.data->'phrases') r
+    where exists (select 1 from public.phrases x where x.user_id = uid and vosea_norm(x.phrase) = vosea_norm(r->>'phrase'));
+  select count(*) into cl from jsonb_array_elements(b.data->'lists') r
+    where exists (select 1 from public.lists x where x.user_id = uid and vosea_norm(x.name) = vosea_norm(r->>'name'));
+  return jsonb_build_object('exists', true, 'created_at', b.created_at, 'counts', b.counts,
+    'conflicts', jsonb_build_object('verbs', cv, 'words', cw, 'phrases', cp, 'lists', cl));
+end;
+$$;
+
+-- p_prefer: 'backup' (an item that already exists is overwritten with the
+-- backup's version, Sabido included) or 'active' (it is left as it is).
+-- Items not in the app are always added. Lists: a missing list is
+-- recreated (keeping its old share link when that's still free); a list
+-- that exists gets the backup's missing items added, and with 'backup' the
+-- items it shares with the backup are replaced by the backup's snapshots.
+create or replace function public.vosea_restore_content(p_prefer text)
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  b record;
+  r jsonb; it jsonb;
+  rv public.verbs; rw public.words; rp public.phrases;
+  ins int := 0; ovw int := 0; kept int := 0;
+  lnew int := 0; lmerged int := 0; iadd int := 0;
+  lid uuid; tok text; ikey text; n int;
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  if p_prefer is null or p_prefer not in ('backup', 'active') then raise exception 'bad_prefer'; end if;
+  select * into b from public.content_backups where user_id = uid;
+  if not found then raise exception 'no_backup'; end if;
+
+  for r in select * from jsonb_array_elements(b.data->'verbs') loop
+    rv := jsonb_populate_record(null::public.verbs, r);
+    select count(*) into n from public.verbs x where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(rv.infinitive);
+    if n = 0 then
+      insert into public.verbs (user_id, infinitive, definition, notes, example, type, irregularity, pattern, reflexive, transitivity,
+                                preposicion, auxiliar, gustar_like, also_personal_use, known, known_forms, forms_en, forms_en_sig, forms)
+      values (uid, rv.infinitive, coalesce(rv.definition, ''), coalesce(rv.notes, ''), coalesce(rv.example, ''), coalesce(rv.type, '-ar'),
+              coalesce(rv.irregularity, 'regular'), coalesce(rv.pattern, ''), coalesce(rv.reflexive, false),
+              coalesce(rv.transitivity, 'transitivo'), coalesce(rv.preposicion, ''), coalesce(rv.auxiliar, false),
+              coalesce(rv.gustar_like, false), coalesce(rv.also_personal_use, false), coalesce(rv.known, false),
+              coalesce(rv.known_forms, '{}'), coalesce(rv.forms_en, '{}'), coalesce(rv.forms_en_sig, ''), coalesce(rv.forms, '{}'));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.verbs x set definition = coalesce(rv.definition, ''), notes = coalesce(rv.notes, ''),
+        example = coalesce(rv.example, ''), type = coalesce(rv.type, '-ar'),
+        irregularity = coalesce(rv.irregularity, 'regular'),
+        pattern = coalesce(rv.pattern, ''), reflexive = coalesce(rv.reflexive, false),
+        transitivity = coalesce(rv.transitivity, 'transitivo'), preposicion = coalesce(rv.preposicion, ''),
+        auxiliar = coalesce(rv.auxiliar, false), gustar_like = coalesce(rv.gustar_like, false),
+        also_personal_use = coalesce(rv.also_personal_use, false), known = coalesce(rv.known, false),
+        known_forms = coalesce(rv.known_forms, '{}'), forms_en = coalesce(rv.forms_en, '{}'),
+        forms_en_sig = coalesce(rv.forms_en_sig, ''), forms = coalesce(rv.forms, '{}')
+      where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(rv.infinitive);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'words') loop
+    rw := jsonb_populate_record(null::public.words, r);
+    select count(*) into n from public.words x where x.user_id = uid and vosea_norm(x.word) = vosea_norm(rw.word);
+    if n = 0 then
+      insert into public.words (user_id, word, definition, part_of_speech, gender, notes, example, known)
+      values (uid, rw.word, coalesce(rw.definition, ''), coalesce(rw.part_of_speech, 'sustantivo'), coalesce(rw.gender, ''),
+              coalesce(rw.notes, ''), coalesce(rw.example, ''), coalesce(rw.known, false));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.words x set definition = coalesce(rw.definition, ''), part_of_speech = coalesce(rw.part_of_speech, 'sustantivo'),
+        gender = coalesce(rw.gender, ''), notes = coalesce(rw.notes, ''), example = coalesce(rw.example, ''), known = coalesce(rw.known, false)
+      where x.user_id = uid and vosea_norm(x.word) = vosea_norm(rw.word);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'phrases') loop
+    rp := jsonb_populate_record(null::public.phrases, r);
+    select count(*) into n from public.phrases x where x.user_id = uid and vosea_norm(x.phrase) = vosea_norm(rp.phrase);
+    if n = 0 then
+      insert into public.phrases (user_id, phrase, definition, function, register, idiomatic, literal, notes, example, known)
+      values (uid, rp.phrase, coalesce(rp.definition, ''), coalesce(rp.function, 'otro'), coalesce(rp.register, 'neutro'),
+              coalesce(rp.idiomatic, false), coalesce(rp.literal, ''), coalesce(rp.notes, ''), coalesce(rp.example, ''), coalesce(rp.known, false));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.phrases x set definition = coalesce(rp.definition, ''), function = coalesce(rp.function, 'otro'),
+        register = coalesce(rp.register, 'neutro'), idiomatic = coalesce(rp.idiomatic, false), literal = coalesce(rp.literal, ''),
+        notes = coalesce(rp.notes, ''), example = coalesce(rp.example, ''), known = coalesce(rp.known, false)
+      where x.user_id = uid and vosea_norm(x.phrase) = vosea_norm(rp.phrase);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'lists') loop
+    select x.id into lid from public.lists x where x.user_id = uid and vosea_norm(x.name) = vosea_norm(r->>'name') order by x.created_at limit 1;
+    if lid is null then
+      tok := r->>'share_token';
+      if tok is null or exists (select 1 from public.lists x where x.share_token = tok) then
+        insert into public.lists (user_id, name, owner_label, share_enabled)
+        values (uid, r->>'name', coalesce(r->>'owner_label', ''), coalesce((r->>'share_enabled')::boolean, true)) returning id into lid;
+      else
+        insert into public.lists (user_id, name, owner_label, share_token, share_enabled)
+        values (uid, r->>'name', coalesce(r->>'owner_label', ''), tok, coalesce((r->>'share_enabled')::boolean, true)) returning id into lid;
+      end if;
+      lnew := lnew + 1;
+    else
+      lmerged := lmerged + 1;
+    end if;
+    for it in select * from jsonb_array_elements(coalesce(r->'items', '[]')) loop
+      ikey := vosea_norm(coalesce(it->'data'->>'infinitive', it->'data'->>'word', it->'data'->>'phrase'));
+      if exists (select 1 from public.list_items i where i.list_id = lid and i.item_type = it->>'item_type'
+                 and vosea_norm(coalesce(i.data->>'infinitive', i.data->>'word', i.data->>'phrase')) = ikey) then
+        if p_prefer = 'backup' then
+          delete from public.list_items i where i.list_id = lid and i.item_type = it->>'item_type'
+            and vosea_norm(coalesce(i.data->>'infinitive', i.data->>'word', i.data->>'phrase')) = ikey;
+          insert into public.list_items (list_id, item_type, data) values (lid, it->>'item_type', it->'data');
+        end if;
+      else
+        insert into public.list_items (list_id, item_type, data) values (lid, it->>'item_type', it->'data');
+        iadd := iadd + 1;
+      end if;
+    end loop;
+    lid := null;
+  end loop;
+
+  return jsonb_build_object('inserted', ins, 'overwritten', ovw, 'kept', kept,
+                            'lists_created', lnew, 'lists_merged', lmerged, 'list_items_added', iadd);
+end;
+$$;
+
+revoke execute on function public.vosea_backup_content() from public, anon;
+revoke execute on function public.vosea_delete_content() from public, anon;
+revoke execute on function public.vosea_restore_preview() from public, anon;
+revoke execute on function public.vosea_restore_content(text) from public, anon;
+grant execute on function public.vosea_backup_content() to authenticated;
+grant execute on function public.vosea_delete_content() to authenticated;
+grant execute on function public.vosea_restore_preview() to authenticated;
+grant execute on function public.vosea_restore_content(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Practice log (2026-10-03)
+--
+-- One row per card shown in a flashcard deck: what it was, how you answered
+-- (the Otra vez / Bien switch under the card, optional), and how you got
+-- there (time to flip, time on each face, audio plays, coming back to it).
+-- It is the history the coming Progreso tab and "Tu historial" panels are
+-- built from, so it starts collecting before any of that UI exists.
+--
+-- Rows are written by the app in small batches, each with a client-made id,
+-- so a batch that is re-sent after a dropped connection is simply ignored
+-- the second time (insert ... on conflict do nothing).
+--
+-- item_key is the item's Spanish text, normalised the same way backups
+-- match items (vosea_norm), so history still lines up with a word after a
+-- delete + restore gives it a new id.
+--
+-- Private per user, like everything else. Not part of backup/restore, and
+-- "Borrar contenido" leaves it alone.
+create table if not exists public.practice_log (
+  id uuid primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  session_id uuid not null,
+  shown_at timestamptz not null,
+  item_kind text not null check (item_kind in ('verb', 'word', 'phrase')),
+  item_id uuid,
+  item_key text not null default '',
+  form_key text,
+  mode text not null default 'leer',
+  direction text,
+  pass integer not null default 1,
+  position integer not null default 0,
+  revisit boolean not null default false,
+  grade text check (grade in ('bien', 'otra')),
+  grade_auto boolean not null default false,
+  grade_changes integer not null default 0,
+  flipped boolean not null default false,
+  flips integer not null default 0,
+  ms_to_flip integer,
+  ms_front integer not null default 0,
+  ms_back integer not null default 0,
+  audio_plays integer not null default 0,
+  known_before boolean not null default false,
+  known_after boolean not null default false,
+  device text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.practice_log enable row level security;
+
+drop policy if exists "select own practice" on public.practice_log;
+create policy "select own practice" on public.practice_log
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own practice" on public.practice_log;
+create policy "insert own practice" on public.practice_log
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "delete own practice" on public.practice_log;
+create policy "delete own practice" on public.practice_log
+  for delete using (auth.uid() = user_id);
+
+create index if not exists practice_log_user_shown_idx on public.practice_log (user_id, shown_at desc);
+create index if not exists practice_log_user_item_idx on public.practice_log (user_id, item_kind, item_key);
