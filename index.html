@@ -972,12 +972,20 @@
         <div class="flash-listen-hint flash-speak-hint" id="flash-speak-hint" hidden></div>
       </div>
       <div class="flash-face flash-back">
-        <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
-        <div class="flash-answer" id="flash-back-main"></div>
+        <!-- The answer, and in Hablar what you said under it (2026-10-05,
+             mason's "Dijiste:" layout): one grid so both lines share a left
+             edge. Outside Hablar this wrapper is just a plain block and the
+             speaker keeps its corner. See renderHeard() in app.js. -->
+        <div class="flash-answer-grid" id="flash-back-answer">
+          <button type="button" class="flash-speak-btn" id="flash-back-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+          <div class="flash-answer" id="flash-back-main"></div>
+          <div class="flash-said-label" id="flash-back-said-label" hidden><span data-i18n="speak_said">Dijiste:</span><span class="said-pre" id="flash-back-said-pre"></span></div>
+          <div class="flash-heard" id="flash-back-heard" hidden></div>
+          <button type="button" class="flash-speak-btn flash-said-play" id="flash-back-play" data-i18n-aria-label="speak_play_aria" aria-label="Escuchar tu grabación" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path class="play-glyph" d="M8 5.5v13l11-6.5z" fill="currentColor"/><rect class="stop-glyph" x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg></button>
+        </div>
         <div class="flash-prompt-sub" id="flash-back-meta" hidden></div>
         <div class="flash-sub" id="flash-back-sub"></div>
         <div class="badges flash-back-badges" id="flash-back-badges"></div>
-        <div class="flash-heard" id="flash-back-heard" hidden></div>
         <div class="flash-example" id="flash-back-example"></div>
       </div>
     </div>

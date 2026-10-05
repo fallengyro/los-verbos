@@ -242,7 +242,8 @@
       speak_again: "Tocá el micrófono para intentar de nuevo",
       speak_mic_denied: "No hay permiso para el micrófono. Habilitalo en la configuración del navegador.",
       speak_mic_error: "No se pudo usar el micrófono.",
-      speak_why_score: "Sonó bien",
+      speak_said: "Dijiste:",
+      speak_play_aria: "Escuchar tu grabación",
       speak_nothing: "No se escuchó nada",
       speak_error: "No se pudo analizar",
       update_toast_text: "Hay una versión nueva de voseá.",
@@ -710,7 +711,8 @@
       speak_again: "Tap the mic to try again",
       speak_mic_denied: "No microphone permission. Allow it in your browser settings.",
       speak_mic_error: "Couldn't use the microphone.",
-      speak_why_score: "Sounded right",
+      speak_said: "You said:",
+      speak_play_aria: "Play your recording",
       speak_nothing: "Nothing heard",
       speak_error: "Couldn't check it",
       update_toast_text: "A new version of voseá is ready.",
@@ -2173,6 +2175,10 @@
     flashBackBadges: document.getElementById("flash-back-badges"),
     flashBackExample: document.getElementById("flash-back-example"),
     flashBackHeard: document.getElementById("flash-back-heard"),
+    flashBackAnswer: document.getElementById("flash-back-answer"),
+    flashBackSaidLabel: document.getElementById("flash-back-said-label"),
+    flashBackSaidPre: document.getElementById("flash-back-said-pre"),
+    flashBackPlay: document.getElementById("flash-back-play"),
     flashSpeakMic: document.getElementById("flash-speak-mic"),
     flashSpeakHint: document.getElementById("flash-speak-hint"),
     flashFrontCloze: document.getElementById("flash-front-cloze"),
@@ -5428,7 +5434,7 @@
   // definition on a short phone screen). Layout sizes, so the card's 3D
   // rotation doesn't matter.
   function flashBackOverflows() {
-    var back = el.flashBackMain.parentNode;
+    var back = el.flashBackMain.closest(".flash-back");
     if (!back || !back.clientHeight) return false;
     var cs = getComputedStyle(back);
     var gap = parseFloat(cs.rowGap || cs.gap) || 0;
@@ -5609,6 +5615,7 @@
 
   function closeFlashcards() {
     hablarRelease();
+    hablarDropRecordings();
     practiceCloseView();
     practiceSession = null;
     practiceFlush();
@@ -6027,6 +6034,7 @@
     if (hablarBusyCard === card) return;
     if (!hablarSupported()) { hablarHint(card, t("speak_unsupported")); return; }
     if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } // don't record our own voice
+    hablarStopPlayback();
     hablarGetStream().then(function (stream) {
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden || hablarRec) return;
       var mr;
@@ -6036,7 +6044,11 @@
       mr.onstop = function () {
         clearTimeout(rec.auto);
         if (hablarRec === rec) hablarRec = null;
-        if (!rec.cancelled) hablarAnalyse(card, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
+        if (!rec.cancelled) {
+          var blob = new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" });
+          hablarKeepRecording(card, blob);
+          hablarAnalyse(card, blob, Date.now() - rec.started);
+        }
         renderSpeakState();
       };
       rec.auto = setTimeout(hablarStop, HABLAR_MAX_MS);
@@ -6143,36 +6155,149 @@
       : t(recording ? "speak_recording" : (busy ? "speak_analyzing" : (card._speech ? "speak_again" : "speak_hint")));
     fitFlashFront();
   }
-  // The line on the back (2026-10-05, mason): short, no "I" voice, no
-  // numbers. ✓ «what it heard» when it matched; ✓ Sonó bien when it was
-  // graded on pronunciation (showing a mismatched transcript next to a ✓
-  // was confusing); ≠ «…» for Otra vez; ? «…» when it isn't sure (nothing
-  // selected — you choose).
+  // ---- your recording, to play back next to the answer ----
+  // The last recording of each card stays in memory (an object URL on the
+  // card) while the deck is open, so ▶ on the back can play it; it is
+  // never uploaded or stored, and every URL is let go when the deck closes.
+  var hablarRecUrls = [];
+  var hablarPlayer = null;
+  function hablarKeepRecording(card, blob) {
+    if (!window.URL || !URL.createObjectURL) return;
+    if (card._recUrl) { try { URL.revokeObjectURL(card._recUrl); } catch (e) {} }
+    card._recUrl = URL.createObjectURL(blob);
+    hablarRecUrls.push(card._recUrl);
+  }
+  function hablarDropRecordings() {
+    hablarStopPlayback();
+    hablarRecUrls.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+    hablarRecUrls = [];
+    flashDeck.forEach(function (c) { if (c) delete c._recUrl; });
+  }
+  function hablarStopPlayback() {
+    if (hablarPlayer) { try { hablarPlayer.pause(); } catch (e) {} }
+    if (el.flashBackPlay) el.flashBackPlay.classList.remove("is-playing");
+  }
+  function hablarPlayOwn() {
+    var card = flashDeck[flashIndex];
+    if (!card || !card._recUrl) return;
+    if (el.flashBackPlay.classList.contains("is-playing")) { hablarStopPlayback(); return; }
+    if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} }
+    if (!hablarPlayer) {
+      hablarPlayer = new Audio();
+      var done = function () { el.flashBackPlay.classList.remove("is-playing"); };
+      hablarPlayer.addEventListener("ended", done);
+      hablarPlayer.addEventListener("pause", done);
+      hablarPlayer.addEventListener("error", done);
+    }
+    hablarPlayer.src = card._recUrl;
+    el.flashBackPlay.classList.add("is-playing");
+    var pr = hablarPlayer.play();
+    if (pr && pr.catch) pr.catch(function () { el.flashBackPlay.classList.remove("is-playing"); });
+    // How often you listen back to yourself goes in the log with the rest
+    // of the Hablar result (practice_log.speech.plays).
+    if (practiceView && practiceView.card === card && practiceView.row.speech) {
+      practiceView.row.speech.plays = (practiceView.row.speech.plays || 0) + 1;
+    }
+  }
+
+  // What you said, lined up under the answer: { pre, core, post }. Words
+  // before the answer ("y la valija") go in pre, so they can hang to the
+  // left beside "Dijiste:"; anything after a full match goes in post.
+  // Punctuation isn't spoken, so it's dropped, and the first letter
+  // follows the answer's case (Azure writes "Revoque." like a sentence).
+  function speechCleanShown(text) {
+    return String(text || "").replace(/[¿?¡!]/g, "").replace(/[.。]+(\s|$)/g, "$1").replace(/\s+/g, " ").trim();
+  }
+  function speechMatchCase(text, model) {
+    var m = String(model || "").match(/\p{L}/u);
+    var i = text.search(/\p{L}/u);
+    if (!m || i < 0) return text;
+    var up = m[0] !== m[0].toLowerCase();
+    return text.slice(0, i) + (up ? text.charAt(i).toUpperCase() : text.charAt(i).toLowerCase()) + text.slice(i + 1);
+  }
+  function speechAlign(card, sp) {
+    var answers = speakAnswers(card);
+    if (sp.rule === "score") {
+      // Judged right on pronunciation though the transcript differs:
+      // show the answer itself (the transcript next to a Bien confused
+      // mason, 2026-10-05); ▶ lets you hear what you actually said.
+      return { pre: "", core: speechCleanShown(answers[0] || card.backMain), post: "" };
+    }
+    var shown = speechMatchCase(speechCleanShown(sp.heard_display || sp.heard || ""), answers[0] || card.backMain);
+    var toks = shown.split(" ").filter(Boolean);
+    if (!toks.length) return { pre: "", core: "", post: "" };
+    var norms = toks.map(speechNorm);
+    var best = { k: 0, score: -1, ans: [] };
+    answers.forEach(function (ans) {
+      var aw = speechNorm(ans).split(" ").filter(Boolean);
+      for (var k = 0; k <= Math.min(3, toks.length - 1); k++) {
+        var sc = 0;
+        for (var i = 0; i < aw.length && k + i < norms.length; i++) if (norms[k + i] === aw[i]) sc++;
+        if (sc > best.score || (sc === best.score && k < best.k)) best = { k: k, score: sc, ans: aw };
+      }
+    });
+    var k = best.score > 0 ? best.k : 0;
+    var pre = toks.slice(0, k), rest = toks.slice(k);
+    var post = [];
+    if (sp.rule === "transcript" && best.ans.length && rest.length > best.ans.length) {
+      post = rest.slice(best.ans.length); rest = rest.slice(0, best.ans.length);
+    }
+    if (!rest.length) { rest = pre; pre = []; }
+    // The first word shown takes the answer's case, wherever it lands.
+    var core = rest.join(" ");
+    var preText = pre.join(" ");
+    if (preText) {
+      core = speechMatchCase(core, answers[0] || card.backMain);
+      preText = speechMatchCase(preText, "a"); // extra words lead in lower case: "y la"
+    }
+    return { pre: preText, core: core, post: post.join(" ") };
+  }
+
   function renderHeard(card) {
     if (!el.flashBackHeard) return;
     var sp = card && card.speak ? card._speech : null;
-    el.flashBackHeard.hidden = !sp;
+    var grid = el.flashBackAnswer;
+    hablarStopPlayback();
+    grid.className = "flash-answer-grid";
     el.flashBackHeard.className = "flash-heard";
     el.flashBackHeard.textContent = "";
-    if (!sp) return;
+    el.flashBackSaidPre.textContent = "";
+    el.flashBackHeard.hidden = !sp;
+    el.flashBackSaidLabel.hidden = !sp;
+    el.flashBackPlay.hidden = !(sp && card._recUrl);
+    if (!sp) { fitFlashBack(); return; }
+    grid.classList.add("is-said");
+    var len = String(card.backMain || "").length;
     if (sp.rule === "error" || sp.rule === "nothing") {
-      el.flashBackHeard.textContent = t(sp.rule === "error" ? "speak_error" : "speak_nothing");
-      el.flashBackHeard.classList.add("is-none");
-      return;
+      grid.classList.add("is-none");
+      el.flashBackHeard.classList.add("is-msg");
+      el.flashBackHeard.textContent = sp.rule === "error" ? t("speak_error") : "—";
+    } else {
+      var parts = speechAlign(card, sp);
+      el.flashBackSaidPre.textContent = parts.pre;
+      el.flashBackHeard.textContent = parts.core;
+      if (parts.post) {
+        var post = document.createElement("span");
+        post.className = "said-post";
+        post.textContent = " " + parts.post;
+        el.flashBackHeard.appendChild(post);
+      }
+      len = Math.max(len, (parts.pre ? parts.pre.length + 1 : 0) + parts.core.length + (parts.post ? parts.post.length + 1 : 0));
+      grid.classList.add(sp.rule === "unsure" ? "is-unsure" : (sp.auto_grade === "bien" ? "is-bien" : "is-otra"));
     }
-    var span = document.createElement("span");
-    span.className = "heard-text";
-    if (sp.rule === "score") span.textContent = t("speak_why_score");
-    else {
-      var shown = (sp.heard_display || sp.heard || "…").replace(/[.。]+$/, "");
-      // Azure capitalises like a sentence ("Revoque."); match the card's case.
-      var ans = String(card.backMain || "");
-      if (ans && ans.charAt(0) === ans.charAt(0).toLowerCase()) shown = shown.charAt(0).toLowerCase() + shown.slice(1);
-      span.textContent = "«" + shown + "»";
-    }
-    el.flashBackHeard.appendChild(span);
-    el.flashBackHeard.classList.add(sp.rule === "unsure" ? "is-unsure" : (sp.auto_grade === "bien" ? "is-bien" : "is-otra"));
+    grid.classList.toggle("is-long", len > 22 && len <= 40);
+    grid.classList.toggle("is-longer", len > 40);
+    fitFlashBack();
   }
+  // The back with a result can run out of room on a phone: the example
+  // sentence goes first; the answer and what you said always stay.
+  function fitFlashBack() {
+    var ex = el.flashBackExample;
+    if (!ex || !ex.textContent) return;
+    ex.hidden = false;
+    if (flashBackOverflows()) ex.hidden = true;
+  }
+  el.flashBackPlay.addEventListener("click", function (evt) { evt.stopPropagation(); hablarPlayOwn(); });
   el.flashSpeakMic.addEventListener("click", function (evt) { evt.stopPropagation(); hablarToggle(); });
 
   // Test/debug hooks.
@@ -9119,7 +9244,7 @@
   el.flashBackSpeak.addEventListener("click", function (evt) {
     evt.stopPropagation();
     var card = flashDeck[flashIndex];
-    if (card) { practiceNoteAudio(); playTts(card.backSpeak, el.flashBackSpeak); }
+    if (card) { hablarStopPlayback(); practiceNoteAudio(); playTts(card.backSpeak, el.flashBackSpeak); }
   });
   // Sabido toggles — see setItemKnown(). The flashcard one sits outside
   // .flash-card, so unlike the speaker buttons it needs no stopPropagation

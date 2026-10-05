@@ -1466,16 +1466,58 @@
   @media (prefers-reduced-motion: reduce) { .flash-speak-mic.is-busy { animation: none; opacity: 0.6; } }
   .flash-speak-hint { margin-top: 2px; text-align: center; }
   .flash-speak-hint.is-warn { color: var(--danger); }
-  .flash-speak-hint[hidden], .flash-heard[hidden] { display: none; }
+  .flash-speak-hint[hidden] { display: none; }
   .flash-card.flipped .flash-front .flash-speak-hint { visibility: hidden; }
-  /* the back's "Escuché «…» · coincide" line */
-  /* More prominent (2026-10-05): it read as easy to miss. */
-  .flash-heard { font-family: "Public Sans", sans-serif; font-size: 17px; color: var(--ink); text-align: center; max-width: 92%; line-height: 1.35; }
-  .flash-heard .heard-text { font-weight: 600; }
-  .flash-heard.is-bien::before { content: "\2713\00a0"; color: var(--teal); font-weight: 700; }
-  .flash-heard.is-otra::before { content: "\2260\00a0"; color: var(--danger); font-weight: 700; }
-  .flash-heard.is-unsure::before { content: "?\00a0"; color: var(--ink-soft); font-weight: 700; }
-  .flash-heard.is-none { font-style: italic; color: var(--ink-soft); font-size: 15px; }
+  /* ---- The back in Hablar: "Dijiste:" under the answer (2026-10-05,
+     mason picked "A, aligned" from maqueta_hablar_dorso/opcion_A2*.png) ----
+     Outside Hablar, .flash-answer-grid is a plain block: the answer looks
+     as it always has and the speaker keeps its top-right corner (it is
+     absolutely positioned against the face, and this block isn't
+     positioned). With a result (.is-said) it becomes a three-column grid:
+         [          ] [answer           ] [speaker]
+         [Dijiste: …] [what you said    ] [▶ yours]
+     so the answer and what you said share one left edge and wrap inside
+     the same column. Words you added before the answer ("y la valija")
+     hang in the label column, faded, so the matching word still sits
+     right under the answer. No ✓/≠ marks: the colour carries the result —
+     teal Bien, gold-to-brick not sure, --danger (the exclude red) Otra
+     vez, grey when nothing was heard. */
+  .flash-answer-grid { max-width: 100%; }
+  .flash-answer-grid.is-said {
+    display: grid; grid-template-columns: auto minmax(0, auto) auto;
+    column-gap: 10px; row-gap: 6px; justify-content: center; align-items: start;
+  }
+  .flash-answer-grid.is-said .flash-answer { grid-column: 2; grid-row: 1; text-align: left; align-self: first baseline; }
+  .flash-answer-grid.is-said #flash-back-speak { grid-column: 3; grid-row: 1; }
+  .flash-answer-grid.is-said .flash-speak-btn { position: relative; top: auto; right: auto; margin-top: 2px; opacity: 0.85; }
+  .flash-said-label { grid-column: 1; grid-row: 2; justify-self: end; text-align: right; align-self: first baseline;
+    font-family: "Public Sans", sans-serif; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+  .flash-said-label[hidden], .flash-heard[hidden], .flash-said-play[hidden] { display: none; }
+  .flash-answer-grid.is-said .flash-heard { grid-column: 2; grid-row: 2; align-self: first baseline; }
+  .flash-said-play { grid-column: 3; grid-row: 2; color: var(--ink-soft); }
+  .flash-said-play .stop-glyph { display: none; }
+  .flash-said-play.is-playing { color: var(--accent-deep); border-color: var(--accent); opacity: 1; }
+  .flash-said-play.is-playing .play-glyph { display: none; }
+  .flash-said-play.is-playing .stop-glyph { display: inline; }
+  .flash-heard, .flash-said-label .said-pre {
+    font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600;
+    font-size: clamp(22px, 6vw, 34px); color: var(--ink); word-break: break-word;
+  }
+  .flash-heard { text-align: left; }
+  .flash-said-label .said-pre { margin-left: 4px; }
+  .flash-said-label .said-pre:empty { display: none; }
+  .flash-heard .said-post, .flash-said-label .said-pre { opacity: 0.5; }
+  .flash-answer-grid.is-bien .flash-heard, .flash-answer-grid.is-bien .said-pre { color: var(--teal); }
+  .flash-answer-grid.is-unsure .flash-heard, .flash-answer-grid.is-unsure .said-pre { color: color-mix(in srgb, var(--gold) 55%, var(--brick)); }
+  .flash-answer-grid.is-otra .flash-heard, .flash-answer-grid.is-otra .said-pre { color: var(--danger); }
+  .flash-answer-grid.is-none .flash-heard { color: var(--ink-soft); font-family: "Public Sans", sans-serif; font-style: italic; font-weight: 400; font-size: 15px; }
+  /* Long answers step down twice, the two lines together. */
+  .flash-answer-grid.is-said.is-long .flash-answer,
+  .flash-answer-grid.is-said.is-long .flash-heard:not(.is-msg),
+  .flash-answer-grid.is-said.is-long .said-pre { font-size: clamp(19px, 5.4vw, 23px); }
+  .flash-answer-grid.is-said.is-longer .flash-answer,
+  .flash-answer-grid.is-said.is-longer .flash-heard:not(.is-msg),
+  .flash-answer-grid.is-said.is-longer .said-pre { font-size: clamp(16px, 4.6vw, 19px); line-height: 1.25; }
   /* Listening back of a word/phrase: the meaning as a plain line under
      the Spanish, not the italic aside style. */
   .flash-sub.listen-def { font-style: normal; font-size: 15.5px; color: var(--ink); }
