@@ -1455,8 +1455,22 @@
      pulse while the recording is being checked. */
   /* A bit smaller than the listening button (2026-10-05) so a long
      definition + context + mic fit on a phone-sized card. */
-  .flash-speak-mic { width: 64px; height: 64px; margin-top: 4px; flex: none; }
-  .flash-speak-mic svg { width: 30px; height: 30px; }
+  /* One action button, one place (2026-10-05, mason): no hint text under
+     it any more, so the button is pinned low and centred on the front —
+     the same size and spot for the Hablar mic and the Escuchar speaker —
+     and the prompt gets the space above it. The face's bottom padding
+     reserves the button's room, so long prompts can't run under it. */
+  .flash-card { --flash-act: 72px; }
+  .flash-card.is-speak .flash-front,
+  .flash-card.is-listen .flash-front { padding-bottom: calc(var(--flash-act) + 38px); }
+  .flash-card.is-speak .flash-front .flash-speak-mic,
+  .flash-card.is-listen .flash-front .flash-listen-btn {
+    position: absolute; left: 50%; bottom: 22px; margin: 0 0 0 calc(var(--flash-act) / -2);
+    width: var(--flash-act); height: var(--flash-act); flex: none;
+  }
+  .flash-card.is-speak .flash-front .flash-speak-mic svg,
+  .flash-card.is-listen .flash-front .flash-listen-btn svg { width: 32px; height: 32px; }
+  .flash-speak-mic { flex: none; }
   .flash-speak-mic .stop-glyph { display: none; }
   .flash-speak-mic.is-recording { background: var(--danger); border-color: var(--danger); color: var(--paper); box-shadow: 0 0 0 7px color-mix(in srgb, var(--danger) 22%, transparent); }
   .flash-speak-mic.is-recording .mic-glyph { display: none; }

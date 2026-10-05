@@ -236,10 +236,6 @@
       speak_unsupported: "Este navegador no puede grabar audio, así que «Hablar» no funciona acá.",
       speak_mic_aria: "Grabar tu respuesta",
       speak_stop_aria: "Terminar de grabar",
-      speak_hint: "Tocá el micrófono y decilo en español",
-      speak_recording: "Escuchando… tocá para terminar",
-      speak_analyzing: "Analizando…",
-      speak_again: "Tocá el micrófono para intentar de nuevo",
       speak_mic_denied: "No hay permiso para el micrófono. Habilitalo en la configuración del navegador.",
       speak_mic_error: "No se pudo usar el micrófono.",
       speak_said: "Dijiste:",
@@ -393,7 +389,6 @@
       flash_autoplay_note: "El español suena apenas aparece (al frente, o al dar vuelta).",
       flash_autoplay_note_listen: "En «Escuchar» siempre suena.",
       flash_autoplay_note_quiet: "Silenciado por el modo silencio.",
-      flash_listen_hint: "Escuchá y pensá qué es",
       flash_listen_aria: "Escuchar otra vez",
       settings_quiet_label: "Modo silencio",
       settings_quiet_off: "Apagado",
@@ -705,10 +700,6 @@
       speak_unsupported: "This browser can't record audio, so Speak won't work here.",
       speak_mic_aria: "Record your answer",
       speak_stop_aria: "Stop recording",
-      speak_hint: "Tap the mic and say it in Spanish",
-      speak_recording: "Listening… tap to finish",
-      speak_analyzing: "Checking…",
-      speak_again: "Tap the mic to try again",
       speak_mic_denied: "No microphone permission. Allow it in your browser settings.",
       speak_mic_error: "Couldn't use the microphone.",
       speak_said: "You said:",
@@ -862,7 +853,6 @@
       flash_autoplay_note: "The Spanish plays as soon as it appears (on the front, or when you flip).",
       flash_autoplay_note_listen: "In Listen it always plays.",
       flash_autoplay_note_quiet: "Muted by quiet mode.",
-      flash_listen_hint: "Listen and think what it is",
       flash_listen_aria: "Play again",
       settings_quiet_label: "Quiet mode",
       settings_quiet_off: "Off",
@@ -2160,7 +2150,6 @@
     flashFrontSub: document.getElementById("flash-front-sub"),
     flashFrontSpeak: document.getElementById("flash-front-speak"),
     flashListenBtn: document.getElementById("flash-listen-btn"),
-    flashListenHint: document.getElementById("flash-listen-hint"),
     flashBackMeta: document.getElementById("flash-back-meta"),
     flashModeRead: document.getElementById("flash-mode-read"),
     flashModeListen: document.getElementById("flash-mode-listen"),
@@ -5295,7 +5284,6 @@
     el.flashFrontSub.textContent = card.frontSub || "";
     el.flashFrontSub.style.display = card.frontSub && !listen ? "" : "none";
     el.flashListenBtn.hidden = !listen;
-    el.flashListenHint.hidden = !listen;
     el.flashBackMain.textContent = card.backMain;
     el.flashBackMeta.textContent = card.backMeta || "";
     el.flashBackMeta.hidden = !card.backMeta;
@@ -5404,9 +5392,8 @@
     return "«" + out + "»";
   }
 
-  // Front-face fit (2026-10-05): if a long prompt + context + mic don't fit
-  // the card, drop the least important pieces first — the Hablar hint, then
-  // the context sentence.
+  // Front-face fit (2026-10-05): if a long prompt + context don't fit above
+  // the mic, drop the context sentence (then a problem message, last).
   function flashFaceOverflows(face) {
     if (!face || !face.clientHeight) return false;
     var cs = getComputedStyle(face);
@@ -5414,7 +5401,9 @@
     var total = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
     var n = 0;
     Array.prototype.forEach.call(face.children, function (ch) {
-      if (ch.classList.contains("flash-speak-btn") || ch.hidden || getComputedStyle(ch).display === "none") return;
+      if (ch.classList.contains("flash-speak-btn") || ch.hidden) return;
+      var chs = getComputedStyle(ch);
+      if (chs.display === "none" || chs.position === "absolute") return; // the pinned mic/speaker has its own reserved space
       total += ch.offsetHeight; n++;
     });
     total += gap * Math.max(0, n - 1);
@@ -5426,8 +5415,10 @@
     el.flashSpeakHint.style.display = "";
     el.flashFrontCloze.style.display = "";
     if (!flashFaceOverflows(face)) return;
-    if (!el.flashSpeakHint.hidden) { el.flashSpeakHint.style.display = "none"; if (!flashFaceOverflows(face)) return; }
-    if (!el.flashFrontCloze.hidden) el.flashFrontCloze.style.display = "none";
+    // The hint line is only ever a problem message now, so it outranks the
+    // context sentence: that goes first.
+    if (!el.flashFrontCloze.hidden) { el.flashFrontCloze.style.display = "none"; if (!flashFaceOverflows(face)) return; }
+    if (!el.flashSpeakHint.hidden) el.flashSpeakHint.style.display = "none";
   }
 
   // Whether the back face's content is taller than the card (a long
@@ -6141,18 +6132,22 @@
     var card = flashDeck[flashIndex];
     var speak = !!(card && card.speak) && !el.flashOverlay.classList.contains("is-done");
     el.flashSpeakMic.hidden = !speak;
-    el.flashSpeakHint.hidden = !speak;
     el.flashCard.classList.toggle("is-speak", speak);
+    // No standing instructions under the mic (2026-10-05, mason: the icon
+    // explains itself; the text was clutter). The mic's own look carries
+    // the state — red with a stop square while recording, pulsing while
+    // checking — and the hint line only appears for a problem (mic
+    // refused, browser can't record).
+    var warn = speak && hablarHintOverride && hablarHintOverride.card === card;
+    el.flashSpeakHint.hidden = !warn;
     if (!speak) return;
     var recording = !!(hablarRec && hablarRec.card === card);
     var busy = hablarBusyCard === card;
     el.flashSpeakMic.classList.toggle("is-recording", recording);
     el.flashSpeakMic.classList.toggle("is-busy", busy);
     el.flashSpeakMic.setAttribute("aria-label", t(recording ? "speak_stop_aria" : "speak_mic_aria"));
-    var warn = hablarHintOverride && hablarHintOverride.card === card;
     el.flashSpeakHint.classList.toggle("is-warn", !!warn);
-    el.flashSpeakHint.textContent = warn ? hablarHintOverride.text
-      : t(recording ? "speak_recording" : (busy ? "speak_analyzing" : (card._speech ? "speak_again" : "speak_hint")));
+    el.flashSpeakHint.textContent = warn ? hablarHintOverride.text : "";
     fitFlashFront();
   }
   // ---- your recording, to play back next to the answer ----
