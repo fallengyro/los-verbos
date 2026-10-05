@@ -5560,9 +5560,18 @@
     }
     var max = Math.max.apply(null, out.concat([1e-6]));
     var a = 0, b = out.length - 1;
-    while (a < b && out[a] < max * 0.05) a++;
-    while (b > a && out[b] < max * 0.05) b--;
-    return out.slice(a, b + 1).map(function (v) { return Math.pow(v / max, 0.8); });
+    while (a < b && out[a] < max * 0.03) a++;
+    while (b > a && out[b] < max * 0.03) b--;
+    // The bars only cover the speech, so keep where it starts and ends in
+    // the clip: playback is mapped onto that span, not the whole file.
+    // (Bug, mason 2026-10-05: the fill ran late and finished well after
+    // the voice did, because the clip's silent lead-in and tail were
+    // trimmed from the bars but not from the timing.)
+    return {
+      bars: out.slice(a, b + 1).map(function (v) { return Math.pow(v / max, 0.8); }),
+      t0: a * WAVE_STEP_S,
+      t1: (b + 1) * WAVE_STEP_S
+    };
   }
   function waveLoad(text) {
     var key = ttsKey(text);
@@ -5577,7 +5586,7 @@
       return fetch(r.src).then(function (resp) { if (!resp.ok) throw new Error("http_" + resp.status); return resp.arrayBuffer(); });
     }).then(waveDecode).then(function (buf) {
       var peaks = wavePeaksFrom(buf);
-      if (!peaks.length) throw new Error("silent");
+      if (!peaks.bars.length) throw new Error("silent");
       wavePeaks[key] = peaks;
       return peaks;
     });
@@ -5586,7 +5595,8 @@
     p.then(clear, clear);
     return p;
   }
-  function waveDraw(peaks, fresh) {
+  function waveDraw(wave, fresh) {
+    var peaks = wave.bars;
     var w = el.flashWave;
     w.textContent = "";
     var room = (w.parentNode && w.parentNode.clientWidth) || 300;
@@ -5625,16 +5635,25 @@
     cancelAnimationFrame(waveRaf);
     if (!el.flashWave.children.length) waveShow(card); // the clip has just arrived
     var bars = el.flashWave.children;
+    var key = ttsKey(text);
     var step = function () {
       var a = ttsAudioEl;
       var playing = a && !a.paused && !a.ended && flashDeck[flashIndex] === card && ttsActiveEl === el.flashListenBtn;
-      var frac = playing && a.duration ? a.currentTime / a.duration : 0;
-      var on = Math.round(frac * bars.length);
+      var wave = wavePeaks[key];
+      var frac = 0;
+      if (playing && wave) frac = Math.max(0, Math.min(1, (a.currentTime - wave.t0) / Math.max(0.05, wave.t1 - wave.t0)));
+      else if (playing && a.duration) frac = a.currentTime / a.duration;
+      var on = Math.ceil(frac * bars.length);
       for (var i = 0; i < bars.length; i++) bars[i].classList.toggle("on", playing && i < on);
       if (playing) waveRaf = requestAnimationFrame(step);
     };
     waveRaf = requestAnimationFrame(step);
   }
+
+  window.voseWaveState = function () {
+    var card = flashDeck[flashIndex], w = card && card.listen ? wavePeaks[ttsKey(card.audio)] : null;
+    return { t: ttsAudioEl ? ttsAudioEl.currentTime : null, playing: !!(ttsAudioEl && !ttsAudioEl.paused), t0: w ? w.t0 : null, t1: w ? w.t1 : null, bars: el.flashWave.children.length, on: el.flashWave.querySelectorAll("i.on").length };
+  };
 
   // iOS only lets a page start audio from a tap; playing one silent clip on
   // the shared <audio> element during the Empezar tap "unlocks" it, so the
