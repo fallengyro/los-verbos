@@ -2150,6 +2150,9 @@
     flashFrontSub: document.getElementById("flash-front-sub"),
     flashFrontSpeak: document.getElementById("flash-front-speak"),
     flashListenBtn: document.getElementById("flash-listen-btn"),
+    flashListenFace: document.getElementById("flash-listen-face"),
+    flashListenTag: document.getElementById("flash-listen-tag"),
+    flashWave: document.getElementById("flash-wave"),
     flashBackMeta: document.getElementById("flash-back-meta"),
     flashModeRead: document.getElementById("flash-mode-read"),
     flashModeListen: document.getElementById("flash-mode-listen"),
@@ -4667,6 +4670,7 @@
           // known — nudge the ring's already-running animation to match it
           // (see syncChaseToAudio() above), with no restart and no jump.
           syncChaseToAudio(btn);
+          if (btn && btn === el.flashListenBtn) waveFollowPlayback(text);
           var totalMs = msSince(ttsStartedAt);
           console.log("[tts] audio started — " + totalMs + "ms after the tap — \"" + text + "\"");
         });
@@ -5284,6 +5288,7 @@
     el.flashFrontSub.textContent = card.frontSub || "";
     el.flashFrontSub.style.display = card.frontSub && !listen ? "" : "none";
     el.flashListenBtn.hidden = !listen;
+    renderListenFace(card);
     el.flashBackMain.textContent = card.backMain;
     el.flashBackMeta.textContent = card.backMeta || "";
     el.flashBackMeta.hidden = !card.backMeta;
@@ -5499,10 +5504,23 @@
     return deck.map(listenCard);
   }
 
+  // The quiet tag over an Escuchar card's waveform (mason, 2026-10-05:
+  // "probably the right amount of help for a low A2"): what kind of thing
+  // you're about to hear — "sustantivo · femenino", "pregunta", and for a
+  // verb its person and tense ("vos · presente"). If that ever becomes too
+  // much help, the verb case is the one to cut back to just "verbo".
+  function listenTagText(c) {
+    var d = c.data || {};
+    if (c.kind === "verb") return c.frontSub || "";
+    if (c.kind === "word") return [d.partOfSpeech, d.gender].filter(Boolean).map(tagLabel).join(" · ");
+    return d.function ? tagLabel(d.function) : "";
+  }
+
   // One ordinary card turned into a listening card. Words/phrases must be
   // built "word2def" (Spanish on the front) before this.
   function listenCard(c) {
     var out = Object.assign({}, c, { listen: true, frontMain: "", frontSub: "", frontSpeak: "" });
+    out.listenTag = listenTagText(c);
     if (c.kind === "verb") {
       out.audio = c.backSpeak || c.backMain;
       out.backMeta = (c.frontMain || "") + (c.frontSub ? " · " + c.frontSub : "");
@@ -5513,6 +5531,109 @@
       out.backSpeak = out.audio;
     }
     return out;
+  }
+
+  // ---- Escuchar waveform (2026-10-05) ----
+  // Drawn from the card's own TTS clip (the bytes ttsLoadAudio() already
+  // downloads for playback, so no extra request): loudness every 25 ms,
+  // silence trimmed off both ends, scaled to the loudest moment. One bar
+  // per 25 ms, so length follows the clip; clips too long for the card
+  // are squeezed (each bar keeps the loudest of what it covers). Kept in
+  // memory per clip. If the audio can't be decoded the card just shows
+  // the tag and the speaker, as before.
+  var WAVE_STEP_S = 0.025;
+  var wavePeaks = {};    // ttsKey -> number[] (0..1)
+  var waveLoading = {};  // ttsKey -> Promise
+  var waveRaf = 0;
+  function waveDecode(ab) {
+    var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (!OAC) return Promise.reject(new Error("no_audio_context"));
+    var ctx = new OAC(1, 1, 44100);
+    return new Promise(function (resolve, reject) { ctx.decodeAudioData(ab, resolve, reject); });
+  }
+  function wavePeaksFrom(buf) {
+    var data = buf.getChannelData(0), win = Math.max(1, Math.round(buf.sampleRate * WAVE_STEP_S)), out = [];
+    for (var i = 0; i < data.length; i += win) {
+      var sum = 0, n = Math.min(win, data.length - i);
+      for (var j = 0; j < n; j++) sum += data[i + j] * data[i + j];
+      out.push(Math.sqrt(sum / n));
+    }
+    var max = Math.max.apply(null, out.concat([1e-6]));
+    var a = 0, b = out.length - 1;
+    while (a < b && out[a] < max * 0.05) a++;
+    while (b > a && out[b] < max * 0.05) b--;
+    return out.slice(a, b + 1).map(function (v) { return Math.pow(v / max, 0.8); });
+  }
+  function waveLoad(text) {
+    var key = ttsKey(text);
+    if (wavePeaks[key]) return Promise.resolve(wavePeaks[key]);
+    if (waveLoading[key]) return waveLoading[key];
+    // Never asks for audio itself (that would double the Edge Function
+    // calls when audio fails): it uses the clip once playback or prefetch
+    // has it — already downloaded, or still on its way.
+    var pending = ttsBlobUrls[key] ? Promise.resolve({ src: ttsBlobUrls[key] }) : ttsLoading[key];
+    if (!pending) return Promise.reject(new Error("not_loaded"));
+    var p = pending.then(function (r) {
+      return fetch(r.src).then(function (resp) { if (!resp.ok) throw new Error("http_" + resp.status); return resp.arrayBuffer(); });
+    }).then(waveDecode).then(function (buf) {
+      var peaks = wavePeaksFrom(buf);
+      if (!peaks.length) throw new Error("silent");
+      wavePeaks[key] = peaks;
+      return peaks;
+    });
+    waveLoading[key] = p;
+    var clear = function () { if (waveLoading[key] === p) delete waveLoading[key]; };
+    p.then(clear, clear);
+    return p;
+  }
+  function waveDraw(peaks, fresh) {
+    var w = el.flashWave;
+    w.textContent = "";
+    var room = (w.parentNode && w.parentNode.clientWidth) || 300;
+    var maxBars = Math.max(8, Math.floor(room / 5));
+    var bars = peaks;
+    if (bars.length > maxBars) {
+      var k = bars.length / maxBars;
+      bars = [];
+      for (var i = 0; i < maxBars; i++) bars.push(Math.max.apply(null, peaks.slice(Math.floor(i * k), Math.max(Math.floor(i * k) + 1, Math.floor((i + 1) * k)))));
+    }
+    var frag = document.createDocumentFragment();
+    bars.forEach(function (v) { var b = document.createElement("i"); b.style.height = Math.max(4, Math.round(v * 60)) + "px"; frag.appendChild(b); });
+    w.appendChild(frag);
+    w.classList.toggle("is-new", !!fresh);
+  }
+  function renderListenFace(card) {
+    var listen = !!(card && card.listen);
+    el.flashListenFace.hidden = !listen;
+    cancelAnimationFrame(waveRaf);
+    el.flashWave.textContent = "";
+    if (!listen) return;
+    el.flashListenTag.textContent = card.listenTag || "";
+    var key = ttsKey(card.audio);
+    if (wavePeaks[key]) { waveDraw(wavePeaks[key], false); return; }
+    waveShow(card);
+  }
+  function waveShow(card) {
+    waveLoad(card.audio).then(function (peaks) {
+      if (flashDeck[flashIndex] === card && !el.flashOverlay.hidden && !el.flashWave.children.length) waveDraw(peaks, true);
+    }, function (err) { if (err && err.message !== "not_loaded") console.log("[wave] no waveform for \"" + card.audio + "\":", err.message); });
+  }
+  // Fills the bars in from the left while the clip plays.
+  function waveFollowPlayback(text) {
+    var card = flashDeck[flashIndex];
+    if (!card || !card.listen || card.audio !== text) return;
+    cancelAnimationFrame(waveRaf);
+    if (!el.flashWave.children.length) waveShow(card); // the clip has just arrived
+    var bars = el.flashWave.children;
+    var step = function () {
+      var a = ttsAudioEl;
+      var playing = a && !a.paused && !a.ended && flashDeck[flashIndex] === card && ttsActiveEl === el.flashListenBtn;
+      var frac = playing && a.duration ? a.currentTime / a.duration : 0;
+      var on = Math.round(frac * bars.length);
+      for (var i = 0; i < bars.length; i++) bars[i].classList.toggle("on", playing && i < on);
+      if (playing) waveRaf = requestAnimationFrame(step);
+    };
+    waveRaf = requestAnimationFrame(step);
   }
 
   // iOS only lets a page start audio from a tap; playing one silent clip on

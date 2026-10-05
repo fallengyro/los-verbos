@@ -1445,6 +1445,24 @@
   }
   .flash-listen-btn svg { width: 38px; height: 38px; }
   .flash-listen-btn[hidden], .flash-listen-hint[hidden], #flash-back-meta[hidden] { display: none; }
+  /* Escuchar front (2026-10-05): the tag in small grey caps — deliberately
+     not one of the coloured badge chips, so it reads as a label on the
+     waveform rather than one more thing to look at — and the clip's
+     waveform: mirrored bars, ~25 ms each, so a word looks short and a
+     phrase long (long clips are squeezed to fit). While the clip plays the
+     bars fill in --accent-deep from the left, in step with the speaker's
+     ring. */
+  .flash-listen-face { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+  .flash-listen-face[hidden] { display: none; }
+  .flash-listen-tag { font-family: "Public Sans", sans-serif; font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); opacity: 0.8; }
+  .flash-listen-tag:empty { display: none; }
+  .flash-wave { display: flex; align-items: center; justify-content: center; gap: 2px; height: 64px; max-width: 100%; }
+  .flash-wave i { display: block; width: 3px; border-radius: 2px; background: var(--ink-soft); opacity: 0.42; flex: none; }
+  .flash-wave.is-new i { animation: wave-in 0.25s ease-out both; }
+  .flash-wave i.on { background: var(--accent-deep); opacity: 1; }
+  @keyframes wave-in { from { transform: scaleY(0.2); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .flash-wave.is-new i { animation: none; } }
+  .flash-card.flipped .flash-front .flash-listen-face { visibility: hidden; transition: visibility 0s linear 0.16s; }
   .flash-listen-hint { font-family: "Public Sans", sans-serif; font-size: 13.5px; color: var(--ink-soft); }
   /* Same rule as the corner speakers: the front's button must not show or
      take taps through the back face once the card is flipped. */
