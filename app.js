@@ -249,6 +249,35 @@
       grade_group_aria: "Cómo te fue con esta tarjeta",
       flash_tally: "{b} bien · {o} otra vez",
       nav_progress: "Progreso",
+      nav_topics: "Temas",
+      topics_intro: "Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.",
+      topic_badge_gen: "generado",
+      topic_badge_n: "{n} oraciones",
+      topic_what: "¿Qué practicar?",
+      topic_start: "Practicar",
+      topic_count: "{n} tarjetas",
+      topic_pick_one: "Elegí al menos un tramo.",
+      topic_sentences: "Ver oraciones",
+      topic_also: "también: {x}",
+      topic_note_read: "Ves el frente, lo decís para vos y das vuelta para ver la respuesta.",
+      topic_note_listen: "El frente es solo audio: escuchás y das vuelta para verlo escrito.",
+      topic_note_speak: "Lo decís en voz alta: tocá el micrófono, hablá y tocá de nuevo.",
+      topic_h_none: "Todavía no practicaste este tema.",
+      topic_h_cards: "{n} tarjetas",
+      topic_h_cards_1: "1 tarjeta",
+      topic_h_firm_sub: "tramos firmes",
+      topic_h_learned_sub: "oraciones aprendidas",
+      topic_h_ranges: "Por tramo",
+      topic_h_hard: "Te cuestan",
+      topic_h_hard_btn: "Practicar estos",
+      topic_s_none: "sin practicar",
+      topic_s_few: "poco",
+      topic_s_weak: "flojo",
+      topic_s_ok: "bien",
+      topic_s_firm: "firme",
+      topic_firm_of: "{b} de {n} tramos firmes",
+      topic_learned_of: "{b} de {n}",
+      prog_topics_title: "Temas",
       flash_done_text_practice: "¡Listo! Todas salieron bien.",
       msg_nada_para_practicar: "No hay nada para practicar ahí.",
       prog_loading: "Cargando tu historial…",
@@ -358,6 +387,7 @@
       rae_lookup_maybe_irregular: "Algunas de las formas que trajo el DLE no coinciden con la conjugación regular esperada — probablemente este verbo sea irregular; revisá el patrón y la Irregularidad.",
       rae_lookup_translation_unavailable: " La traducción automática no está disponible ahora, así que la definición quedó en español.",
       rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
+      rae_lookup_daily_limit: "Llegaste al límite de búsquedas de hoy. Mañana podés seguir.",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
@@ -713,6 +743,35 @@
       grade_group_aria: "How this card went",
       flash_tally: "{b} got it · {o} again",
       nav_progress: "Progress",
+      nav_topics: "Topics",
+      topics_intro: "Topics for drilling one thing. They don't add anything to your verbs, vocabulary or phrases.",
+      topic_badge_gen: "generated",
+      topic_badge_n: "{n} sentences",
+      topic_what: "What to practise?",
+      topic_start: "Practise",
+      topic_count: "{n} cards",
+      topic_pick_one: "Pick at least one range.",
+      topic_sentences: "See the sentences",
+      topic_also: "also: {x}",
+      topic_note_read: "See the front, say it to yourself, then flip for the answer.",
+      topic_note_listen: "The front is audio only: listen, then flip to see it written.",
+      topic_note_speak: "Say it out loud: tap the mic, speak, tap again.",
+      topic_h_none: "You haven't practised this topic yet.",
+      topic_h_cards: "{n} cards",
+      topic_h_cards_1: "1 card",
+      topic_h_firm_sub: "ranges solid",
+      topic_h_learned_sub: "sentences learned",
+      topic_h_ranges: "By range",
+      topic_h_hard: "Giving you trouble",
+      topic_h_hard_btn: "Practise these",
+      topic_s_none: "not yet",
+      topic_s_few: "a little",
+      topic_s_weak: "shaky",
+      topic_s_ok: "good",
+      topic_s_firm: "solid",
+      topic_firm_of: "{b} of {n} ranges solid",
+      topic_learned_of: "{b} of {n}",
+      prog_topics_title: "Topics",
       flash_done_text_practice: "Done! You got every card.",
       msg_nada_para_practicar: "Nothing to practice there.",
       prog_loading: "Loading your history…",
@@ -822,6 +881,7 @@
       rae_lookup_maybe_irregular: "Some of the forms the DLE filled in don't match the expected regular conjugation — this verb is probably irregular; check the pattern and Irregularidad.",
       rae_lookup_translation_unavailable: " Automatic translation isn't available right now, so the definition stayed in Spanish.",
       rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
+      rae_lookup_daily_limit: "You've reached today's lookup limit. You can look up more tomorrow.",
       lists_intro: "Build a list out of any verbs, words and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
@@ -1442,6 +1502,8 @@
     renderOfflineBanner();
     if (selectedId) selectVerb(selectedId);
     if (selectedWordId) selectWord(selectedWordId);
+    renderTopicList();
+    if (selectedTopicId) selectTopic(selectedTopicId, true);
     if (selectedListId && !el.listDetail.hidden) selectListRow(selectedListId);
     if (currentShareList) renderSharePreview();
     if (!el.flashcardsPanel.hidden) renderFlashSetup();
@@ -2190,6 +2252,27 @@
 
     tabLists: document.getElementById("tab-lists"),
     tabProgress: document.getElementById("tab-progress"),
+    tabTopics: document.getElementById("tab-topics"),
+    topicsPanel: document.getElementById("topics-panel"),
+    topicList: document.getElementById("topic-list"),
+    topicDetail: document.getElementById("topic-detail"),
+    tdName: document.getElementById("td-name"),
+    tdDesc: document.getElementById("td-desc"),
+    tdBadges: document.getElementById("td-badges"),
+    tdLesson: document.getElementById("td-lesson"),
+    tdRangesWrap: document.getElementById("td-ranges-wrap"),
+    tdRanges: document.getElementById("td-ranges"),
+    tdModeRead: document.getElementById("td-mode-read"),
+    tdModeListen: document.getElementById("td-mode-listen"),
+    tdModeSpeak: document.getElementById("td-mode-speak"),
+    tdModeNote: document.getElementById("td-mode-note"),
+    tdMsg: document.getElementById("td-msg"),
+    tdStart: document.getElementById("td-start"),
+    tdCount: document.getElementById("td-count"),
+    tdSentencesWrap: document.getElementById("td-sentences-wrap"),
+    tdSentencesToggle: document.getElementById("td-sentences-toggle"),
+    tdSentences: document.getElementById("td-sentences"),
+    flashTopicTag: document.getElementById("flash-topic-tag"),
     progressPanel: document.getElementById("progress-panel"),
     progressBody: document.getElementById("progress-body"),
     lastSession: document.getElementById("last-session"),
@@ -3348,6 +3431,8 @@
     el.tabFlashcards.classList.toggle("active", tab === "flashcards");
     el.tabLists.classList.toggle("active", tab === "lists");
     el.tabProgress.classList.toggle("active", tab === "progress");
+    el.tabTopics.classList.toggle("active", tab === "topics");
+    el.topicsPanel.hidden = tab !== "topics";
     el.progressPanel.hidden = tab !== "progress";
     el.verbsPanel.hidden = tab !== "verbs";
     el.wordsPanel.hidden = tab !== "words";
@@ -3360,6 +3445,10 @@
       loadPracticeHistory(false).then(function () { if (!el.listsPanel.hidden) decorateListRows(); });
     }
     if (tab === "progress") renderProgress();
+    if (tab === "topics") {
+      renderTopicList();
+      if (currentUser) loadPracticeHistory(false).then(function () { if (!el.topicsPanel.hidden) { renderTopicList(); if (selectedTopicId) renderItemHistory("topic"); } });
+    }
     try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
   }
 
@@ -4946,7 +5035,9 @@
       })
       .catch(function (err) {
         console.log("[dle-lookup] request failed", err);
-        msgEl.textContent = t("rae_lookup_error");
+        // 429 = this account's daily lookup limit (see dle-lookup/index.ts).
+        var limited = err && err.context && err.context.status === 429;
+        msgEl.textContent = t(limited ? "rae_lookup_daily_limit" : "rae_lookup_error");
       })
       .then(function () {
         raeLookupInFlight = false;
@@ -5310,6 +5401,7 @@
     el.flashFrontSpeak.hidden = !card.frontSpeak;
     el.flashBackSpeak.hidden = !card.backSpeak;
     setKnownToggleState(el.flashKnownToggle, cardShowsKnown(card));
+    renderTopicFaces(card);
     renderFlashGrade(card);
     renderFlashTally();
     renderSpeakState();
@@ -5489,6 +5581,7 @@
     flashMode = mode === "escuchar" || mode === "hablar" ? mode : "leer";
     try { localStorage.setItem(FLASH_MODE_LOCAL_KEY, flashMode); } catch (e) {}
     renderFlashModeControls();
+    renderTopicModeControls();
   }
 
   // Listening cards are the ordinary cards (built "palabra → definición"
@@ -5521,6 +5614,14 @@
   function listenCard(c) {
     var out = Object.assign({}, c, { listen: true, frontMain: "", frontSub: "", frontSpeak: "" });
     out.listenTag = listenTagText(c);
+    if (c.kind === "topic") {
+      out.audio = c.backSpeak;
+      out.backMain = c.listenBackMain || c.backMain;
+      out.backSub = c.listenBackSub || "";
+      out.backSpeak = c.backSpeak;
+      out.listenTag = c.listenTag || "";
+      return out;
+    }
     if (c.kind === "verb") {
       out.audio = c.backSpeak || c.backMain;
       out.backMeta = (c.frontMain || "") + (c.frontSub ? " · " + c.frontSub : "");
@@ -5836,7 +5937,7 @@
   }
   function practiceCardKey(card) {
     var d = card.data || {};
-    return card.kind + "|" + practiceNorm(d.infinitive || d.word || d.phrase) + "|" + (card.formKey || "");
+    return card.kind + "|" + practiceNorm(d.infinitive || d.word || d.phrase || d.topic) + "|" + (card.formKey || "");
   }
 
   function practiceStartSession() {
@@ -5875,10 +5976,10 @@
         shown_at: new Date().toISOString(),
         item_kind: card.kind,
         item_id: findItemId(card.kind, card.data),
-        item_key: practiceNorm(d.infinitive || d.word || d.phrase),
+        item_key: practiceNorm(d.infinitive || d.word || d.phrase || d.topic),
         form_key: card.formKey || null,
         mode: card.listen ? "escuchar" : (card.speak ? "hablar" : "leer"),
-        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : (card.speak ? "def2word" : flashDirection)),
+        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : (card.kind === "topic" ? "topic" : (card.speak ? "def2word" : flashDirection))),
         pass: practiceSession.pass,
         position: practiceSession.position,
         revisit: !!practiceSession.seen[key],
@@ -5945,8 +6046,12 @@
     // Rows without Hablar details go first, in their own batch: if the
     // practice_log.speech column isn't there yet (pending SQL not run),
     // only the Hablar rows wait.
-    var plain = mine.filter(function (r) { return !r.speech; });
-    var batch = (plain.length ? plain : mine).slice(0, PRACTICE_BATCH);
+    // Topic rows (2026-10-06) go last, on their own, for the same reason:
+    // practice_log only accepts item_kind 'topic' once
+    // pending_2026-10-06_temas.sql has run.
+    var classic = mine.filter(function (r) { return r.item_kind !== "topic"; });
+    var plain = classic.filter(function (r) { return !r.speech; });
+    var batch = (plain.length ? plain : (classic.length ? classic : mine)).slice(0, PRACTICE_BATCH);
     practiceFlushing = true;
     supabaseClient.from("practice_log").upsert(batch, { onConflict: "id", ignoreDuplicates: true }).then(function (res) {
       practiceFlushing = false;
@@ -6100,6 +6205,7 @@
   // What the card expects, for matching: gustar-mode cells hold two
   // answers ("me gusta / me gustan").
   function speakAnswers(card) {
+    if (card.answers && card.answers.length) return card.answers.slice(); // topics: every accepted way to say it
     return String(card.backMain || "").split(/\s*\/\s*/).map(function (x) { return x.trim(); }).filter(Boolean);
   }
   function speakCard(c) { return Object.assign({}, c, { speak: true }); }
@@ -6143,7 +6249,9 @@
       min_phoneme: minPh,
       word_error: wordErr
     };
-    if (heard && speakAnswers(card).some(function (ans) { return speechMatches(ans, heard); })) {
+    // A number can come back written in digits ("4372"): compare digits.
+    var heardDigits = card.digits ? String(h.display || "").replace(/\D/g, "") : "";
+    if ((heard && speakAnswers(card).some(function (ans) { return speechMatches(ans, heard); })) || (heardDigits && heardDigits === card.digits)) {
       res.auto_grade = "bien"; res.rule = "transcript";
     } else if (scored && res.accuracy >= HABLAR_MIN_ACCURACY && (minPh === null || minPh >= HABLAR_MIN_PHONEME) && !wordErr) {
       res.auto_grade = "bien"; res.rule = "score";
@@ -6358,7 +6466,9 @@
       // mason, 2026-10-05); ▶ lets you hear what you actually said.
       return { pre: "", core: speechCleanShown(answers[0] || card.backMain), post: "" };
     }
-    var shown = speechMatchCase(speechCleanShown(sp.heard_display || sp.heard || ""), answers[0] || card.backMain);
+    // Topics show the spoken form (lexical): "cuatro mil…", not "4372".
+    var said = card.kind === "topic" ? (sp.heard || sp.heard_display) : (sp.heard_display || sp.heard);
+    var shown = speechMatchCase(speechCleanShown(said || ""), answers[0] || card.backMain);
     var toks = shown.split(" ").filter(Boolean);
     if (!toks.length) return { pre: "", core: "", post: "" };
     var norms = toks.map(speechNorm);
@@ -6437,6 +6547,666 @@
 
   // Test/debug hooks.
   window.voseHablarJudge = function (backMain, data) { return hablarJudge({ backMain: backMain }, data); };
+
+  // ================= Temas (2026-10-06) =================
+  // mason: drilling things that come in large, focused volumes (numbers,
+  // prices, the time, grammar structures like más/menos que or ya/todavía)
+  // would swamp Verbos/Vocabulario/Frases, which are his own collection.
+  // So topics live in their own tab, as one list (mason: "a single list for
+  // the topics instead of two"). Tapping one opens its detail page: a short
+  // lesson, what/how to practise and Practicar (which opens the usual
+  // flashcards: Leer / Escuchar / Hablar, Bien / Otra vez), and "Tu
+  // historial" behind the same remembered expander as verbs and words.
+  // Mockups mason approved: practica_maqueta.png → temas_maqueta.png.
+  //
+  // Two kinds of topic, both built into the app (nothing stored):
+  //  - generated ("gen"): every card is made on the spot from a range the
+  //    person picks — Números, Precios, La hora, Fechas;
+  //  - sentence packs ("pack"): a fixed set of example sentences for one
+  //    structure, each with the key words as gaps — Comparativos, Hay que ·
+  //    tener que, Ya · todavía.
+  // Practice rows are logged like any card: item_kind "topic", item_key the
+  // topic id, form_key "<range>:<value>" (generated) or the sentence id.
+  // The rows need practice_log to accept item_kind 'topic' — see
+  // pending_2026-10-06_temas.sql; until that has run, topic rows simply
+  // wait on the device (practiceFlush() sends them last, on their own).
+  // ---- Spanish number words (Rioplatense usage; RAE spelling) ----
+  // numWords(n, beforeNoun): 21 → "veintiuno", but before a noun or "mil"
+  // the -uno shortens: "veintiún pesos", "veintiún mil", "un millón".
+  var NUM_UNITS = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
+    "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte",
+    "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"];
+  var NUM_TENS = ["", "", "", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"];
+  var NUM_HUNDREDS = ["", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
+  function numUnder100(n, apo) {
+    if (n < 30) {
+      if (n === 1) return apo ? "un" : "uno";
+      if (n === 21) return apo ? "veintiún" : "veintiuno";
+      return NUM_UNITS[n];
+    }
+    var u = n % 10;
+    return NUM_TENS[Math.floor(n / 10)] + (u ? " y " + (u === 1 ? (apo ? "un" : "uno") : NUM_UNITS[u]) : "");
+  }
+  function numUnder1000(n, apo) {
+    if (n === 100) return "cien";
+    var h = Math.floor(n / 100), r = n % 100;
+    return [h ? NUM_HUNDREDS[h] : "", r ? numUnder100(r, apo) : ""].filter(Boolean).join(" ");
+  }
+  function numWords(n, beforeNoun) {
+    n = Math.floor(Math.abs(n));
+    if (n === 0) return "cero";
+    var mil = Math.floor(n / 1000000), th = Math.floor((n % 1000000) / 1000), rest = n % 1000;
+    var parts = [];
+    if (mil) parts.push(mil === 1 ? "un millón" : numUnder1000(mil, true) + " millones");
+    if (th) parts.push(th === 1 ? "mil" : numUnder1000(th, true) + " mil");
+    if (rest) parts.push(numUnder1000(rest, !!beforeNoun));
+    return parts.join(" ");
+  }
+  // "4.372", "1.000.000" — Argentina writes thousands with a dot.
+  function numDigits(n) { return String(Math.floor(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+  function pesosWords(n) {
+    if (n === 1) return "un peso";
+    var exactMillions = n >= 1000000 && n % 1000000 === 0;
+    return numWords(n, true) + (exactMillions ? " de pesos" : " pesos");
+  }
+  // 15:45 → "las cuatro menos cuarto" (and the other way of saying it).
+  function horaWords(h, m) {
+    function hourName(x) { var h12 = x % 12 || 12; return h12 === 1 ? "la una" : "las " + numWords(h12); }
+    var minName = function (x) { return x === 15 ? "cuarto" : (x === 30 ? "media" : numWords(x)); };
+    if (m === 0) return [hourName(h)];
+    if (m <= 30) return [hourName(h) + " y " + minName(m)];
+    var forms = [hourName(h + 1) + " menos " + minName(60 - m), hourName(h) + " y " + numWords(m)];
+    return forms;
+  }
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  // 9/7 → "el nueve de julio"; the 1st is "el primero" (also "el uno").
+  function fechaWords(d, mo, y) {
+    var tail = " de " + MESES[mo - 1] + (y ? " de " + numWords(y) : "");
+    if (d === 1) return ["el primero" + tail, "el uno" + tail];
+    return ["el " + numWords(d) + tail];
+  }
+
+  function topicRand(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function topicPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function L(es, en) { return { es: es, en: en }; }
+  function topicText(x) { return x && typeof x === "object" ? (x[currentLang] || x.es) : (x || ""); }
+  var FECHAS_PATRIAS = [
+    [1, 1, "Año Nuevo"], [24, 3, "Día de la Memoria"], [2, 4, "Día de los Veteranos y Caídos en Malvinas"],
+    [1, 5, "Día del Trabajador"], [25, 5, "Revolución de Mayo"], [20, 6, "Día de la Bandera"],
+    [9, 7, "Día de la Independencia"], [17, 8, "Paso a la Inmortalidad de San Martín"],
+    [12, 10, "Día del Respeto a la Diversidad Cultural"], [20, 11, "Día de la Soberanía Nacional"],
+    [8, 12, "Inmaculada Concepción"], [25, 12, "Navidad"]
+  ];
+  var DIAS_MES = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  function horaFront(h, m) { return h + ":" + (m < 10 ? "0" : "") + m; }
+
+  var TOPICS = [
+    {
+      id: "numeros", type: "gen", name: L("Números", "Numbers"),
+      desc: L("Del cero al millón. Cada tarjeta es un número nuevo.", "Zero to a million. Every card is a new number."),
+      tag: L("número", "number"),
+      ranges: [
+        { key: "0-20", label: L("0–20", "0–20"), gen: function () { return topicRand(0, 20); } },
+        { key: "21-99", label: L("21–99", "21–99"), gen: function () { return topicRand(21, 99); } },
+        { key: "cientos", label: L("cientos", "hundreds"), gen: function () { return topicRand(100, 999); } },
+        { key: "miles", label: L("miles", "thousands"), gen: function () { return topicRand(1000, 9999); } },
+        { key: "grandes", label: L("10.000+", "10,000+"), gen: function () { return topicRand(10, 999) * 1000 + (Math.random() < 0.5 ? topicRand(1, 999) : 0); } },
+        { key: "millones", label: L("millones", "millions"), gen: function () { return topicRand(1, 20) * 1000000 + (Math.random() < 0.5 ? topicRand(1, 9) * 100000 : 0); } },
+        { key: "anios", label: L("años", "years"), gen: function () { return topicRand(1900, 2035); } },
+        { key: "dificiles", label: L("los difíciles", "the tricky ones"), gen: function () { return topicPick([15, 16, 21, 50, 60, 70, 100, 101, 500, 505, 515, 700, 707, 900, 999, 1000, 1001, 1100, 21000, 31000, 100000, 101000, 500000, 700000, 1000000, 2000000]); } }
+      ],
+      defaults: ["21-99", "cientos", "miles"],
+      card: function (range, v) {
+        var n = Number(v), words = numWords(n);
+        var front = range === "anios" ? String(n) : numDigits(n);
+        return { frontMain: front, backMain: words, backSpeak: words, digits: String(n), listenBackMain: front, listenBackSub: words };
+      },
+      lesson: [
+        { f: "16–29 → una palabra", ex: "dieci[séis] · veinti[trés] · veinti[ún] años" },
+        { f: "31–99 → decena y unidad", ex: "treinta [y] cuatro · noventa [y] nueve" },
+        { f: "100 → cien · 101 → ciento uno", ex: "[cien] pesos · [ciento] veinte" },
+        { f: "500 · 700 · 900", ex: "[quinientos] · [setecientos] · [novecientos]" },
+        { f: "mil · un millón de", ex: "dos [mil] · un [millón de] pesos" }
+      ],
+      tip: L("En Argentina el punto separa los miles: 4.372 · 1.000.000. Antes de un sustantivo, «uno» se acorta: veintiún años, un millón.",
+             "In Argentina a dot separates thousands: 4.372 · 1.000.000. Before a noun «uno» shortens: veintiún años, un millón.")
+    },
+    {
+      id: "precios", type: "gen", name: L("Precios", "Prices"),
+      desc: L("Lo que vas a escuchar en la caja: $1.250 → mil doscientos cincuenta pesos.", "What you'll hear at the till: $1.250 → mil doscientos cincuenta pesos."),
+      tag: L("precio", "price"),
+      ranges: [
+        { key: "hasta-1000", label: L("hasta $1.000", "up to $1,000"), gen: function () { return topicRand(2, 99) * 10; } },
+        { key: "miles", label: L("$1.000–$9.999", "$1,000–$9,999"), gen: function () { return topicRand(20, 199) * 50; } },
+        { key: "decenas", label: L("$10.000–$99.999", "$10,000–$99,999"), gen: function () { return topicRand(20, 199) * 500; } },
+        { key: "cientos-mil", label: L("$100.000+", "$100,000+"), gen: function () { return topicRand(20, 199) * 5000; } }
+      ],
+      defaults: ["miles", "decenas"],
+      card: function (range, v) {
+        var n = Number(v), words = pesosWords(n), front = "$" + numDigits(n);
+        return { frontMain: front, backMain: words, backSpeak: words, digits: String(n), listenBackMain: front, listenBackSub: words };
+      },
+      lesson: [
+        { f: "número + pesos", ex: "mil doscientos cincuenta [pesos]" },
+        { f: "uno → un, veintiuno → veintiún", ex: "[un] peso · [veintiún] pesos · treinta y [un] mil" },
+        { f: "millón exacto → de pesos", ex: "un millón [de] pesos · un millón quinientos mil pesos" }
+      ],
+      tip: L("En la calle se dice mucho «lucas» por miles: cinco lucas = $5.000.", "On the street people often say «lucas» for thousands: cinco lucas = $5,000.")
+    },
+    {
+      id: "hora", type: "gen", name: L("La hora", "Telling the time"),
+      desc: L("15:45 → las cuatro menos cuarto.", "15:45 → las cuatro menos cuarto."),
+      tag: L("la hora", "the time"),
+      ranges: [
+        { key: "faciles", label: L("en punto · cuarto · media", "o'clock · quarter · half"), gen: function () { return horaFront(topicRand(0, 23), topicPick([0, 15, 30, 45])); } },
+        { key: "cada5", label: L("cada cinco minutos", "every five minutes"), gen: function () { return horaFront(topicRand(0, 23), topicRand(0, 11) * 5); } }
+      ],
+      defaults: ["faciles"],
+      card: function (range, v) {
+        var p = String(v).split(":"), forms = horaWords(Number(p[0]), Number(p[1]));
+        return { frontMain: String(v), backMain: forms[0], backSpeak: forms[0], answers: forms, backSub: forms[1] ? t("topic_also", { x: forms[1] }) : "", listenBackMain: String(v), listenBackSub: forms[0] };
+      },
+      lesson: [
+        { f: "la una · las dos, las tres…", ex: "[es la] una · [son las] tres" },
+        { f: "y cuarto · y media · menos cuarto", ex: "las cuatro [y cuarto] · las cuatro [y media] · las cinco [menos cuarto]" },
+        { f: "hasta y media: y …; después: menos …", ex: "las nueve [y diez] · las diez [menos veinte]" }
+      ],
+      tip: L("Se escribe en 24 horas (15:45) pero se dice en 12: «las cuatro menos cuarto», y si hace falta, «de la tarde».",
+             "It's written in 24-hour time (15:45) but said in 12: «las cuatro menos cuarto», adding «de la tarde» if needed.")
+    },
+    {
+      id: "fechas", type: "gen", name: L("Fechas", "Dates"),
+      desc: L("9/7 → el nueve de julio. Día primero, mes después.", "9/7 → el nueve de julio. Day first, then month."),
+      tag: L("fecha", "date"),
+      ranges: [
+        { key: "dia-mes", label: L("día y mes", "day and month"), gen: function () { var m = topicRand(1, 12); return topicRand(1, DIAS_MES[m - 1]) + "/" + m; } },
+        { key: "con-anio", label: L("con año", "with the year"), gen: function () { var m = topicRand(1, 12); return topicRand(1, DIAS_MES[m - 1]) + "/" + m + "/" + topicRand(1950, 2030); } },
+        { key: "patrias", label: L("feriados", "holidays"), gen: function () { var f = topicPick(FECHAS_PATRIAS); return f[0] + "/" + f[1]; } }
+      ],
+      defaults: ["dia-mes", "patrias"],
+      card: function (range, v) {
+        var p = String(v).split("/").map(Number), forms = fechaWords(p[0], p[1], p[2] || 0);
+        var fiesta = FECHAS_PATRIAS.find(function (f) { return f[0] === p[0] && f[1] === p[1]; });
+        var sub = [fiesta ? fiesta[2] : "", forms[1] ? t("topic_also", { x: forms[1] }) : ""].filter(Boolean).join(" · ");
+        return { frontMain: String(v), backMain: forms[0], backSpeak: forms[0], answers: forms, backSub: sub, listenBackMain: String(v), listenBackSub: forms[0] + (fiesta ? " · " + fiesta[2] : "") };
+      },
+      lesson: [
+        { f: "el + número + de + mes", ex: "[el] nueve [de] julio" },
+        { f: "el 1 → el primero", ex: "el [primero] de mayo" },
+        { f: "año → de + número", ex: "el 9 de julio [de] mil ochocientos dieciséis" }
+      ],
+      tip: L("Los meses van con minúscula: enero, julio. En Argentina se escribe día/mes: 9/7 es el 9 de julio.",
+             "Months are lower case: enero, julio. Argentina writes day/month: 9/7 is the 9th of July.")
+    },
+    {
+      id: "comparativos", type: "pack", name: L("Comparativos", "Comparisons"),
+      desc: L("Comparar cosas, personas y cantidades.", "Comparing things, people and amounts."),
+      tag: L("comparativos", "comparisons"),
+      lesson: [
+        { f: "más / menos + adjetivo + que", ex: "Este café es [más] caro [que] el otro." },
+        { f: "tan + adjetivo + como", ex: "Mendoza es [tan] linda [como] Salta." },
+        { f: "tanto/a/os/as + sustantivo + como", ex: "No tengo [tanta] plata [como] vos." },
+        { f: "mejor · peor · mayor · menor + que", ex: "Este vino es [mejor que] ese." },
+        { f: "más de / menos de + cantidad", ex: "Gasté [más de] diez mil pesos." }
+      ],
+      items: [
+        { id: "c01", es: "Este café es [más] caro [que] el de la esquina.", en: "This coffee is more expensive than the one on the corner.", p: "más + adjetivo + que" },
+        { id: "c02", es: "El subte es [más] rápido [que] el colectivo.", en: "The subway is faster than the bus.", p: "más + adjetivo + que" },
+        { id: "c03", es: "Hoy hace [menos] frío [que] ayer.", en: "It's less cold today than yesterday.", p: "menos + sustantivo + que" },
+        { id: "c04", es: "Mi departamento es [más] chico [que] el tuyo.", en: "My apartment is smaller than yours.", p: "más + adjetivo + que" },
+        { id: "c05", es: "Vos hablás [más] rápido [que] yo.", en: "You speak faster than I do.", p: "más + adverbio + que" },
+        { id: "c06", es: "Este barrio es [más] tranquilo [que] el centro.", en: "This neighborhood is quieter than downtown.", p: "más + adjetivo + que" },
+        { id: "c07", es: "Esta pizza está [tan] rica [como] la de ayer.", en: "This pizza is as good as yesterday's.", p: "tan + adjetivo + como" },
+        { id: "c08", es: "Mendoza es [tan] linda [como] Salta.", en: "Mendoza is as pretty as Salta.", p: "tan + adjetivo + como" },
+        { id: "c09", es: "No soy [tan] alto [como] mi hermano.", en: "I'm not as tall as my brother.", p: "tan + adjetivo + como" },
+        { id: "c10", es: "No tengo [tanta] plata [como] vos.", en: "I don't have as much money as you.", p: "tanto/a + sustantivo + como" },
+        { id: "c11", es: "Hay [tantos] turistas [como] el año pasado.", en: "There are as many tourists as last year.", p: "tantos/as + sustantivo + como" },
+        { id: "c12", es: "Trabajo [tanto como] vos.", en: "I work as much as you do.", p: "verbo + tanto como" },
+        { id: "c13", es: "Este vino es [mejor que] ese.", en: "This wine is better than that one.", p: "mejor que" },
+        { id: "c14", es: "El tráfico hoy está [peor que] nunca.", en: "The traffic today is worse than ever.", p: "peor que" },
+        { id: "c15", es: "Mi hermana es [mayor que] yo.", en: "My sister is older than me.", p: "mayor que" },
+        { id: "c16", es: "Él es dos años [menor que] su novia.", en: "He's two years younger than his girlfriend.", p: "menor que" },
+        { id: "c17", es: "Es el café [más] caro [de] la carta.", en: "It's the most expensive coffee on the menu.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c18", es: "Buenos Aires es la ciudad [más] grande [del] país.", en: "Buenos Aires is the biggest city in the country.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c19", es: "Gasté [más de] diez mil pesos.", en: "I spent more than ten thousand pesos.", p: "más de + cantidad" },
+        { id: "c20", es: "Tengo [menos de] una hora.", en: "I have less than an hour.", p: "menos de + cantidad" }
+      ]
+    },
+    {
+      id: "hay-que", type: "pack", name: L("Hay que · tener que", "Hay que · tener que"),
+      desc: L("Obligación general o de una persona.", "Obligation in general, or for someone."),
+      tag: L("hay que · tener que", "hay que · tener que"), choice: "hay que · tener que",
+      lesson: [
+        { f: "hay que + infinitivo → en general, nadie en particular", ex: "[Hay que] sacar turno." },
+        { f: "tener que + infinitivo → una persona", ex: "[Tengo que] llamar a mi mamá." },
+        { f: "pasado: hubo que / había que · tuve que / tenía que", ex: "[Tuve que] esperar una hora." },
+        { f: "«Tenés que…» también recomienda", ex: "[Tenés que] probar el choripán." }
+      ],
+      items: [
+        { id: "h01", es: "[Hay que] sacar turno antes de ir.", en: "You have to get an appointment before going.", p: "hay que · en general" },
+        { id: "h02", es: "[Tengo que] llamar a mi mamá.", en: "I have to call my mom.", p: "tener que · yo" },
+        { id: "h03", es: "Para entrar, [hay que] mostrar el documento.", en: "To get in, you have to show ID.", p: "hay que · en general" },
+        { id: "h04", es: "Mañana [tenemos que] madrugar.", en: "Tomorrow we have to get up early.", p: "tener que · nosotros" },
+        { id: "h05", es: "[Hay que] pagar en efectivo.", en: "You have to pay in cash.", p: "hay que · en general" },
+        { id: "h06", es: "¿[Tenés que] trabajar el sábado?", en: "Do you have to work on Saturday?", p: "tener que · vos" },
+        { id: "h07", es: "En el colectivo [hay que] tener la SUBE cargada.", en: "On the bus you need a topped-up SUBE card.", p: "hay que · en general" },
+        { id: "h08", es: "[Tienen que] bajar en la próxima parada.", en: "You (all) have to get off at the next stop.", p: "tener que · ustedes" },
+        { id: "h09", es: "[Hay que] reservar con tiempo.", en: "You have to book ahead.", p: "hay que · en general" },
+        { id: "h10", es: "Mi hermano [tiene que] estudiar para el examen.", en: "My brother has to study for the exam.", p: "tener que · él" },
+        { id: "h11", es: "No [hay que] pagar para entrar.", en: "You don't have to pay to get in.", p: "no hay que" },
+        { id: "h12", es: "[Tuve que] esperar una hora.", en: "I had to wait an hour.", p: "tener que · pasado" },
+        { id: "h13", es: "[Hubo que] cancelar la reunión.", en: "The meeting had to be cancelled.", p: "hay que · pasado" },
+        { id: "h14", es: "¿Qué [hay que] hacer para sacar la residencia?", en: "What do you have to do to get residency?", p: "hay que · en general" },
+        { id: "h15", es: "[Tenés que] probar el choripán.", en: "You have to try the choripán.", p: "tener que · recomendación" },
+        { id: "h16", es: "[Vamos a tener que] tomar un taxi.", en: "We're going to have to take a taxi.", p: "ir a + tener que" }
+      ]
+    },
+    {
+      id: "ya-todavia", type: "pack", name: L("Ya · todavía", "Ya · todavía"),
+      desc: L("Ya, todavía, ya no, todavía no.", "Already, still, not anymore, not yet."),
+      tag: L("ya · todavía", "ya · todavía"), choice: "ya · todavía",
+      lesson: [
+        { f: "ya → already (en preguntas: yet)", ex: "[Ya] comí. · ¿[Ya] llegó?" },
+        { f: "todavía → still", ex: "[Todavía] vivo en Palermo." },
+        { f: "todavía no → not yet", ex: "[Todavía no] llegó." },
+        { f: "ya no → not anymore", ex: "[Ya no] trabajo ahí." },
+        { f: "muy de acá: ya voy · ya está", ex: "¡[Ya] voy! · [Ya] está, listo." }
+      ],
+      items: [
+        { id: "y01", es: "¿[Ya] llegó el colectivo?", en: "Has the bus arrived yet?", p: "ya · pregunta" },
+        { id: "y02", es: "[Todavía] no llegó.", en: "It hasn't arrived yet.", p: "todavía no" },
+        { id: "y03", es: "[Ya] comí, gracias.", en: "I already ate, thanks.", p: "ya · already" },
+        { id: "y04", es: "¿[Todavía] vivís en Palermo?", en: "Do you still live in Palermo?", p: "todavía · still" },
+        { id: "y05", es: "[Ya] no trabajo ahí.", en: "I don't work there anymore.", p: "ya no" },
+        { id: "y06", es: "[Todavía] no sé.", en: "I don't know yet.", p: "todavía no" },
+        { id: "y07", es: "¡[Ya] voy!", en: "Coming!", p: "ya voy" },
+        { id: "y08", es: "Son las once y [todavía] está abierto.", en: "It's eleven and it's still open.", p: "todavía · still" },
+        { id: "y09", es: "¿[Ya] terminaste?", en: "Are you done already?", p: "ya · pregunta" },
+        { id: "y10", es: "[Ya] no llueve.", en: "It's not raining anymore.", p: "ya no" },
+        { id: "y11", es: "[Todavía] tenemos tiempo.", en: "We still have time.", p: "todavía · still" },
+        { id: "y12", es: "¿[Todavía] no pediste?", en: "You still haven't ordered?", p: "todavía no" },
+        { id: "y13", es: "[Ya] está, listo.", en: "That's it, done.", p: "ya está" },
+        { id: "y14", es: "Mi hermano [todavía] duerme.", en: "My brother is still asleep.", p: "todavía · still" },
+        { id: "y15", es: "[Ya] es tarde.", en: "It's already late.", p: "ya · already" },
+        { id: "y16", es: "¿[Ya] pagaste la luz?", en: "Have you paid the electricity bill yet?", p: "ya · pregunta" }
+      ]
+    }
+  ];
+  var TOPIC_DECK_SIZE = 20;
+  var TOPIC_RANGES_KEY = "iv-topic-ranges";
+  var topicData = {}; // id -> { topic: id } (the card's data object, shared per topic)
+  TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
+  function topicById(id) { return TOPICS.find(function (tp) { return tp.id === id; }) || null; }
+  function topicRange(tp, key) { return (tp.ranges || []).find(function (r) { return r.key === key; }) || null; }
+
+  // "Este café es [más] caro [que] …" → pieces [{text, fill}]
+  function topicPieces(es) {
+    var out = [], re = /\[([^\]]*)\]/g, m, last = 0;
+    while ((m = re.exec(es))) {
+      if (m.index > last) out.push({ text: es.slice(last, m.index), fill: false });
+      out.push({ text: m[1], fill: true });
+      last = m.index + m[0].length;
+    }
+    if (last < es.length) out.push({ text: es.slice(last), fill: false });
+    return out;
+  }
+  function topicPlain(es) { return es.replace(/[\[\]]/g, ""); }
+  function topicGapped(es) { return es.replace(/\[[^\]]*\]/g, "___"); }
+  // Fills the element with the sentence: gaps ("gap") or the filled words
+  // highlighted ("fill"). Built from text nodes only.
+  function topicSentenceInto(elm, es, how) {
+    elm.textContent = "";
+    topicPieces(es).forEach(function (p) {
+      if (!p.fill) { elm.appendChild(document.createTextNode(p.text)); return; }
+      var s = document.createElement("span");
+      s.className = how === "gap" ? "topic-gap" : "topic-fill";
+      if (how !== "gap") s.textContent = p.text;
+      elm.appendChild(s);
+    });
+  }
+
+  // One card. Generated: (range, value); pack: the sentence id.
+  function topicCard(tp, unitKey) {
+    var base = { kind: "topic", data: topicData[tp.id], formKey: unitKey, topicId: tp.id, frontSub: "" };
+    if (tp.type === "pack") {
+      var it = tp.items.find(function (x) { return x.id === unitKey; });
+      if (!it) return null;
+      var full = topicPlain(it.es);
+      return Object.assign(base, {
+        frontMain: topicGapped(it.es), backMain: full, backSpeak: full, backSub: it.p,
+        sentence: it.es, cue: it.en, choice: tp.choice || "",
+        listenTag: topicText(tp.tag), listenBackMain: full, listenBackSub: it.en
+      });
+    }
+    var i = unitKey.indexOf(":");
+    var range = unitKey.slice(0, i), value = unitKey.slice(i + 1);
+    var r = topicRange(tp, range);
+    if (!r) return null;
+    var c = tp.card(range, value);
+    return Object.assign(base, c, { bigFront: true, backSub: c.backSub || "", listenTag: topicText(tp.tag) + " · " + topicText(r.label) });
+  }
+  function topicCardFromUnit(topicId, formKey) {
+    var tp = topicById(topicId);
+    return tp && formKey ? topicCard(tp, formKey) : null;
+  }
+
+  // ---- what's been practised ----
+  function topicRows(id) {
+    return practiceAllRows().filter(function (r) { return r.item_kind === "topic" && r.item_key === id; });
+  }
+  // How solid one range (generated) is, from its last 30 graded cards.
+  function topicStrength(events) {
+    var recent = events.slice(-30);
+    if (!recent.length) return { key: "none", cls: "h0" };
+    var bien = recent.filter(function (e) { return e.grade === "bien"; }).length, rate = bien / recent.length;
+    if (recent.length < 5) return { key: "few", cls: "h1" };
+    if (rate >= 0.9 && recent.length >= 8) return { key: "firm", cls: "h4" };
+    if (rate >= 0.75) return { key: "ok", cls: "h3" };
+    return { key: "weak", cls: "h2" };
+  }
+  function topicStats(tp, rows) {
+    rows = rows || topicRows(tp.id);
+    var P = computeProgress(rows);
+    var units = Object.keys(P.units).map(function (k) { return P.units[k]; });
+    var out = { P: P, rows: rows, units: units };
+    if (tp.type === "gen") {
+      var byRange = {};
+      P.events.forEach(function (r) {
+        var k = String(r.form_key || "").split(":")[0];
+        (byRange[k] || (byRange[k] = [])).push(r);
+      });
+      out.ranges = tp.ranges.map(function (r) { return { range: r, events: byRange[r.key] || [], strength: topicStrength(byRange[r.key] || []) }; });
+      out.total = tp.ranges.length;
+      out.firm = out.ranges.filter(function (x) { return x.strength.key === "firm"; }).length;
+      out.practiced = out.ranges.filter(function (x) { return x.events.length; }).length;
+    } else {
+      var ids = {};
+      tp.items.forEach(function (it) { ids[it.id] = true; });
+      var mine = units.filter(function (u) { return ids[u.formKey]; });
+      out.total = tp.items.length;
+      out.firm = mine.filter(function (u) { return u.learned; }).length;
+      out.practiced = mine.length;
+    }
+    // "Te cuestan": last time it came up, it was Otra vez (most recent first)
+    out.hard = units.filter(function (u) { return u.last && u.last.grade === "otra"; })
+      .sort(function (a, b) { return b.last.at - a.last.at; });
+    return out;
+  }
+  function topicTrack(st) {
+    var track = progEl("span", "prog-track");
+    var l = st.total ? st.firm / st.total : 0, p = st.total ? (st.practiced - st.firm) / st.total : 0;
+    if (l > 0) { var a = progEl("i", "l"); a.style.width = Math.round(l * 100) + "%"; track.appendChild(a); }
+    if (p > 0) { var b = progEl("i", "p"); b.style.width = Math.round(p * 100) + "%"; track.appendChild(b); }
+    return track;
+  }
+
+  // ---- the Temas tab ----
+  var selectedTopicId = null;
+  function topicHistoryReady() { return !!(practiceHistory.rows && currentUser && practiceHistory.userId === currentUser.id); }
+  function renderTopicList() {
+    if (!el.topicList) return;
+    el.topicList.innerHTML = "";
+    var ready = topicHistoryReady() || practiceQueue.length;
+    TOPICS.forEach(function (tp) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "card-row topic-row" + (tp.id === selectedTopicId ? " is-selected" : "");
+      btn.dataset.topicId = tp.id;
+      btn.appendChild(progEl("span", "inf", topicText(tp.name)));
+      btn.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
+      btn.appendChild(progEl("span", "def", topicText(tp.desc)));
+      if (ready) btn.appendChild(topicTrack(topicStats(tp)));
+      btn.addEventListener("click", function () {
+        if (selectedTopicId === tp.id) deselectTopic(); else selectTopic(tp.id);
+      });
+      li.appendChild(btn);
+      el.topicList.appendChild(li);
+    });
+  }
+  function deselectTopic() {
+    selectedTopicId = null;
+    el.topicDetail.hidden = true;
+    renderTopicList();
+  }
+  function topicSavedRanges(tp) {
+    try {
+      var all = JSON.parse(localStorage.getItem(TOPIC_RANGES_KEY) || "{}");
+      var mine = Array.isArray(all[tp.id]) ? all[tp.id].filter(function (k) { return topicRange(tp, k); }) : null;
+      if (mine) return mine;
+    } catch (e) {}
+    return tp.defaults.slice();
+  }
+  function topicSaveRanges(tp, keys) {
+    try {
+      var all = JSON.parse(localStorage.getItem(TOPIC_RANGES_KEY) || "{}");
+      all[tp.id] = keys;
+      localStorage.setItem(TOPIC_RANGES_KEY, JSON.stringify(all));
+    } catch (e) {}
+  }
+  function selectTopic(id, quiet) {
+    var tp = topicById(id);
+    if (!tp) return;
+    selectedTopicId = id;
+    el.tdName.textContent = topicText(tp.name);
+    el.tdDesc.textContent = topicText(tp.desc);
+    el.tdBadges.innerHTML = "";
+    el.tdBadges.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
+    // the lesson
+    el.tdLesson.innerHTML = "";
+    tp.lesson.forEach(function (ln) {
+      el.tdLesson.appendChild(progEl("p", "topic-lesson-f", ln.f));
+      var ex = progEl("p", "topic-lesson-ex");
+      topicSentenceInto(ex, ln.ex, "fill");
+      el.tdLesson.appendChild(ex);
+    });
+    if (tp.tip) el.tdLesson.appendChild(progEl("p", "topic-lesson-tip", topicText(tp.tip)));
+    el.tdMsg.textContent = "";
+    renderTopicRanges();
+    renderTopicModeControls();
+    // a pack's sentences, behind their own disclosure
+    el.tdSentencesWrap.hidden = tp.type !== "pack";
+    el.tdSentences.hidden = true;
+    el.tdSentencesToggle.classList.remove("open");
+    el.tdSentencesToggle.setAttribute("aria-expanded", "false");
+    el.tdSentences.innerHTML = "";
+    if (tp.type === "pack") {
+      tp.items.forEach(function (it) {
+        var row = progEl("div", "topic-sentence");
+        var es = progEl("p", "es");
+        topicSentenceInto(es, it.es, "fill");
+        row.appendChild(es);
+        row.appendChild(progEl("p", "en", it.en));
+        el.tdSentences.appendChild(row);
+      });
+    }
+    el.topicDetail.hidden = false;
+    renderTopicList();
+    renderItemHistory("topic");
+    if (!quiet) el.topicDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function renderTopicRanges() {
+    var tp = topicById(selectedTopicId);
+    if (!tp) return;
+    el.tdRangesWrap.hidden = tp.type !== "gen";
+    el.tdRanges.innerHTML = "";
+    var size = tp.type === "pack" ? Math.min(TOPIC_DECK_SIZE, tp.items.length) : TOPIC_DECK_SIZE;
+    el.tdCount.textContent = t("topic_count", { n: size });
+    if (tp.type !== "gen") return;
+    var on = topicSavedRanges(tp);
+    tp.ranges.forEach(function (r) {
+      var active = on.indexOf(r.key) !== -1;
+      el.tdRanges.appendChild(flashPickChip(topicText(r.label), active ? "all" : "none", function () {
+        var now = topicSavedRanges(tp);
+        var i = now.indexOf(r.key);
+        if (i === -1) now.push(r.key); else now.splice(i, 1);
+        topicSaveRanges(tp, now);
+        el.tdMsg.textContent = "";
+        renderTopicRanges();
+      }));
+    });
+  }
+  function renderTopicModeControls() {
+    if (!el.tdModeRead) return;
+    var mode = effectiveFlashMode();
+    el.tdModeRead.classList.toggle("active", mode === "leer");
+    el.tdModeListen.classList.toggle("active", mode === "escuchar");
+    el.tdModeSpeak.classList.toggle("active", mode === "hablar");
+    el.tdModeListen.disabled = quietMode;
+    el.tdModeSpeak.disabled = quietMode;
+    el.tdModeNote.textContent = t(quietMode ? "flash_mode_note_quiet" : (mode === "escuchar" ? "topic_note_listen" : (mode === "hablar" ? (hablarSupported() ? "topic_note_speak" : "speak_unsupported") : "topic_note_read")));
+    el.tdModeNote.classList.toggle("is-warn", quietMode);
+  }
+
+  // The deck: generated topics mix in what's been giving you trouble (up
+  // to a quarter of the deck) with fresh values from the chosen ranges;
+  // packs put due / missed sentences first, then ones not seen yet.
+  function buildTopicDeck(tp) {
+    var st = topicStats(tp);
+    var cards = [], seen = {};
+    function add(key) { if (seen[key] || cards.length >= TOPIC_DECK_SIZE) return; var c = topicCard(tp, key); if (c) { seen[key] = true; cards.push(c); } }
+    if (tp.type === "gen") {
+      var on = topicSavedRanges(tp);
+      if (!on.length) return [];
+      st.hard.filter(function (u) { return on.indexOf(String(u.formKey).split(":")[0]) !== -1; })
+        .slice(0, Math.floor(TOPIC_DECK_SIZE / 4)).forEach(function (u) { add(u.formKey); });
+      for (var guard = 0; cards.length < TOPIC_DECK_SIZE && guard < 400; guard++) {
+        var r = topicRange(tp, on[guard % on.length]);
+        add(r.key + ":" + r.gen());
+      }
+    } else {
+      var byId = {};
+      st.units.forEach(function (u) { byId[u.formKey] = u; });
+      var first = [], unseen = [], rest = [];
+      shuffleArray(tp.items.slice()).forEach(function (it) {
+        var u = byId[it.id];
+        if (!u) unseen.push(it.id);
+        else if (u.due || (u.last && u.last.grade === "otra")) first.push(it.id);
+        else rest.push(it.id);
+      });
+      first.concat(unseen, rest).forEach(add);
+    }
+    return progModeCards(cards);
+  }
+  function startTopicDeck() {
+    var tp = topicById(selectedTopicId);
+    if (!tp) return;
+    var cards = buildTopicDeck(tp);
+    if (!cards.length) { el.tdMsg.textContent = t("topic_pick_one"); return; }
+    el.tdMsg.textContent = "";
+    openFlashDeck(cards, "practice");
+  }
+
+  // ---- the topic's own faces on the card ----
+  function renderTopicFaces(card) {
+    var topic = card && card.kind === "topic";
+    el.flashKnownToggle.style.display = topic ? "none" : "";
+    el.flashFrontMain.classList.toggle("is-number", !!(topic && card.bigFront && !card.listen));
+    el.flashTopicTag.textContent = topic && !card.listen && card.choice ? card.choice : "";
+    el.flashTopicTag.hidden = !el.flashTopicTag.textContent;
+    if (!topic) return;
+    if (card.sentence) {
+      if (!card.listen) {
+        topicSentenceInto(el.flashFrontMain, card.sentence, "gap");
+        el.flashFrontCloze.textContent = card.cue || "";
+        el.flashFrontCloze.hidden = !card.cue;
+      }
+      topicSentenceInto(el.flashBackMain, card.sentence, "fill");
+    }
+  }
+
+  // ---- Tu historial for a topic ----
+  function drawTopicHistory(bodyEl, id) {
+    var tp = topicById(id);
+    bodyEl.innerHTML = "";
+    if (!tp) return;
+    var st = topicStats(tp);
+    if (!st.rows.length) { bodyEl.appendChild(progEl("p", "prog-text", t("topic_h_none"))); return; }
+    var P = st.P;
+    var days = {};
+    st.rows.forEach(function (r) { days[progDayNum(r.shown_at)] = true; });
+    var nDays = Object.keys(days).length;
+    var bien = P.events.filter(function (r) { return r.grade === "bien"; }).length;
+    var flips = st.rows.filter(function (r) { return r.flipped && r.ms_to_flip != null; });
+    var avgFlip = flips.length ? flips.reduce(function (s, r) { return s + r.ms_to_flip; }, 0) / flips.length : null;
+    var grid = progEl("div", "history-grid");
+    function stat(big, small) {
+      var x = progEl("div");
+      x.appendChild(progEl("b", null, big));
+      x.appendChild(progEl("span", null, small));
+      grid.appendChild(x);
+    }
+    stat(t(st.rows.length === 1 ? "topic_h_cards_1" : "topic_h_cards", { n: st.rows.length }), t(nDays === 1 ? "history_seen_sub_1" : "history_seen_sub", { d: nDays }));
+    if (P.events.length) stat(t("prog_x_of_y", { b: bien, n: P.events.length }), t("history_grade_sub"));
+    else stat("—", t("history_no_grades"));
+    stat(avgFlip !== null ? progNum(avgFlip / 1000, 1) + " s" : "—", t("history_flip_sub"));
+    stat(t("prog_x_of_y", { b: st.firm, n: st.total }), t(tp.type === "gen" ? "topic_h_firm_sub" : "topic_h_learned_sub"));
+    bodyEl.appendChild(grid);
+    if (tp.type === "gen") {
+      bodyEl.appendChild(progEl("p", "topic-h-label", t("topic_h_ranges")));
+      var heat = progEl("div", "topic-heat");
+      st.ranges.forEach(function (x) {
+        var cell = progEl("div", x.strength.cls);
+        cell.appendChild(progEl("b", null, topicText(x.range.label)));
+        cell.appendChild(progEl("span", null, t("topic_s_" + x.strength.key)));
+        heat.appendChild(cell);
+      });
+      bodyEl.appendChild(heat);
+    }
+    if (st.hard.length) {
+      bodyEl.appendChild(progEl("p", "topic-h-label", t("topic_h_hard")));
+      var chips = progEl("div", "topic-hard");
+      st.hard.slice(0, tp.type === "gen" ? 8 : 4).forEach(function (u) {
+        var c = topicCard(tp, u.formKey);
+        if (!c) return;
+        chips.appendChild(progEl("span", "chip", tp.type === "gen" ? c.frontMain + " · " + c.backMain : c.backMain));
+      });
+      bodyEl.appendChild(chips);
+      var btn = progButton(t("topic_h_hard_btn"), false, function () {
+        startPracticeDeck(cardsForUnits(st.hard));
+      });
+      btn.classList.add("topic-hard-btn");
+      bodyEl.appendChild(btn);
+    }
+    var lastTen = P.events.slice(-10).map(function (r) { return r.grade; });
+    if (lastTen.length) {
+      var line = progEl("div", "history-last");
+      line.appendChild(progDots(lastTen));
+      line.appendChild(progEl("span", null, t("history_last", { n: lastTen.length })));
+      bodyEl.appendChild(line);
+    }
+  }
+
+  // ---- Progreso: one quiet card linking back to the topics ----
+  function drawTopicBars() {
+    var any = TOPICS.map(function (tp) { return { tp: tp, st: topicStats(tp) }; }).filter(function (x) { return x.st.rows.length; });
+    if (!any.length) return null;
+    var c = progCard(t("prog_topics_title"));
+    any.forEach(function (x) {
+      var row = progEl("button", "prog-bar");
+      row.type = "button";
+      var top = progEl("div", "prog-bar-top");
+      top.appendChild(progEl("span", null, topicText(x.tp.name)));
+      top.appendChild(progEl("span", "count", t(x.tp.type === "gen" ? "topic_firm_of" : "topic_learned_of", { b: x.st.firm, n: x.st.total })));
+      row.appendChild(top);
+      row.appendChild(topicTrack(x.st));
+      row.addEventListener("click", function () { setMainTab("topics"); selectTopic(x.tp.id); });
+      c.appendChild(row);
+    });
+    return c;
+  }
+
+  el.tdModeRead.addEventListener("click", function () { setFlashMode("leer"); });
+  el.tdModeListen.addEventListener("click", function () { setFlashMode("escuchar"); });
+  el.tdModeSpeak.addEventListener("click", function () { setFlashMode("hablar"); });
+  el.tdStart.addEventListener("click", startTopicDeck);
+  el.tdSentencesToggle.addEventListener("click", function () {
+    var open = el.tdSentences.hidden;
+    el.tdSentences.hidden = !open;
+    el.tdSentencesToggle.classList.toggle("open", open);
+    el.tdSentencesToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  window.voseTopics = { numWords: numWords, pesosWords: pesosWords, horaWords: horaWords, fechaWords: fechaWords, card: topicCardFromUnit, deck: function (id) { return buildTopicDeck(topicById(id)); } };
 
   // ================= Progreso + Tu historial (2026-10-03) =================
   // Everything here is computed on the device from the practice log (see
@@ -6578,8 +7348,9 @@
         u.box = Math.min(u.box + 1, PROG_INTERVAL_DAYS.length - 1); u.anchor = day;
       }
       var isLearned = u.box >= PROG_LEARNED_BOX;
-      if (isLearned && !wasLearned) { learnedMoves.push({ day: day, delta: 1 }); u.learnedSince = day; }
-      if (!isLearned && wasLearned) { learnedMoves.push({ day: day, delta: -1 }); u.learnedSince = null; }
+      var countMove = r.item_kind !== "topic"; // "Aprendidas" counts your collection only
+      if (isLearned && !wasLearned) { if (countMove) learnedMoves.push({ day: day, delta: 1 }); u.learnedSince = day; }
+      if (!isLearned && wasLearned) { if (countMove) learnedMoves.push({ day: day, delta: -1 }); u.learnedSince = null; }
       u.events.push({ day: day, at: progTime(r), grade: r.grade });
     });
     Object.keys(units).forEach(function (k) {
@@ -6619,6 +7390,7 @@
     var cards = [];
     var byVerb = {};
     units.forEach(function (u) {
+      if (u.kind === "topic") { var tc = topicCardFromUnit(u.itemKey, u.formKey); if (tc) cards.push(tc); return; }
       var item = progUnitItem(idx, u);
       if (!item) return;
       if (u.kind === "verb") {
@@ -6712,6 +7484,8 @@
       if (P.rows.length) body.appendChild(drawWeek(P));
       var lb = drawListBars(P, idx);
       if (lb) body.appendChild(lb);
+      var tb0 = drawTopicBars();
+      if (tb0) body.appendChild(tb0);
       return;
     }
     body.appendChild(drawDue(P, unitList));
@@ -6723,6 +7497,8 @@
     body.appendChild(drawLearned(P, unitList));
     var lists = drawListBars(P, idx);
     if (lists) body.appendChild(lists);
+    var topicsCard = drawTopicBars();
+    if (topicsCard) body.appendChild(topicsCard);
     var still = drawStillKnown(P, unitList, idx);
     if (still) body.appendChild(still);
   }
@@ -7033,7 +7809,7 @@
     var d = new Date();
     var name = t("prog_struggle_list_name", { date: d.toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { day: "numeric", month: "short" }) });
     btn.disabled = true;
-    supabaseClient.from("lists").insert({ name: name, owner_label: currentUser ? currentUser.email : "" }).select().single().then(function (res) {
+    supabaseClient.from("lists").insert({ name: name, owner_label: shareOwnerLabel() }).select().single().then(function (res) {
       if (res.error) { btn.disabled = false; showBanner(t("msg_error_crear", { msg: res.error.message })); return; }
       var listId = res.data.id;
       supabaseClient.from("list_items").insert(rows.map(function (r) { return { list_id: listId, item_type: r.item_type, data: r.data }; })).then(function (res2) {
@@ -7109,12 +7885,14 @@
     });
   }
   function historySelectedData(kind) {
+    if (kind === "topic") return selectedTopicId ? { topic: selectedTopicId } : null;
     var coll = kind === "verb" ? allVerbs : (kind === "word" ? allWords : allPhrases);
     var id = kind === "verb" ? selectedId : (kind === "word" ? selectedWordId : selectedPhraseId);
     var entry = id ? coll.find(function (x) { return x.id === id; }) : null;
     return entry ? entry.data : null;
   }
   function drawItemHistory(bodyEl, kind, data) {
+    if (kind === "topic") { drawTopicHistory(bodyEl, data && data.topic); return; }
     bodyEl.innerHTML = "";
     if (!data) return;
     var key = practiceNorm(data.infinitive || data.word || data.phrase);
@@ -7190,6 +7968,8 @@
     if (selectedId) renderItemHistory("verb");
     if (selectedWordId) renderItemHistory("word");
     if (selectedPhraseId) renderItemHistory("phrase");
+    if (el.topicsPanel && !el.topicsPanel.hidden) renderTopicList();
+    if (selectedTopicId) renderItemHistory("topic");
   }
 
   // ================= Sabido (self-assessed "I know this one") =================
@@ -7214,6 +7994,7 @@
   // an O(n) reference-equality scan at click-time is cheap and avoids
   // threading id through every deck.push() call site.
   function findItemId(kind, data) {
+    if (kind === "topic") return null; // built into the app, no row
     var found = knownCollection(kind).find(function (item) { return item.data === data; });
     return found ? found.id : null;
   }
@@ -7728,8 +8509,14 @@
     }
     if (excCount === 1) parts.push(t("lists_excluded_s", { n: excCount }));
     else if (excCount > 1) parts.push(t("lists_excluded_pl", { n: excCount }));
-    refs.label.innerHTML = t("lists_trigger_prefix") + parts.join(", ") +
-      ' <span class="count-badge">' + (incCount + excCount) + "</span>";
+    // Text nodes, never innerHTML: a list name can come from someone
+    // else's shared list (saving it copies the name), so it must never be
+    // read as HTML (risk review 2026-10-05, item 2).
+    refs.label.textContent = t("lists_trigger_prefix") + parts.join(", ") + " ";
+    var countBadge = document.createElement("span");
+    countBadge.className = "count-badge";
+    countBadge.textContent = String(incCount + excCount);
+    refs.label.appendChild(countBadge);
   }
 
   // Drops any include/exclude selection that names a list which no longer
@@ -8011,7 +8798,7 @@
     el.listFormMsg.textContent = t("msg_creando");
     supabaseClient.from("lists").insert({
       name: name,
-      owner_label: currentUser ? currentUser.email : ""
+      owner_label: shareOwnerLabel()
     }).select().single().then(function (res) {
       if (res.error) { el.listFormMsg.textContent = t("msg_error_guardar", { msg: res.error.message }); return; }
       var savedId = res.data.id;
@@ -8187,7 +8974,7 @@
     el.listPickerMsg.textContent = t("msg_creando");
     supabaseClient.from("lists").insert({
       name: name,
-      owner_label: currentUser ? currentUser.email : ""
+      owner_label: shareOwnerLabel()
     }).select().single().then(function (res) {
       if (res.error) { el.listPickerMsg.textContent = t("msg_error_crear", { msg: res.error.message }); return; }
       addItemToList(res.data.id);
@@ -8368,7 +9155,7 @@
       // second, duplicate list.
       supabaseClient.from("lists").insert({
         name: s.listName,
-        owner_label: currentUser.email || ""
+        owner_label: shareOwnerLabel()
       }).select().single().then(function (listRes) {
         if (listRes.error) {
           msg += t("msg_no_pudo_crear_lista_cuenta", { msg: listRes.error.message });
@@ -8842,7 +9629,7 @@
       if (match) return { id: match.id, created: false };
       return supabaseClient.from("lists").insert({
         name: name,
-        owner_label: currentUser ? currentUser.email : ""
+        owner_label: shareOwnerLabel()
       }).select().single().then(function (insRes) {
         if (insRes.error) return { error: insRes.error };
         return { id: insRes.data.id, created: true };
@@ -9079,6 +9866,15 @@
       renderOfflineBanner();
       if (currentShareList) renderSharePreview();
     }
+  }
+
+  // What a shared-list link shows as "shared by": the name part of your
+  // email, never the address itself (risk review 2026-10-05, item 6;
+  // get_shared_list() also strips anything after an "@" server-side, for
+  // lists saved before this).
+  function shareOwnerLabel() {
+    var email = (currentUser && currentUser.email) || "";
+    return email.split("@")[0];
   }
 
   function handleAuthSubmit(evt) {
@@ -9427,6 +10223,7 @@
 
   el.tabLists.addEventListener("click", function () { setMainTab("lists"); });
   el.tabProgress.addEventListener("click", function () { setMainTab("progress"); });
+  el.tabTopics.addEventListener("click", function () { setMainTab("topics"); });
   el.toggleAddList.addEventListener("click", openListForm);
   el.listFormCancel.addEventListener("click", closeListForm);
   el.listForm.addEventListener("submit", handleListSubmit);
@@ -9483,6 +10280,7 @@
     else if (saved === "flashcards") setMainTab("flashcards");
     else if (saved === "lists") setMainTab("lists");
     else if (saved === "progress") setMainTab("progress");
+    else if (saved === "topics") setMainTab("topics");
   })();
 
   // A ?share=TOKEN link opens the share preview via the public get_shared_list

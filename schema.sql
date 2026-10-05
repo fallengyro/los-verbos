@@ -1033,3 +1033,75 @@ create index if not exists practice_log_user_item_idx on public.practice_log (us
 -- you left the suggestion as it was), this is what the Bien/Otra vez
 -- thresholds get re-tuned from. Never contains audio.
 alter table public.practice_log add column if not exists speech jsonb;
+
+-- ---------------------------------------------------------------------------
+-- Safety (2026-10-05, from the cost/security risk review —
+-- claude/vosea-risk-review.md in the project).
+
+-- 1. Per-account daily counter for the Edge Functions that make paid Claude
+--    calls (dle-lookup: 150 lookups a day; verb-gloss: 120 Claude calls a
+--    day — cache hits don't count). Only the functions (service role) can
+--    touch it: RLS is on with no policies, and the bump function is
+--    service-role only. Until this has run, the functions just don't count
+--    (they allow the call).
+create table if not exists public.api_usage (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  day date not null default ((now() at time zone 'utc')::date),
+  fn text not null,
+  count int not null default 0,
+  primary key (user_id, day, fn)
+);
+alter table public.api_usage enable row level security;
+
+-- Adds one and says whether the account is still within its limit today.
+create or replace function public.api_usage_bump(p_user uuid, p_fn text, p_limit int)
+returns boolean
+language sql
+as $$
+  with up as (
+    insert into public.api_usage as u (user_id, day, fn, count)
+    values (p_user, (now() at time zone 'utc')::date, p_fn, 1)
+    on conflict (user_id, day, fn) do update set count = u.count + 1
+    returning u.count as n
+  )
+  select n <= p_limit from up;
+$$;
+revoke all on function public.api_usage_bump(uuid, text, int) from public, anon, authenticated;
+grant execute on function public.api_usage_bump(uuid, text, int) to service_role;
+
+-- 2. A shared-list link no longer reveals the owner's email address: only
+--    the part before the "@" is returned (the app now stores just that for
+--    new lists), and existing lists are cleaned up.
+create or replace function public.get_shared_list(p_token text)
+returns table (
+  list_id uuid,
+  list_name text,
+  owner_label text,
+  item_type text,
+  data jsonb
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select l.id, l.name, split_part(coalesce(l.owner_label, ''), '@', 1), i.item_type, i.data
+  from public.lists l
+  join public.list_items i on i.list_id = l.id
+  where l.share_token = p_token and l.share_enabled = true;
+$$;
+grant execute on function public.get_shared_list(text) to anon, authenticated;
+
+update public.lists set owner_label = split_part(owner_label, '@', 1) where owner_label like '%@%';
+
+-- ---------------------------------------------------------------------------
+-- Temas (2026-10-06): practice rows for topics (Números, Precios, La hora,
+-- Fechas, and the sentence packs) use item_kind 'topic', item_key = the
+-- topic's id ('numeros', 'comparativos', ...) and form_key = the range and
+-- value ('cientos:515') or the sentence id ('c07'). The topics themselves
+-- are built into the app — no table. Until this has run, topic rows wait on
+-- the device (the app sends them last, on their own) and nothing else is
+-- held up.
+alter table public.practice_log drop constraint if exists practice_log_item_kind_check;
+alter table public.practice_log add constraint practice_log_item_kind_check
+  check (item_kind in ('verb', 'word', 'phrase', 'topic'));

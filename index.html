@@ -100,6 +100,7 @@
       <button type="button" class="main-tab active" id="tab-verbs" data-i18n="nav_verbs">Verbos</button>
       <button type="button" class="main-tab" id="tab-words" data-i18n="nav_words">Vocabulario</button>
       <button type="button" class="main-tab" id="tab-phrases" data-i18n="nav_phrases">Frases</button>
+      <button type="button" class="main-tab" id="tab-topics" data-i18n="nav_topics">Temas</button>
       <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
       <button type="button" class="main-tab" id="tab-progress" data-i18n="nav_progress">Progreso</button>
       <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
@@ -618,6 +619,54 @@
 
   </section>
 
+  <!-- Temas (2026-10-06): topics to drill one thing — numbers, prices, the
+       time, dates, and sentence packs for structures. Built into the app,
+       separate from your own verbs/words/phrases. One list; tapping a row
+       opens its detail page (lesson, practice, Tu historial). See app.js's
+       "Temas" section. -->
+  <section id="topics-panel" hidden>
+    <p class="flash-setup-note topics-intro" data-i18n="topics_intro">Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.</p>
+    <ul class="card-list topic-list" id="topic-list"></ul>
+    <section class="detail topic-detail" id="topic-detail" hidden>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 id="td-name"></h2>
+          <p class="definition" id="td-desc"></p>
+        </div>
+      </div>
+      <div class="badges" id="td-badges"></div>
+      <div class="topic-lesson" id="td-lesson"></div>
+      <div class="topic-practice">
+        <div id="td-ranges-wrap">
+          <p class="flash-group-label" data-i18n="topic_what">¿Qué practicar?</p>
+          <div class="flash-presets topic-ranges" id="td-ranges"></div>
+        </div>
+        <div class="flash-mode-options">
+          <p class="flash-group-label" data-i18n="flash_group_mode">Cómo practicar</p>
+          <div class="lang-toggle flash-mode-toggle">
+            <button type="button" class="lang-option" id="td-mode-read" data-i18n="flash_mode_read">Leer</button>
+            <button type="button" class="lang-option" id="td-mode-listen" data-i18n="flash_mode_listen">Escuchar</button>
+            <button type="button" class="lang-option" id="td-mode-speak" data-i18n="flash_mode_speak">Hablar</button>
+          </div>
+          <p class="flash-mode-note" id="td-mode-note"></p>
+        </div>
+        <p class="form-msg" id="td-msg"></p>
+        <div class="flash-start-row">
+          <button type="button" class="btn-primary" id="td-start" data-i18n="topic_start">Practicar</button>
+          <span class="flash-deck-count" id="td-count"></span>
+        </div>
+      </div>
+      <div class="item-history" data-history-kind="topic">
+        <button type="button" class="flash-custom-toggle item-history-toggle" aria-expanded="false"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="history_toggle">Tu historial</span></button>
+        <div class="flash-custom item-history-body" hidden></div>
+      </div>
+      <div class="topic-sentences-wrap" id="td-sentences-wrap" hidden>
+        <button type="button" class="flash-custom-toggle" id="td-sentences-toggle" aria-expanded="false"><span class="flash-custom-caret" aria-hidden="true"></span><span data-i18n="topic_sentences">Ver oraciones</span></button>
+        <div class="flash-custom topic-sentences" id="td-sentences" hidden></div>
+      </div>
+    </section>
+  </section>
+
   <section id="flashcards-panel" hidden>
     <div class="flash-setup">
       <h2 data-i18n="flash_title">Modo tarjetas</h2>
@@ -959,6 +1008,8 @@
     <div class="flash-card" id="flash-card">
       <div class="flash-face flash-front">
         <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+        <!-- Temas, choice packs: the two options ("ya · todavía"). -->
+        <div class="flash-listen-tag topic-front-tag" id="flash-topic-tag" hidden></div>
         <div class="flash-prompt-main" id="flash-front-main"></div>
         <div class="flash-prompt-sub" id="flash-front-sub"></div>
         <!-- Context for a definition → Spanish card (2026-10-05): the item's
