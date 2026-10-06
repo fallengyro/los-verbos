@@ -3675,6 +3675,7 @@
       if (currentUser) {
         loadPracticeHistory(false).then(function () { if (!el.playPanel.hidden) { renderPlay(); playCheckRacha(); } });
         loadRewards();
+        loadGameRecords();
       }
     }
     if (tab === "topics") {
@@ -8791,21 +8792,94 @@
     return d.word || d.phrase || c.backMain || "";
   }
 
-  // On this device: one record per game, for the Partida row.
+  // ---- records, per account ----
+  // One row per game in public.game_records (pending_2026-10-06_records.sql;
+  // mason: "i want the records to be per account"). This device keeps a
+  // copy of its own games (iv-partidas) and sends any the server hasn't got
+  // yet — offline, or before the SQL has run — on load, on `online` and
+  // after each save. The Partida row's "más larga · combo" is the best of
+  // the server's rows and this device's.
+  var ptServer = { userId: null, rows: [], loaded: false, loading: null, flushing: false };
   function ptRecords() { try { return JSON.parse(localStorage.getItem(PT_RECORDS_KEY) || "[]") || []; } catch (e) { return []; } }
+  function ptSaveLocal(all) {
+    // keep every unsent game; of the sent ones, only the latest few
+    var sent = all.filter(function (r) { return r.sent; });
+    if (sent.length > PT_RECORDS_MAX) {
+      var drop = {};
+      sent.slice(0, sent.length - PT_RECORDS_MAX).forEach(function (r) { drop[r.id] = true; });
+      all = all.filter(function (r) { return !drop[r.id]; });
+    }
+    try { localStorage.setItem(PT_RECORDS_KEY, JSON.stringify(all)); } catch (e) {}
+  }
   function ptSaveRecord() {
     if (!partida || !currentUser) return;
     var st = ptStats();
     if (!st.cards) return;
     var all = ptRecords().filter(function (r) { return r.id !== partida.id; });
-    all.push({ id: partida.id, user: currentUser.id, at: new Date(partida.started).toISOString(), cards: st.cards, best: st.best, ms: st.ms });
-    if (all.length > PT_RECORDS_MAX) all = all.slice(all.length - PT_RECORDS_MAX);
-    try { localStorage.setItem(PT_RECORDS_KEY, JSON.stringify(all)); } catch (e) {}
+    all.push({ id: partida.id, user: currentUser.id, at: new Date(partida.started).toISOString(), cards: st.cards, best: st.best, ms: Math.round(st.ms), bien: st.bien, otra: st.otra, sent: false });
+    ptSaveLocal(all);
+    ptFlushRecords();
   }
+  function ptRecordRow(r) {
+    return { id: r.id, user_id: r.user, game: "partida", started_at: r.at, cards: r.cards || 0, best: r.best || 0, ms: Math.round(r.ms || 0), bien: r.bien || 0, otra: r.otra || 0, updated_at: new Date().toISOString() };
+  }
+  function ptFlushRecords() {
+    if (!currentUser || ptServer.flushing) return;
+    var uid = currentUser.id;
+    var waiting = ptRecords().filter(function (r) { return r.user === uid && !r.sent; });
+    if (!waiting.length) return;
+    ptServer.flushing = true;
+    supabaseClient.from("game_records").upsert(waiting.map(ptRecordRow), { onConflict: "id" }).then(function (res) {
+      ptServer.flushing = false;
+      if (res && res.error) { console.warn("[partida] records kept on this device for now:", res.error.message); return; }
+      var sentNow = {};
+      waiting.forEach(function (r) { sentNow[r.id] = r; });
+      // a game saved again while this was on its way stays unsent
+      var all = ptRecords();
+      all.forEach(function (r) { var w = sentNow[r.id]; if (w && w.cards === r.cards && w.best === r.best && w.ms === r.ms) r.sent = true; });
+      ptSaveLocal(all);
+      if (ptServer.userId === uid) {
+        waiting.forEach(function (w) {
+          var have = ptServer.rows.find(function (x) { return x.id === w.id; });
+          if (have) { have.cards = w.cards; have.best = w.best; } else ptServer.rows.push({ id: w.id, cards: w.cards, best: w.best });
+        });
+      }
+      if (all.some(function (r) { return r.user === uid && !r.sent; })) ptFlushRecords();
+    }, function (err) {
+      ptServer.flushing = false;
+      console.warn("[partida] records kept on this device for now:", err && err.message);
+    });
+  }
+  function loadGameRecords() {
+    if (!currentUser) return Promise.resolve();
+    var uid = currentUser.id;
+    if (ptServer.userId !== uid) ptServer = { userId: uid, rows: [], loaded: false, loading: null, flushing: false };
+    if (ptServer.loading) return ptServer.loading;
+    ptServer.loading = supabaseClient.from("game_records").select("id,cards,best").eq("game", "partida").then(function (res) {
+      if (ptServer.userId !== uid) return;
+      ptServer.loading = null;
+      if (res && res.error) console.warn("[partida] records not loaded:", res.error.message);
+      else { ptServer.rows = res.data || []; ptServer.loaded = true; }
+      ptFlushRecords();
+      if (el.playPanel && !el.playPanel.hidden && !albumOpen) drawPlayModes();
+    }, function (err) {
+      ptServer.loading = null;
+      console.warn("[partida] records not loaded:", err && err.message);
+    });
+    return ptServer.loading;
+  }
+  window.addEventListener("online", function () { if (currentUser) ptFlushRecords(); });
   function ptBest() {
     var uid = currentUser ? currentUser.id : null;
     var out = { cards: 0, best: 0, n: 0 };
-    ptRecords().forEach(function (r) { if (r.user !== uid) return; out.n++; if (r.cards > out.cards) out.cards = r.cards; if (r.best > out.best) out.best = r.best; });
+    var seen = {};
+    function add(id, cards, best) {
+      if (!seen[id]) { seen[id] = true; out.n++; }
+      if (cards > out.cards) out.cards = cards;
+      if (best > out.best) out.best = best;
+    }
+    if (ptServer.userId === uid) ptServer.rows.forEach(function (r) { add(r.id, r.cards || 0, r.best || 0); });
+    ptRecords().forEach(function (r) { if (r.user === uid) add(r.id, r.cards || 0, r.best || 0); });
     return out;
   }
 
@@ -11548,6 +11622,7 @@
       loadPhrases();
       loadLists();
       loadRewards();
+      loadGameRecords();
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;

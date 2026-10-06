@@ -1157,3 +1157,53 @@ create policy "insert own rewards" on public.rewards
 drop policy if exists "delete own rewards" on public.rewards;
 create policy "delete own rewards" on public.rewards
   for delete using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Game records (2026-10-06): one row per game played on the Jugar tab, so
+-- records are per account rather than per device (mason). For now only
+-- Partida ('partida'); Contrarreloj will add its own `game` value (and use
+-- `scope` for which topic / part of the collection). The app saves a game
+-- at Terminar and again when it ends, upserting by id; it keeps a copy on
+-- the device and sends anything the server doesn't have yet.
+create table if not exists public.game_records (
+  id uuid primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  game text not null,
+  scope text,
+  started_at timestamptz not null,
+  cards integer not null default 0,
+  best integer not null default 0,
+  ms bigint not null default 0,
+  bien integer not null default 0,
+  otra integer not null default 0,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+alter table public.game_records drop constraint if exists game_records_game_check;
+alter table public.game_records add constraint game_records_game_check
+  check (game in ('partida'));
+alter table public.game_records drop constraint if exists game_records_values_check;
+alter table public.game_records add constraint game_records_values_check
+  check (cards between 0 and 100000 and best between 0 and 100000 and bien between 0 and 100000
+         and otra between 0 and 100000 and ms between 0 and 86400000
+         and (scope is null or char_length(scope) <= 60));
+
+create index if not exists game_records_user_game_idx on public.game_records (user_id, game);
+
+alter table public.game_records enable row level security;
+
+drop policy if exists "select own game records" on public.game_records;
+create policy "select own game records" on public.game_records
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own game records" on public.game_records;
+create policy "insert own game records" on public.game_records
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "update own game records" on public.game_records;
+create policy "update own game records" on public.game_records
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "delete own game records" on public.game_records;
+create policy "delete own game records" on public.game_records
+  for delete using (auth.uid() = user_id);
