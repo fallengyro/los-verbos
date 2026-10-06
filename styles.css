@@ -2194,7 +2194,14 @@
   .play-msg:empty { display: none; }
   .play-msg { margin: -6px 0 0; }
   /* the why line on the front */
-  .pt-why { position: absolute; top: 16px; left: 18px; right: 64px; font-family: "Public Sans", sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); text-align: left; line-height: 1.3; z-index: 1; pointer-events: none; }
+  .pt-why { position: absolute; top: 16px; left: 18px; right: 64px; font-family: "Public Sans", sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); text-align: left; line-height: 1.3; pointer-events: none; }
+  /* Same rule as the corner speakers (and for the same reason): an
+     absolutely positioned child of the front isn't reliably hidden by
+     backface-visibility on iOS, so it showed through the back, mirrored
+     (mason, 2026-10-06). Hide it off the card's own .flipped class, at
+     the flip's edge-on moment (0.16s). */
+  .flash-front .pt-why { transition: visibility 0s linear 0s; }
+  .flash-card.flipped .flash-front .pt-why { visibility: hidden; transition: visibility 0s linear 0.16s; }
   .pt-why b { color: var(--accent-deep); font-weight: 600; }
   .pt-why[hidden] { display: none; }
   .flash-card:has(.pt-why:not([hidden])) .flash-front { padding-top: 38px; }
