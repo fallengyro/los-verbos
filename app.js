@@ -6242,7 +6242,9 @@
       accuracy: scored ? a.scores.accuracy : null,
       pron: scored ? a.scores.pron : null,
       min_phoneme: minPh,
-      word_error: wordErr
+      word_error: wordErr,
+      // false when the function skipped the scoring call (transcript matched)
+      assessed: !!((data && data.assessments) || []).length
     };
     // A number can come back written in digits ("4372"): compare digits.
     var heardDigits = card.digits ? String(h.display || "").replace(/\D/g, "") : "";
@@ -6302,7 +6304,9 @@
     var t0 = Date.now();
     var answers = speakAnswers(card);
     speechToWav16k(blob).then(function (wav) {
-      return supabaseClient.functions.invoke("stt", { body: { text: answers[0] || card.backMain, audio: speechBytesToBase64(wav), assess: ["es-AR"] } });
+      // answers/digits let the function skip the scoring call when the plain
+      // transcript already matches (one Azure call instead of two).
+      return supabaseClient.functions.invoke("stt", { body: { text: answers[0] || card.backMain, answers: answers, digits: card.digits || undefined, audio: speechBytesToBase64(wav), assess: ["es-AR"] } });
     }).then(function (res) {
       if (res.error) {
         var ctx = res.error.context;
