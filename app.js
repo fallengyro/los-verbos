@@ -250,6 +250,62 @@
       flash_tally: "{b} bien · {o} otra vez",
       nav_progress: "Progreso",
       nav_topics: "Temas",
+      nav_play: "Jugar",
+      play_combo_hud: "seguidos",
+      play_combo_aria: "{n} Bien seguidos",
+      play_how_racha: "racha {n}",
+      play_how_hablar: "{n} hablando",
+      play_how_combo: "{n} seguidos",
+      play_how_otro: "premio",
+      play_kick_racha: "¡{n} días seguidos!",
+      play_kick_hablar: "¡{n} Bien hablando!",
+      play_kick_combo: "¡{n} Bien seguidos!",
+      play_kick_otro: "¡Premio!",
+      play_album_done_title: "¡Álbum completo!",
+      play_album_done_text: "Ya tenés todo el álbum. Pronto, más.",
+      play_added_word: "Ya está en tu **Vocabulario** · lista «{list}»",
+      play_added_phrase: "Ya está en tus **Frases** · lista «{list}»",
+      play_keep_playing: "Seguir jugando",
+      play_to_album: "Ver el álbum",
+      play_listen: "Escuchar",
+      play_days_one: "día seguido",
+      play_days: "días seguidos",
+      play_today: "hoy: {n} de {goal} tarjetas",
+      play_today_met: "hoy: {n} de {goal} ✓",
+      play_free_day: "Día libre",
+      play_next_keep: "Te faltan **{n} tarjetas** hoy para seguir la racha.",
+      play_next_keep_one: "Te falta **1 tarjeta** hoy para seguir la racha.",
+      play_next_start: "Hacé **{n} tarjetas** hoy para empezar una racha.",
+      play_next_start_one: "Hacé **1 tarjeta** hoy para empezar una racha.",
+      play_next_reward: "Próximo premio: **{n} días más** de racha.",
+      play_next_reward_one: "Próximo premio: **mañana**, si seguís la racha.",
+      play_goal_label: "Meta diaria",
+      play_racha_rule: "Cuenta cada tarjeta que diste vuelta o calificaste, en cualquier modo. Tenés un día libre por semana.",
+      play_today_title: "Hoy, hablando",
+      play_today_sub: "Premios en Hablar: cuenta la nota automática. Cada uno, una vez por día.",
+      play_goal_session: "{n} Bien en una sesión",
+      play_goal_combo: "{n} Bien seguidos",
+      play_won_today: "¡ganado!",
+      play_speak_btn: "Practicar hablando",
+      play_quiet_note: "Hablar no está disponible en modo silencio.",
+      play_album_title: "Tu álbum",
+      play_album_entry: "Cosas de acá: {n} de {total} · se suman a tu Vocabulario y tus Frases",
+      play_album_desc: "Cosas de acá que ganaste jugando. Cada una ya está en tu Vocabulario o tus Frases, en la lista «{list}». {n} de {total}.",
+      play_album_left: "Quedan {n} por descubrir.",
+      play_album_how: "Cómo se ganan",
+      play_album_back: "‹ Jugar",
+      play_rule_racha: "Racha de {a}, {b}, {c}… días",
+      play_rule_session: "{a} Bien hablando en una sesión (y {b})",
+      play_rule_combo: "{n} Bien seguidos hablando",
+      play_rule_fine: "En Hablar cuenta la nota automática, no la que cambiás vos. Cada premio de Hablar se gana una vez por día. Pronto: récords de Contrarreloj y retos.",
+      play_stat_days: "{n} días",
+      play_stat_days_one: "1 día",
+      play_stat_racha: "de racha (mejor: {n})",
+      play_stat_longest: "tarjetas, tu sesión más larga",
+      play_stat_combo: "Bien seguidos hablando (mejor)",
+      play_stat_album_n: "{n} de {total}",
+      play_stat_album: "en tu álbum",
+      play_go_btn: "Ir a Jugar",
       topics_intro: "Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.",
       topic_what: "¿Qué practicar?",
       topic_start: "Practicar",
@@ -742,6 +798,62 @@
       flash_tally: "{b} got it · {o} again",
       nav_progress: "Progress",
       nav_topics: "Topics",
+      nav_play: "Play",
+      play_combo_hud: "in a row",
+      play_combo_aria: "{n} Bien in a row",
+      play_how_racha: "{n}-day streak",
+      play_how_hablar: "{n} spoken",
+      play_how_combo: "{n} in a row",
+      play_how_otro: "reward",
+      play_kick_racha: "{n} days in a row!",
+      play_kick_hablar: "{n} Bien speaking!",
+      play_kick_combo: "{n} Bien in a row!",
+      play_kick_otro: "Reward!",
+      play_album_done_title: "Album complete!",
+      play_album_done_text: "You have the whole album. More soon.",
+      play_added_word: "Now in your **Vocabulary** · list «{list}»",
+      play_added_phrase: "Now in your **Phrases** · list «{list}»",
+      play_keep_playing: "Keep playing",
+      play_to_album: "See the album",
+      play_listen: "Listen",
+      play_days_one: "day in a row",
+      play_days: "days in a row",
+      play_today: "today: {n} of {goal} cards",
+      play_today_met: "today: {n} of {goal} ✓",
+      play_free_day: "Free day",
+      play_next_keep: "**{n} more cards** today to keep your streak.",
+      play_next_keep_one: "**1 more card** today to keep your streak.",
+      play_next_start: "Do **{n} cards** today to start a streak.",
+      play_next_start_one: "Do **1 card** today to start a streak.",
+      play_next_reward: "Next reward: **{n} more days** of streak.",
+      play_next_reward_one: "Next reward: **tomorrow**, if you keep the streak.",
+      play_goal_label: "Daily goal",
+      play_racha_rule: "Every card you turned over or graded counts, in any mode. You get one free day a week.",
+      play_today_title: "Today, speaking",
+      play_today_sub: "Hablar rewards: the automatic grade counts. Each one once a day.",
+      play_goal_session: "{n} Bien in one session",
+      play_goal_combo: "{n} Bien in a row",
+      play_won_today: "won!",
+      play_speak_btn: "Practice speaking",
+      play_quiet_note: "Hablar isn't available in quiet mode.",
+      play_album_title: "Your album",
+      play_album_entry: "Things from here: {n} of {total} · added to your Vocabulary and Phrases",
+      play_album_desc: "Things from here you won by playing. Each one is already in your Vocabulary or Phrases, in the list «{list}». {n} of {total}.",
+      play_album_left: "{n} left to discover.",
+      play_album_how: "How to win them",
+      play_album_back: "‹ Play",
+      play_rule_racha: "A streak of {a}, {b}, {c}… days",
+      play_rule_session: "{a} Bien speaking in one session (and {b})",
+      play_rule_combo: "{n} Bien in a row, speaking",
+      play_rule_fine: "In Hablar the automatic grade counts, not the one you change. Each Hablar reward can be won once a day. Coming: Contrarreloj records and challenges.",
+      play_stat_days: "{n} days",
+      play_stat_days_one: "1 day",
+      play_stat_racha: "streak (best: {n})",
+      play_stat_longest: "cards, your longest session",
+      play_stat_combo: "Bien in a row speaking (best)",
+      play_stat_album_n: "{n} of {total}",
+      play_stat_album: "in your album",
+      play_go_btn: "Go to Play",
       topics_intro: "Topics for drilling one thing. They don't add anything to your verbs, vocabulary or phrases.",
       topic_what: "What to practise?",
       topic_start: "Practise",
@@ -1549,6 +1661,7 @@
       }
       renderVoiceButtons();
     });
+    loadPlayGoal();
   }
 
   // ================= conjugation model (unchanged from the original tool) =================
@@ -2249,6 +2362,32 @@
     tabLists: document.getElementById("tab-lists"),
     tabProgress: document.getElementById("tab-progress"),
     tabTopics: document.getElementById("tab-topics"),
+    tabPlay: document.getElementById("tab-play"),
+    playPanel: document.getElementById("play-panel"),
+    playHome: document.getElementById("play-home"),
+    playRacha: document.getElementById("play-racha"),
+    playToday: document.getElementById("play-today"),
+    playAlbumEntry: document.getElementById("play-album-entry"),
+    playAlbumEntryText: document.getElementById("play-album-entry-text"),
+    playAlbum: document.getElementById("play-album"),
+    playAlbumBack: document.getElementById("play-album-back"),
+    playAlbumDesc: document.getElementById("play-album-desc"),
+    playAlbumGrid: document.getElementById("play-album-grid"),
+    playAlbumLeft: document.getElementById("play-album-left"),
+    playAlbumHow: document.getElementById("play-album-how"),
+    playAlbumFine: document.getElementById("play-album-fine"),
+    rewardOverlay: document.getElementById("reward-overlay"),
+    rewardClose: document.getElementById("reward-close"),
+    rewardKicker: document.getElementById("reward-kicker"),
+    rewardWord: document.getElementById("reward-word"),
+    rewardGloss: document.getElementById("reward-gloss"),
+    rewardExample: document.getElementById("reward-example"),
+    rewardNote: document.getElementById("reward-note"),
+    rewardWhere: document.getElementById("reward-where"),
+    rewardListen: document.getElementById("reward-listen"),
+    rewardGo: document.getElementById("reward-go"),
+    rewardMsg: document.getElementById("reward-msg"),
+    flashCombo: document.getElementById("flash-combo"),
     topicsPanel: document.getElementById("topics-panel"),
     topicList: document.getElementById("topic-list"),
     topicDetail: document.getElementById("topic-detail"),
@@ -3427,7 +3566,9 @@
     el.tabLists.classList.toggle("active", tab === "lists");
     el.tabProgress.classList.toggle("active", tab === "progress");
     el.tabTopics.classList.toggle("active", tab === "topics");
+    el.tabPlay.classList.toggle("active", tab === "play");
     el.topicsPanel.hidden = tab !== "topics";
+    el.playPanel.hidden = tab !== "play";
     el.progressPanel.hidden = tab !== "progress";
     el.verbsPanel.hidden = tab !== "verbs";
     el.wordsPanel.hidden = tab !== "words";
@@ -3440,6 +3581,14 @@
       loadPracticeHistory(false).then(function () { if (!el.listsPanel.hidden) decorateListRows(); });
     }
     if (tab === "progress") renderProgress();
+    if (tab === "play") {
+      albumOpen = false; // the tab always opens on its home; the album is one tap in
+      renderPlay();
+      if (currentUser) {
+        loadPracticeHistory(false).then(function () { if (!el.playPanel.hidden) { renderPlay(); playCheckRacha(); } });
+        loadRewards();
+      }
+    }
     if (tab === "topics") {
       renderTopicList();
       if (currentUser) loadPracticeHistory(false).then(function () { if (!el.topicsPanel.hidden) { renderTopicList(); if (selectedTopicId) renderItemHistory("topic"); } });
@@ -5804,6 +5953,7 @@
     el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
     el.flashOverlay.hidden = false;
     practiceStartSession();
+    playDeckStart();
     renderFlashCard();
     practiceOpenView(flashDeck[flashIndex]);
     return true;
@@ -5848,6 +5998,7 @@
     practiceFlush();
     el.flashOverlay.hidden = true;
     el.flashOverlay.classList.remove("is-done");
+    renderFlashCombo();
     refreshPracticeViews();
   }
 
@@ -6032,6 +6183,7 @@
     practiceQueue.push(row);
     savePracticeQueue();
     if (practiceQueue.length >= PRACTICE_FLUSH_AT) practiceFlush();
+    playAfterRow(row);
   }
 
   function practiceFlush() {
@@ -6325,6 +6477,7 @@
       result.attempt = ((card._speech && card._speech.attempt) || 0) + 1;
       card._speech = result;
       if (result.auto_grade && !card._gradeTouched) card._grade = result.auto_grade;
+      playOnSpeech(card, result);
       if (practiceView && practiceView.card === card) practiceView.row.speech = Object.assign({}, result);
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden) return;
       renderSpeakState();
@@ -7531,6 +7684,693 @@
   });
   window.voseTopics = { topics: TOPICS, numWords: numWords, pesosWords: pesosWords, horaWords: horaWords, fechaWords: fechaWords, card: topicCardFromUnit, deck: function (id) { return buildTopicDeck(topicById(id)); } };
 
+  // ================= Jugar: racha + álbum (2026-10-06) =================
+  // The fourth-from-last tab (… Temas · Tarjetas · Jugar · Progreso ·
+  // Listas). mason: the metrics are useful but don't pull you back; he
+  // wants to "get sucked in for hours". This first piece is:
+  //   · La racha — days in a row reaching a daily goal you pick (default
+  //     20 cards), counting any card you turned over or graded, in any
+  //     mode. One free day per calendar week (Mon–Sun) keeps it alive.
+  //   · Premios — each one unlocks the next ALBUM item (lunfardo, sayings,
+  //     customs) and adds it to your own Vocabulario or Frases and to a list
+  //     «Álbum», so it gets drilled like everything else:
+  //       racha of 7, 14, 21… days (any mode);
+  //       50 and 100 Bien in one Hablar session, and 20 Bien in a row in
+  //       Hablar (mason, 2026-10-06: "the progressive and bien related
+  //       rewards should only be earned in hablar mode"). These count the
+  //       AUTOMATIC grade, so switching Otra vez → Bien can't farm them; a
+  //       card with no suggestion (unsure, nothing heard) neither counts nor
+  //       breaks the run. Each Hablar reward can be won once a day.
+  //   · Tu álbum — what you've won and how, plus how to win more.
+  // Partida, Contrarreloj and Te reto come later, as rows on this tab.
+  // Rewards live in the `rewards` table (pending_2026-10-06_jugar.sql);
+  // until that has run they're kept on this device and sent later, and
+  // the content they add goes in either way.
+  // ---- the album: cosas de acá (2026-10-06) ----
+  // What a reward unlocks, in this order (the useful, everyday ones first,
+  // words and expressions mixed). Each one is added to the person's own
+  // Vocabulario (k "w") or Frases (k "p") and to a list «Álbum», so it gets
+  // drilled like anything else. `id` is what the rewards table stores:
+  // never rename or reuse one — add new items at the end.
+  //   es: the Spanish · def: English definition (the card's meaning)
+  //   gloss: a short Spanish meaning (the album tile, the reward screen)
+  //   ex: an example · cat: lunfardo | dicho | costumbre | de acá
+  //   words: pos + g (gender) · phrases: fn + reg (+ idio, lit)
+  //   note: goes into the item's notes
+  var ALBUM = [
+    { id: "bondi", k: "w", es: "bondi", def: "bus (slang for colectivo)", gloss: "el colectivo", ex: "Me tomo el bondi en la esquina.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Lunfardo; viene del portugués de Brasil «bonde» (tranvía)." },
+    { id: "de-una", k: "p", es: "De una", def: "for sure! / absolutely / let's do it", gloss: "¡sí, claro!", ex: "—¿Vamos al cine? —¡De una!", cat: "dicho", fn: "acuerdo", reg: "coloquial", idio: true, lit: "of one (go)" },
+    { id: "laburo", k: "w", es: "laburo", def: "work, job (slang)", gloss: "el trabajo", ex: "Mañana tengo mucho laburo.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Del italiano «lavoro». Laburar = trabajar." },
+    { id: "al-toque", k: "p", es: "Al toque", def: "right away / in a sec", gloss: "enseguida", ex: "Te llamo al toque.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "at the touch" },
+    { id: "che", k: "w", es: "che", def: "hey (to get someone's attention); also to address a friend", gloss: "oye", ex: "Che, ¿me pasás la sal?", cat: "de acá", pos: "interjección", g: "", note: "Tan argentino que al Che Guevara le quedó de apodo." },
+    { id: "tener-fiaca", k: "p", es: "Tener fiaca", def: "to feel lazy / not feel like doing anything", gloss: "no tener ganas de hacer nada", ex: "Hoy tengo una fiaca bárbara.", cat: "dicho", fn: "otro", reg: "lunfardo", idio: true, lit: "to have laziness", note: "La fiaca, del italiano «fiacca» (cansancio)." },
+    { id: "guita", k: "w", es: "guita", def: "money (slang)", gloss: "la plata", ex: "No tengo guita para el taxi.", cat: "lunfardo", pos: "sustantivo", g: "femenino" },
+    { id: "me-cobras", k: "p", es: "¿Me cobrás?", def: "can I pay? (asking for the bill, in a shop or café)", gloss: "quiero pagar", ex: "Perdón, ¿me cobrás?", cat: "de acá", fn: "pregunta", reg: "neutro", idio: true, lit: "will you charge me?", note: "En el café también: «¿me traés la cuenta?»." },
+    { id: "subte", k: "w", es: "subte", def: "the Buenos Aires subway / metro", gloss: "el metro", ex: "Tomo el subte en la línea D.", cat: "de acá", pos: "sustantivo", g: "masculino", note: "De «subterráneo». La línea A es de 1913, la primera de Latinoamérica." },
+    { id: "buena-onda", k: "p", es: "Buena onda", def: "nice, friendly, good vibes (a person or place)", gloss: "simpático, agradable", ex: "El verdulero es re buena onda.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "good wave", note: "Lo contrario: mala onda." },
+    { id: "re", k: "w", es: "re", def: "very, really (before an adjective or verb)", gloss: "muy", ex: "Está re lindo el día.", cat: "de acá", pos: "adverbio", g: "", note: "«Re bien», «re cansado», «me re gustó»." },
+    { id: "cebar-mate", k: "p", es: "Cebar mate", def: "to prepare and serve mate, refilling it for each person in turn", gloss: "preparar y servir el mate", ex: "¿Quién ceba hoy?", cat: "costumbre", fn: "otro", reg: "neutro", idio: false, lit: "", note: "La ronda va de mano en mano. Decir «gracias» quiere decir «no quiero más»." },
+    { id: "pibe", k: "w", es: "pibe", def: "kid, young guy (piba = girl)", gloss: "el chico", ex: "Ese pibe juega muy bien al fútbol.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Femenino: la piba." },
+    { id: "estar-al-horno", k: "p", es: "Estar al horno", def: "to be in big trouble / to be done for", gloss: "estar en un gran problema", ex: "Si no llego al bondi, estoy al horno.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to be in the oven" },
+    { id: "medialuna", k: "w", es: "medialuna", def: "croissant-like pastry (de manteca: sweet; de grasa: plainer)", gloss: "el croissant de acá", ex: "Un café con leche con dos medialunas.", cat: "costumbre", pos: "sustantivo", g: "femenino" },
+    { id: "que-garron", k: "p", es: "¡Qué garrón!", def: "what a drag! / what a bummer!", gloss: "¡qué mala suerte, qué fastidio!", ex: "Se cortó la luz otra vez, ¡qué garrón!", cat: "dicho", fn: "sorpresa", reg: "lunfardo", idio: true, lit: "what a (cut of) shank!" },
+    { id: "quilombo", k: "w", es: "quilombo", def: "a mess, chaos, a big fuss", gloss: "el lío", ex: "Mi cuarto es un quilombo.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Muy usado y algo informal. «Se armó un quilombo» = se armó lío." },
+    { id: "te-banco", k: "p", es: "Te banco", def: "I've got your back / I support you", gloss: "te apoyo", ex: "Si te querés mudar, te banco.", cat: "dicho", fn: "acuerdo", reg: "coloquial", idio: true, lit: "I bench you", note: "Bancar = apoyar, y también aguantar: «no lo banco» = no lo soporto." },
+    { id: "facturas", k: "w", es: "facturas", def: "pastries from the bakery (medialunas, vigilantes, bolas de fraile...)", gloss: "masitas dulces de panadería", ex: "Compré media docena de facturas para la merienda.", cat: "costumbre", pos: "sustantivo", g: "femenino", note: "Se compran por docena." },
+    { id: "que-se-yo", k: "p", es: "Qué sé yo", def: "I dunno / who knows (also a filler while thinking)", gloss: "no sé", ex: "—¿A qué hora viene? —Qué sé yo, a las ocho.", cat: "dicho", fn: "muletilla", reg: "coloquial", idio: true, lit: "what do I know" },
+    { id: "birra", k: "w", es: "birra", def: "beer (slang)", gloss: "la cerveza", ex: "¿Tomamos una birra después del laburo?", cat: "lunfardo", pos: "sustantivo", g: "femenino", note: "Del italiano." },
+    { id: "hacer-la-previa", k: "p", es: "Hacer la previa", def: "to get together for drinks before going out", gloss: "juntarse antes de salir", ex: "Hacemos la previa en casa y después vamos al boliche.", cat: "costumbre", fn: "otro", reg: "coloquial", idio: true, lit: "to do the before" },
+    { id: "boliche", k: "w", es: "boliche", def: "nightclub", gloss: "la discoteca", ex: "El sábado vamos al boliche.", cat: "de acá", pos: "sustantivo", g: "masculino", note: "Se sale tarde: nadie llega antes de la una." },
+    { id: "mira-vos", k: "p", es: "Mirá vos", def: "well, look at that / you don't say", gloss: "¡qué interesante!", ex: "—Mi abuela era de Rosario. —Mirá vos.", cat: "dicho", fn: "sorpresa", reg: "coloquial", idio: true, lit: "look, you" },
+    { id: "kiosco", k: "w", es: "kiosco", def: "corner shop for sweets, drinks, cigarettes", gloss: "la tiendita de la esquina", ex: "Voy al kiosco a comprar un alfajor.", cat: "de acá", pos: "sustantivo", g: "masculino", note: "Muchos abren hasta tarde o todo el día." },
+    { id: "ponerse-las-pilas", k: "p", es: "Ponerse las pilas", def: "to get one's act together / get going", gloss: "esforzarse, ponerse en marcha", ex: "Me tengo que poner las pilas con el castellano.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to put one's batteries in" },
+    { id: "alfajor", k: "w", es: "alfajor", def: "two soft biscuits with dulce de leche, often covered in chocolate", gloss: "la golosina más argentina", ex: "Un alfajor de chocolate, por favor.", cat: "costumbre", pos: "sustantivo", g: "masculino" },
+    { id: "cortala", k: "p", es: "Cortala", def: "cut it out / stop it", gloss: "basta", ex: "Cortala con el celular, que estamos comiendo.", cat: "dicho", fn: "desacuerdo", reg: "coloquial", idio: true, lit: "cut it" },
+    { id: "trucho", k: "w", es: "trucho", def: "fake, counterfeit, dodgy", gloss: "falso", ex: "Ese billete es trucho.", cat: "lunfardo", pos: "adjetivo", g: "", note: "Femenino: trucha." },
+    { id: "ser-un-capo", k: "p", es: "Ser un capo", def: "to be a pro / a star / brilliant at something", gloss: "ser muy bueno en algo", ex: "Gracias por arreglarlo, sos un capo.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to be a boss" },
+    { id: "copado", k: "w", es: "copado", def: "cool, great (a person, plan or place)", gloss: "genial", ex: "Tu hermana es re copada.", cat: "de acá", pos: "adjetivo", g: "", note: "Femenino: copada." },
+    { id: "la-sobremesa", k: "w", es: "sobremesa", def: "the long chat at the table after a meal", gloss: "la charla después de comer", ex: "La sobremesa duró dos horas.", cat: "costumbre", pos: "sustantivo", g: "femenino", note: "Levantarse enseguida queda mal." },
+    { id: "dar-bola", k: "p", es: "Dar bola", def: "to pay attention to someone", gloss: "prestar atención", ex: "Le hablé y no me dio bola.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to give ball" },
+    { id: "posta", k: "w", es: "posta", def: "for real, really; the truth", gloss: "de verdad", ex: "¿Posta que te mudás?", cat: "de acá", pos: "adverbio", g: "", note: "«La posta» = la verdad, el dato bueno." },
+    { id: "nioquis-del-29", k: "p", es: "Ñoquis del 29", def: "eating gnocchi on the 29th of the month, with money under the plate for luck", gloss: "la tradición de comer ñoquis el 29", ex: "Hoy es 29: ¡ñoquis con plata abajo del plato!", cat: "costumbre", fn: "otro", reg: "neutro", idio: true, lit: "gnocchi of the 29th", note: "Llegó con los inmigrantes italianos." },
+    { id: "piola", k: "w", es: "piola", def: "cool, nice; also clever or easygoing", gloss: "bueno, tranquilo", ex: "Es un lugar piola para comer.", cat: "lunfardo", pos: "adjetivo", g: "" },
+    { id: "esta-joya", k: "p", es: "Está joya", def: "it's great / perfect", gloss: "está perfecto", ex: "—¿Te queda bien el martes? —Está joya.", cat: "dicho", fn: "acuerdo", reg: "coloquial", idio: true, lit: "it's a jewel", note: "También solo: «¡Joya!»." },
+    { id: "heladera", k: "w", es: "heladera", def: "fridge", gloss: "el refrigerador", ex: "La leche está en la heladera.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "ni-ahi", k: "p", es: "Ni ahí", def: "not at all / no way", gloss: "para nada", ex: "—¿Estás cansada? —Ni ahí.", cat: "dicho", fn: "desacuerdo", reg: "coloquial", idio: true, lit: "not even there" },
+    { id: "groso", k: "w", es: "groso", def: "great, awesome; someone impressive", gloss: "genial, un fenómeno", ex: "Messi es un groso.", cat: "lunfardo", pos: "adjetivo", g: "", note: "Del italiano «grosso». Femenino: grosa." },
+    { id: "no-tengo-un-mango", k: "p", es: "No tengo un mango", def: "I'm broke / I don't have a cent", gloss: "no tengo plata", ex: "No puedo salir, no tengo un mango.", cat: "dicho", fn: "otro", reg: "lunfardo", idio: true, lit: "I don't have a mango", note: "Un mango = un peso." },
+    { id: "la-merienda", k: "w", es: "merienda", def: "afternoon snack (around five: mate or coffee with something sweet)", gloss: "la comida de la tarde", ex: "A la merienda tomamos mate con facturas.", cat: "costumbre", pos: "sustantivo", g: "femenino", note: "Se cena tarde, a las nueve o diez, así que la merienda importa." },
+    { id: "me-da-bronca", k: "p", es: "Me da bronca", def: "it makes me mad / it really annoys me", gloss: "me enoja", ex: "Me da bronca cuando el bondi no para.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "it gives me anger" },
+    { id: "pileta", k: "w", es: "pileta", def: "swimming pool (also the kitchen sink)", gloss: "la piscina", ex: "En verano vamos a la pileta del club.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "cargar-la-sube", k: "p", es: "Cargar la SUBE", def: "to top up the SUBE (the transit card for bus, subway and train)", gloss: "ponerle saldo a la tarjeta", ex: "Tengo que cargar la SUBE antes de tomar el subte.", cat: "costumbre", fn: "otro", reg: "neutro", idio: false, lit: "", note: "Se carga en el kiosco, en la estación o desde el celular." },
+    { id: "chamuyo", k: "w", es: "chamuyo", def: "smooth talk, sweet talk; a line", gloss: "la charla para convencer", ex: "No le creas, es puro chamuyo.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Chamuyar = hablar para convencer o seducir." },
+    { id: "mandar-fruta", k: "p", es: "Mandar fruta", def: "to talk nonsense / make things up", gloss: "decir cualquier cosa", ex: "No sabía la respuesta y mandó fruta.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to send fruit" },
+    { id: "frutilla", k: "w", es: "frutilla", def: "strawberry", gloss: "la fresa", ex: "Un licuado de frutilla, por favor.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "que-bajon", k: "p", es: "¡Qué bajón!", def: "what a bummer! / how depressing!", gloss: "¡qué triste!", ex: "Llueve todo el fin de semana, ¡qué bajón!", cat: "dicho", fn: "sorpresa", reg: "coloquial", idio: true, lit: "what a big drop!" },
+    { id: "bardo", k: "w", es: "bardo", def: "trouble, a mess; a hassle", gloss: "el lío, el problema", ex: "Sacar el turno fue un bardo.", cat: "lunfardo", pos: "sustantivo", g: "masculino", note: "Hacer bardo = hacer lío." },
+    { id: "fin-de-semana-largo", k: "p", es: "Fin de semana largo", def: "long weekend (with a holiday on Friday or Monday)", gloss: "un finde con feriado", ex: "Este fin de semana largo nos vamos a la costa.", cat: "costumbre", fn: "otro", reg: "neutro", idio: false, lit: "", note: "Algunos feriados se mueven a un lunes para armarlo." },
+    { id: "palta", k: "w", es: "palta", def: "avocado", gloss: "el aguacate", ex: "Un tostado con palta.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "que-mala-leche", k: "p", es: "¡Qué mala leche!", def: "what bad luck!", gloss: "¡qué mala suerte!", ex: "Perdí el bondi por un segundo, ¡qué mala leche!", cat: "dicho", fn: "sorpresa", reg: "coloquial", idio: true, lit: "what bad milk!", note: "Acá «mala leche» es mala suerte; también, mala intención." },
+    { id: "remera", k: "w", es: "remera", def: "T-shirt", gloss: "la camiseta", ex: "Me puse una remera blanca.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "estar-podrido", k: "p", es: "Estar podrido", def: "to be fed up / sick of something", gloss: "estar harto", ex: "Estoy podrido de esperar.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to be rotten" },
+    { id: "campera", k: "w", es: "campera", def: "jacket", gloss: "la chaqueta", ex: "Llevá campera, que a la noche refresca.", cat: "de acá", pos: "sustantivo", g: "femenino" },
+    { id: "ir-a-los-bifes", k: "p", es: "Ir a los bifes", def: "to get to the point", gloss: "ir al grano", ex: "Bueno, vamos a los bifes: ¿cuánto sale?", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to go to the steaks" },
+    { id: "asado", k: "w", es: "asado", def: "barbecue — the meat, and the long gathering around it", gloss: "la carne a la parrilla, y la reunión", ex: "El domingo hay asado en lo de mis suegros.", cat: "costumbre", pos: "sustantivo", g: "masculino", note: "El asador recibe un aplauso: «¡un aplauso para el asador!»." },
+    { id: "mas-vale", k: "p", es: "Más vale", def: "you bet / of course", gloss: "¡claro que sí!", ex: "—¿Venís al asado? —¡Más vale!", cat: "dicho", fn: "acuerdo", reg: "coloquial", idio: true, lit: "it's worth more" },
+    { id: "birome", k: "w", es: "birome", def: "ballpoint pen", gloss: "el bolígrafo", ex: "¿Me prestás una birome?", cat: "de acá", pos: "sustantivo", g: "femenino", note: "Por Bíró y Meyne, que la fabricaron en Buenos Aires en los años cuarenta." },
+    { id: "una-banda", k: "p", es: "Una banda", def: "a lot / loads", gloss: "mucho", ex: "Te extraño una banda.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "a band" },
+    { id: "pochoclo", k: "w", es: "pochoclo", def: "popcorn", gloss: "las palomitas", ex: "Compramos pochoclo en el cine.", cat: "de acá", pos: "sustantivo", g: "masculino" },
+    { id: "salir-de-joda", k: "p", es: "Salir de joda", def: "to go out partying", gloss: "salir a divertirse", ex: "El viernes salimos de joda.", cat: "dicho", fn: "otro", reg: "coloquial", idio: true, lit: "to go out on a spree", note: "Informal; entre amigos." },
+    { id: "cortado", k: "w", es: "cortado", def: "espresso with a little milk", gloss: "el café con un poco de leche", ex: "Un cortado y una medialuna, por favor.", cat: "costumbre", pos: "sustantivo", g: "masculino", note: "Una lágrima es al revés: mucha leche y un poco de café." },
+    { id: "chabon", k: "w", es: "chabón", def: "guy, dude", gloss: "el tipo", ex: "Un chabón me preguntó la hora.", cat: "lunfardo", pos: "sustantivo", g: "masculino" },
+    { id: "luca", k: "w", es: "luca", def: "a thousand pesos (slang)", gloss: "mil pesos", ex: "La entrada sale diez lucas.", cat: "lunfardo", pos: "sustantivo", g: "femenino" },
+    { id: "changuito", k: "w", es: "changuito", def: "shopping cart; a wheeled shopping trolley", gloss: "el carrito", ex: "Agarrá un changuito, que compramos mucho.", cat: "de acá", pos: "sustantivo", g: "masculino" },
+    { id: "hincha", k: "w", es: "hincha", def: "fan of a football club", gloss: "el o la fan de un club", ex: "Soy hincha de Boca.", cat: "costumbre", pos: "sustantivo", g: "masculino", note: "El hincha, la hincha. La primera pregunta: «¿de qué cuadro sos?»." },
+    { id: "feriado", k: "w", es: "feriado", def: "public holiday", gloss: "el día festivo", ex: "El lunes es feriado.", cat: "costumbre", pos: "sustantivo", g: "masculino" },
+    { id: "canchero", k: "w", es: "canchero", def: "confident and savvy; a bit of a show-off", gloss: "que se las sabe todas", ex: "Se hace el canchero, pero está nervioso.", cat: "lunfardo", pos: "adjetivo", g: "", note: "Femenino: canchera. Tener cancha = tener experiencia." }
+  ];
+
+  var ALBUM_LIST_NAME = "Álbum";
+  var PLAY_GOALS = [10, 20, 30, 50];
+  var PLAY_GOAL_DEFAULT = 20;
+  var PLAY_GOAL_KEY = "iv-daily-goal";
+  var PLAY_RACHA_STEP = 7;
+  var PLAY_SESSION_STEPS = [50, 100];
+  var PLAY_COMBO = 20;
+  var REWARDS_LOCAL_KEY = "iv-rewards";
+  var REWARD_COLS = ["id", "user_id", "reason", "item_id", "earned_at"];
+
+  var playGoal = PLAY_GOAL_DEFAULT;
+  try { var savedGoal = parseInt(localStorage.getItem(PLAY_GOAL_KEY), 10); if (PLAY_GOALS.indexOf(savedGoal) !== -1) playGoal = savedGoal; } catch (e) {}
+  var rewardsState = { userId: null, list: [], loaded: false, loading: null, flushing: false };
+  var rewardScreens = [];   // reward screens waiting their turn: [{ rec, view }]
+  var rewardShowing = null;
+  var albumOpen = false;
+
+  function albumItem(id) { for (var i = 0; i < ALBUM.length; i++) if (ALBUM[i].id === id) return ALBUM[i]; return null; }
+
+  // ---- the daily goal (user_settings.daily_goal, and this device) ----
+  function setPlayGoal(n) {
+    if (PLAY_GOALS.indexOf(n) === -1 || n === playGoal) return;
+    playGoal = n;
+    try { localStorage.setItem(PLAY_GOAL_KEY, String(n)); } catch (e) {}
+    renderPlay();
+    if (currentUser) {
+      supabaseClient.from("user_settings")
+        .upsert({ user_id: currentUser.id, daily_goal: n, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+        .then(function (res) { if (res && res.error) console.warn("[jugar] daily goal kept on this device only:", res.error.message); });
+    }
+    playCheckRacha();
+  }
+  // Its own query, so a missing daily_goal column (SQL not run yet) can't
+  // break loading the language and voice.
+  function loadPlayGoal() {
+    if (!currentUser) return;
+    supabaseClient.from("user_settings").select("daily_goal").eq("user_id", currentUser.id).maybeSingle().then(function (res) {
+      if (!res || res.error || !res.data) return;
+      var n = parseInt(res.data.daily_goal, 10);
+      if (PLAY_GOALS.indexOf(n) === -1 || n === playGoal) return;
+      playGoal = n;
+      try { localStorage.setItem(PLAY_GOAL_KEY, String(n)); } catch (e) {}
+      renderPlay();
+    });
+  }
+
+  // ---- the racha, from the practice log ----
+  // A card counts toward the day's goal once it was turned over or graded
+  // (just swiping past one doesn't).
+  function playCounted(r) { return !!(r.flipped || r.grade === "bien" || r.grade === "otra"); }
+  function playWeekOf(day) { return Math.floor((day - 4) / 7); } // day 4 (1970-01-05) was a Monday
+  function playDayStr(day) { return new Date(day * 86400000).toISOString().slice(0, 10); }
+  function playDayCounts(rows) {
+    var c = {};
+    rows.forEach(function (r) { if (playCounted(r)) { var d = progDayNum(r.shown_at); c[d] = (c[d] || 0) + 1; } });
+    return c;
+  }
+  // Walks every day from the first one practised to today. A day under the
+  // goal uses that week's free day if it's still unused and a racha is
+  // running; otherwise the racha ends. Today never breaks it (the day isn't
+  // over).
+  function playStreak(counts, goal, today) {
+    var days = Object.keys(counts).map(Number);
+    var out = { cur: 0, start: null, best: 0, free: {}, today: counts[today] || 0, todayMet: (counts[today] || 0) >= goal };
+    if (!days.length) return out;
+    var first = Math.min.apply(null, days);
+    var used = {};
+    for (var d = first; d <= today; d++) {
+      if ((counts[d] || 0) >= goal) {
+        if (!out.cur) { out.start = d; out.free = {}; }
+        out.cur++;
+        if (out.cur > out.best) out.best = out.cur;
+      } else if (d === today) {
+        // still to play
+      } else if (out.cur && !used[playWeekOf(d)]) {
+        used[playWeekOf(d)] = true;
+        out.free[d] = true;
+      } else {
+        out.cur = 0; out.start = null; out.free = {};
+      }
+    }
+    return out;
+  }
+
+  // Sessions, from the log: cards per session, and in Hablar the automatic
+  // Bien (grade_auto + bien: the suggestion, kept) and runs of them. An
+  // automatic Otra vez ends a run; a card graded by hand neither counts nor
+  // ends one. Each card counts once per pass.
+  function playSessionStats(rows, today) {
+    var s = {};
+    rows.forEach(function (r) {
+      var x = s[r.session_id] || (s[r.session_id] = { cards: 0, bien: 0, combo: 0, best: 0, day: null, seen: {} });
+      if (playCounted(r)) x.cards++;
+      var d = progDayNum(r.shown_at);
+      if (x.day === null) x.day = d;
+      if (r.mode !== "hablar" || !r.grade_auto) return;
+      var k = r.pass + "|" + unitKey(r.item_kind, r.item_key, r.form_key);
+      if (r.grade === "bien") {
+        if (x.seen[k]) return;
+        x.seen[k] = true;
+        x.bien++; x.combo++;
+        if (x.combo > x.best) x.best = x.combo;
+      } else if (r.grade === "otra") {
+        x.combo = 0;
+      }
+    });
+    var out = { longest: 0, bestCombo: 0, todayBien: 0, todayCombo: 0 };
+    Object.keys(s).forEach(function (id) {
+      var x = s[id];
+      if (x.cards > out.longest) out.longest = x.cards;
+      if (x.best > out.bestCombo) out.bestCombo = x.best;
+      if (x.day === today) {
+        if (x.bien > out.todayBien) out.todayBien = x.bien;
+        if (x.best > out.todayCombo) out.todayCombo = x.best;
+      }
+    });
+    // the deck that's open right now (its newest card may not be logged yet)
+    var live = practiceSession && practiceSession.play;
+    if (live) {
+      if (live.n > out.todayBien) out.todayBien = live.n;
+      if (live.best > out.todayCombo) out.todayCombo = live.best;
+      if (live.best > out.bestCombo) out.bestCombo = live.best;
+    }
+    return out;
+  }
+
+  function playHistoryReady() {
+    return !!(currentUser && practiceHistory.rows && practiceHistory.userId === currentUser.id && !practiceHistory.error);
+  }
+  function playModel() {
+    var rows = practiceAllRows();
+    var today = progToday();
+    var st = playStreak(playDayCounts(rows), playGoal, today);
+    st.sessions = playSessionStats(rows, today);
+    st.todayDay = today;
+    return st;
+  }
+
+  // ---- rewards: stored, sent, and what they add ----
+  function rewardsLocalAll() {
+    try { return JSON.parse(localStorage.getItem(REWARDS_LOCAL_KEY) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function rewardsSaveLocal() {
+    if (!rewardsState.userId) return;
+    var all = rewardsLocalAll();
+    all[rewardsState.userId] = rewardsState.list;
+    try { localStorage.setItem(REWARDS_LOCAL_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  function rewardsForUser() {
+    if (!currentUser) return [];
+    if (rewardsState.userId !== currentUser.id) {
+      rewardsState = { userId: currentUser.id, list: rewardsLocalAll()[currentUser.id] || [], loaded: false, loading: null, flushing: false };
+    }
+    return rewardsState.list;
+  }
+  function rewardHas(reason) { return rewardsForUser().some(function (r) { return r.reason === reason; }); }
+  function albumEarnedIds() {
+    var ids = {};
+    rewardsForUser().forEach(function (r) { if (r.item_id) ids[r.item_id] = true; });
+    return ids;
+  }
+  function albumNextItem() {
+    var have = albumEarnedIds();
+    for (var i = 0; i < ALBUM.length; i++) if (!have[ALBUM[i].id]) return ALBUM[i];
+    return null;
+  }
+
+  // Server rows win for a reason both sides have; this device's rows the
+  // server hasn't got yet stay, marked to be sent.
+  function loadRewards() {
+    if (!currentUser) return Promise.resolve([]);
+    rewardsForUser();
+    if (rewardsState.loading) return rewardsState.loading;
+    var uid = currentUser.id;
+    rewardsState.loading = supabaseClient.from("rewards").select("id,reason,item_id,earned_at").then(function (res) {
+      if (rewardsState.userId !== uid) return;
+      rewardsState.loading = null;
+      rewardsState.loaded = true;
+      if (res && res.error) {
+        console.warn("[jugar] rewards kept on this device for now:", res.error.message);
+      } else {
+        var byReason = {};
+        (res.data || []).forEach(function (r) { byReason[r.reason] = { id: r.id, user_id: uid, reason: r.reason, item_id: r.item_id || null, earned_at: r.earned_at }; });
+        rewardsState.list.forEach(function (r) {
+          if (byReason[r.reason]) { if (r._add) byReason[r.reason]._add = true; return; }
+          byReason[r.reason] = Object.assign({}, r, { _send: true });
+        });
+        rewardsState.list = Object.keys(byReason).map(function (k) { return byReason[k]; })
+          .sort(function (a, b) { return Date.parse(a.earned_at) - Date.parse(b.earned_at); });
+        rewardsSaveLocal();
+      }
+      rewardsFlush();
+      rewardsRetryAdds();
+      playCheckRacha();
+      renderPlay();
+    }, function (err) {
+      rewardsState.loading = null;
+      rewardsState.loaded = true;
+      console.warn("[jugar] rewards kept on this device for now:", err && err.message);
+      playCheckRacha();
+    });
+    return rewardsState.loading;
+  }
+
+  function rewardsFlush() {
+    if (!currentUser || rewardsState.flushing || rewardsState.userId !== currentUser.id) return;
+    var waiting = rewardsState.list.filter(function (r) { return r._send; });
+    if (!waiting.length) return;
+    var rows = waiting.map(function (r) { var o = {}; REWARD_COLS.forEach(function (k) { o[k] = r[k]; }); return o; });
+    rewardsState.flushing = true;
+    supabaseClient.from("rewards").upsert(rows, { onConflict: "user_id,reason", ignoreDuplicates: true }).then(function (res) {
+      rewardsState.flushing = false;
+      if (res && res.error) { console.warn("[jugar] rewards not sent yet (will retry):", res.error.message); return; }
+      waiting.forEach(function (r) { delete r._send; });
+      rewardsSaveLocal();
+    }, function () { rewardsState.flushing = false; });
+  }
+  function rewardsRetryAdds() {
+    rewardsForUser().forEach(function (r) { if (r._add) albumAdd(r); });
+  }
+  window.addEventListener("online", function () { if (currentUser) { rewardsFlush(); rewardsRetryAdds(); } });
+
+  // Puts an album item into the person's own Vocabulario / Frases (unless
+  // it's already there) and into the «Álbum» list. Safe to repeat.
+  var albumAdding = {};
+  function albumAdd(rec) {
+    var item = albumItem(rec.item_id);
+    if (!item || !currentUser || albumAdding[item.id]) return Promise.resolve(false);
+    albumAdding[item.id] = true;
+    var isWord = item.k === "w";
+    var table = isWord ? "words" : "phrases";
+    var col = isWord ? "word" : "phrase";
+    var toData = isWord ? rowToWord : rowToPhrase;
+    var notes = item.gloss ? ("= " + item.gloss + "." + (item.note ? " " + item.note : "")) : (item.note || "");
+    var row = isWord
+      ? { word: item.es, definition: item.def, part_of_speech: item.pos || "sustantivo", gender: item.g || "", notes: notes, example: item.ex || "" }
+      : { phrase: item.es, definition: item.def, function: item.fn || "otro", register: item.reg || "coloquial", idiomatic: !!item.idio, literal: item.lit || "", notes: notes, example: item.ex || "" };
+    var inserted = false;
+    return supabaseClient.from(table).select("*").then(function (res) {
+      if (res.error) throw res.error;
+      var have = (res.data || []).filter(function (r) { return norm(r[col] || "") === norm(item.es); })[0];
+      if (have) return toData(have).data;
+      return supabaseClient.from(table).insert(row).select().single().then(function (ins) {
+        if (ins.error) throw ins.error;
+        inserted = true;
+        return toData(ins.data).data;
+      });
+    }).then(function (data) {
+      return findOrCreateListByName(ALBUM_LIST_NAME).then(function (lr) {
+        if (lr.error) throw lr.error;
+        return addImportSnapshotsToList(lr.id, isWord ? "word" : "phrase", [data]);
+      });
+    }).then(function (r) {
+      if (r && r.error) throw r.error;
+      delete albumAdding[item.id];
+      if (inserted) { if (isWord) loadWords(); else loadPhrases(); }
+      loadLists();
+      if (rec._add) { delete rec._add; rewardsSaveLocal(); }
+      return true;
+    }).catch(function (err) {
+      delete albumAdding[item.id];
+      console.warn("[jugar] couldn't add " + item.es + " yet (will retry):", err && err.message);
+      return false;
+    });
+  }
+
+  // A new reward: the next album item, stored, sent, added to your content
+  // and shown. Each reason can only be won once.
+  function rewardEarn(reason) {
+    if (!currentUser || rewardHas(reason)) return null;
+    var item = albumNextItem();
+    var rec = { id: practiceUuid(), user_id: currentUser.id, reason: reason, item_id: item ? item.id : null, earned_at: new Date().toISOString(), _send: true, _add: !!item };
+    rewardsState.list.push(rec);
+    rewardsSaveLocal();
+    rewardsFlush();
+    if (item) albumAdd(rec);
+    showReward(rec, false);
+    if (el.playPanel && !el.playPanel.hidden) renderPlay();
+    return rec;
+  }
+
+  // Racha rewards: every multiple of 7 in the current racha that hasn't
+  // been won yet. The reason names the racha's first day, so a new racha
+  // can win its 7 again.
+  function playCheckRacha() {
+    if (!playHistoryReady() || !rewardsState.loaded || rewardsState.userId !== currentUser.id) return;
+    var st = playStreak(playDayCounts(practiceAllRows()), playGoal, progToday());
+    if (!st.cur || st.start === null) return;
+    for (var m = PLAY_RACHA_STEP; m <= st.cur; m += PLAY_RACHA_STEP) rewardEarn("racha:" + playDayStr(st.start) + ":" + m);
+  }
+
+  // ---- in a deck ----
+  function playDeckStart() {
+    if (practiceSession) practiceSession.play = { seen: {}, n: 0, combo: 0, best: 0 };
+    renderFlashCombo();
+    if (!currentUser) return;
+    loadPracticeHistory(false);
+    if (!rewardsState.loaded || rewardsState.userId !== currentUser.id) loadRewards();
+  }
+  // Called for every card closed in a deck: maybe today's goal was just
+  // reached and the racha hit a multiple of 7.
+  function playAfterRow(row) {
+    if (!row || !playCounted(row) || !playHistoryReady()) return;
+    var today = progToday();
+    var n = 0;
+    practiceAllRows().forEach(function (r) { if (playCounted(r) && progDayNum(r.shown_at) === today) n++; });
+    if (n >= playGoal) playCheckRacha();
+  }
+  // A Hablar result came back. Counts the automatic grade only.
+  function playOnSpeech(card, result) {
+    var live = practiceSession && practiceSession.play;
+    if (!live || !card || !result) return;
+    var key = practiceSession.pass + "|" + practiceCardKey(card);
+    if (live.seen[key]) return; // this card already counted Bien in this pass
+    if (result.auto_grade === "bien") {
+      live.seen[key] = true;
+      live.n++; live.combo++;
+      if (live.combo > live.best) live.best = live.combo;
+      var day = playDayStr(progToday());
+      PLAY_SESSION_STEPS.forEach(function (s) { if (live.n === s) rewardEarn("hablar" + s + ":" + day); });
+      if (live.combo === PLAY_COMBO) rewardEarn("combo" + PLAY_COMBO + ":" + day);
+    } else if (result.auto_grade === "otra") {
+      live.combo = 0;
+    }
+    renderFlashCombo();
+  }
+  // "×7" in the deck's top bar once two or more Bien in a row in Hablar.
+  function renderFlashCombo() {
+    if (!el.flashCombo) return;
+    var live = practiceSession && practiceSession.play;
+    var n = live ? live.combo : 0;
+    el.flashCombo.hidden = n < 2 || el.flashOverlay.hidden;
+    el.flashCombo.textContent = "";
+    if (n < 2) return;
+    el.flashCombo.appendChild(progEl("b", null, "×" + n));
+    el.flashCombo.appendChild(document.createTextNode(" " + t("play_combo_hud")));
+    el.flashCombo.setAttribute("aria-label", t("play_combo_aria", { n: n }));
+  }
+
+  // ---- labels ----
+  function rewardParse(reason) {
+    var m = /^racha:(\d{4}-\d{2}-\d{2}):(\d+)$/.exec(reason || "");
+    if (m) return { kind: "racha", n: parseInt(m[2], 10) };
+    m = /^hablar(\d+):/.exec(reason || "");
+    if (m) return { kind: "hablar", n: parseInt(m[1], 10) };
+    m = /^combo(\d+):/.exec(reason || "");
+    if (m) return { kind: "combo", n: parseInt(m[1], 10) };
+    return { kind: "otro", n: 0 };
+  }
+  function rewardHow(reason) { var p = rewardParse(reason); return t("play_how_" + p.kind, { n: p.n }); }
+  function rewardKicker(reason) { var p = rewardParse(reason); return t("play_kick_" + p.kind, { n: p.n }); }
+  function albumMeaning(item) { return currentLang === "es" ? (item.gloss || item.def) : item.def; }
+
+  // ---- the reward screen ----
+  function showReward(rec, view) {
+    rewardScreens.push({ rec: rec, view: !!view });
+    if (!rewardShowing) nextReward();
+  }
+  function nextReward() {
+    rewardShowing = rewardScreens.shift() || null;
+    if (!rewardShowing) { el.rewardOverlay.hidden = true; document.body.classList.remove("reward-open"); return; }
+    renderReward();
+    el.rewardOverlay.hidden = false;
+    document.body.classList.add("reward-open");
+    try { el.rewardGo.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function renderReward() {
+    var s = rewardShowing;
+    if (!s) return;
+    var rec = s.rec;
+    var item = albumItem(rec.item_id);
+    el.rewardKicker.textContent = s.view ? rewardHow(rec.reason) + " · " + new Date(rec.earned_at).toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { day: "numeric", month: "long" }) : rewardKicker(rec.reason);
+    el.rewardWord.textContent = item ? item.es : t("play_album_done_title");
+    el.rewardGloss.textContent = item ? albumMeaning(item) : t("play_album_done_text");
+    el.rewardExample.textContent = item && item.ex ? "«" + item.ex + "»" : "";
+    el.rewardExample.hidden = !(item && item.ex);
+    el.rewardNote.textContent = item && item.note ? item.note : "";
+    el.rewardNote.hidden = !(item && item.note);
+    el.rewardWhere.textContent = "";
+    if (item) {
+      var parts = t(item.k === "w" ? "play_added_word" : "play_added_phrase", { list: ALBUM_LIST_NAME }).split(/\*\*/);
+      parts.forEach(function (p, i) { el.rewardWhere.appendChild(i % 2 ? progEl("b", null, p) : document.createTextNode(p)); });
+    }
+    el.rewardWhere.hidden = !item;
+    el.rewardListen.hidden = !item;
+    el.rewardMsg.textContent = "";
+    var inDeck = !el.flashOverlay.hidden;
+    el.rewardGo.textContent = s.view ? t("close") : (inDeck ? t("play_keep_playing") : t("play_to_album"));
+  }
+  function closeReward(toAlbum) {
+    if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} }
+    var s = rewardShowing;
+    if (toAlbum && s && !s.view && el.flashOverlay.hidden) { setMainTab("play"); openAlbum(true); }
+    nextReward();
+  }
+
+  // ---- the tab ----
+  function renderPlay() {
+    if (!el.playPanel || el.playPanel.hidden) return;
+    el.playHome.hidden = albumOpen;
+    el.playAlbum.hidden = !albumOpen;
+    if (!currentUser) { el.playRacha.textContent = ""; return; }
+    var m = playModel();
+    if (albumOpen) { drawAlbum(); return; }
+    drawRacha(m);
+    drawPlayToday(m);
+    drawAlbumEntry();
+  }
+  function openAlbum(open) {
+    albumOpen = !!open;
+    renderPlay();
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+
+  function drawRacha(m) {
+    var box = el.playRacha;
+    box.innerHTML = "";
+    var top = progEl("div", "play-racha-top");
+    var n = progEl("div", "play-racha-n", String(m.cur));
+    n.appendChild(progEl("span", null, t(m.cur === 1 ? "play_days_one" : "play_days")));
+    top.appendChild(n);
+    top.appendChild(progEl("div", "play-racha-goal" + (m.todayMet ? " is-met" : ""), t(m.todayMet ? "play_today_met" : "play_today", { n: m.today, goal: playGoal })));
+    box.appendChild(top);
+
+    var week = progEl("div", "play-week");
+    var letters = t("prog_days").split(",");
+    var start = progWeekStartDay();
+    var counts = null;
+    for (var i = 0; i < 7; i++) {
+      var d = start + i;
+      var cls = "";
+      if (d === m.todayDay) cls = m.todayMet ? "on today" : "today";
+      else if (d < m.todayDay) {
+        if (!counts) counts = playDayCounts(practiceAllRows());
+        if ((counts[d] || 0) >= playGoal) cls = "on";
+        else if (m.free[d]) cls = "free";
+      }
+      var cell = progEl("div", "play-day");
+      var dot = progEl("i", cls || null);
+      if (cls.indexOf("free") !== -1) dot.title = t("play_free_day");
+      cell.appendChild(dot);
+      cell.appendChild(progEl("span", null, letters[i]));
+      week.appendChild(cell);
+    }
+    box.appendChild(week);
+
+    var track = progEl("div", "prog-track play-track");
+    var fill = progEl("i", "l");
+    fill.style.width = Math.min(100, Math.round(100 * m.today / playGoal)) + "%";
+    track.appendChild(fill);
+    box.appendChild(track);
+
+    var next = progEl("p", "play-next");
+    var left = Math.max(0, playGoal - m.today);
+    var msg;
+    if (!m.todayMet) msg = t((m.cur ? "play_next_keep" : "play_next_start") + (left === 1 ? "_one" : ""), { n: left });
+    else { var toGo = PLAY_RACHA_STEP - (m.cur % PLAY_RACHA_STEP); msg = t(toGo === 1 ? "play_next_reward_one" : "play_next_reward", { n: toGo }); }
+    msg.split(/\*\*/).forEach(function (p, i) { next.appendChild(i % 2 ? progEl("b", null, p) : document.createTextNode(p)); });
+    box.appendChild(next);
+
+    var goalRow = progEl("div", "play-goal-row");
+    goalRow.appendChild(progEl("span", "play-goal-label", t("play_goal_label")));
+    var tog = progEl("div", "lang-toggle play-goal-toggle");
+    PLAY_GOALS.forEach(function (g) {
+      var b = progEl("button", "lang-option" + (g === playGoal ? " active" : ""), String(g));
+      b.type = "button";
+      b.setAttribute("aria-pressed", g === playGoal ? "true" : "false");
+      b.addEventListener("click", function () { setPlayGoal(g); });
+      tog.appendChild(b);
+    });
+    goalRow.appendChild(tog);
+    box.appendChild(goalRow);
+    box.appendChild(progEl("p", "play-fine", t("play_racha_rule")));
+  }
+
+  function drawPlayToday(m) {
+    var box = el.playToday;
+    box.innerHTML = "";
+    box.appendChild(progEl("h3", null, t("play_today_title")));
+    box.appendChild(progEl("p", "prog-sub", t("play_today_sub")));
+    var day = playDayStr(m.todayDay);
+    var rows = [
+      [t("play_goal_session", { n: PLAY_SESSION_STEPS[0] }), m.sessions.todayBien, PLAY_SESSION_STEPS[0], "hablar" + PLAY_SESSION_STEPS[0] + ":" + day],
+      [t("play_goal_session", { n: PLAY_SESSION_STEPS[1] }), m.sessions.todayBien, PLAY_SESSION_STEPS[1], "hablar" + PLAY_SESSION_STEPS[1] + ":" + day],
+      [t("play_goal_combo", { n: PLAY_COMBO }), m.sessions.todayCombo, PLAY_COMBO, "combo" + PLAY_COMBO + ":" + day]
+    ];
+    var list = progEl("div", "play-goals");
+    rows.forEach(function (r) {
+      var won = rewardHas(r[3]);
+      var line = progEl("div", "play-goal" + (won ? " is-won" : ""));
+      line.appendChild(progEl("span", "play-goal-name", r[0]));
+      line.appendChild(progEl("span", "play-goal-val", won ? t("play_won_today") : Math.min(r[1], r[2]) + " / " + r[2]));
+      var tr = progEl("div", "prog-track");
+      var f = progEl("i", "l");
+      f.style.width = (won ? 100 : Math.min(100, Math.round(100 * r[1] / r[2]))) + "%";
+      tr.appendChild(f);
+      line.appendChild(tr);
+      list.appendChild(line);
+    });
+    box.appendChild(list);
+    var go = progButton(t("play_speak_btn"), true, function () {
+      setFlashMode("hablar");
+      setMainTab("flashcards");
+      try { window.scrollTo({ top: 0 }); } catch (e) {}
+    });
+    go.disabled = quietMode;
+    box.appendChild(go);
+    if (quietMode) box.appendChild(progEl("p", "play-fine", t("play_quiet_note")));
+  }
+
+  function drawAlbumEntry() {
+    var b = el.playAlbumEntry;
+    var n = Object.keys(albumEarnedIds()).length;
+    el.playAlbumEntryText.textContent = t("play_album_entry", { n: n, total: ALBUM.length });
+    b.setAttribute("aria-label", t("play_album_title") + ". " + el.playAlbumEntryText.textContent);
+  }
+
+  function drawAlbum() {
+    var earned = rewardsForUser().filter(function (r) { return albumItem(r.item_id); });
+    var seen = {};
+    earned = earned.filter(function (r) { if (seen[r.item_id]) return false; seen[r.item_id] = true; return true; });
+    el.playAlbumDesc.textContent = t("play_album_desc", { n: earned.length, total: ALBUM.length, list: ALBUM_LIST_NAME });
+    var grid = el.playAlbumGrid;
+    grid.innerHTML = "";
+    earned.forEach(function (r) {
+      var item = albumItem(r.item_id);
+      var tile = progEl("button", "album-tile");
+      tile.type = "button";
+      tile.appendChild(progEl("b", null, item.es));
+      tile.appendChild(progEl("span", null, albumMeaning(item) + " · " + rewardHow(r.reason)));
+      tile.addEventListener("click", function () { showReward(r, true); });
+      grid.appendChild(tile);
+    });
+    var left = ALBUM.length - earned.length;
+    // fill the last row, plus one more row of "?"
+    var locked = Math.min(left, earned.length % 3 ? (3 - earned.length % 3) + 3 : 6);
+    for (var i = 0; i < locked; i++) {
+      var lk = progEl("div", "album-tile is-locked", "?");
+      lk.setAttribute("aria-hidden", "true");
+      grid.appendChild(lk);
+    }
+    el.playAlbumLeft.textContent = left ? t("play_album_left", { n: left }) : t("play_album_done_text");
+    var how = el.playAlbumHow;
+    how.innerHTML = "";
+    [[t("play_rule_racha", { a: PLAY_RACHA_STEP, b: 2 * PLAY_RACHA_STEP, c: 3 * PLAY_RACHA_STEP })],
+     [t("play_rule_session", { a: PLAY_SESSION_STEPS[0], b: PLAY_SESSION_STEPS[1] })],
+     [t("play_rule_combo", { n: PLAY_COMBO })]].forEach(function (r) {
+      how.appendChild(progEl("span", null, r[0]));
+      how.appendChild(progEl("span", "plus", "+1"));
+    });
+    el.playAlbumFine.textContent = t("play_rule_fine");
+  }
+
+  // ---- Progreso: the "Jugar" card ----
+  function drawPlayCard() {
+    if (!currentUser) return null;
+    var m = playModel();
+    var c = progCard(t("nav_play"));
+    var stats = progEl("div", "play-stats");
+    [[t(m.cur === 1 ? "play_stat_days_one" : "play_stat_days", { n: m.cur }), t("play_stat_racha", { n: m.best })],
+     [String(m.sessions.longest), t("play_stat_longest")],
+     [String(m.sessions.bestCombo), t("play_stat_combo")],
+     [t("play_stat_album_n", { n: Object.keys(albumEarnedIds()).length, total: ALBUM.length }), t("play_stat_album")]
+    ].forEach(function (s) {
+      var x = progEl("div");
+      x.appendChild(progEl("b", null, s[0]));
+      x.appendChild(progEl("span", null, s[1]));
+      stats.appendChild(x);
+    });
+    c.appendChild(stats);
+    c.appendChild(progButton(t("play_go_btn"), false, function () { setMainTab("play"); try { window.scrollTo({ top: 0 }); } catch (e) {} }));
+    return c;
+  }
+
+  // Test/debug hook.
+  window.vosePlay = {
+    album: ALBUM, streak: playStreak, sessions: playSessionStats, dayStr: playDayStr, weekOf: playWeekOf,
+    rewards: function () { return rewardsForUser().slice(); }, goal: function () { return playGoal; },
+    earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech
+  };
+
   // ================= Progreso + Tu historial (2026-10-03) =================
   // Everything here is computed on the device from the practice log (see
   // "Practice log" above): the server's rows, plus whatever is still queued
@@ -7556,7 +8396,7 @@
   var PROG_GRID_DAYS = 60;
   var PROG_DECK_MAX = 40;
   var HISTORY_OPEN_KEY = "iv-history-open";
-  var PROG_COLS = "id,session_id,shown_at,item_kind,item_key,form_key,mode,direction,pass,grade,flipped,ms_to_flip,ms_front,ms_back";
+  var PROG_COLS = "id,session_id,shown_at,item_kind,item_key,form_key,mode,direction,pass,grade,grade_auto,flipped,ms_to_flip,ms_front,ms_back";
   var PROG_GRID_TENSES = ["presente", "preterito", "imperfecto", "futuro", "condicional", "subjPresente", "subjPasado", "imperativo"];
   var PROG_GRID_PERSONS = ["yo", "vos", "el", "nosotros", "ellos"];
 
@@ -7805,6 +8645,7 @@
       intro.appendChild(progEl("p", "prog-text", t("prog_intro_text")));
       body.appendChild(intro);
       if (P.rows.length) body.appendChild(drawWeek(P));
+      if (P.rows.length) { var pc0 = drawPlayCard(); if (pc0) body.appendChild(pc0); }
       var lb = drawListBars(P, idx);
       if (lb) body.appendChild(lb);
       var tb0 = drawTopicBars();
@@ -7813,6 +8654,8 @@
     }
     body.appendChild(drawDue(P, unitList));
     body.appendChild(drawWeek(P));
+    var pc = drawPlayCard();
+    if (pc) body.appendChild(pc);
     var st = drawStruggles(P, unitList, idx);
     if (st) body.appendChild(st);
     var grid = drawVerbGrid(P);
@@ -8293,6 +9136,7 @@
     if (selectedPhraseId) renderItemHistory("phrase");
     if (el.topicsPanel && !el.topicsPanel.hidden) renderTopicList();
     if (selectedTopicId) renderItemHistory("topic");
+    if (el.playPanel && !el.playPanel.hidden) renderPlay();
   }
 
   // ================= Sabido (self-assessed "I know this one") =================
@@ -10142,6 +10986,7 @@
       loadWords();
       loadPhrases();
       loadLists();
+      loadRewards();
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
@@ -10547,6 +11392,18 @@
   el.tabLists.addEventListener("click", function () { setMainTab("lists"); });
   el.tabProgress.addEventListener("click", function () { setMainTab("progress"); });
   el.tabTopics.addEventListener("click", function () { setMainTab("topics"); });
+  el.tabPlay.addEventListener("click", function () { setMainTab("play"); });
+  el.playAlbumEntry.addEventListener("click", function () { openAlbum(true); });
+  el.playAlbumBack.addEventListener("click", function () { openAlbum(false); });
+  el.rewardGo.addEventListener("click", function () { closeReward(true); });
+  el.rewardClose.addEventListener("click", function () { closeReward(false); });
+  el.rewardListen.addEventListener("click", function () {
+    var item = rewardShowing && albumItem(rewardShowing.rec.item_id);
+    if (item) playTts(item.es, el.rewardListen, el.rewardMsg);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !el.rewardOverlay.hidden) closeReward(false);
+  });
   el.toggleAddList.addEventListener("click", openListForm);
   el.listFormCancel.addEventListener("click", closeListForm);
   el.listForm.addEventListener("submit", handleListSubmit);
@@ -10604,6 +11461,7 @@
     else if (saved === "lists") setMainTab("lists");
     else if (saved === "progress") setMainTab("progress");
     else if (saved === "topics") setMainTab("topics");
+    else if (saved === "play") setMainTab("play");
   })();
 
   // A ?share=TOKEN link opens the share preview via the public get_shared_list

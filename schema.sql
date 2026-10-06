@@ -1105,3 +1105,55 @@ update public.lists set owner_label = split_part(owner_label, '@', 1) where owne
 alter table public.practice_log drop constraint if exists practice_log_item_kind_check;
 alter table public.practice_log add constraint practice_log_item_kind_check
   check (item_kind in ('verb', 'word', 'phrase', 'topic'));
+
+-- ---------------------------------------------------------------------------
+-- Jugar (2026-10-06): la racha and the album.
+--
+-- user_settings.daily_goal: the racha's daily goal (cards per day). The app
+-- offers 10 / 20 / 30 / 50; null means the default (20). Until this column
+-- exists the goal is kept on each device.
+alter table public.user_settings add column if not exists daily_goal integer;
+alter table public.user_settings drop constraint if exists user_settings_daily_goal_check;
+alter table public.user_settings add constraint user_settings_daily_goal_check
+  check (daily_goal is null or daily_goal between 5 and 200);
+
+-- rewards: one row per reward won. `reason` says what won it and is unique
+-- per person, so the same reward can't be counted twice (two devices, a
+-- retry):
+--   racha:<first day of the racha>:<days>   e.g. racha:2026-10-01:7
+--   hablar50:<day> / hablar100:<day>          50 / 100 Bien in one Hablar session
+--   combo20:<day>                            20 Bien in a row in Hablar
+-- `item_id` is the album item it unlocked (the ids are in app.js's ALBUM);
+-- null once the album is complete. The item itself is added to the
+-- person's own words / phrases and to their list «Álbum» by the app.
+-- New kinds of reward (Contrarreloj records, challenges) will widen the
+-- reason check below.
+create table if not exists public.rewards (
+  id uuid primary key,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  reason text not null,
+  item_id text,
+  earned_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  unique (user_id, reason)
+);
+alter table public.rewards drop constraint if exists rewards_reason_check;
+alter table public.rewards add constraint rewards_reason_check
+  check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2})$');
+alter table public.rewards drop constraint if exists rewards_item_id_check;
+alter table public.rewards add constraint rewards_item_id_check
+  check (item_id is null or item_id ~ '^[a-z0-9-]{1,40}$');
+
+alter table public.rewards enable row level security;
+
+drop policy if exists "select own rewards" on public.rewards;
+create policy "select own rewards" on public.rewards
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "insert own rewards" on public.rewards;
+create policy "insert own rewards" on public.rewards
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "delete own rewards" on public.rewards;
+create policy "delete own rewards" on public.rewards
+  for delete using (auth.uid() = user_id);

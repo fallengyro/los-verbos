@@ -102,6 +102,7 @@
       <button type="button" class="main-tab" id="tab-phrases" data-i18n="nav_phrases">Frases</button>
       <button type="button" class="main-tab" id="tab-topics" data-i18n="nav_topics">Temas</button>
       <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
+      <button type="button" class="main-tab" id="tab-play" data-i18n="nav_play">Jugar</button>
       <button type="button" class="main-tab" id="tab-progress" data-i18n="nav_progress">Progreso</button>
       <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
     </div>
@@ -756,6 +757,34 @@
   <!-- Progreso (2026-10-03): built from the practice log (schema.sql's
        practice_log). Every section ends in something to practice. Rendered
        by app.js's renderProgress(). -->
+  <!-- Jugar (2026-10-06): la racha, today's Hablar rewards, and the album.
+       Partida, Contrarreloj and Te reto will be rows here later. See app.js's
+       "Jugar" section. -->
+  <section id="play-panel" class="play-panel" hidden>
+    <div id="play-home">
+      <div class="play-racha" id="play-racha"></div>
+      <div class="prog-card play-today" id="play-today"></div>
+      <button type="button" class="play-album-entry" id="play-album-entry">
+        <span class="play-album-entry-t"><b data-i18n="play_album_title">Tu álbum</b><span id="play-album-entry-text"></span></span>
+        <span class="play-chev" aria-hidden="true">&rsaquo;</span>
+      </button>
+    </div>
+    <section class="detail play-album" id="play-album" hidden>
+      <button type="button" class="icon-btn play-album-back" id="play-album-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 data-i18n="play_album_title">Tu álbum</h2>
+          <p class="definition" id="play-album-desc"></p>
+        </div>
+      </div>
+      <div class="album-grid" id="play-album-grid"></div>
+      <p class="play-fine" id="play-album-left"></p>
+      <p class="flash-group-label" data-i18n="play_album_how">Cómo se ganan</p>
+      <div class="album-how" id="play-album-how"></div>
+      <p class="play-fine" id="play-album-fine"></p>
+    </section>
+  </section>
+
   <section id="progress-panel" class="progress-panel" hidden>
     <div id="progress-body" class="prog"></div>
   </section>
@@ -1000,6 +1029,7 @@
          picked in Settings (id="settings-voice-elena"/"-tomas") rather than
          here — see app.js's setTtsVoice()/TTS_VOICES. -->
     <span class="flash-tally" id="flash-tally" hidden></span>
+    <span class="flash-combo" id="flash-combo" hidden></span>
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
@@ -1074,6 +1104,25 @@
   <div class="flash-controls">
     <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>
     <button type="button" class="btn-primary" id="flash-next-btn" data-i18n="flash_next">Siguiente &rsaquo;</button>
+  </div>
+</div>
+<!-- A reward (Jugar, 2026-10-06): what you just won, over whatever is on
+     screen — mid-deck it says "Seguir jugando" and the deck carries on.
+     Also shows an album item you tap. -->
+<div class="reward-overlay" id="reward-overlay" role="dialog" aria-modal="true" aria-labelledby="reward-word" hidden>
+  <div class="reward-box">
+    <button type="button" class="icon-btn reward-close" id="reward-close"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
+    <p class="reward-kicker" id="reward-kicker"></p>
+    <p class="reward-word" id="reward-word"></p>
+    <p class="reward-gloss" id="reward-gloss"></p>
+    <p class="reward-example" id="reward-example"></p>
+    <p class="reward-note" id="reward-note" hidden></p>
+    <p class="reward-where" id="reward-where"></p>
+    <div class="reward-actions">
+      <button type="button" class="btn-secondary" id="reward-listen" data-i18n="play_listen">Escuchar</button>
+      <button type="button" class="btn-primary" id="reward-go">Seguir jugando</button>
+    </div>
+    <p class="form-msg" id="reward-msg"></p>
   </div>
 </div>
 
