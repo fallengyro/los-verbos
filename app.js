@@ -251,8 +251,6 @@
       nav_progress: "Progreso",
       nav_topics: "Temas",
       topics_intro: "Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.",
-      topic_badge_gen: "generado",
-      topic_badge_n: "{n} oraciones",
       topic_what: "¿Qué practicar?",
       topic_start: "Practicar",
       topic_count: "{n} tarjetas",
@@ -745,8 +743,6 @@
       nav_progress: "Progress",
       nav_topics: "Topics",
       topics_intro: "Topics for drilling one thing. They don't add anything to your verbs, vocabulary or phrases.",
-      topic_badge_gen: "generated",
-      topic_badge_n: "{n} sentences",
       topic_what: "What to practise?",
       topic_start: "Practise",
       topic_count: "{n} cards",
@@ -2258,7 +2254,6 @@
     topicDetail: document.getElementById("topic-detail"),
     tdName: document.getElementById("td-name"),
     tdDesc: document.getElementById("td-desc"),
-    tdBadges: document.getElementById("td-badges"),
     tdLesson: document.getElementById("td-lesson"),
     tdRangesWrap: document.getElementById("td-ranges-wrap"),
     tdRanges: document.getElementById("td-ranges"),
@@ -7236,9 +7231,9 @@
       btn.type = "button";
       btn.className = "card-row topic-row" + (tp.id === selectedTopicId ? " is-selected" : "");
       btn.dataset.topicId = tp.id;
+      // No badges (mason, 2026-10-06): the level only sets the order, and
+      // "generated" vs "sentences" is an implementation detail.
       btn.appendChild(progEl("span", "inf", topicText(tp.name)));
-      if (tp.level) btn.appendChild(badge("level", tp.level));
-      btn.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
       btn.appendChild(progEl("span", "def", topicText(tp.desc)));
       if (ready) btn.appendChild(topicTrack(topicStats(tp)));
       btn.addEventListener("click", function () {
@@ -7302,9 +7297,6 @@
     selectedTopicId = id;
     el.tdName.textContent = topicText(tp.name);
     el.tdDesc.textContent = topicText(tp.desc);
-    el.tdBadges.innerHTML = "";
-    if (tp.level) el.tdBadges.appendChild(badge("level", tp.level));
-    el.tdBadges.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
     // the lesson
     el.tdLesson.innerHTML = "";
     tp.lesson.forEach(function (ln) {
