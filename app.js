@@ -251,6 +251,47 @@
       nav_progress: "Progreso",
       nav_topics: "Temas",
       nav_play: "Jugar",
+      pt_name: "Partida",
+      pt_row_def: "Sin fin: lo que te toca repasar, lo que te cuesta, cosas nuevas y temas. Cada tarjeta sube de Leer a Escuchar a Hablar a medida que la sabés.",
+      pt_row_def_quiet: "Sin fin. Con el modo silencio activado, todas las tarjetas quedan en Leer.",
+      pt_row_stat: "más larga: {cards} · combo: {best}",
+      pt_row_stat_cards: "más larga: {cards}",
+      pt_soon: "pronto",
+      pt_crono_name: "Contrarreloj",
+      pt_crono_def: "60 segundos, todas las que puedas.",
+      pt_reto_name: "Te reto",
+      pt_reto_def: "La misma tanda para los dos.",
+      pt_nothing: "Todavía no hay nada para jugar: agregá verbos, palabras o frases, o practicá un tema.",
+      pt_end: "Terminar",
+      pt_why_due: "Para repasar",
+      pt_why_hard: "Te cuesta",
+      pt_why_new: "Nueva",
+      pt_why_topic: "Tema",
+      pt_why_up: "Sube",
+      pt_why_again: "Otra vez",
+      pt_why_back: "Vuelve",
+      pt_note_up: "**Bien** → vuelve en unas tarjetas, en **{mode}**",
+      pt_note_done: "**Bien** → lista por esta partida",
+      pt_note_down: "**Otra vez** → vuelve pronto, en **{mode}**",
+      pt_note_again: "**Otra vez** → vuelve pronto",
+      pt_sum_title: "Partida terminada",
+      pt_sum_title_good: "¡Buena partida!",
+      pt_sum_today: "Hoy: {n} de {goal} tarjetas",
+      pt_sum_today_met: "Hoy: {n} de {goal} ✓ · racha de {days} días",
+      pt_sum_today_met_one: "Hoy: {n} de {goal} ✓ · racha de 1 día",
+      pt_sum_cards: "tarjetas",
+      pt_sum_min: "jugando",
+      pt_sum_bien: "bien",
+      pt_sum_best: "Bien seguidos hablando",
+      pt_sum_ladder: "Dónde quedaron",
+      pt_sum_ladder_note: "{n} llegaron a {mode} en esta partida.",
+      pt_sum_ladder_note_one: "1 llegó a {mode} en esta partida.",
+      pt_sum_ladder_note_zero: "Ninguna llegó a {mode} todavía: dale un rato más.",
+      pt_sum_ladder_quiet: "Modo silencio: todas quedaron en Leer.",
+      pt_sum_missed: "Te costaron",
+      pt_sum_review: "Repasar estas {n}",
+      pt_sum_review_one: "Repasar esta",
+      pt_sum_won: "Ganaste",
       play_combo_hud: "seguidos",
       play_combo_aria: "{n} Bien seguidos",
       play_how_racha: "racha {n}",
@@ -799,6 +840,47 @@
       nav_progress: "Progress",
       nav_topics: "Topics",
       nav_play: "Play",
+      pt_name: "Game",
+      pt_row_def: "Endless: what's due, what you've been missing, new things and topics. Each card climbs from Read to Listen to Speak as you get it.",
+      pt_row_def_quiet: "Endless. With quiet mode on, every card stays in Read.",
+      pt_row_stat: "longest: {cards} · run: {best}",
+      pt_row_stat_cards: "longest: {cards}",
+      pt_soon: "soon",
+      pt_crono_name: "Against the clock",
+      pt_crono_def: "60 seconds, as many as you can.",
+      pt_reto_name: "Challenge",
+      pt_reto_def: "The same cards for both of you.",
+      pt_nothing: "Nothing to play yet: add some verbs, words or phrases, or practise a topic.",
+      pt_end: "Finish",
+      pt_why_due: "Due",
+      pt_why_hard: "Tricky",
+      pt_why_new: "New",
+      pt_why_topic: "Topic",
+      pt_why_up: "Up",
+      pt_why_again: "Again",
+      pt_why_back: "Back",
+      pt_note_up: "**Got it** → back in a few cards, in **{mode}**",
+      pt_note_done: "**Got it** → done for this game",
+      pt_note_down: "**Again** → back soon, in **{mode}**",
+      pt_note_again: "**Again** → back soon",
+      pt_sum_title: "Game over",
+      pt_sum_title_good: "Good game!",
+      pt_sum_today: "Today: {n} of {goal} cards",
+      pt_sum_today_met: "Today: {n} of {goal} ✓ · {days}-day streak",
+      pt_sum_today_met_one: "Today: {n} of {goal} ✓ · 1-day streak",
+      pt_sum_cards: "cards",
+      pt_sum_min: "playing",
+      pt_sum_bien: "got it",
+      pt_sum_best: "Bien in a row speaking",
+      pt_sum_ladder: "Where they ended up",
+      pt_sum_ladder_note: "{n} reached {mode} this game.",
+      pt_sum_ladder_note_one: "1 reached {mode} this game.",
+      pt_sum_ladder_note_zero: "None reached {mode} yet: give it a bit longer.",
+      pt_sum_ladder_quiet: "Quiet mode: they all stayed in Read.",
+      pt_sum_missed: "These cost you",
+      pt_sum_review: "Review these {n}",
+      pt_sum_review_one: "Review this one",
+      pt_sum_won: "You won",
       play_combo_hud: "in a row",
       play_combo_aria: "{n} Bien in a row",
       play_how_racha: "{n}-day streak",
@@ -2388,6 +2470,12 @@
     rewardGo: document.getElementById("reward-go"),
     rewardMsg: document.getElementById("reward-msg"),
     flashCombo: document.getElementById("flash-combo"),
+    playModes: document.getElementById("play-modes"),
+    playMsg: document.getElementById("play-msg"),
+    ptWhy: document.getElementById("pt-why"),
+    ptNote: document.getElementById("pt-note"),
+    ptSummary: document.getElementById("pt-summary"),
+    flashHintLine: document.getElementById("flash-hint-line"),
     topicsPanel: document.getElementById("topics-panel"),
     topicList: document.getElementById("topic-list"),
     topicDetail: document.getElementById("topic-detail"),
@@ -5570,12 +5658,13 @@
     var token = ++flashAutoToken;
     if (listen) {
       setTimeout(function () { autoPlayFlash(card.audio, el.flashListenBtn, token); }, 200);
-    } else if (flashAutoPlayOn() && card.frontSpeak && !card.speak) {
+    } else if (deckAutoPlayOn() && card.frontSpeak && !card.speak) {
       setTimeout(function () { autoPlayFlash(card.frontSpeak, el.flashFrontSpeak, token); }, 200);
     }
     el.flashProgress.textContent = (flashIndex + 1) + " / " + flashDeck.length;
     el.flashPrevBtn.disabled = flashIndex === 0;
     el.flashArrowPrev.disabled = flashIndex === 0;
+    renderPartidaFaces(card);
     // force layout so the un-flip above is actually painted before we
     // re-enable the transition on the next frame
     void el.flashCard.offsetWidth;
@@ -5699,6 +5788,9 @@
   // (Leer) cards. Quiet mode wins over both.
   function effectiveFlashMode() { return quietMode ? "leer" : flashMode; }
   function flashAutoPlayOn() { return !quietMode && (effectiveFlashMode() === "escuchar" || flashAutoPlay); }
+  // In a Partida each card has its own mode, so Leer cards follow just the
+  // "Reproducir el audio solo" switch.
+  function deckAutoPlayOn() { return ptActive() ? (!quietMode && flashAutoPlay) : flashAutoPlayOn(); }
 
   function renderFlashModeControls() {
     if (!el.flashModeRead) return;
@@ -5945,7 +6037,7 @@
     flashDeckSource = source || "setup";
     if (flashAutoPlayOn()) unlockTtsAudio();
     if (cards.some(function (c) { return c.speak; })) hablarPrepareMic(); // inside the tap, so iOS asks for the mic here
-    flashDeck = shuffleArray(cards);
+    flashDeck = flashDeckSource === "partida" ? cards : shuffleArray(cards); // Partida keeps its own order
     flashIndex = 0;
     el.flashOverlay.classList.remove("is-done");
     // only the card itself flips to the opposite theme — the overlay's
@@ -5962,7 +6054,9 @@
   function nextFlashCard() {
     if (!flashDeck.length) return;
     hablarAbort();
+    var leaving = flashDeck[flashIndex];
     practiceCloseView();
+    if (ptActive()) { ptOnLeave(leaving); ptEnsureAhead(PT_AHEAD); } // Partida never reaches the end
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
@@ -5998,6 +6092,7 @@
     practiceFlush();
     el.flashOverlay.hidden = true;
     el.flashOverlay.classList.remove("is-done");
+    ptEnd();
     renderFlashCombo();
     refreshPracticeViews();
   }
@@ -6009,7 +6104,7 @@
     // Leer + audio automático: the back's Spanish plays as it turns over
     // (Escuchar already played it on the front; its back has a speaker).
     var card = flashDeck[flashIndex];
-    if (card && !card.listen && el.flashCard.classList.contains("flipped") && flashAutoPlayOn() && card.backSpeak) {
+    if (card && !card.listen && el.flashCard.classList.contains("flipped") && deckAutoPlayOn() && card.backSpeak) {
       autoPlayFlash(card.backSpeak, el.flashBackSpeak, flashAutoToken);
     }
   }
@@ -6125,7 +6220,7 @@
         item_key: practiceNorm(d.infinitive || d.word || d.phrase || d.topic),
         form_key: card.formKey || null,
         mode: card.listen ? "escuchar" : (card.speak ? "hablar" : "leer"),
-        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : (card.kind === "topic" ? "topic" : (card.speak ? "def2word" : flashDirection))),
+        direction: card.listen ? "audio" : (card.kind === "verb" ? "inf2form" : (card.kind === "topic" ? "topic" : (card.speak ? "def2word" : (card.dir || flashDirection)))),
         pass: practiceSession.pass,
         position: practiceSession.position,
         revisit: !!practiceSession.seen[key],
@@ -6258,12 +6353,14 @@
     el.flashGradeBien.setAttribute("aria-pressed", g === "bien" ? "true" : "false");
     el.flashGradeOtra.tabIndex = shown ? 0 : -1;
     el.flashGradeBien.tabIndex = shown ? 0 : -1;
+    renderPartidaNote(card);
   }
 
   // "5 bien · 1 otra vez" in the top bar, for this deck so far; hidden until
   // the first grade.
   function renderFlashTally() {
     if (!el.flashTally) return;
+    if (ptActive()) { el.flashTally.hidden = true; return; } // Partida: the counts are in its summary
     var b = practiceTallyBase.bien, o = practiceTallyBase.otra;
     flashDeck.forEach(function (c) { if (c._grade === "bien") b++; else if (c._grade === "otra") o++; });
     el.flashTally.hidden = !(b || o);
@@ -7532,7 +7629,10 @@
   // The deck: generated topics mix in what's been giving you trouble (up
   // to a quarter of the deck) with fresh values from the chosen ranges;
   // packs put due / missed sentences first, then ones not seen yet.
-  function buildTopicDeck(tp) {
+  function buildTopicDeck(tp) { return progModeCards(buildTopicCards(tp)); }
+  // A topic's cards (as plain Leer cards): the deck Practicar starts, and
+  // what Partida draws its topic cards from.
+  function buildTopicCards(tp) {
     var st = topicStats(tp);
     var cards = [], seen = {};
     function add(key) { if (seen[key] || cards.length >= TOPIC_DECK_SIZE) return; var c = topicCard(tp, key); if (c) { seen[key] = true; cards.push(c); } }
@@ -7557,7 +7657,7 @@
       });
       first.concat(unseen, rest).forEach(add);
     }
-    return progModeCards(cards);
+    return cards;
   }
   function startTopicDeck() {
     var tp = topicById(selectedTopicId);
@@ -8064,6 +8164,7 @@
     var rec = { id: practiceUuid(), user_id: currentUser.id, reason: reason, item_id: item ? item.id : null, earned_at: new Date().toISOString(), _send: true, _add: !!item };
     rewardsState.list.push(rec);
     rewardsSaveLocal();
+    if (ptActive()) partida.rewards.push(rec);
     rewardsFlush();
     if (item) albumAdd(rec);
     showReward(rec, false);
@@ -8195,6 +8296,7 @@
     var m = playModel();
     if (albumOpen) { drawAlbum(); return; }
     drawRacha(m);
+    drawPlayModes();
     drawPlayToday(m);
     drawAlbumEntry();
   }
@@ -8368,8 +8470,467 @@
   window.vosePlay = {
     album: ALBUM, streak: playStreak, sessions: playSessionStats, dayStr: playDayStr, weekOf: playWeekOf,
     rewards: function () { return rewardsForUser().slice(); }, goal: function () { return playGoal; },
-    earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech
+    earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech,
+    partida: function () { return partida; }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
   };
+
+  // ================= Partida (2026-10-06) =================
+  // The first game on the Jugar tab (mockup partida_maqueta.png; mason:
+  // "a ladder per card", "everything + Temas", "endless + summary").
+  //   · One endless deck. New cards are drawn as you go: what's due for
+  //     review, what you've missed lately, things you've never practised,
+  //     and every PT_TOPIC_EVERY-th card a Tema you've practised.
+  //   · Each card sits on a rung — Leer (0), Escuchar (1), Hablar (2). It
+  //     starts where its history puts it (Progreso's review box: 0 → Leer,
+  //     1–2 → Escuchar, 3+ → Hablar). Bien sends it back a few cards later
+  //     one rung up; Otra vez sends it back sooner, one rung down; Bien on
+  //     the top rung retires it for this game. A swipe with no grade sends
+  //     it back later on the same rung.
+  //   · Quiet mode keeps every card in Leer (Bien retires it); without a
+  //     microphone the top rung is Escuchar.
+  //   · A quiet tag on the front says why the card came up and in which
+  //     mode; the hint line under the card says where a grade sends it.
+  //   · Terminar shows a summary (cards, time, % Bien, best run, where the
+  //     cards ended up, the ones you missed, what you won); Seguir jugando
+  //     picks the same game back up.
+  // Every card is logged like any other card, so Progreso, the racha and
+  // the Hablar rewards all see it.
+  var PT_AHEAD = 9;          // cards kept queued ahead of the current one
+  var PT_UP_MIN = 5, PT_UP_MAX = 8;  // Bien → back this many cards later
+  var PT_DOWN = 3;           // Otra vez → back this soon
+  var PT_SAME = 10;          // no grade → back this much later
+  var PT_TOPIC_EVERY = 8;
+  var PT_PATTERN = ["due", "hard", "new", "due", "new", "due", "hard"];
+  var PT_RECORDS_KEY = "iv-partidas";
+  var PT_RECORDS_MAX = 50;
+  var partida = null;
+
+  function ptTop() { return quietMode ? 0 : (hablarSupported() ? 2 : 1); }
+  function ptRungName(r) { return t(r === 2 ? "flash_mode_speak" : (r === 1 ? "flash_mode_listen" : "flash_mode_read")); }
+  function ptRungFromBox(box) { return box >= PROG_LEARNED_BOX ? 2 : (box >= 1 ? 1 : 0); }
+
+  // One unit's card on a rung. A ref is { kind, data, formKey } (topics:
+  // { kind: "topic", tp, formKey }).
+  function ptCardFor(ref, rung, why) {
+    var base;
+    var dir = rung === 2 ? "def2word" : "word2def";
+    if (ref.kind === "topic") base = topicCard(ref.tp, ref.formKey);
+    else if (ref.kind === "verb") base = verbCards(ref.data, function (fk) { return fk === ref.formKey; })[0];
+    else if (ref.kind === "word") base = wordCard(ref.data, dir);
+    else base = phraseCard(ref.data, dir);
+    if (!base) return null;
+    var card = rung === 2 ? speakCard(base) : (rung === 1 ? listenCard(base) : Object.assign({}, base));
+    card.dir = ref.kind === "word" || ref.kind === "phrase" ? dir : null;
+    card._pt = { ref: ref, rung: rung, why: why, unit: practiceCardKey(card) };
+    return card;
+  }
+
+  // ---- what goes in ----
+  function ptBuildPools() {
+    var P = computeProgress(practiceAllRows());
+    var idx = progContentIndex();
+    var since = P.today - PROG_STRUGGLE_DAYS + 1;
+    var pools = { due: [], hard: [], new: [], seen: [] };
+    var used = {};
+    var units = Object.keys(P.units).map(function (k) { return P.units[k]; });
+    var tensesUsed = {};
+    function refFor(u) {
+      if (u.kind === "topic") { var tp = topicById(u.itemKey); return tp && u.formKey ? { kind: "topic", tp: tp, formKey: u.formKey } : null; }
+      var item = progUnitItem(idx, u);
+      if (!item) return null;
+      if (u.kind === "verb") {
+        if (!u.formKey) return null;
+        if (!verbCards(item.data, function (fk) { return fk === u.formKey; }).length) return null;
+        return { kind: "verb", data: item.data, formKey: u.formKey };
+      }
+      return { kind: u.kind, data: item.data, formKey: null };
+    }
+    function push(pool, u, why) {
+      if (used[u.key]) return;
+      var ref = refFor(u);
+      if (!ref) return;
+      used[u.key] = true;
+      pools[pool].push({ ref: ref, rung: ptRungFromBox(u.box), why: why });
+    }
+    units.forEach(function (u) { if (u.kind === "verb" && u.formKey) tensesUsed[String(u.formKey).split("|")[0]] = true; });
+    // Topic cards come in through their own rotation (ptTopicPools), so
+    // the pools below are your collection only.
+    var mine = units.filter(function (u) { return u.kind !== "topic"; });
+    // Missed lately first (they're usually due too, and "te cuesta" says
+    // more), then the rest of what's due, oldest first.
+    shuffleArray(mine.filter(function (u) {
+      return !u.learned && u.events.some(function (e) { return e.day >= since && e.grade === "otra"; });
+    })).forEach(function (u) { push("hard", u, "hard"); });
+    shuffleArray(mine.filter(function (u) { return u.due; }))
+      .sort(function (a, b) { return a.dueDay - b.dueDay; })
+      .forEach(function (u) { push("due", u, "due"); });
+    // never practised: words and phrases, and one form per verb (a tense
+    // you already practise, presente if none)
+    var tenses = Object.keys(tensesUsed);
+    if (!tenses.length) tenses = ["presente"];
+    var fresh = [];
+    allWords.forEach(function (w) { if (!P.items["word|" + practiceNorm(w.data.word)]) fresh.push({ kind: "word", data: w.data, formKey: null }); });
+    allPhrases.forEach(function (ph) { if (!P.items["phrase|" + practiceNorm(ph.data.phrase)]) fresh.push({ kind: "phrase", data: ph.data, formKey: null }); });
+    allVerbs.forEach(function (v) {
+      if (P.items["verb|" + practiceNorm(v.data.infinitive)]) return;
+      var forms = verbCards(v.data, function (fk) { return tenses.indexOf(String(fk).split("|")[0]) !== -1; });
+      if (!forms.length) forms = verbCards(v.data, function () { return true; });
+      if (forms.length) fresh.push({ kind: "verb", data: v.data, formKey: forms[Math.floor(Math.random() * forms.length)].formKey });
+    });
+    shuffleArray(fresh).forEach(function (ref) { pools.new.push({ ref: ref, rung: 0, why: "new" }); });
+    // everything else you've practised, least recently seen first
+    mine.slice()
+      .sort(function (a, b) { return (a.last ? a.last.at : 0) - (b.last ? b.last.at : 0); })
+      .forEach(function (u) { push("seen", u, "back"); });
+    pools.topics = ptTopicPools(P);
+    pools.P = P;
+    return pools;
+  }
+  // The topics you've practised, each with a queue of its own cards.
+  function ptTopicPools(P) {
+    var ids = {};
+    Object.keys(P.items).forEach(function (k) { var it = P.items[k]; if (it.kind === "topic" && topicById(it.key)) ids[it.key] = true; });
+    // TOPICS is already in A1 → B1 order
+    return TOPICS.filter(function (tp) { return ids[tp.id]; }).map(function (tp) { return { tp: tp, queue: [] }; });
+  }
+  function ptHasContent(pools) {
+    return pools.due.length + pools.hard.length + pools.new.length + pools.seen.length + pools.topics.length > 0;
+  }
+
+  // ---- the queue ----
+  function ptUpcomingUnits() {
+    var u = {};
+    for (var i = Math.max(0, flashIndex - 3); i < flashDeck.length; i++) { var c = flashDeck[i]; if (c && c._pt) u[c._pt.unit] = true; }
+    return u;
+  }
+  function ptTake(pool, skip) {
+    var list = partida.pools[pool];
+    while (list.length) {
+      var e = list.shift();
+      var c = ptCardFor(e.ref, Math.min(e.rung, ptTop()), e.why);
+      if (!c || skip[c._pt.unit] || (partida.units[c._pt.unit] && partida.units[c._pt.unit].retired)) continue;
+      return c;
+    }
+    return null;
+  }
+  function ptTakeTopic(skip) {
+    var tps = partida.pools.topics;
+    for (var tries = 0; tries < tps.length; tries++) {
+      var tq = tps[partida.topicN++ % tps.length];
+      for (var guard = 0; guard < 3; guard++) {
+        if (!tq.queue.length) tq.queue = buildTopicCards(tq.tp).map(function (c) { return c.formKey; });
+        if (!tq.queue.length) break;
+        var key = tq.queue.shift();
+        var u = partida.pools.P.units[unitKey("topic", tq.tp.id, key)];
+        var c = ptCardFor({ kind: "topic", tp: tq.tp, formKey: key }, Math.min(u ? ptRungFromBox(u.box) : 0, ptTop()), "topic");
+        if (c && !skip[c._pt.unit]) return c;
+      }
+    }
+    return null;
+  }
+  // The next new card for the queue: a topic every PT_TOPIC_EVERY, else
+  // the pattern (due / hard / new), falling back to whatever is left.
+  function ptDrawFresh() {
+    var skip = ptUpcomingUnits();
+    var n = partida.freshN++;
+    var c = null;
+    if (partida.pools.topics.length && n % PT_TOPIC_EVERY === PT_TOPIC_EVERY - 1) c = ptTakeTopic(skip);
+    if (!c) {
+      var first = PT_PATTERN[n % PT_PATTERN.length];
+      [first, "due", "hard", "new", "seen"].some(function (p) { c = ptTake(p, skip); return !!c; });
+    }
+    if (!c && partida.pools.topics.length) c = ptTakeTopic(skip);
+    if (!c) {
+      // Everything has been played: start over with what this game saw.
+      var again = Object.keys(partida.units).map(function (k) { return partida.units[k]; }).filter(function (s) { return !skip[s.unit]; });
+      if (!again.length || partida.refills > 50) return null;
+      partida.refills++;
+      again.forEach(function (s) { s.retired = false; partida.pools.seen.push({ ref: s.ref, rung: s.rung, why: "back" }); });
+      shuffleArray(partida.pools.seen);
+      c = ptTake("seen", skip);
+    }
+    if (c) ptNote(c);
+    return c;
+  }
+  // What the game knows about a unit: its rung and whether it's done.
+  function ptNote(c) {
+    var s = partida.units[c._pt.unit];
+    if (!s) s = partida.units[c._pt.unit] = { unit: c._pt.unit, ref: c._pt.ref, rung: c._pt.rung, startRung: c._pt.rung, retired: false, label: ptLabel(ptCardFor(c._pt.ref, 0, "x") || c) };
+    return s;
+  }
+  function ptEnsureAhead(n) {
+    while (flashDeck.length - 1 - flashIndex < n) {
+      var c = ptDrawFresh();
+      if (!c) break;
+      flashDeck.push(c);
+    }
+  }
+  // Leaving a card going forward: where its grade sends it. Leaving it
+  // again (after swiping back) replaces the return it scheduled before,
+  // as long as that return hasn't been shown yet.
+  function ptOnLeave(card) {
+    var pt = card && card._pt;
+    if (!pt || !partida) return;
+    var s = ptNote(card);
+    if (card._ptReturn) {
+      var at = flashDeck.indexOf(card._ptReturn, flashIndex + 1);
+      if (at === -1) return; // already played
+      flashDeck.splice(at, 1);
+      card._ptReturn = null;
+    }
+    var top = ptTop();
+    var g = card._grade;
+    var rung, offset, why;
+    if (g === "bien") {
+      if (pt.rung >= top) { s.rung = top; s.retired = true; s.reachedTop = true; return; }
+      rung = pt.rung + 1; offset = PT_UP_MIN + Math.floor(Math.random() * (PT_UP_MAX - PT_UP_MIN + 1)); why = "up";
+    } else if (g === "otra") {
+      rung = Math.max(0, pt.rung - 1); offset = PT_DOWN; why = "again";
+    } else {
+      rung = pt.rung; offset = PT_SAME; why = "back";
+    }
+    s.retired = false;
+    s.rung = rung;
+    if (rung >= top) s.reachedTop = true;
+    var next = ptCardFor(pt.ref, rung, why);
+    if (!next) return;
+    ptEnsureAhead(offset);
+    flashDeck.splice(Math.min(flashDeck.length, flashIndex + offset), 0, next);
+    card._ptReturn = next;
+  }
+
+  // ---- starting, stopping ----
+  function ptStart() {
+    if (!currentUser || partida) return;
+    // inside the tap, so iOS allows the audio and asks for the mic here
+    if (!quietMode) { unlockTtsAudio(); hablarPrepareMic(); }
+    el.playMsg.textContent = "";
+    loadPracticeHistory(false).then(function () {
+      var pools = ptBuildPools();
+      if (!ptHasContent(pools)) { el.playMsg.textContent = t("pt_nothing"); return; }
+      partida = { id: practiceUuid(), started: Date.now(), pools: pools, units: {}, freshN: 0, topicN: 0, refills: 0, rewards: [], record: null };
+      flashDeck = []; flashIndex = 0;
+      ptEnsureAhead(PT_AHEAD);
+      if (!flashDeck.length) { partida = null; el.playMsg.textContent = t("pt_nothing"); return; }
+      openFlashDeck(flashDeck.slice(), "partida");
+      // kept on the game, since closing the deck clears the session
+      partida.sessionId = practiceSession ? practiceSession.id : null;
+      partida.play = practiceSession ? practiceSession.play : null;
+    });
+  }
+  function ptActive() { return !!partida && !el.flashOverlay.hidden; }
+
+  // Terminar: the summary (the game stays open behind it).
+  function ptShowSummary() {
+    hablarAbort();
+    practiceCloseView();
+    practiceFlush();
+    var cur = flashDeck[flashIndex];
+    if (cur && cur._pt) ptOnLeave(cur);
+    partida.paused = true;
+    ptSaveRecord();
+    drawPtSummary();
+    el.flashOverlay.classList.add("is-summary");
+    el.flashProgress.textContent = "";
+    renderFlashCombo();
+    ptRenderClose();
+  }
+  function ptResume() {
+    partida.paused = false;
+    el.flashOverlay.classList.remove("is-summary");
+    ptEnsureAhead(PT_AHEAD);
+    flashIndex = Math.min(flashIndex + 1, flashDeck.length - 1);
+    ptEnsureAhead(PT_AHEAD);
+    renderFlashCard();
+    practiceOpenView(flashDeck[flashIndex]);
+    renderFlashCombo();
+    ptRenderClose();
+  }
+  // Called from closeFlashcards().
+  function ptEnd() {
+    if (!partida) return;
+    ptSaveRecord();
+    partida = null;
+    el.flashOverlay.classList.remove("is-summary");
+    ptRenderClose();
+    if (el.playPanel && !el.playPanel.hidden) renderPlay();
+  }
+  function ptRenderClose() {
+    var lab = el.flashCloseBtn && el.flashCloseBtn.querySelector("[data-i18n]");
+    if (lab) lab.textContent = t(partida && !partida.paused && !el.flashOverlay.hidden ? "pt_end" : "close");
+  }
+
+  // ---- the numbers ----
+  function ptStats() {
+    var played = flashDeck.slice(0, flashIndex + 1).filter(function (c) { return c && c._pt; });
+    var bien = 0, otra = 0, missed = {}, missedOrder = [];
+    played.forEach(function (c) {
+      if (c._grade === "bien") bien++;
+      else if (c._grade === "otra") {
+        otra++;
+        if (!missed[c._pt.unit]) { missed[c._pt.unit] = true; missedOrder.push(c._pt.unit); }
+      }
+    });
+    var sid = partida.sessionId;
+    var ms = 0, cards = 0;
+    practiceAllRows().forEach(function (r) { if (r.session_id === sid) { ms += (r.ms_front || 0) + (r.ms_back || 0); cards++; } });
+    var rungs = [0, 0, 0], upTop = 0;
+    Object.keys(partida.units).forEach(function (k) {
+      var s = partida.units[k];
+      if (!played.some(function (c) { return c._pt.unit === k; })) return;
+      rungs[Math.min(2, s.rung)]++;
+      if (s.reachedTop && s.startRung < ptTop()) upTop++;
+    });
+    var live = partida.play;
+    return { cards: Math.max(cards, played.length), ms: ms, bien: bien, otra: otra, missed: missedOrder, rungs: rungs, upTop: upTop, best: live ? live.best : 0 };
+  }
+  function ptLabel(c) {
+    var d = c.data || {};
+    if (c.kind === "verb") { var who = String(c.frontSub || "").split(" · ")[0]; return c.backMain + (who ? " · " + who : ""); }
+    if (c.kind === "topic") { var s = String(c.backMain || c.backSpeak || ""); return s.length > 30 ? s.slice(0, 29) + "…" : s; }
+    return d.word || d.phrase || c.backMain || "";
+  }
+
+  // On this device: one record per game, for the Partida row.
+  function ptRecords() { try { return JSON.parse(localStorage.getItem(PT_RECORDS_KEY) || "[]") || []; } catch (e) { return []; } }
+  function ptSaveRecord() {
+    if (!partida || !currentUser) return;
+    var st = ptStats();
+    if (!st.cards) return;
+    var all = ptRecords().filter(function (r) { return r.id !== partida.id; });
+    all.push({ id: partida.id, user: currentUser.id, at: new Date(partida.started).toISOString(), cards: st.cards, best: st.best, ms: st.ms });
+    if (all.length > PT_RECORDS_MAX) all = all.slice(all.length - PT_RECORDS_MAX);
+    try { localStorage.setItem(PT_RECORDS_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  function ptBest() {
+    var uid = currentUser ? currentUser.id : null;
+    var out = { cards: 0, best: 0, n: 0 };
+    ptRecords().forEach(function (r) { if (r.user !== uid) return; out.n++; if (r.cards > out.cards) out.cards = r.cards; if (r.best > out.best) out.best = r.best; });
+    return out;
+  }
+
+  // ---- on the card ----
+  // Called at the end of renderFlashCard().
+  function renderPartidaFaces(card) {
+    var on = ptActive() && card && card._pt;
+    el.ptWhy.hidden = !on;
+    if (!on) { el.ptNote.hidden = true; el.flashHintLine.hidden = false; return; }
+    el.flashTally.hidden = true; // the summary has the counts
+    el.flashKnownToggle.style.display = "none";
+    el.ptWhy.textContent = "";
+    var why = card._pt.why;
+    var lead = why === "topic" ? t("pt_why_topic") + " · " + topicText(card._pt.ref.tp.name) : t("pt_why_" + why);
+    el.ptWhy.appendChild(progEl("b", null, lead));
+    el.ptWhy.appendChild(document.createTextNode(" · " + ptRungName(card._pt.rung)));
+    el.flashProgress.textContent = String(flashIndex + 1);
+    ptRenderClose();
+    renderPartidaNote(card);
+  }
+  // The hint line: where this card's grade sends it.
+  function renderPartidaNote(card) {
+    if (!ptActive() || !card || !card._pt || card !== flashDeck[flashIndex]) return;
+    var g = card._grade;
+    el.flashHintLine.hidden = !!g;
+    el.ptNote.hidden = !g;
+    el.ptNote.textContent = "";
+    if (!g) return;
+    var top = ptTop(), r = card._pt.rung, msg;
+    if (g === "bien") msg = r >= top ? t("pt_note_done") : t("pt_note_up", { mode: ptRungName(r + 1) });
+    else msg = r > 0 ? t("pt_note_down", { mode: ptRungName(r - 1) }) : t("pt_note_again");
+    msg.split(/\*\*/).forEach(function (p, i) { el.ptNote.appendChild(i % 2 ? progEl("b", g === "otra" ? "o" : null, p) : document.createTextNode(p)); });
+  }
+
+  // ---- the summary ----
+  function drawPtSummary() {
+    var box = el.ptSummary;
+    box.innerHTML = "";
+    var st = ptStats();
+    var m = playModel();
+    box.appendChild(progEl("h2", null, t(st.cards >= 20 ? "pt_sum_title_good" : "pt_sum_title")));
+    box.appendChild(progEl("p", "pt-sum-sub", t(m.todayMet ? (m.cur === 1 ? "pt_sum_today_met_one" : "pt_sum_today_met") : "pt_sum_today", { n: m.today, goal: playGoal, days: m.cur })));
+    var stats = progEl("div", "prog-stats");
+    var graded = st.bien + st.otra;
+    [[String(st.cards), t("pt_sum_cards")],
+     [progNum(Math.max(1, Math.round(st.ms / 60000))) + " min", t("pt_sum_min")],
+     [graded ? Math.round(100 * st.bien / graded) + "%" : "—", t("pt_sum_bien")],
+     [st.best ? "×" + st.best : "—", t("pt_sum_best")]].forEach(function (s) {
+      var x = progEl("div"); x.appendChild(progEl("b", null, s[0])); x.appendChild(progEl("span", null, s[1])); stats.appendChild(x);
+    });
+    box.appendChild(stats);
+    // where the cards ended up
+    var top = ptTop();
+    var blk = progEl("div", "pt-blk");
+    blk.appendChild(progEl("p", "pt-lab", t("pt_sum_ladder")));
+    var lad = progEl("div", "pt-ladder");
+    var total = st.rungs[0] + st.rungs[1] + st.rungs[2] || 1;
+    [0, 1, 2].forEach(function (r) {
+      if (r > top) return;
+      lad.appendChild(progEl("span", null, ptRungName(r)));
+      var bar = progEl("span", "pt-bar"); var f = progEl("i"); f.style.width = Math.round(100 * st.rungs[r] / total) + "%"; bar.appendChild(f); lad.appendChild(bar);
+      lad.appendChild(progEl("span", "pt-n", String(st.rungs[r])));
+    });
+    blk.appendChild(lad);
+    blk.appendChild(progEl("p", "play-fine", top === 0 ? t("pt_sum_ladder_quiet") : t(st.upTop === 0 ? "pt_sum_ladder_note_zero" : (st.upTop === 1 ? "pt_sum_ladder_note_one" : "pt_sum_ladder_note"), { n: st.upTop, mode: ptRungName(top) })));
+    box.appendChild(blk);
+    // the ones that cost you
+    if (st.missed.length) {
+      var mb = progEl("div", "pt-blk");
+      mb.appendChild(progEl("p", "pt-lab", t("pt_sum_missed")));
+      var chips = progEl("div", "pt-chips");
+      st.missed.slice(0, 12).forEach(function (k) { chips.appendChild(progEl("span", null, partida.units[k].label)); });
+      mb.appendChild(chips);
+      var n = st.missed.length;
+      mb.appendChild(progButton(t(n === 1 ? "pt_sum_review_one" : "pt_sum_review", { n: n }), false, function () {
+        var cards = st.missed.map(function (k) { var s = partida.units[k]; return ptCardFor(s.ref, Math.min(s.rung, ptTop()), "again"); }).filter(Boolean);
+        cards.forEach(function (c) { delete c._pt; });
+        closeFlashcards();
+        startPracticeDeck(cards);
+      }));
+      box.appendChild(mb);
+    }
+    // what you won
+    var won = partida.rewards.map(function (r) { return albumItem(r.item_id) ? r : null; }).filter(Boolean);
+    if (won.length) {
+      var wb = progEl("div", "pt-blk");
+      wb.appendChild(progEl("p", "pt-lab", t("pt_sum_won")));
+      won.forEach(function (r) {
+        var line = progEl("div", "pt-prize");
+        line.appendChild(progEl("b", null, albumItem(r.item_id).es));
+        line.appendChild(progEl("span", null, rewardHow(r.reason)));
+        wb.appendChild(line);
+      });
+      box.appendChild(wb);
+    }
+    var btns = progEl("div", "pt-btns");
+    btns.appendChild(progButton(t("close"), false, closeFlashcards));
+    var go = progButton(t("play_keep_playing"), true, ptResume);
+    btns.appendChild(go);
+    box.appendChild(btns);
+  }
+
+  // ---- the Jugar tab's list of games ----
+  function drawPlayModes() {
+    var ul = el.playModes;
+    ul.innerHTML = "";
+    var b = ptBest();
+    function row(name, stat, def, onClick) {
+      var li = document.createElement("li");
+      var btn = progEl("button", "card-row play-mode" + (onClick ? "" : " is-soon"));
+      btn.type = "button";
+      btn.appendChild(progEl("span", "inf", name));
+      if (stat) btn.appendChild(progEl("span", "stat", stat));
+      btn.appendChild(progEl("span", "def", def));
+      if (onClick) btn.addEventListener("click", onClick); else btn.disabled = true;
+      li.appendChild(btn);
+      ul.appendChild(li);
+      return btn;
+    }
+    var stat = b.n ? t(b.best ? "pt_row_stat" : "pt_row_stat_cards", { cards: b.cards, best: b.best }) : "";
+    var p = row(t("pt_name"), stat, t(quietMode ? "pt_row_def_quiet" : "pt_row_def"), ptStart);
+    p.id = "play-partida";
+    row(t("pt_crono_name"), t("pt_soon"), t("pt_crono_def"), null);
+    row(t("pt_reto_name"), t("pt_soon"), t("pt_reto_def"), null);
+  }
 
   // ================= Progreso + Tu historial (2026-10-03) =================
   // Everything here is computed on the device from the practice log (see
@@ -11317,7 +11878,8 @@
   el.flashDirDef.addEventListener("change", function () { if (el.flashDirDef.checked) flashDirection = "def2word"; });
   el.flashDirWord.addEventListener("change", function () { if (el.flashDirWord.checked) flashDirection = "word2def"; });
   el.flashStartBtn.addEventListener("click", startFlashcards);
-  el.flashCloseBtn.addEventListener("click", closeFlashcards);
+  // In a Partida, × is "Terminar": the summary first (closing is from there).
+  el.flashCloseBtn.addEventListener("click", function () { if (ptActive() && !partida.paused) ptShowSummary(); else closeFlashcards(); });
   // stopPropagation on both speaker buttons — without it, a tap would also
   // bubble up to el.flashCard's own click listener (toggleFlashFlip) below
   // and flip the card at the same time as playing the audio.

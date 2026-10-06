@@ -763,6 +763,9 @@
   <section id="play-panel" class="play-panel" hidden>
     <div id="play-home">
       <div class="play-racha" id="play-racha"></div>
+      <!-- The games (Partida; Contrarreloj and Te reto to come). -->
+      <ul class="card-list play-modes" id="play-modes"></ul>
+      <p class="form-msg play-msg" id="play-msg"></p>
       <div class="prog-card play-today" id="play-today"></div>
       <button type="button" class="play-album-entry" id="play-album-entry">
         <span class="play-album-entry-t"><b data-i18n="play_album_title">Tu álbum</b><span id="play-album-entry-text"></span></span>
@@ -1039,6 +1042,8 @@
         <button type="button" class="flash-speak-btn" id="flash-front-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
         <!-- Temas, choice packs: the two options ("ya · todavía"). -->
         <div class="flash-listen-tag topic-front-tag" id="flash-topic-tag" hidden></div>
+        <!-- Partida: why this card came up, and in which mode. -->
+        <div class="pt-why" id="pt-why" hidden></div>
         <div class="flash-prompt-main" id="flash-front-main"></div>
         <div class="flash-prompt-sub" id="flash-front-sub"></div>
         <!-- Context for a definition → Spanish card (2026-10-05): the item's
@@ -1080,6 +1085,8 @@
   <!-- Shown instead of the card once a pass ends with nothing left for the
        next one (every card removed by its tab's Sabido chip). See
        nextFlashCard()/showFlashDone() in app.js. -->
+  <!-- Partida: the summary after Terminar. See app.js's "Partida" section. -->
+  <div class="pt-summary" id="pt-summary"></div>
   <div class="flash-done" id="flash-done">
     <p class="flash-done-title" data-i18n="flash_done_title">¡Listo!</p>
     <p class="flash-done-text" id="flash-done-text">Marcaste todas las tarjetas como sabidas.</p>
@@ -1100,7 +1107,9 @@
     <button type="button" class="known-toggle" id="flash-known-toggle" aria-pressed="false" data-i18n="known_toggle">Sabido</button>
   </div>
   <p class="form-msg flash-tts-msg" id="flash-tts-msg"></p>
-  <p class="flash-hint" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
+  <p class="flash-hint" id="flash-hint-line" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
+  <!-- Partida: where the grade sends this card (replaces the hint once graded). -->
+  <p class="flash-hint pt-note" id="pt-note" hidden></p>
   <div class="flash-controls">
     <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>
     <button type="button" class="btn-primary" id="flash-next-btn" data-i18n="flash_next">Siguiente &rsaquo;</button>
