@@ -251,6 +251,46 @@
       nav_progress: "Progreso",
       nav_topics: "Temas",
       nav_play: "Jugar",
+      cr_group_topics: "Temas",
+      cr_group_mine: "Tu colección",
+      cr_group_lists: "Tus listas",
+      cr_verbs: "Verbos · {tense}",
+      cr_verbs_sub: "{v} verbos · {f} formas",
+      cr_words_sub: "{n} palabras",
+      cr_words_sub_one: "1 palabra",
+      cr_phrases_sub: "{n} frases",
+      cr_phrases_sub_one: "1 frase",
+      cr_list_sub: "{n} ítems",
+      cr_list_sub_one: "1 ítem",
+      cr_a_list: "Una lista",
+      cr_no_record: "sin récord",
+      cr_desc: "60 segundos, todas las que puedas. Cada Otra vez te saca 3 segundos.",
+      cr_note_quiet: "Con el modo silencio activado, solo Leer.",
+      cr_note_hablar: "Lo decís en voz alta y pasa sola a la siguiente. Un récord nuevo en Hablar gana algo del álbum.",
+      cr_note_leer: "Bien u Otra vez pasan a la siguiente. Leer y Hablar tienen récords separados.",
+      cr_fine: "Un récord por cada tema y parte de tu colección, en cada modo. Las tarjetas cuentan para tu racha y tu progreso.",
+      cr_rules: "60 segundos. Cada Otra vez te saca 3.",
+      cr_your_record: "Tu récord: {n}",
+      cr_first_run: "Todavía sin récord: este es el primero.",
+      cr_start: "Empezar",
+      cr_hud_bien: " bien",
+      cr_quit: "Salir",
+      cr_hint_hablar: "Decilo · pasa sola a la siguiente",
+      cr_hint_leer: "Tocá la tarjeta para darla vuelta · Bien u Otra vez pasan a la siguiente",
+      cr_new_record: "¡Récord nuevo!",
+      cr_first_record: "Tu primer récord",
+      cr_time_up: "Se acabó el tiempo",
+      cr_end_sub: "bien en 60 segundos · {what} · {mode}",
+      cr_before: "antes: {n}",
+      cr_record_is: "tu récord: {n}",
+      cr_stat_otra: "otra vez",
+      cr_stat_skip: "sin nota",
+      cr_stat_combo: "seguidos",
+      cr_again: "Revancha",
+      cr_row_stat: "mejor: {n} · {what}",
+      play_how_crono: "récord en Contrarreloj",
+      play_kick_crono: "¡Récord nuevo en Contrarreloj!",
+      play_rule_crono: "Un récord nuevo en Contrarreloj (Hablar)",
       pt_name: "Partida",
       pt_row_def: "Sin fin: lo que te toca repasar, lo que te cuesta, cosas nuevas y temas. Cada tarjeta sube de Leer a Escuchar a Hablar a medida que la sabés.",
       pt_row_def_quiet: "Sin fin. Con el modo silencio activado, todas las tarjetas quedan en Leer.",
@@ -258,7 +298,7 @@
       pt_row_stat_cards: "más larga: {cards}",
       pt_soon: "pronto",
       pt_crono_name: "Contrarreloj",
-      pt_crono_def: "60 segundos, todas las que puedas.",
+      pt_crono_def: "60 segundos, todas las que puedas. Cada Otra vez te saca 3. Un récord por tema y por parte de tu colección.",
       pt_reto_name: "Te reto",
       pt_reto_def: "La misma tanda para los dos.",
       pt_nothing: "Todavía no hay nada para jugar: agregá verbos, palabras o frases, o practicá un tema.",
@@ -840,6 +880,46 @@
       nav_progress: "Progress",
       nav_topics: "Topics",
       nav_play: "Play",
+      cr_group_topics: "Topics",
+      cr_group_mine: "Your collection",
+      cr_group_lists: "Your lists",
+      cr_verbs: "Verbs · {tense}",
+      cr_verbs_sub: "{v} verbs · {f} forms",
+      cr_words_sub: "{n} words",
+      cr_words_sub_one: "1 word",
+      cr_phrases_sub: "{n} phrases",
+      cr_phrases_sub_one: "1 phrase",
+      cr_list_sub: "{n} items",
+      cr_list_sub_one: "1 item",
+      cr_a_list: "A list",
+      cr_no_record: "no record",
+      cr_desc: "60 seconds, as many as you can. Each Again costs you 3 seconds.",
+      cr_note_quiet: "With quiet mode on, Read only.",
+      cr_note_hablar: "You say it out loud and it moves on by itself. A new record in Speak wins something for the album.",
+      cr_note_leer: "Got it or Again moves on. Read and Speak keep separate records.",
+      cr_fine: "A record for each topic and part of your collection, in each mode. The cards count for your streak and your progress.",
+      cr_rules: "60 seconds. Each Again costs 3.",
+      cr_your_record: "Your record: {n}",
+      cr_first_run: "No record yet: this is the first.",
+      cr_start: "Start",
+      cr_hud_bien: " got it",
+      cr_quit: "Quit",
+      cr_hint_hablar: "Say it · it moves on by itself",
+      cr_hint_leer: "Tap the card to turn it over · Got it or Again moves on",
+      cr_new_record: "New record!",
+      cr_first_record: "Your first record",
+      cr_time_up: "Time's up",
+      cr_end_sub: "right in 60 seconds · {what} · {mode}",
+      cr_before: "before: {n}",
+      cr_record_is: "your record: {n}",
+      cr_stat_otra: "again",
+      cr_stat_skip: "no grade",
+      cr_stat_combo: "in a row",
+      cr_again: "Rematch",
+      cr_row_stat: "best: {n} · {what}",
+      play_how_crono: "Contrarreloj record",
+      play_kick_crono: "New Contrarreloj record!",
+      play_rule_crono: "A new Contrarreloj record (Speak)",
       pt_name: "Game",
       pt_row_def: "Endless: what's due, what you've been missing, new things and topics. Each card climbs from Read to Listen to Speak as you get it.",
       pt_row_def_quiet: "Endless. With quiet mode on, every card stays in Read.",
@@ -847,7 +927,7 @@
       pt_row_stat_cards: "longest: {cards}",
       pt_soon: "soon",
       pt_crono_name: "Against the clock",
-      pt_crono_def: "60 seconds, as many as you can.",
+      pt_crono_def: "60 seconds, as many as you can. Each Again costs 3. A record for each topic and part of your collection.",
       pt_reto_name: "Challenge",
       pt_reto_def: "The same cards for both of you.",
       pt_nothing: "Nothing to play yet: add some verbs, words or phrases, or practise a topic.",
@@ -2476,6 +2556,23 @@
     ptNote: document.getElementById("pt-note"),
     ptSummary: document.getElementById("pt-summary"),
     flashHintLine: document.getElementById("flash-hint-line"),
+    playCrono: document.getElementById("play-crono"),
+    crBack: document.getElementById("cr-back"),
+    crModeLeer: document.getElementById("cr-mode-leer"),
+    crModeHablar: document.getElementById("cr-mode-hablar"),
+    crModeNote: document.getElementById("cr-mode-note"),
+    crList: document.getElementById("cr-list"),
+    crBarWrap: document.getElementById("cr-bar-wrap"),
+    crBar: document.getElementById("cr-bar"),
+    crHud: document.getElementById("cr-hud"),
+    crClock: document.getElementById("cr-clock"),
+    crScore: document.getElementById("cr-score"),
+    crPen: document.getElementById("cr-pen"),
+    crGrade: document.getElementById("cr-grade"),
+    crOtra: document.getElementById("cr-otra"),
+    crBien: document.getElementById("cr-bien"),
+    crHint: document.getElementById("cr-hint"),
+    crPanel: document.getElementById("cr-panel"),
     topicsPanel: document.getElementById("topics-panel"),
     topicList: document.getElementById("topic-list"),
     topicDetail: document.getElementById("topic-detail"),
@@ -3670,7 +3767,8 @@
     }
     if (tab === "progress") renderProgress();
     if (tab === "play") {
-      albumOpen = false; // the tab always opens on its home; the album is one tap in
+      albumOpen = false; // the tab always opens on its home; the album and
+      cronoOpen = false; // Contrarreloj's list are one tap in
       renderPlay();
       if (currentUser) {
         loadPracticeHistory(false).then(function () { if (!el.playPanel.hidden) { renderPlay(); playCheckRacha(); } });
@@ -5666,6 +5764,7 @@
     el.flashPrevBtn.disabled = flashIndex === 0;
     el.flashArrowPrev.disabled = flashIndex === 0;
     renderPartidaFaces(card);
+    renderCronoFaces(card);
     // force layout so the un-flip above is actually painted before we
     // re-enable the transition on the next frame
     void el.flashCard.offsetWidth;
@@ -5791,7 +5890,7 @@
   function flashAutoPlayOn() { return !quietMode && (effectiveFlashMode() === "escuchar" || flashAutoPlay); }
   // In a Partida each card has its own mode, so Leer cards follow just the
   // "Reproducir el audio solo" switch.
-  function deckAutoPlayOn() { return ptActive() ? (!quietMode && flashAutoPlay) : flashAutoPlayOn(); }
+  function deckAutoPlayOn() { return ptActive() || crActive() ? (!quietMode && flashAutoPlay) : flashAutoPlayOn(); }
 
   function renderFlashModeControls() {
     if (!el.flashModeRead) return;
@@ -6038,7 +6137,7 @@
     flashDeckSource = source || "setup";
     if (flashAutoPlayOn()) unlockTtsAudio();
     if (cards.some(function (c) { return c.speak; })) hablarPrepareMic(); // inside the tap, so iOS asks for the mic here
-    flashDeck = flashDeckSource === "partida" ? cards : shuffleArray(cards); // Partida keeps its own order
+    flashDeck = flashDeckSource === "partida" || flashDeckSource === "crono" ? cards : shuffleArray(cards); // the games keep their own order
     flashIndex = 0;
     el.flashOverlay.classList.remove("is-done");
     // only the card itself flips to the opposite theme — the overlay's
@@ -6058,6 +6157,7 @@
     var leaving = flashDeck[flashIndex];
     practiceCloseView();
     if (ptActive()) { ptOnLeave(leaving); ptEnsureAhead(PT_AHEAD); } // Partida never reaches the end
+    if (crActive() && !crBeforeNext()) return; // Contrarreloj: time may be up
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
@@ -6077,7 +6177,7 @@
   }
 
   function prevFlashCard() {
-    if (flashIndex <= 0) return;
+    if (flashIndex <= 0 || crActive()) return; // no going back against the clock
     hablarAbort();
     practiceCloseView();
     flashIndex--;
@@ -6094,6 +6194,7 @@
     el.flashOverlay.hidden = true;
     el.flashOverlay.classList.remove("is-done");
     ptEnd();
+    crCleanup();
     renderFlashCombo();
     refreshPracticeViews();
   }
@@ -6361,7 +6462,7 @@
   // the first grade.
   function renderFlashTally() {
     if (!el.flashTally) return;
-    if (ptActive()) { el.flashTally.hidden = true; return; } // Partida: the counts are in its summary
+    if (ptActive() || crActive()) { el.flashTally.hidden = true; return; } // the games show their own counts
     var b = practiceTallyBase.bien, o = practiceTallyBase.otra;
     flashDeck.forEach(function (c) { if (c._grade === "bien") b++; else if (c._grade === "otra") o++; });
     el.flashTally.hidden = !(b || o);
@@ -6576,6 +6677,7 @@
       card._speech = result;
       if (result.auto_grade && !card._gradeTouched) card._grade = result.auto_grade;
       playOnSpeech(card, result);
+      crOnSpeech(card, result);
       if (practiceView && practiceView.card === card) practiceView.row.speech = Object.assign({}, result);
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden) return;
       renderSpeakState();
@@ -8166,6 +8268,7 @@
     rewardsState.list.push(rec);
     rewardsSaveLocal();
     if (ptActive()) partida.rewards.push(rec);
+    if (crActive()) crono.rewards.push(rec);
     rewardsFlush();
     if (item) albumAdd(rec);
     showReward(rec, false);
@@ -8239,6 +8342,7 @@
     if (m) return { kind: "hablar", n: parseInt(m[1], 10) };
     m = /^combo(\d+):/.exec(reason || "");
     if (m) return { kind: "combo", n: parseInt(m[1], 10) };
+    if (/^crono:/.test(reason || "")) return { kind: "crono", n: 0 };
     return { kind: "otro", n: 0 };
   }
   function rewardHow(reason) { var p = rewardParse(reason); return t("play_how_" + p.kind, { n: p.n }); }
@@ -8291,9 +8395,11 @@
   // ---- the tab ----
   function renderPlay() {
     if (!el.playPanel || el.playPanel.hidden) return;
-    el.playHome.hidden = albumOpen;
+    el.playHome.hidden = albumOpen || cronoOpen;
     el.playAlbum.hidden = !albumOpen;
+    el.playCrono.hidden = !cronoOpen;
     if (!currentUser) { el.playRacha.textContent = ""; return; }
+    if (cronoOpen) { drawCrono(); return; }
     var m = playModel();
     if (albumOpen) { drawAlbum(); return; }
     drawRacha(m);
@@ -8303,6 +8409,7 @@
   }
   function openAlbum(open) {
     albumOpen = !!open;
+    if (open) cronoOpen = false;
     renderPlay();
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
@@ -8439,7 +8546,8 @@
     how.innerHTML = "";
     [[t("play_rule_racha", { a: PLAY_RACHA_STEP, b: 2 * PLAY_RACHA_STEP, c: 3 * PLAY_RACHA_STEP })],
      [t("play_rule_session", { a: PLAY_SESSION_STEPS[0], b: PLAY_SESSION_STEPS[1] })],
-     [t("play_rule_combo", { n: PLAY_COMBO })]].forEach(function (r) {
+     [t("play_rule_combo", { n: PLAY_COMBO })],
+     [t("play_rule_crono")]].forEach(function (r) {
       how.appendChild(progEl("span", null, r[0]));
       how.appendChild(progEl("span", "plus", "+1"));
     });
@@ -8472,7 +8580,7 @@
     album: ALBUM, streak: playStreak, sessions: playSessionStats, dayStr: playDayStr, weekOf: playWeekOf,
     rewards: function () { return rewardsForUser().slice(); }, goal: function () { return playGoal; },
     earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech,
-    partida: function () { return partida; }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
+    partida: function () { return partida; }, crono: function () { return crono; }, crScopes: function () { return crScopes(); }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
   };
 
   // ================= Partida (2026-10-06) =================
@@ -8821,7 +8929,7 @@
     ptFlushRecords();
   }
   function ptRecordRow(r) {
-    return { id: r.id, user_id: r.user, game: "partida", started_at: r.at, cards: r.cards || 0, best: r.best || 0, ms: Math.round(r.ms || 0), bien: r.bien || 0, otra: r.otra || 0, updated_at: new Date().toISOString() };
+    return { id: r.id, user_id: r.user, game: r.game || "partida", scope: r.scope || null, started_at: r.at, cards: r.cards || 0, best: r.best || 0, ms: Math.round(r.ms || 0), bien: r.bien || 0, otra: r.otra || 0, updated_at: new Date().toISOString() };
   }
   function ptFlushRecords() {
     if (!currentUser || ptServer.flushing) return;
@@ -8841,7 +8949,7 @@
       if (ptServer.userId === uid) {
         waiting.forEach(function (w) {
           var have = ptServer.rows.find(function (x) { return x.id === w.id; });
-          if (have) { have.cards = w.cards; have.best = w.best; } else ptServer.rows.push({ id: w.id, cards: w.cards, best: w.best });
+          if (have) { have.cards = w.cards; have.best = w.best; } else ptServer.rows.push({ id: w.id, game: w.game || "partida", scope: w.scope || null, cards: w.cards, best: w.best });
         });
       }
       if (all.some(function (r) { return r.user === uid && !r.sent; })) ptFlushRecords();
@@ -8855,13 +8963,13 @@
     var uid = currentUser.id;
     if (ptServer.userId !== uid) ptServer = { userId: uid, rows: [], loaded: false, loading: null, flushing: false };
     if (ptServer.loading) return ptServer.loading;
-    ptServer.loading = supabaseClient.from("game_records").select("id,cards,best").eq("game", "partida").then(function (res) {
+    ptServer.loading = supabaseClient.from("game_records").select("id,game,scope,cards,best").then(function (res) {
       if (ptServer.userId !== uid) return;
       ptServer.loading = null;
       if (res && res.error) console.warn("[partida] records not loaded:", res.error.message);
       else { ptServer.rows = res.data || []; ptServer.loaded = true; }
       ptFlushRecords();
-      if (el.playPanel && !el.playPanel.hidden && !albumOpen) drawPlayModes();
+      if (el.playPanel && !el.playPanel.hidden) { if (cronoOpen) drawCrono(); else if (!albumOpen) drawPlayModes(); }
     }, function (err) {
       ptServer.loading = null;
       console.warn("[partida] records not loaded:", err && err.message);
@@ -8878,8 +8986,8 @@
       if (cards > out.cards) out.cards = cards;
       if (best > out.best) out.best = best;
     }
-    if (ptServer.userId === uid) ptServer.rows.forEach(function (r) { add(r.id, r.cards || 0, r.best || 0); });
-    ptRecords().forEach(function (r) { if (r.user === uid) add(r.id, r.cards || 0, r.best || 0); });
+    if (ptServer.userId === uid) ptServer.rows.forEach(function (r) { if ((r.game || "partida") === "partida") add(r.id, r.cards || 0, r.best || 0); });
+    ptRecords().forEach(function (r) { if (r.user === uid && (r.game || "partida") === "partida") add(r.id, r.cards || 0, r.best || 0); });
     return out;
   }
 
@@ -9002,8 +9110,424 @@
     var stat = b.n ? t(b.best ? "pt_row_stat" : "pt_row_stat_cards", { cards: b.cards, best: b.best }) : "";
     var p = row(t("pt_name"), stat, t(quietMode ? "pt_row_def_quiet" : "pt_row_def"), ptStart);
     p.id = "play-partida";
-    row(t("pt_crono_name"), t("pt_soon"), t("pt_crono_def"), null);
+    var cb = crBestOverall();
+    row(t("pt_crono_name"), cb.best ? t("cr_row_stat", { n: cb.best, what: crScopeName(String(cb.scope).replace(/^(leer|hablar):/, "")) }) : "", t("pt_crono_def"), function () { openCrono(true); }).id = "play-crono-row";
     row(t("pt_reto_name"), t("pt_soon"), t("pt_reto_def"), null);
+  }
+
+  // ================= Contrarreloj (2026-10-06) =================
+  // The second game on the Jugar tab (mockup contrarreloj_maqueta.png;
+  // mason picked: Leer or Hablar, chosen at the start, records kept
+  // separately; Temas + parts of your collection; 60 s, Otra vez −3 s).
+  //   · Pick a mode and what to race: a Tema, your verbs by tense group,
+  //     your Vocabulario, your Frases, or one of your lists. Each has its
+  //     own record per mode.
+  //   · A ready screen; the clock starts on Empezar.
+  //   · Leer: flip if you want, then the big Bien / Otra vez buttons grade
+  //     AND move on (only here; Tarjetas keeps the switch + swiping).
+  //   · Hablar: say it; the card turns over with the result and moves on
+  //     by itself. Automatic Bien scores, automatic Otra vez costs 3 s, no
+  //     suggestion (unsure, nothing heard) just moves on.
+  //   · Time's up: score, the record before, misses, anything won. A new
+  //     record in Hablar that beats an earlier one wins an album item (once
+  //     a day per thing raced).
+  // Records: public.game_records (game 'contrarreloj', scope
+  // "<mode>:<what>", best = Bien), alongside Partida's. Cards are logged
+  // like any card, so they count for the racha and Progreso.
+  var CR_MS = 60000;
+  var CR_PENALTY_MS = 3000;
+  var CR_NEXT_BIEN_MS = 900, CR_NEXT_OTRA_MS = 1500, CR_NEXT_NONE_MS = 1100;
+  var CR_MODE_KEY = "iv-crono-mode";
+  var crono = null;
+  var cronoOpen = false;
+  var crMode = "hablar";
+  try { var savedCrMode = localStorage.getItem(CR_MODE_KEY); if (savedCrMode === "leer" || savedCrMode === "hablar") crMode = savedCrMode; } catch (e) {}
+
+  function crCanSpeak() { return !quietMode && hablarSupported(); }
+  function crEffectiveMode() { return crMode === "hablar" && crCanSpeak() ? "hablar" : "leer"; }
+  function crActive() { return !!crono && !el.flashOverlay.hidden; }
+  function crRunning() { return crActive() && crono.phase === "run"; }
+
+  // ---- what you can race ----
+  function crPresetKey(p) { return p.i18n.replace("flash_preset_", ""); }
+  function crPresetWant(p) {
+    return function (fk, tenseKey, tag) {
+      if (tag === "standalone") return !!(p.standalone && p.standalone.indexOf(fk) !== -1);
+      return !!(p.tenses && p.tenses.indexOf(tenseKey) !== -1);
+    };
+  }
+  // Every scope, grouped: [{ label, rows: [{ scope, name, sub, build() }] }]
+  function crScopes() {
+    var groups = [];
+    groups.push({ label: t("cr_group_topics"), rows: TOPICS.map(function (tp) {
+      return { scope: "tema:" + tp.id, name: topicText(tp.name), sub: "", build: function () { return buildTopicCards(tp); } };
+    }) });
+    var mine = [];
+    FLASH_PRESETS.forEach(function (p) {
+      var want = crPresetWant(p);
+      var verbs = 0, forms = 0;
+      allVerbs.forEach(function (v) { var n = verbCards(v.data, want).length; if (n) { verbs++; forms += n; } });
+      if (!forms) return;
+      mine.push({ scope: "verbos:" + crPresetKey(p), name: t("cr_verbs", { tense: t(p.i18n).toLowerCase() }), sub: t("cr_verbs_sub", { v: verbs, f: forms }),
+        build: function () { var out = []; allVerbs.forEach(function (v) { Array.prototype.push.apply(out, verbCards(v.data, want)); }); return out; } });
+    });
+    if (allWords.length) mine.push({ scope: "vocab", name: t("nav_words"), sub: t(allWords.length === 1 ? "cr_words_sub_one" : "cr_words_sub", { n: allWords.length }),
+      build: function () { return allWords.map(function (w) { return wordCard(w.data, crono && crono.mode === "hablar" ? "def2word" : flashDirection); }); } });
+    if (allPhrases.length) mine.push({ scope: "frases", name: t("nav_phrases"), sub: t(allPhrases.length === 1 ? "cr_phrases_sub_one" : "cr_phrases_sub", { n: allPhrases.length }),
+      build: function () { return allPhrases.map(function (ph) { return phraseCard(ph.data, crono && crono.mode === "hablar" ? "def2word" : flashDirection); }); } });
+    if (mine.length) groups.push({ label: t("cr_group_mine"), rows: mine });
+    var lists = allLists.filter(function (l) { return (l.data.items || []).length; }).slice().sort(function (a, b) { return compareText(a.data.name, b.data.name); });
+    if (lists.length) groups.push({ label: t("cr_group_lists"), rows: lists.map(function (l) {
+      var n = (l.data.items || []).length;
+      return { scope: "lista:" + l.id, name: l.data.name, sub: t(n === 1 ? "cr_list_sub_one" : "cr_list_sub", { n: n }),
+        build: function () { return crListCards(l); } };
+    }) });
+    return groups;
+  }
+  function crListCards(l) {
+    var idx = progContentIndex();
+    var dir = crono && crono.mode === "hablar" ? "def2word" : flashDirection;
+    var out = [];
+    (l.data.items || []).forEach(function (it) {
+      var entry = (idx[it.type] || {})[it.key];
+      if (!entry) return;
+      if (it.type === "verb") Array.prototype.push.apply(out, verbCards(entry.data, setupVerbWant));
+      else if (it.type === "word") out.push(wordCard(entry.data, dir));
+      else out.push(phraseCard(entry.data, dir));
+    });
+    return out;
+  }
+  function crFindScope(scope) {
+    var found = null;
+    crScopes().some(function (g) { return g.rows.some(function (r) { if (r.scope === scope) { found = r; return true; } return false; }); });
+    return found;
+  }
+  function crScopeName(scope) {
+    var s = String(scope || "");
+    if (s.indexOf("tema:") === 0) { var tp = topicById(s.slice(5)); return tp ? topicText(tp.name) : s; }
+    if (s.indexOf("verbos:") === 0) {
+      var p = FLASH_PRESETS.find(function (x) { return crPresetKey(x) === s.slice(7); });
+      return p ? t("cr_verbs", { tense: t(p.i18n).toLowerCase() }) : t("nav_verbs");
+    }
+    if (s === "vocab") return t("nav_words");
+    if (s === "frases") return t("nav_phrases");
+    if (s.indexOf("lista:") === 0) { var l = allLists.find(function (x) { return x.id === s.slice(6); }); return l ? l.data.name : t("cr_a_list"); }
+    return s;
+  }
+
+  // ---- records ----
+  function crRecordScope(mode, scope) { return mode + ":" + scope; }
+  function crBest(mode, scope) {
+    var key = crRecordScope(mode, scope);
+    var best = 0, uid = currentUser ? currentUser.id : null;
+    if (ptServer.userId === uid) ptServer.rows.forEach(function (r) { if (r.game === "contrarreloj" && r.scope === key && (r.best || 0) > best) best = r.best; });
+    ptRecords().forEach(function (r) { if (r.user === uid && r.game === "contrarreloj" && r.scope === key && (r.best || 0) > best) best = r.best; });
+    return best;
+  }
+  function crBestOverall() {
+    var out = { best: 0, scope: null }, uid = currentUser ? currentUser.id : null;
+    function add(r) { if (r.game === "contrarreloj" && (r.best || 0) > out.best) { out.best = r.best; out.scope = r.scope; } }
+    if (ptServer.userId === uid) ptServer.rows.forEach(add);
+    ptRecords().forEach(function (r) { if (r.user === uid) add(r); });
+    return out;
+  }
+  function crSaveRecord() {
+    if (!crono || !currentUser || !crono.cards) return;
+    var all = ptRecords().filter(function (r) { return r.id !== crono.id; });
+    all.push({ id: crono.id, user: currentUser.id, game: "contrarreloj", scope: crRecordScope(crono.mode, crono.scope), at: new Date(crono.startedAt).toISOString(),
+      cards: crono.cards, best: crono.bien, ms: CR_MS, bien: crono.bien, otra: crono.otra, sent: false });
+    ptSaveLocal(all);
+    ptFlushRecords();
+  }
+
+  // ---- the picker (on the Jugar tab) ----
+  function openCrono(open) {
+    cronoOpen = !!open;
+    if (open) albumOpen = false;
+    renderPlay();
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+  function setCrMode(m) {
+    if (m === "hablar" && !crCanSpeak()) return;
+    crMode = m === "hablar" ? "hablar" : "leer";
+    try { localStorage.setItem(CR_MODE_KEY, crMode); } catch (e) {}
+    drawCrono();
+  }
+  function drawCrono() {
+    var mode = crEffectiveMode();
+    el.crModeLeer.classList.toggle("active", mode === "leer");
+    el.crModeHablar.classList.toggle("active", mode === "hablar");
+    el.crModeHablar.disabled = !crCanSpeak();
+    el.crModeNote.textContent = !crCanSpeak() ? t(quietMode ? "cr_note_quiet" : "speak_unsupported") : t(mode === "hablar" ? "cr_note_hablar" : "cr_note_leer");
+    var ul = el.crList;
+    ul.innerHTML = "";
+    crScopes().forEach(function (g) {
+      var lab = progEl("li", "cr-lab", g.label);
+      lab.setAttribute("role", "presentation");
+      ul.appendChild(lab);
+      g.rows.forEach(function (r) {
+        var li = document.createElement("li");
+        var btn = progEl("button", "card-row cr-row");
+        btn.type = "button";
+        btn.dataset.scope = r.scope;
+        btn.appendChild(progEl("span", "inf", r.name));
+        var best = crBest(mode, r.scope);
+        btn.appendChild(progEl("span", "rec" + (best ? "" : " none"), best ? String(best) : t("cr_no_record")));
+        if (r.sub) btn.appendChild(progEl("span", "def", r.sub));
+        btn.addEventListener("click", function () { crReady(r.scope); });
+        li.appendChild(btn);
+        ul.appendChild(li);
+      });
+    });
+  }
+
+  // ---- ready → run → end ----
+  function crReady(scope) {
+    var mode = crEffectiveMode();
+    var row = crFindScope(scope);
+    if (!row || !currentUser) return;
+    // inside the tap, so iOS allows audio and asks for the mic here
+    if (!quietMode) unlockTtsAudio();
+    if (mode === "hablar") hablarPrepareMic();
+    crono = { id: practiceUuid(), scope: scope, name: row.name, mode: mode, phase: "ready", pool: [], before: crBest(mode, scope), bien: 0, otra: 0, skipped: 0, cards: 0, missed: [], missedSeen: {}, rewards: [], timer: null, nextTimer: null };
+    flashDeck = []; flashIndex = 0;
+    el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
+    el.flashOverlay.classList.remove("is-done", "is-summary");
+    el.flashOverlay.classList.add("is-crono", "is-crono-panel");
+    el.flashOverlay.hidden = false;
+    renderFlashCombo();
+    crRenderTop();
+    drawCrPanel();
+  }
+  function crTake() {
+    if (!crono.pool.length) {
+      var row = crFindScope(crono.scope);
+      var fresh = row ? shuffleArray(row.build().slice()) : [];
+      // don't start a refill with the card just shown
+      var last = flashDeck[flashDeck.length - 1];
+      if (last && fresh.length > 1 && practiceCardKey(fresh[0]) === practiceCardKey(last)) fresh.push(fresh.shift());
+      crono.pool = fresh;
+    }
+    var c = crono.pool.shift();
+    if (!c) return null;
+    c = crono.mode === "hablar" ? speakCard(c) : Object.assign({}, c);
+    c._cr = true;
+    return c;
+  }
+  function crEnsureAhead() {
+    for (var guard = 0; flashDeck.length - 1 - flashIndex < 3 && guard < 10; guard++) {
+      var c = crTake();
+      if (!c) break;
+      flashDeck.push(c);
+    }
+  }
+  function crStart() {
+    if (!crono) return;
+    crono.phase = "run";
+    crono.startedAt = Date.now();
+    crono.endsAt = crono.startedAt + CR_MS;
+    var first = [];
+    flashDeck = [];
+    flashIndex = 0;
+    for (var i = 0; i < 4; i++) { var c = crTake(); if (c) { first.push(c); flashDeck.push(c); } }
+    if (!first.length) { crono.phase = "ready"; return; }
+    el.flashOverlay.classList.remove("is-crono-panel");
+    openFlashDeck(first, "crono");
+    crono.cards = 1;
+    clearInterval(crono.timer);
+    crono.timer = setInterval(crTick, 100);
+    crTick();
+  }
+  function crTick() {
+    if (!crono || crono.phase !== "run") return;
+    var left = Math.max(0, crono.endsAt - Date.now());
+    el.crBar.style.width = (100 * left / CR_MS) + "%";
+    var s = Math.ceil(left / 1000);
+    el.crClock.textContent = Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+    el.crClock.classList.toggle("is-low", left <= 10000);
+    if (left <= 0) crEnd();
+  }
+  function crPenalty() {
+    crono.endsAt -= CR_PENALTY_MS;
+    el.crPen.hidden = false;
+    el.crPen.classList.remove("is-on");
+    void el.crPen.offsetWidth;
+    el.crPen.classList.add("is-on");
+    clearTimeout(crono.penTimer);
+    crono.penTimer = setTimeout(function () { el.crPen.hidden = true; }, 900);
+    crTick();
+  }
+  function crMiss(card) {
+    var k = practiceCardKey(card);
+    if (crono.missedSeen[k]) return;
+    crono.missedSeen[k] = true;
+    crono.missed.push(ptLabel(card));
+  }
+  function crAdvance() {
+    if (!crRunning()) return;
+    clearTimeout(crono.nextTimer);
+    crono.nextTimer = null;
+    nextFlashCard(); // counts the card and checks the clock (crBeforeNext)
+  }
+  // From nextFlashCard(): keep cards queued, count them, and stop if time
+  // ran out. Returns false when the run just ended.
+  function crBeforeNext() {
+    if (!crRunning()) return true;
+    clearTimeout(crono.nextTimer);
+    if (Date.now() >= crono.endsAt) { crEnd(); return false; }
+    crEnsureAhead();
+    crono.cards++;
+    return true;
+  }
+  // Leer: the big buttons grade and move on.
+  function crGrade(g) {
+    if (!crRunning()) return;
+    var card = flashDeck[flashIndex];
+    if (!card) return;
+    card._grade = g;
+    card._gradeTouched = true;
+    if (g === "bien") crono.bien++;
+    else { crono.otra++; crMiss(card); crPenalty(); }
+    crRenderTop();
+    if (crono.phase === "run") crAdvance();
+  }
+  // Hablar: called when a recording has been judged.
+  function crOnSpeech(card, result) {
+    if (!crRunning() || !card || !card._cr || card._crDone) return;
+    var g = result && result.auto_grade;
+    card._crDone = true;
+    var wait = CR_NEXT_NONE_MS;
+    if (g === "bien") { crono.bien++; wait = CR_NEXT_BIEN_MS; }
+    else if (g === "otra") { crono.otra++; crMiss(card); crPenalty(); wait = CR_NEXT_OTRA_MS; }
+    else crono.skipped++;
+    crRenderTop();
+    if (crono.phase !== "run") return;
+    clearTimeout(crono.nextTimer);
+    crono.nextTimer = setTimeout(function () { if (flashDeck[flashIndex] === card) crAdvance(); }, wait);
+  }
+  function crEnd() {
+    if (!crono || crono.phase !== "run") return;
+    crono.phase = "end";
+    clearInterval(crono.timer);
+    clearTimeout(crono.nextTimer);
+    hablarAbort();
+    practiceCloseView();
+    practiceFlush();
+    crono.combo = practiceSession && practiceSession.play ? practiceSession.play.best : 0;
+    crono.isRecord = crono.bien > crono.before;
+    crSaveRecord();
+    el.flashOverlay.classList.add("is-crono-panel");
+    el.crBar.style.width = "0%";
+    clearTimeout(crono.penTimer);
+    el.crPen.hidden = true;
+    renderFlashCombo();
+    crRenderTop();
+    // A new record in Hablar that beats an earlier one wins an album item.
+    if (crono.mode === "hablar" && crono.before > 0 && crono.isRecord) rewardEarn("crono:" + crono.scope + ":" + playDayStr(progToday()));
+    drawCrPanel();
+  }
+  function crRestart() {
+    var scope = crono && crono.scope;
+    closeFlashcards();
+    if (scope) crReady(scope);
+  }
+  // Called from closeFlashcards().
+  function crCleanup() {
+    if (!crono) return;
+    clearInterval(crono.timer);
+    clearTimeout(crono.nextTimer);
+    clearTimeout(crono.penTimer);
+    crono = null;
+    el.flashOverlay.classList.remove("is-crono", "is-crono-panel");
+    el.crPen.hidden = true;
+    el.crPanel.innerHTML = "";
+    crRenderTop();
+    if (el.playPanel && !el.playPanel.hidden) renderPlay();
+  }
+
+  // ---- on screen ----
+  function crRenderTop() {
+    var run = !!crono && crono.phase === "run";
+    el.crHud.hidden = !run;
+    el.crBarWrap.hidden = !run;
+    if (run) {
+      el.crScore.textContent = "";
+      el.crScore.appendChild(progEl("b", null, String(crono.bien)));
+      el.crScore.appendChild(document.createTextNode(t("cr_hud_bien")));
+    }
+    var lab = el.flashCloseBtn && el.flashCloseBtn.querySelector("[data-i18n]");
+    if (lab && !ptActive()) lab.textContent = t(run ? "cr_quit" : "close");
+  }
+  // Called at the end of renderFlashCard().
+  function renderCronoFaces(card) {
+    var on = crActive() && card && card._cr;
+    el.crGrade.hidden = !(on && crono.mode === "leer");
+    el.crHint.hidden = !on;
+    if (!on) return;
+    el.flashHintLine.hidden = true;
+    el.flashKnownToggle.style.display = "none";
+    el.flashTally.hidden = true;
+    el.flashProgress.textContent = "";
+    el.crHint.textContent = t(crono.mode === "hablar" ? "cr_hint_hablar" : "cr_hint_leer");
+    crRenderTop();
+  }
+  function drawCrPanel() {
+    var box = el.crPanel;
+    box.innerHTML = "";
+    if (!crono) return;
+    var modeName = t(crono.mode === "hablar" ? "flash_mode_speak" : "flash_mode_read");
+    if (crono.phase === "ready") {
+      var r = progEl("div", "cr-ready");
+      r.appendChild(progEl("p", "cr-k", t("pt_crono_name") + " · " + modeName));
+      r.appendChild(progEl("p", "cr-w", crono.name));
+      r.appendChild(progEl("p", "cr-s", t("cr_rules")));
+      r.appendChild(progEl("p", "cr-s", crono.before ? t("cr_your_record", { n: crono.before }) : t("cr_first_run")));
+      var go = progButton(t("cr_start"), true, crStart);
+      go.id = "cr-start";
+      r.appendChild(go);
+      box.appendChild(r);
+      return;
+    }
+    var e = progEl("div", "cr-end");
+    var firstRun = !crono.before;
+    e.appendChild(progEl("p", "cr-k" + (crono.isRecord && !firstRun ? " is-record" : ""), t(crono.isRecord && !firstRun ? "cr_new_record" : (firstRun ? "cr_first_record" : "cr_time_up"))));
+    e.appendChild(progEl("p", "cr-n", String(crono.bien)));
+    e.appendChild(progEl("p", "cr-u", t("cr_end_sub", { what: crono.name, mode: modeName })));
+    if (!firstRun) e.appendChild(progEl("p", "cr-u", t(crono.isRecord ? "cr_before" : "cr_record_is", { n: crono.before })));
+    var row = progEl("div", "cr-row3");
+    [[String(crono.otra), t("cr_stat_otra")], [String(crono.skipped), t("cr_stat_skip")], [crono.combo ? "×" + crono.combo : "—", t("cr_stat_combo")]].forEach(function (s, i) {
+      if (i === 1 && crono.mode !== "hablar") return;
+      if (i === 2 && crono.mode !== "hablar") return;
+      var x = progEl("div"); x.appendChild(progEl("b", null, s[0])); x.appendChild(document.createTextNode(s[1])); row.appendChild(x);
+    });
+    e.appendChild(row);
+    if (crono.missed.length) {
+      var mb = progEl("div", "pt-blk");
+      mb.appendChild(progEl("p", "pt-lab", t("pt_sum_missed")));
+      var chips = progEl("div", "pt-chips");
+      crono.missed.slice(0, 12).forEach(function (m) { chips.appendChild(progEl("span", null, m)); });
+      mb.appendChild(chips);
+      e.appendChild(mb);
+    }
+    var won = crono.rewards.filter(function (r) { return albumItem(r.item_id); });
+    if (won.length) {
+      var wb = progEl("div", "pt-blk");
+      wb.appendChild(progEl("p", "pt-lab", t("pt_sum_won")));
+      won.forEach(function (r) {
+        var line = progEl("div", "pt-prize");
+        line.appendChild(progEl("b", null, albumItem(r.item_id).es));
+        line.appendChild(progEl("span", null, rewardHow(r.reason)));
+        wb.appendChild(line);
+      });
+      e.appendChild(wb);
+    }
+    var btns = progEl("div", "pt-btns");
+    btns.appendChild(progButton(t("close"), false, closeFlashcards));
+    var again = progButton(t("cr_again"), true, crRestart);
+    again.id = "cr-again";
+    btns.appendChild(again);
+    e.appendChild(btns);
+    box.appendChild(e);
   }
 
   // ================= Progreso + Tu historial (2026-10-03) =================
@@ -12032,6 +12556,11 @@
   el.tabPlay.addEventListener("click", function () { setMainTab("play"); });
   el.playAlbumEntry.addEventListener("click", function () { openAlbum(true); });
   el.playAlbumBack.addEventListener("click", function () { openAlbum(false); });
+  el.crBack.addEventListener("click", function () { openCrono(false); });
+  el.crModeLeer.addEventListener("click", function () { setCrMode("leer"); });
+  el.crModeHablar.addEventListener("click", function () { setCrMode("hablar"); });
+  el.crOtra.addEventListener("click", function (e) { e.stopPropagation(); crGrade("otra"); });
+  el.crBien.addEventListener("click", function (e) { e.stopPropagation(); crGrade("bien"); });
   el.rewardGo.addEventListener("click", function () { closeReward(true); });
   el.rewardClose.addEventListener("click", function () { closeReward(false); });
   el.rewardListen.addEventListener("click", function () {

@@ -772,6 +772,23 @@
         <span class="play-chev" aria-hidden="true">&rsaquo;</span>
       </button>
     </div>
+    <!-- Contrarreloj: pick a mode and what to race (see app.js's "Contrarreloj"). -->
+    <section class="detail play-crono" id="play-crono" hidden>
+      <button type="button" class="icon-btn play-album-back" id="cr-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 data-i18n="pt_crono_name">Contrarreloj</h2>
+          <p class="definition" data-i18n="cr_desc">60 segundos, todas las que puedas. Cada Otra vez te saca 3 segundos.</p>
+        </div>
+      </div>
+      <div class="lang-toggle flash-mode-toggle cr-modes">
+        <button type="button" class="lang-option" id="cr-mode-leer" data-i18n="flash_mode_read">Leer</button>
+        <button type="button" class="lang-option" id="cr-mode-hablar" data-i18n="flash_mode_speak">Hablar</button>
+      </div>
+      <p class="flash-mode-note" id="cr-mode-note"></p>
+      <ul class="card-list cr-list" id="cr-list"></ul>
+      <p class="play-fine" data-i18n="cr_fine"></p>
+    </section>
     <section class="detail play-album" id="play-album" hidden>
       <button type="button" class="icon-btn play-album-back" id="play-album-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
       <div class="detail-head">
@@ -1026,6 +1043,9 @@
 </div>
 
 <div class="flash-overlay" id="flash-overlay" hidden>
+  <!-- Contrarreloj: the time left, as a thin bar across the top. -->
+  <div class="cr-bar-wrap" id="cr-bar-wrap" hidden><i id="cr-bar"></i></div>
+  <div class="cr-pen" id="cr-pen" hidden aria-hidden="true">−3 s</div>
   <div class="flash-topbar">
     <button type="button" class="icon-btn" id="flash-close-btn"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
     <!-- Which Azure Rioplatense voice the speaker buttons below use is now
@@ -1033,6 +1053,7 @@
          here — see app.js's setTtsVoice()/TTS_VOICES. -->
     <span class="flash-tally" id="flash-tally" hidden></span>
     <span class="flash-combo" id="flash-combo" hidden></span>
+    <span class="cr-hud" id="cr-hud" hidden><span class="cr-clock" id="cr-clock"></span><span class="cr-score" id="cr-score"></span></span>
     <span class="flash-progress" id="flash-progress"></span>
   </div>
   <div class="flash-stage">
@@ -1087,6 +1108,8 @@
        nextFlashCard()/showFlashDone() in app.js. -->
   <!-- Partida: the summary after Terminar. See app.js's "Partida" section. -->
   <div class="pt-summary" id="pt-summary"></div>
+  <!-- Contrarreloj: the ready and time's-up screens. -->
+  <div class="cr-panel" id="cr-panel"></div>
   <div class="flash-done" id="flash-done">
     <p class="flash-done-title" data-i18n="flash_done_title">¡Listo!</p>
     <p class="flash-done-text" id="flash-done-text">Marcaste todas las tarjetas como sabidas.</p>
@@ -1106,10 +1129,16 @@
     </span>
     <button type="button" class="known-toggle" id="flash-known-toggle" aria-pressed="false" data-i18n="known_toggle">Sabido</button>
   </div>
+  <!-- Contrarreloj, Leer: grade AND move on (only here). -->
+  <div class="cr-grade" id="cr-grade" hidden>
+    <button type="button" class="cr-otra" id="cr-otra" data-i18n="grade_otra">Otra vez</button>
+    <button type="button" class="cr-bien" id="cr-bien" data-i18n="grade_bien">Bien</button>
+  </div>
   <p class="form-msg flash-tts-msg" id="flash-tts-msg"></p>
   <p class="flash-hint" id="flash-hint-line" data-i18n="flash_hint">Tocá la tarjeta para dar vuelta &middot; deslizá para cambiar</p>
   <!-- Partida: where the grade sends this card (replaces the hint once graded). -->
   <p class="flash-hint pt-note" id="pt-note" hidden></p>
+  <p class="flash-hint cr-hint" id="cr-hint" hidden></p>
   <div class="flash-controls">
     <button type="button" class="btn-secondary" id="flash-prev-btn" data-i18n="flash_prev">&lsaquo; Anterior</button>
     <button type="button" class="btn-primary" id="flash-next-btn" data-i18n="flash_next">Siguiente &rsaquo;</button>

@@ -2233,3 +2233,60 @@
   .pt-prize b { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; }
   .pt-prize span { color: var(--ink-soft); font-size: 13px; }
   .pt-btns { display: flex; gap: 8px; justify-content: center; margin-top: 14px !important; }
+
+  /* ---- Contrarreloj (2026-10-06) ---- */
+  .play-crono { display: block; margin-top: 4px; }
+  .play-crono[hidden] { display: none; }
+  .cr-modes { margin: 4px 0 6px; }
+  .play-crono .flash-mode-note { margin: 0 0 10px; }
+  .cr-list { margin: 0 0 10px; height: auto !important; max-height: none !important; overflow: visible; }
+  .cr-list::after { display: none !important; }
+  .cr-lab { list-style: none; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); padding: 10px 14px 4px; border-top: 1px solid var(--line); }
+  .cr-lab:first-child { border-top: 0; }
+  .card-row.cr-row { flex-wrap: wrap; row-gap: 2px; align-items: baseline; width: 100%; }
+  .card-row.cr-row .inf { flex: 1 1 auto; }
+  .card-row.cr-row .rec { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 17px; color: var(--accent-deep); font-variant-numeric: lining-nums; }
+  .card-row.cr-row .rec.none { font-family: "Public Sans", sans-serif; font-weight: 400; font-size: 12.5px; color: var(--ink-soft); }
+  .card-row.cr-row .def { flex: 1 1 100%; }
+  /* in the deck */
+  .cr-bar-wrap { position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--paper-sunken); }
+  .cr-bar-wrap[hidden] { display: none; }
+  .cr-bar-wrap i { display: block; height: 100%; width: 100%; background: var(--accent); transition: width 0.1s linear; }
+  .cr-hud { display: inline-flex; align-items: baseline; gap: 10px; margin-left: auto; }
+  .cr-hud[hidden] { display: none; }
+  .cr-clock { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 24px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .cr-clock.is-low { color: var(--danger); }
+  .cr-score { font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+  .cr-score b { font-family: "Fraunces", Georgia, serif; font-size: 20px; color: var(--teal); }
+  .cr-pen { position: absolute; top: 52px; right: 22px; font-weight: 700; color: var(--danger); font-size: 15px; z-index: 5; pointer-events: none; }
+  .cr-pen[hidden] { display: none; }
+  .cr-pen.is-on { animation: cr-pen 0.9s ease-out both; }
+  @keyframes cr-pen { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-14px); } }
+  @media (prefers-reduced-motion: reduce) { .cr-pen.is-on { animation: none; } }
+  .flash-overlay.is-crono .flash-known-row, .flash-overlay.is-crono .flash-controls,
+  .flash-overlay.is-crono .flash-arrow { display: none !important; }
+  .cr-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 420px; margin: 14px auto 0; }
+  .cr-grade[hidden] { display: none; }
+  .cr-grade button { height: 56px; border-radius: 14px; font: inherit; font-size: 18px; font-weight: 600; border: 0; cursor: pointer; }
+  .cr-otra { background: color-mix(in srgb, var(--danger) 16%, var(--paper-raised)); color: var(--danger); }
+  .cr-otra::before { content: "↺ "; }
+  .cr-bien { background: var(--teal); color: var(--paper); }
+  .flash-hint.cr-hint { font-style: italic; }
+  /* the ready / time's-up screens */
+  .cr-panel { display: none; }
+  .flash-overlay.is-crono-panel .cr-panel { display: flex; flex-direction: column; justify-content: center; flex: 1; overflow-y: auto; padding: 4px 4px 20px; }
+  .flash-overlay.is-crono-panel .flash-stage, .flash-overlay.is-crono-panel .flash-known-row,
+  .flash-overlay.is-crono-panel .flash-hint, .flash-overlay.is-crono-panel .flash-controls,
+  .flash-overlay.is-crono-panel .flash-tts-msg, .flash-overlay.is-crono-panel .flash-done,
+  .flash-overlay.is-crono-panel .pt-summary, .flash-overlay.is-crono-panel .cr-grade { display: none !important; }
+  .cr-ready, .cr-end { text-align: center; width: 100%; max-width: 420px; margin: 0 auto; }
+  .cr-k { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
+  .cr-k.is-record { color: var(--accent-deep); font-weight: 600; }
+  .cr-w { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 38px; color: var(--ink); margin: 6px 0 8px; line-height: 1.15; overflow-wrap: anywhere; }
+  .cr-s { color: var(--ink-soft); font-size: 14px; margin: 0 0 4px; line-height: 1.5; }
+  .cr-ready .btn-primary { min-width: 200px; margin-top: 14px; }
+  .cr-n { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 72px; color: var(--ink); line-height: 1; margin: 6px 0 4px; font-variant-numeric: lining-nums; }
+  .cr-u { color: var(--ink-soft); font-size: 14px; margin: 0; }
+  .cr-row3 { display: flex; justify-content: center; gap: 24px; margin: 14px 0 12px; font-size: 13px; color: var(--ink-soft); }
+  .cr-row3 b { display: block; font-size: 18px; color: var(--ink); }
+  .cr-end .pt-blk { text-align: left; }

@@ -1207,3 +1207,16 @@ create policy "update own game records" on public.game_records
 drop policy if exists "delete own game records" on public.game_records;
 create policy "delete own game records" on public.game_records
   for delete using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Contrarreloj (2026-10-06): its records go in game_records (game
+-- 'contrarreloj', scope "<leer|hablar>:<what>", e.g. "hablar:tema:numeros",
+-- "leer:verbos:presente", "hablar:lista:<list id>"; best = Bien in 60 s),
+-- and a new record in Hablar can win an album item, with the reward reason
+-- "crono:<what>:<day>" (once a day per thing raced).
+alter table public.game_records drop constraint if exists game_records_game_check;
+alter table public.game_records add constraint game_records_game_check
+  check (game in ('partida', 'contrarreloj'));
+alter table public.rewards drop constraint if exists rewards_reason_check;
+alter table public.rewards add constraint rewards_reason_check
+  check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2}|crono:[a-z0-9:-]{1,48}:\d{4}-\d{2}-\d{2})$');
