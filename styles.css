@@ -2070,7 +2070,10 @@
 
   /* ---------- Temas (2026-10-06, from temas_maqueta.png) ---------- */
   .topics-intro { margin: 12px 0 10px; }
-  .card-list.topic-list { max-height: none; overflow: visible; }
+  /* 5 rows tall with its own scroller, like the Verbos/Vocabulario/Frases
+     lists; the exact height is measured by fitTopicList() in app.js. */
+  .card-list.topic-list { max-height: none; overflow-y: auto; position: relative; }
+  .badge.level { background: var(--paper-sunken); color: var(--ink-soft); border: 1px solid var(--line); }
   .card-row.topic-row { flex-wrap: wrap; row-gap: 4px; }
   .card-row.topic-row .inf { flex: 1 1 auto; min-width: 0; }
   .card-row.topic-row .def { flex: 1 1 100%; }
@@ -2111,3 +2114,5 @@
   /* on the card: numbers, times and dates big and upright */
   .flash-prompt-main.is-number { font-size: clamp(38px, 11vw, 52px); font-style: normal; letter-spacing: 0.01em; font-variant-numeric: lining-nums; }
   .topic-front-tag[hidden] { display: none; }
+  /* pronunciation / spelling words: big and upright, a bit smaller than numbers */
+  .flash-prompt-main.is-word { font-size: clamp(30px, 9vw, 42px); font-style: normal; }

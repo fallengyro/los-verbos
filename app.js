@@ -6661,12 +6661,16 @@
         var front = range === "anios" ? String(n) : numDigits(n);
         return { frontMain: front, backMain: words, backSpeak: words, digits: String(n), listenBackMain: front, listenBackSub: words };
       },
+      // Each pattern line is a range; the line under it is that same
+      // range in words (mason, 2026-10-06: examples under a range read as
+      // its translation, so make them exactly that).
       lesson: [
-        { f: "16–29 → una palabra", ex: "dieci[séis] · veinti[trés] · veinti[ún] años" },
-        { f: "31–99 → decena y unidad", ex: "treinta [y] cuatro · noventa [y] nueve" },
-        { f: "100 → cien · 101 → ciento uno", ex: "[cien] pesos · [ciento] veinte" },
-        { f: "500 · 700 · 900", ex: "[quinientos] · [setecientos] · [novecientos]" },
-        { f: "mil · un millón de", ex: "dos [mil] · un [millón de] pesos" }
+        { f: "0–15 · cada uno tiene su nombre", ex: "[cero] a [quince]" },
+        { f: "16–29 · una sola palabra", ex: "[dieci]séis a [veinti]nueve" },
+        { f: "31–99 · decena y unidad", ex: "treinta [y] uno a noventa [y] nueve" },
+        { f: "100 · 101–199", ex: "[cien] · [ciento] uno a [ciento] noventa y nueve" },
+        { f: "200–999 · ojo con 500, 700 y 900", ex: "doscientos a novecientos noventa y nueve · [quinientos] · [setecientos] · [novecientos]" },
+        { f: "1.000 · 2.000 · 1.000.000", ex: "[mil] · dos [mil] · un [millón]" }
       ],
       tip: L("En Argentina el punto separa los miles: 4.372 · 1.000.000. Antes de un sustantivo, «uno» se acorta: veintiún años, un millón.",
              "In Argentina a dot separates thousands: 4.372 · 1.000.000. Before a noun «uno» shortens: veintiún años, un millón.")
@@ -6832,6 +6836,280 @@
       ]
     }
   ];
+  // ---- more topics (2026-10-06, mason: ABCs, vowels, consonants, the
+  // c/g sounds, and the pronouns), and the order they're listed in ----
+  // Word topics (pronunciation): each range is a short list of words with
+  // the letters in focus in [brackets]; sy = the syllables, the stressed
+  // one in capitals; the range's note says how it sounds.
+  function wordRange(key, label, note, items) {
+    return { key: key, label: label, note: note, items: items, size: items.length,
+      gen: function () { return topicPlain(topicPick(items).w); } };
+  }
+  function W(w, sy) { return { w: w, sy: sy }; }
+  function wordCardFor(r, v) {
+    var it = r.items.find(function (x) { return topicPlain(x.w) === v; });
+    if (!it) return null;
+    var word = topicPlain(it.w), note = topicText(r.note);
+    return { frontMain: word, frontRich: it.w, backMain: it.sy, backSpeak: word, answers: [word], backSub: note,
+      listenBackMain: word, listenBackRich: it.w, listenBackSub: note, wordFront: true };
+  }
+  var LETRAS = [["a", ["a"]], ["b", ["be", "be larga"]], ["c", ["ce"]], ["d", ["de"]], ["e", ["e"]], ["f", ["efe"]], ["g", ["ge"]],
+    ["h", ["hache"]], ["i", ["i", "i latina"]], ["j", ["jota"]], ["k", ["ka"]], ["l", ["ele"]], ["m", ["eme"]], ["n", ["ene"]],
+    ["ñ", ["eñe"]], ["o", ["o"]], ["p", ["pe"]], ["q", ["cu"]], ["r", ["erre", "ere"]], ["s", ["ese"]], ["t", ["te"]], ["u", ["u"]],
+    ["v", ["ve", "ve corta", "uve"]], ["w", ["doble ve", "doble u", "uve doble"]], ["x", ["equis"]], ["y", ["ye", "i griega"]], ["z", ["zeta"]]];
+  var DELETREAR = ["hola", "calle", "queso", "vaso", "llave", "jugo", "zapato", "año", "hielo", "kiosco", "taxi", "boca",
+    "Palermo", "Belgrano", "Recoleta", "subte", "yerba", "cerveza", "guitarra", "Juan"];
+  function letraNames(ch) { var e = LETRAS.find(function (x) { return x[0] === ch; }); return e ? e[1] : [ch]; }
+  function spellWord(word) { return word.toLowerCase().split("").map(function (ch) { return letraNames(ch)[0]; }); }
+
+  TOPICS.push(
+    {
+      id: "abecedario", type: "gen", name: L("El abecedario", "The alphabet"),
+      desc: L("Las letras y cómo deletrear: G → ge, «hola» → hache, o, ele, a.", "The letters, and spelling: G → ge, «hola» → hache, o, ele, a."),
+      tag: L("letra", "letter"),
+      ranges: [
+        { key: "letras", label: L("las letras", "the letters"), size: LETRAS.length, gen: function () { return topicPick(LETRAS)[0]; } },
+        { key: "deletrear", label: L("deletrear", "spelling"), size: DELETREAR.length, gen: function () { return topicPick(DELETREAR); } }
+      ],
+      defaults: ["letras"],
+      card: function (range, v) {
+        if (range === "letras") {
+          var names = letraNames(v);
+          return { frontMain: v.toUpperCase(), backMain: names[0], backSpeak: names[0], answers: names,
+            backSub: names.length > 1 ? t("topic_also", { x: names.slice(1).join(", ") }) : "",
+            listenBackMain: v.toUpperCase(), listenBackSub: names[0] };
+        }
+        var letters = spellWord(v);
+        return { frontMain: v, backMain: letters.join(" · "), backSpeak: letters.join(", "), answers: [letters.join(" ")],
+          listenBackMain: v, listenBackSub: letters.join(" · "), wordFront: true };
+      },
+      lesson: [
+        { f: "A – M", ex: "a · be · ce · de · e · efe · ge · [hache] · i · [jota] · ka · ele · eme" },
+        { f: "N – Z", ex: "ene · [eñe] · o · pe · [cu] · erre · ese · te · u · ve · [doble ve] · equis · [ye] · zeta" },
+        { f: "b · v", ex: "en Argentina: [be larga] · [ve corta]" }
+      ],
+      tip: L("Ch y ll ya no son letras: se deletrean «ce, hache» y «ele, ele». Muchos dicen «i griega» por la y.",
+             "Ch and ll are no longer letters: spell them «ce, hache» and «ele, ele». Many people say «i griega» for y.")
+    },
+    {
+      id: "vocales", type: "gen", name: L("Las vocales", "The vowels"),
+      desc: L("Las cinco vocales: siempre cortas y siempre iguales.", "The five vowels: always short, always the same."),
+      tag: L("vocales", "vowels"),
+      ranges: [
+        wordRange("a", L("a", "a"), L("a: abierta y corta, nunca «ei»", "a: open and short, like 'ah', never 'ay'"),
+          [W("c[a]s[a]", "CA·sa"), W("m[a]m[á]", "ma·MÁ"), W("p[a]p[a]", "PA·pa"), W("n[a]d[a]", "NA·da"), W("pl[a]t[a]", "PLA·ta"), W("m[a]ñ[a]n[a]", "ma·ÑA·na")]),
+        wordRange("e", L("e", "e"), L("e: corta, sin deslizarse a «ei»", "e: short, like 'eh', no glide into 'ay'"),
+          [W("m[e]sa", "ME·sa"), W("l[e]ch[e]", "LE·che"), W("v[e]rd[e]", "VER·de"), W("t[e]la", "TE·la"), W("n[e]n[e]", "NE·ne"), W("tr[e]c[e]", "TRE·ce")]),
+        wordRange("i", L("i", "i"), L("i: como «ee», pero corta", "i: like 'ee', but short"),
+          [W("s[í]", "SÍ"), W("p[i]so", "PI·so"), W("v[i]no", "VI·no"), W("f[i]n", "FIN"), W("Ch[i]le", "CHI·le"), W("l[i]ndo", "LIN·do")]),
+        wordRange("o", L("o", "o"), L("o: redonda y corta, nunca «ou»", "o: round and short, never 'oh-oo'"),
+          [W("t[o]d[o]", "TO·do"), W("f[o]t[o]", "FO·to"), W("p[o]c[o]", "PO·co"), W("l[o]c[o]", "LO·co"), W("[o]j[o]", "O·jo"), W("s[o]l[o]", "SO·lo")]),
+        wordRange("u", L("u", "u"), L("u: como «oo», labios redondos", "u: like 'oo', lips rounded"),
+          [W("[u]no", "U·no"), W("l[u]na", "LU·na"), W("m[u]cho", "MU·cho"), W("n[u]nca", "NUN·ca"), W("fr[u]ta", "FRU·ta"), W("s[u]r", "SUR")]),
+        wordRange("juntas", L("dos juntas", "two together"), L("dos vocales juntas: se dicen las dos, rápido", "two vowels together: say both, quickly"),
+          [W("b[ue]no", "BUE·no"), W("[ai]re", "AI·re"), W("c[iu]dad", "ciu·DAD"), W("c[au]sa", "CAU·sa"), W("n[ie]ve", "NIE·ve"), W("h[oy]", "HOY")])
+      ],
+      defaults: ["a", "e", "i", "o", "u"],
+      lesson: [
+        { f: "a · e · i · o · u", ex: "siempre el mismo sonido, siempre cortas" },
+        { f: "nunca se «comen»", ex: "cho·co·LA·te: cada vocal entera" },
+        { f: "la sílaba fuerte (en las tarjetas, en mayúsculas)", ex: "CA·sa · ca·[FÉ] · ma·[ÑA]·na" }
+      ],
+      tip: L("En inglés las vocales sin acento se apagan; en español no: cada una suena clara.",
+             "In English unstressed vowels fade; in Spanish they don't: each one stays clear.")
+    },
+    {
+      id: "consonantes", type: "gen", name: L("Las consonantes", "The consonants"),
+      desc: L("Los sonidos de acá: ll e y como «sh», r y rr, j, h muda…", "The local sounds: ll and y as 'sh', r and rr, j, silent h…"),
+      tag: L("consonantes", "consonants"),
+      ranges: [
+        wordRange("ll-y", L("ll · y", "ll · y"), L("en Buenos Aires ll e y suenan «sh»: «cashe», «sho»", "in Buenos Aires ll and y sound like 'sh': «cashe», «sho»"),
+          [W("ca[ll]e", "CA·lle"), W("po[ll]o", "PO·llo"), W("[y]o", "YO"), W("pla[y]a", "PLA·ya"), W("[ll]ave", "LLA·ve"), W("a[y]er", "a·YER")]),
+        wordRange("r", L("r suave", "soft r"), L("r entre vocales: un solo toque de la lengua", "r between vowels: one quick tap of the tongue"),
+          [W("pe[r]o", "PE·ro"), W("ca[r]o", "CA·ro"), W("pa[r]a", "PA·ra"), W("ca[r]a", "CA·ra"), W("ho[r]a", "HO·ra"), W("to[r]o", "TO·ro")]),
+        wordRange("rr", L("rr · r inicial", "rr · initial r"), L("rr, y r al principio: vibrante, varios toques", "rr, and r at the start: rolled, several taps"),
+          [W("pe[rr]o", "PE·rro"), W("ca[rr]o", "CA·rro"), W("[r]osa", "RO·sa"), W("[r]ico", "RI·co"), W("a[rr]iba", "a·RRI·ba"), W("[R]oma", "RO·ma")]),
+        wordRange("j", L("j", "j"), L("j: una h fuerte, de la garganta", "j: a strong, throaty h"),
+          [W("[j]amón", "ja·MÓN"), W("o[j]o", "O·jo"), W("[j]ugo", "JU·go"), W("[j]oven", "JO·ven"), W("me[j]or", "me·JOR"), W("via[j]e", "VIA·je")]),
+        wordRange("h", L("h muda", "silent h"), L("h: no suena nunca", "h: always silent"),
+          [W("[h]ola", "HO·la"), W("[h]ora", "HO·ra"), W("a[h]ora", "a·HO·ra"), W("[h]acer", "ha·CER"), W("[h]ijo", "HI·jo"), W("[h]oy", "HOY")]),
+        wordRange("b-v", L("b = v", "b = v"), L("b y v suenan igual; entre vocales, suave, sin cerrar del todo los labios", "b and v sound the same; between vowels, soft, lips not quite closed"),
+          [W("[v]aso", "VA·so"), W("[b]eso", "BE·so"), W("[v]ino", "VI·no"), W("[b]ueno", "BUE·no"), W("[v]os", "VOS"), W("a[b]uela", "a·BUE·la")]),
+        wordRange("d", L("d suave", "soft d"), L("d entre vocales y al final: suave, casi la «th» de «this»", "d between vowels and at the end: soft, close to the 'th' in 'this'"),
+          [W("cansa[d]o", "can·SA·do"), W("to[d]o", "TO·do"), W("na[d]a", "NA·da"), W("verda[d]", "ver·DAD"), W("Madri[d]", "ma·DRID"), W("ciuda[d]", "ciu·DAD")]),
+        wordRange("n", L("ñ", "ñ"), L("ñ: como «ny» en «canyon»", "ñ: like 'ny' in 'canyon'"),
+          [W("a[ñ]o", "A·ño"), W("ni[ñ]o", "NI·ño"), W("ma[ñ]ana", "ma·ÑA·na"), W("Espa[ñ]a", "es·PA·ña"), W("ba[ñ]o", "BA·ño"), W("se[ñ]or", "se·ÑOR")]),
+        wordRange("z", L("z = s", "z = s"), L("en Argentina z, ce y ci suenan como s", "in Argentina z, ce and ci sound like s"),
+          [W("[z]apato", "za·PA·to"), W("cerve[z]a", "cer·VE·za"), W("pla[z]a", "PLA·za"), W("a[z]ul", "a·ZUL"), W("[c]ine", "CI·ne"), W("[c]ielo", "CIE·lo")]),
+        wordRange("s", L("s antes de consonante", "s before a consonant"), L("en Buenos Aires la s antes de consonante a veces se aspira: «ehte», «mihmo»", "in Buenos Aires an s before a consonant is often breathed: «ehte», «mihmo»"),
+          [W("mo[s]ca", "MOS·ca"), W("e[s]te", "ES·te"), W("mi[s]mo", "MIS·mo"), W("de[s]pués", "des·PUÉS"), W("gu[s]to", "GUS·to"), W("fie[s]ta", "FIES·ta")])
+      ],
+      defaults: ["ll-y", "r", "rr", "j"],
+      lesson: [
+        { f: "ll · y → «sh» (en Buenos Aires)", ex: "ca[ll]e → «cashe» · [y]o → «sho»" },
+        { f: "r · rr", ex: "pe[r]o (un toque) · pe[rr]o (vibrante)" },
+        { f: "j · h", ex: "[j]amón (h fuerte) · [h]ola (muda)" },
+        { f: "b = v · z = s", ex: "[v]aso / [b]eso · [z]apato / [s]apo" },
+        { f: "d suave", ex: "cansa[d]o · verda[d]" }
+      ],
+      tip: L("La pronunciación de acá: el «sheísmo» (ll, y) es lo más porteño de todo.",
+             "The local accent: «sheísmo» (ll and y as 'sh') is the most porteño sound of all.")
+    },
+    {
+      id: "c-g", type: "gen", name: L("La c y la g", "C and G"),
+      desc: L("Cuándo suenan k, s, g o j: casa, cena, gato, gente.", "When they sound k, s, g or j: casa, cena, gato, gente."),
+      tag: L("c · g", "c · g"),
+      ranges: [
+        wordRange("ca", L("ca · co · cu", "ca · co · cu"), L("c + a, o, u → k", "c + a, o, u → k"),
+          [W("[c]asa", "CA·sa"), W("[c]osa", "CO·sa"), W("[c]una", "CU·na"), W("[c]uchara", "cu·CHA·ra"), W("[c]ampo", "CAM·po"), W("[C]órdoba", "CÓR·do·ba")]),
+        wordRange("ce", L("ce · ci", "ce · ci"), L("c + e, i → s", "c + e, i → s"),
+          [W("[c]ena", "CE·na"), W("[c]ine", "CI·ne"), W("[c]ielo", "CIE·lo"), W("[c]ebolla", "ce·BO·lla"), W("[c]inco", "CIN·co"), W("[c]entro", "CEN·tro")]),
+        wordRange("ga", L("ga · go · gu", "ga · go · gu"), L("g + a, o, u → g", "g + a, o, u → g"),
+          [W("[g]ato", "GA·to"), W("[g]ordo", "GOR·do"), W("[g]usto", "GUS·to"), W("a[g]ua", "A·gua"), W("ami[g]o", "a·MI·go"), W("la[g]o", "LA·go")]),
+        wordRange("ge", L("ge · gi", "ge · gi"), L("g + e, i → j", "g + e, i → j"),
+          [W("[g]ente", "GEN·te"), W("[g]imnasio", "gim·NA·sio"), W("[g]eneral", "ge·ne·RAL"), W("má[g]ico", "MÁ·gi·co"), W("pá[g]ina", "PÁ·gi·na"), W("[g]irar", "gi·RAR")]),
+        wordRange("gue", L("gue · gui", "gue · gui"), L("gue, gui → g: la u no suena", "gue, gui → g: the u is silent"),
+          [W("[gu]erra", "GUE·rra"), W("[gu]itarra", "gui·TA·rra"), W("hambur[gu]esa", "ham·bur·GUE·sa"), W("Mi[gu]el", "mi·GUEL"), W("[gu]iso", "GUI·so"), W("se[gu]ir", "se·GUIR")]),
+        wordRange("gue2", L("güe · güi", "güe · güi"), L("güe, güi → gu: la u sí suena", "güe, güi → gu: the u is said"),
+          [W("pin[gü]ino", "pin·GÜI·no"), W("ver[gü]enza", "ver·GÜEN·za"), W("biling[ü]e", "bi·LIN·güe"), W("ci[gü]eña", "ci·GÜE·ña"), W("a[gü]ita", "a·GÜI·ta"), W("lin[gü]ística", "lin·GÜÍS·ti·ca")]),
+        wordRange("qu", L("que · qui", "que · qui"), L("que, qui → k: la u no suena", "que, qui → k: the u is silent"),
+          [W("[qu]eso", "QUE·so"), W("[qu]ince", "QUIN·ce"), W("por[qu]e", "POR·que"), W("a[qu]í", "a·QUÍ"), W("[qu]iero", "QUIE·ro"), W("ra[qu]eta", "ra·QUE·ta")])
+      ],
+      defaults: ["ca", "ce", "ga", "ge"],
+      lesson: [
+        { f: "c + a, o, u → k · c + e, i → s", ex: "[c]asa · [c]osa · [c]ena · [c]ine" },
+        { f: "g + a, o, u → g · g + e, i → j", ex: "[g]ato · [g]usto · [g]ente · [g]imnasio" },
+        { f: "gue, gui → g (la u no suena)", ex: "[gu]erra · [gu]itarra" },
+        { f: "güe, güi → gu (la u suena)", ex: "pin[gü]ino · ver[gü]enza" },
+        { f: "que, qui → k", ex: "[qu]eso · [qu]ince" }
+      ],
+      tip: L("Por eso se escribe qu y gu: para que antes de e o i se mantenga el sonido k o g.",
+             "That's why qu and gu exist: to keep the k or g sound before e or i.")
+    },
+    {
+      id: "pronombres", type: "pack", name: L("Pronombres personales", "Subject pronouns"),
+      desc: L("yo, vos, él, ella, usted, nosotros, ustedes, ellos.", "yo, vos, él, ella, usted, nosotros, ustedes, ellos."),
+      tag: L("pronombres", "pronouns"),
+      lesson: [
+        { f: "yo · vos · él, ella, usted", ex: "[Vos] sos · [usted] es" },
+        { f: "nosotros/as · ustedes · ellos/as", ex: "[Ustedes] son (acá no se usa «vosotros»)" },
+        { f: "muchas veces no hace falta", ex: "Vivimos en Palermo. (= nosotros)" }
+      ],
+      tip: L("En Argentina: vos en vez de tú, y ustedes para el plural, también con amigos.",
+             "In Argentina: vos instead of tú, and ustedes for the plural, even with friends."),
+      items: [
+        { id: "p01", es: "[Yo] soy de Estados Unidos.", en: "I'm from the United States.", p: "yo" },
+        { id: "p02", es: "¿[Vos] sos de acá?", en: "Are you from here?", p: "vos" },
+        { id: "p03", es: "[Ella] trabaja en un banco.", en: "She works at a bank.", p: "ella" },
+        { id: "p04", es: "[Nosotros] vivimos en Palermo.", en: "We live in Palermo.", p: "nosotros" },
+        { id: "p05", es: "[Ustedes] hablan muy rápido.", en: "You (all) speak very fast.", p: "ustedes" },
+        { id: "p06", es: "[Ellos] llegan mañana.", en: "They arrive tomorrow.", p: "ellos" },
+        { id: "p07", es: "¿[Usted] es el dueño?", en: "Are you (formal) the owner?", p: "usted" },
+        { id: "p08", es: "[Él] es mi marido.", en: "He's my husband.", p: "él" },
+        { id: "p09", es: "[Nosotras] somos hermanas.", en: "We're sisters.", p: "nosotras" },
+        { id: "p10", es: "[Vos] tenés razón.", en: "You're right.", p: "vos" },
+        { id: "p11", es: "[Ellas] son de Córdoba.", en: "They (women) are from Córdoba.", p: "ellas" },
+        { id: "p12", es: "¿Y [vos]? ¿Qué hacés?", en: "And you? What do you do?", p: "vos" }
+      ]
+    },
+    {
+      id: "objeto-directo", type: "pack", name: L("Objeto directo", "Direct object pronouns"),
+      desc: L("lo, la, los, las, me, te, nos: «Sí, lo vi».", "lo, la, los, las, me, te, nos: «Sí, lo vi»."),
+      tag: L("objeto directo", "direct object"),
+      lesson: [
+        { f: "me · te · lo / la · nos · los / las", ex: "¿Viste a Juan? Sí, [lo] vi." },
+        { f: "antes del verbo conjugado", ex: "[La] conozco." },
+        { f: "o pegado al infinitivo", ex: "Voy a llamar[lo]." },
+        { f: "lo / la = una persona o una cosa", ex: "El auto [lo] estacioné acá." }
+      ],
+      tip: L("En Argentina se usa «lo» para él: «lo vi», no «le vi».", "In Argentina «lo» is used for him: «lo vi», not «le vi»."),
+      items: [
+        { id: "d01", es: "¿Viste a Juan? Sí, [lo] vi ayer.", en: "Did you see Juan? Yes, I saw him yesterday.", p: "lo = a Juan" },
+        { id: "d02", es: "¿Tenés las llaves? Sí, [las] tengo.", en: "Do you have the keys? Yes, I have them.", p: "las = las llaves" },
+        { id: "d03", es: "Compré pan y [lo] dejé en la mesa.", en: "I bought bread and left it on the table.", p: "lo = el pan" },
+        { id: "d04", es: "¿Me escuchás? Sí, [te] escucho.", en: "Can you hear me? Yes, I can hear you.", p: "te = a vos" },
+        { id: "d05", es: "¿Dónde está el auto? [Lo] estacioné en la esquina.", en: "Where's the car? I parked it on the corner.", p: "lo = el auto" },
+        { id: "d06", es: "Las empanadas [las] compré en la esquina.", en: "I bought the empanadas on the corner.", p: "las = las empanadas" },
+        { id: "d07", es: "¿Conocés a María? Sí, [la] conozco.", en: "Do you know María? Yes, I know her.", p: "la = a María" },
+        { id: "d08", es: "Voy a llamar[lo] mañana.", en: "I'm going to call him tomorrow.", p: "pegado al infinitivo" },
+        { id: "d09", es: "¿[Nos] esperás? Ya salimos.", en: "Will you wait for us? We're just leaving.", p: "nos = a nosotros" },
+        { id: "d10", es: "Estos zapatos [los] compré en Once.", en: "I bought these shoes in Once.", p: "los = los zapatos" },
+        { id: "d11", es: "¿La cuenta? Ya [la] pagué.", en: "The bill? I already paid it.", p: "la = la cuenta" },
+        { id: "d12", es: "¿[Me] llamás después?", en: "Will you call me later?", p: "me = a mí" },
+        { id: "d13", es: "La película está buena: quiero ver[la] otra vez.", en: "The movie is good: I want to see it again.", p: "pegado al infinitivo" },
+        { id: "d14", es: "No [lo] sé.", en: "I don't know.", p: "lo = eso" }
+      ]
+    },
+    {
+      id: "objeto-indirecto", type: "pack", name: L("Objeto indirecto", "Indirect object pronouns"),
+      desc: L("me, te, le, nos, les: «Le di el libro».", "me, te, le, nos, les: «Le di el libro»."),
+      tag: L("objeto indirecto", "indirect object"),
+      lesson: [
+        { f: "me · te · le · nos · les", ex: "[Le] di el libro a Juan." },
+        { f: "a quién, para quién", ex: "[Te] mando un mensaje." },
+        { f: "gustar, encantar, doler", ex: "[Me] gusta · [nos] encanta · [me] duele" },
+        { f: "muchas veces se repite con «a …»", ex: "[Le] di el libro [a Juan]." }
+      ],
+      tip: L("Con gustar, lo que gusta es la cosa: a mí me gusta el mate, a ellos les gustan las empanadas.",
+             "With gustar, the thing liked is the subject: a mí me gusta el mate, a ellos les gustan las empanadas."),
+      items: [
+        { id: "i01", es: "[Le] di el libro a Juan.", en: "I gave Juan the book.", p: "le = a Juan" },
+        { id: "i02", es: "¿[Me] pasás la sal?", en: "Can you pass me the salt?", p: "me = a mí" },
+        { id: "i03", es: "[Les] escribo a mis viejos todos los domingos.", en: "I write to my parents every Sunday.", p: "les = a mis viejos" },
+        { id: "i04", es: "[Te] mando un mensaje más tarde.", en: "I'll send you a message later.", p: "te = a vos" },
+        { id: "i05", es: "El mozo [nos] trajo la cuenta.", en: "The waiter brought us the bill.", p: "nos = a nosotros" },
+        { id: "i06", es: "A mi hermana [le] gusta el mate.", en: "My sister likes mate.", p: "gustar: le" },
+        { id: "i07", es: "¿[Le] preguntaste al mozo?", en: "Did you ask the waiter?", p: "le = al mozo" },
+        { id: "i08", es: "[Les] dije que sí.", en: "I told them yes.", p: "les = a ellos" },
+        { id: "i09", es: "¿Qué [te] dijo el médico?", en: "What did the doctor tell you?", p: "te = a vos" },
+        { id: "i10", es: "[Me] duele la cabeza.", en: "My head hurts.", p: "doler: me" },
+        { id: "i11", es: "¿[Le] podés dar esto a Ana?", en: "Can you give this to Ana?", p: "le = a Ana" },
+        { id: "i12", es: "[Nos] encanta Buenos Aires.", en: "We love Buenos Aires.", p: "encantar: nos" },
+        { id: "i13", es: "Voy a decir[le] la verdad.", en: "I'm going to tell him the truth.", p: "pegado al infinitivo" },
+        { id: "i14", es: "A ustedes, ¿[les] gusta el asado?", en: "Do you (all) like asado?", p: "gustar: les" }
+      ]
+    },
+    {
+      id: "dobles", type: "pack", name: L("Me lo · se lo", "Me lo · se lo"),
+      desc: L("Los dos pronombres juntos: «Sí, se lo di».", "Both pronouns together: «Sí, se lo di»."),
+      tag: L("me lo · se lo", "me lo · se lo"),
+      lesson: [
+        { f: "indirecto + directo", ex: "[me lo] · [te la] · [nos los]" },
+        { f: "le / les + lo, la → se lo, se la", ex: "[Se lo] di. (nunca «le lo»)" },
+        { f: "pegados al infinitivo, con tilde", ex: "Voy a dár[selo]." }
+      ],
+      tip: L("El orden es siempre el mismo: primero a quién (me, te, se, nos), después qué (lo, la, los, las).",
+             "The order never changes: first to whom (me, te, se, nos), then what (lo, la, los, las)."),
+      items: [
+        { id: "x01", es: "¿Le diste el regalo? Sí, [se lo] di.", en: "Did you give him the present? Yes, I gave it to him.", p: "le + lo → se lo" },
+        { id: "x02", es: "¿Me prestás la birome? Sí, [te la] presto.", en: "Will you lend me the pen? Yes, I'll lend it to you.", p: "te + la" },
+        { id: "x03", es: "La cuenta, ¿[nos la] traés?", en: "Can you bring us the bill?", p: "nos + la" },
+        { id: "x04", es: "¿Quién te dio eso? [Me lo] dio mi viejo.", en: "Who gave you that? My dad gave it to me.", p: "me + lo" },
+        { id: "x05", es: "Las fotos [se las] mando a mis amigos.", en: "I'll send the photos to my friends.", p: "les + las → se las" },
+        { id: "x06", es: "¿Le contaste a tu mamá? Sí, ya [se lo] conté.", en: "Did you tell your mom? Yes, I already told her.", p: "le + lo → se lo" },
+        { id: "x07", es: "No [te lo] puedo decir.", en: "I can't tell you.", p: "te + lo" },
+        { id: "x08", es: "¿[Me lo] explicás otra vez?", en: "Can you explain it to me again?", p: "me + lo" },
+        { id: "x09", es: "Voy a dár[selo] mañana.", en: "I'm going to give it to him tomorrow.", p: "pegado al infinitivo" },
+        { id: "x10", es: "Las llaves [se las] dejé al portero.", en: "I left the keys with the doorman.", p: "le + las → se las" },
+        { id: "x11", es: "¿El vino? [Nos lo] regalaron.", en: "The wine? They gave it to us.", p: "nos + lo" },
+        { id: "x12", es: "[Te lo] juro.", en: "I swear.", p: "te + lo" }
+      ]
+    }
+  );
+  // Listed roughly in the order a learner meets them, A1 → B1 (mason,
+  // 2026-10-06), with the level as a badge.
+  var TOPIC_ORDER = [
+    ["abecedario", "A1"], ["vocales", "A1"], ["consonantes", "A1"], ["c-g", "A1"], ["pronombres", "A1"],
+    ["numeros", "A1"], ["precios", "A1"], ["hora", "A1"], ["fechas", "A1"],
+    ["hay-que", "A2"], ["comparativos", "A2"], ["ya-todavia", "A2"], ["objeto-directo", "A2"], ["objeto-indirecto", "A2"],
+    ["dobles", "B1"]
+  ];
+  TOPICS.forEach(function (tp) {
+    var i = TOPIC_ORDER.findIndex(function (o) { return o[0] === tp.id; });
+    tp.order = i === -1 ? 999 : i;
+    tp.level = i === -1 ? "" : TOPIC_ORDER[i][1];
+  });
+  TOPICS.sort(function (a, b) { return a.order - b.order; });
   var TOPIC_DECK_SIZE = 20;
   var TOPIC_RANGES_KEY = "iv-topic-ranges";
   var topicData = {}; // id -> { topic: id } (the card's data object, shared per topic)
@@ -6882,8 +7160,12 @@
     var range = unitKey.slice(0, i), value = unitKey.slice(i + 1);
     var r = topicRange(tp, range);
     if (!r) return null;
-    var c = tp.card(range, value);
-    return Object.assign(base, c, { bigFront: true, backSub: c.backSub || "", listenTag: topicText(tp.tag) + " · " + topicText(r.label) });
+    var c = r.items ? wordCardFor(r, value) : tp.card(range, value);
+    if (!c) return null;
+    // Word topics (pronunciation, spelling): the tag is just the topic —
+    // the range would tell you how the word sounds or is spelled.
+    var tag = r.items || c.wordFront ? topicText(tp.tag) : topicText(tp.tag) + " · " + topicText(r.label);
+    return Object.assign(base, c, { bigFront: !c.wordFront, backSub: c.backSub || "", listenTag: tag });
   }
   function topicCardFromUnit(topicId, formKey) {
     var tp = topicById(topicId);
@@ -6945,6 +7227,7 @@
   function topicHistoryReady() { return !!(practiceHistory.rows && currentUser && practiceHistory.userId === currentUser.id); }
   function renderTopicList() {
     if (!el.topicList) return;
+    var keepScroll = el.topicList.scrollTop;
     el.topicList.innerHTML = "";
     var ready = topicHistoryReady() || practiceQueue.length;
     TOPICS.forEach(function (tp) {
@@ -6954,6 +7237,7 @@
       btn.className = "card-row topic-row" + (tp.id === selectedTopicId ? " is-selected" : "");
       btn.dataset.topicId = tp.id;
       btn.appendChild(progEl("span", "inf", topicText(tp.name)));
+      if (tp.level) btn.appendChild(badge("level", tp.level));
       btn.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
       btn.appendChild(progEl("span", "def", topicText(tp.desc)));
       if (ready) btn.appendChild(topicTrack(topicStats(tp)));
@@ -6963,7 +7247,35 @@
       li.appendChild(btn);
       el.topicList.appendChild(li);
     });
+    fitTopicList();
+    el.topicList.scrollTop = keepScroll;
   }
+  // Same box as the Verbos / Vocabulario / Frases lists (mason, 2026-10-06:
+  // "there will probably be MANY topics"): exactly 5 rows tall, the rest
+  // behind the list's own scroller. Rows wrap differently by width, so the
+  // height is measured from the rows themselves.
+  function fitTopicList() {
+    var list = el.topicList;
+    if (!list || !list.offsetParent) return;
+    var rows = list.children;
+    if (rows.length <= 5) { list.style.height = ""; return; }
+    var keep = list.scrollTop;
+    list.style.height = "";
+    var top = list.getBoundingClientRect().top;
+    var cs = getComputedStyle(list);
+    var h = rows[4].getBoundingClientRect().bottom - top + (parseFloat(cs.borderBottomWidth) || 0);
+    list.style.height = Math.ceil(h) + "px";
+    list.scrollTop = keep;
+  }
+  function scrollTopicRowIntoList(id) {
+    var row = el.topicList.querySelector('[data-topic-id="' + id + '"]');
+    if (!row) return;
+    var li = row.parentNode, list = el.topicList;
+    if (li.offsetTop < list.scrollTop || li.offsetTop + li.offsetHeight > list.scrollTop + list.clientHeight) {
+      list.scrollTop = Math.max(0, li.offsetTop - 4);
+    }
+  }
+  window.addEventListener("resize", function () { if (el.topicsPanel && !el.topicsPanel.hidden) fitTopicList(); });
   function deselectTopic() {
     selectedTopicId = null;
     el.topicDetail.hidden = true;
@@ -6991,6 +7303,7 @@
     el.tdName.textContent = topicText(tp.name);
     el.tdDesc.textContent = topicText(tp.desc);
     el.tdBadges.innerHTML = "";
+    if (tp.level) el.tdBadges.appendChild(badge("level", tp.level));
     el.tdBadges.appendChild(badge(tp.type === "pack" ? "register" : "type", tp.type === "pack" ? t("topic_badge_n", { n: tp.items.length }) : t("topic_badge_gen")));
     // the lesson
     el.tdLesson.innerHTML = "";
@@ -7022,6 +7335,7 @@
     }
     el.topicDetail.hidden = false;
     renderTopicList();
+    scrollTopicRowIntoList(id);
     renderItemHistory("topic");
     if (!quiet) el.topicDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
@@ -7030,10 +7344,9 @@
     if (!tp) return;
     el.tdRangesWrap.hidden = tp.type !== "gen";
     el.tdRanges.innerHTML = "";
-    var size = tp.type === "pack" ? Math.min(TOPIC_DECK_SIZE, tp.items.length) : TOPIC_DECK_SIZE;
-    el.tdCount.textContent = t("topic_count", { n: size });
+    var on = tp.type === "gen" ? topicSavedRanges(tp) : [];
+    el.tdCount.textContent = t("topic_count", { n: topicDeckSize(tp, on) });
     if (tp.type !== "gen") return;
-    var on = topicSavedRanges(tp);
     tp.ranges.forEach(function (r) {
       var active = on.indexOf(r.key) !== -1;
       el.tdRanges.appendChild(flashPickChip(topicText(r.label), active ? "all" : "none", function () {
@@ -7045,6 +7358,15 @@
         renderTopicRanges();
       }));
     });
+  }
+  // How many cards Practicar makes: 20, or fewer when the chosen ranges
+  // are short word lists (a pack: all its sentences, up to 20).
+  function topicDeckSize(tp, on) {
+    if (tp.type === "pack") return Math.min(TOPIC_DECK_SIZE, tp.items.length);
+    var sized = on.map(function (k) { return topicRange(tp, k); }).filter(Boolean);
+    if (!sized.length) return 0;
+    if (sized.some(function (r) { return !r.size; })) return TOPIC_DECK_SIZE;
+    return Math.min(TOPIC_DECK_SIZE, sized.reduce(function (s, r) { return s + r.size; }, 0));
   }
   function renderTopicModeControls() {
     if (!el.tdModeRead) return;
@@ -7102,6 +7424,7 @@
     var topic = card && card.kind === "topic";
     el.flashKnownToggle.style.display = topic ? "none" : "";
     el.flashFrontMain.classList.toggle("is-number", !!(topic && card.bigFront && !card.listen));
+    el.flashFrontMain.classList.toggle("is-word", !!(topic && card.wordFront && !card.listen));
     el.flashTopicTag.textContent = topic && !card.listen && card.choice ? card.choice : "";
     el.flashTopicTag.hidden = !el.flashTopicTag.textContent;
     if (!topic) return;
@@ -7112,6 +7435,10 @@
         el.flashFrontCloze.hidden = !card.cue;
       }
       topicSentenceInto(el.flashBackMain, card.sentence, "fill");
+    } else {
+      // pronunciation words: the letters in focus highlighted
+      if (card.frontRich && !card.listen) topicSentenceInto(el.flashFrontMain, card.frontRich, "fill");
+      if (card.listen && card.listenBackRich) topicSentenceInto(el.flashBackMain, card.listenBackRich, "fill");
     }
   }
 
@@ -7206,7 +7533,7 @@
     el.tdSentencesToggle.classList.toggle("open", open);
     el.tdSentencesToggle.setAttribute("aria-expanded", open ? "true" : "false");
   });
-  window.voseTopics = { numWords: numWords, pesosWords: pesosWords, horaWords: horaWords, fechaWords: fechaWords, card: topicCardFromUnit, deck: function (id) { return buildTopicDeck(topicById(id)); } };
+  window.voseTopics = { topics: TOPICS, numWords: numWords, pesosWords: pesosWords, horaWords: horaWords, fechaWords: fechaWords, card: topicCardFromUnit, deck: function (id) { return buildTopicDeck(topicById(id)); } };
 
   // ================= Progreso + Tu historial (2026-10-03) =================
   // Everything here is computed on the device from the practice log (see
