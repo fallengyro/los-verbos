@@ -1220,3 +1220,158 @@ alter table public.game_records add constraint game_records_game_check
 alter table public.rewards drop constraint if exists rewards_reason_check;
 alter table public.rewards add constraint rewards_reason_check
   check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2}|crono:[a-z0-9:-]{1,48}:\d{4}-\d{2}-\d{2})$');
+
+-- ---------------------------------------------------------------------------
+-- Profiles + friends (2026-10-06), the first step towards Te reto.
+-- mason: add a friend with a code or an invite link, and they accept; no
+-- public directory — nobody can be found by email or name.
+--
+-- profiles: one per account — a display name (shown to friends, and on
+-- your shared lists instead of the email) and a friend code (8 letters /
+-- digits, no look-alikes; shown as XXXX-XXXX). Only you can read or change
+-- your own row; friends see your name through friends_list().
+create table if not exists public.profiles (
+  user_id uuid primary key default auth.uid() references auth.users(id) on delete cascade,
+  display_name text not null,
+  friend_code text not null unique,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.profiles drop constraint if exists profiles_name_check;
+alter table public.profiles add constraint profiles_name_check
+  check (char_length(btrim(display_name)) between 1 and 24 and display_name !~ '[[:cntrl:]<>]');
+alter table public.profiles drop constraint if exists profiles_code_check;
+alter table public.profiles add constraint profiles_code_check
+  check (friend_code ~ '^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$');
+alter table public.profiles enable row level security;
+drop policy if exists "select own profile" on public.profiles;
+create policy "select own profile" on public.profiles for select using (auth.uid() = user_id);
+drop policy if exists "update own profile" on public.profiles;
+create policy "update own profile" on public.profiles for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- rows are created by ensure_profile() (it picks the code), not inserted directly
+revoke insert on public.profiles from anon, authenticated;
+-- only the name can be changed (table-wide UPDATE would let the code be rewritten)
+revoke update on public.profiles from anon, authenticated;
+grant update (display_name, updated_at) on public.profiles to authenticated;
+
+-- friendships: one row per pair. 'pending' until the addressee accepts.
+-- Either side can delete it (cancel, decline, unfriend).
+create table if not exists public.friendships (
+  id uuid primary key default gen_random_uuid(),
+  requester uuid not null references auth.users(id) on delete cascade,
+  addressee uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending',
+  created_at timestamptz not null default now(),
+  responded_at timestamptz,
+  constraint friendships_not_self check (requester <> addressee),
+  constraint friendships_status_check check (status in ('pending', 'accepted'))
+);
+create unique index if not exists friendships_pair_idx on public.friendships (least(requester, addressee), greatest(requester, addressee));
+alter table public.friendships enable row level security;
+drop policy if exists "select own friendships" on public.friendships;
+create policy "select own friendships" on public.friendships for select using (auth.uid() in (requester, addressee));
+drop policy if exists "delete own friendships" on public.friendships;
+create policy "delete own friendships" on public.friendships for delete using (auth.uid() in (requester, addressee));
+-- inserts and accepting go through the functions below
+revoke insert, update on public.friendships from anon, authenticated;
+
+-- Your profile, created the first time (name = what the app suggests,
+-- normally the part of your email before "@"; you can change it).
+create or replace function public.ensure_profile(p_name text)
+returns public.profiles
+language plpgsql security definer set search_path = public as $$
+declare
+  me uuid := auth.uid();
+  row public.profiles;
+  alphabet text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  code text;
+  tries int := 0;
+  nm text := left(btrim(regexp_replace(coalesce(p_name, ''), '[[:cntrl:]<>]', '', 'g')), 24);
+begin
+  if me is null then raise exception 'sign_in_required'; end if;
+  select * into row from public.profiles where user_id = me;
+  if found then return row; end if;
+  if nm = '' then nm := 'yo'; end if;
+  loop
+    code := '';
+    for i in 1..8 loop code := code || substr(alphabet, 1 + floor(random() * length(alphabet))::int, 1); end loop;
+    begin
+      insert into public.profiles (user_id, display_name, friend_code) values (me, nm, code) returning * into row;
+      return row;
+    exception when unique_violation then
+      tries := tries + 1;
+      if tries > 10 then raise; end if;
+    end;
+  end loop;
+end $$;
+
+-- Send a request with someone's code. Returns { result, name }:
+--   sent      a new request
+--   accepted  they had already asked you, so now you're friends
+--   already   a request or friendship already exists
+--   self      it's your own code
+--   not_found no such code
+--   too_many  20 requests of yours are already waiting
+create or replace function public.friend_request(p_code text)
+returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  me uuid := auth.uid();
+  code text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9]', '', 'g'));
+  other public.profiles;
+  f public.friendships;
+begin
+  if me is null then raise exception 'sign_in_required'; end if;
+  select * into other from public.profiles where friend_code = code;
+  if not found then return json_build_object('result', 'not_found'); end if;
+  if other.user_id = me then return json_build_object('result', 'self'); end if;
+  select * into f from public.friendships
+    where least(requester, addressee) = least(me, other.user_id) and greatest(requester, addressee) = greatest(me, other.user_id);
+  if found then
+    if f.status = 'pending' and f.addressee = me then
+      update public.friendships set status = 'accepted', responded_at = now() where id = f.id;
+      return json_build_object('result', 'accepted', 'name', other.display_name);
+    end if;
+    return json_build_object('result', 'already', 'name', other.display_name);
+  end if;
+  if (select count(*) from public.friendships where requester = me and status = 'pending') >= 20 then
+    return json_build_object('result', 'too_many');
+  end if;
+  insert into public.friendships (requester, addressee) values (me, other.user_id);
+  return json_build_object('result', 'sent', 'name', other.display_name);
+end $$;
+
+-- Accept a request sent to you (decline = delete the row).
+create or replace function public.friend_accept(p_id uuid)
+returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.friendships set status = 'accepted', responded_at = now()
+    where id = p_id and addressee = auth.uid() and status = 'pending';
+  return found;
+end $$;
+
+-- Your friends and requests, with the other person's display name.
+create or replace function public.friends_list()
+returns table (id uuid, other_id uuid, display_name text, status text, incoming boolean, created_at timestamptz)
+language sql stable security definer set search_path = public as $$
+  select f.id,
+         case when f.requester = auth.uid() then f.addressee else f.requester end,
+         coalesce(p.display_name, '?'),
+         f.status,
+         f.addressee = auth.uid(),
+         f.created_at
+  from public.friendships f
+  left join public.profiles p on p.user_id = case when f.requester = auth.uid() then f.addressee else f.requester end
+  where auth.uid() in (f.requester, f.addressee)
+  order by f.status, p.display_name;
+$$;
+
+revoke execute on function public.ensure_profile(text) from public, anon;
+revoke execute on function public.friend_request(text) from public, anon;
+revoke execute on function public.friend_accept(uuid) from public, anon;
+revoke execute on function public.friends_list() from public, anon;
+grant execute on function public.ensure_profile(text) to authenticated;
+grant execute on function public.friend_request(text) to authenticated;
+grant execute on function public.friend_accept(uuid) to authenticated;
+grant execute on function public.friends_list() to authenticated;

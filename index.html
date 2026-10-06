@@ -789,6 +789,49 @@
       <ul class="card-list cr-list" id="cr-list"></ul>
       <p class="play-fine" data-i18n="cr_fine"></p>
     </section>
+    <!-- Amigos (profiles + friends, for Te reto). See app.js's "Amigos". -->
+    <section class="detail play-amigos" id="play-amigos" hidden>
+      <button type="button" class="icon-btn play-album-back" id="am-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 data-i18n="am_title">Amigos</h2>
+          <p class="definition" data-i18n="am_desc"></p>
+        </div>
+      </div>
+      <p class="form-msg is-warn" id="am-missing" data-i18n="am_missing" hidden></p>
+      <div id="am-body" hidden>
+        <div class="am-me">
+          <label class="am-lab" for="am-name" data-i18n="am_you">Tu nombre</label>
+          <div class="am-inline">
+            <input type="text" id="am-name" maxlength="24" autocomplete="nickname" />
+            <button type="button" class="btn-secondary" id="am-name-save" data-i18n="am_save">Guardar</button>
+          </div>
+          <p class="play-fine am-help" data-i18n="am_name_help"></p>
+          <p class="am-lab" data-i18n="am_your_code">Tu código</p>
+          <div class="am-inline am-code-row">
+            <span class="am-code" id="am-code-shown"></span>
+            <button type="button" class="btn-secondary" id="am-copy" data-i18n="am_copy">Copiar enlace</button>
+            <button type="button" class="btn-secondary" id="am-share" data-i18n="am_share" hidden>Compartir</button>
+          </div>
+        </div>
+        <div class="am-add">
+          <label class="am-lab" for="am-code" data-i18n="am_add_label">Agregar a alguien</label>
+          <div class="am-inline">
+            <input type="text" id="am-code" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" data-i18n-placeholder="am_code_ph" />
+            <button type="button" class="btn-primary" id="am-add" data-i18n="am_add">Agregar</button>
+          </div>
+          <p class="form-msg am-msg" id="am-msg" aria-live="polite"></p>
+        </div>
+        <p class="flash-group-label" id="am-in-lab" data-i18n="am_in" hidden>Te quieren agregar</p>
+        <ul class="am-list" id="am-in" hidden></ul>
+        <p class="flash-group-label" id="am-out-lab" data-i18n="am_out" hidden>Esperando respuesta</p>
+        <ul class="am-list" id="am-out" hidden></ul>
+        <p class="flash-group-label" id="am-friends-lab" data-i18n="am_friends">Tus amigos</p>
+        <ul class="am-list" id="am-friends" hidden></ul>
+        <p class="play-fine" id="am-none" data-i18n="am_none"></p>
+        <p class="play-fine am-soon" data-i18n="am_soon"></p>
+      </div>
+    </section>
     <section class="detail play-album" id="play-album" hidden>
       <button type="button" class="icon-btn play-album-back" id="play-album-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
       <div class="detail-head">

@@ -2290,3 +2290,31 @@
   .cr-row3 { display: flex; justify-content: center; gap: 24px; margin: 14px 0 12px; font-size: 13px; color: var(--ink-soft); }
   .cr-row3 b { display: block; font-size: 18px; color: var(--ink); }
   .cr-end .pt-blk { text-align: left; }
+
+  /* ---- Amigos (2026-10-06) ---- */
+  .play-amigos { display: block; margin-top: 4px; }
+  .play-amigos[hidden], #am-body[hidden], .am-list[hidden] { display: none; }
+  .am-me, .am-add { border-top: 1px solid var(--line); padding: 12px 0 4px; }
+  .am-lab { display: block; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+  .am-inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .am-inline input { flex: 1 1 160px; min-width: 0; }
+  .am-help { margin: 6px 0 12px; }
+  .am-code { font-family: "JetBrains Mono", monospace; font-size: 20px; letter-spacing: 0.08em; color: var(--ink); margin-right: auto; }
+  .am-msg { min-height: 1.2em; margin: 8px 0 0; }
+  .am-msg:not(.is-warn) { color: var(--teal); }
+  .am-list { list-style: none; margin: 0 0 8px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-raised); }
+  .am-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+  .am-row:first-child { border-top: 0; }
+  .am-who { flex: 1; min-width: 0; }
+  .am-who b { display: block; font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 16px; color: var(--ink); overflow-wrap: anywhere; }
+  .am-who span { font-size: 12.5px; color: var(--ink-soft); }
+  .am-row button { padding: 6px 12px; font-size: 13.5px; }
+  .am-row .is-danger { color: var(--danger); border-color: var(--danger); }
+  .am-soon { border-top: 1px solid var(--line); padding-top: 10px; }
+  .card-row.play-mode .stat.is-new { color: var(--accent-deep); font-weight: 600; }
+  .card-row.play-mode .stat.is-new::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); margin-right: 6px; transform: translateY(-1px); }
+  .am-inline input[type="text"] { font-family: "Public Sans", sans-serif; font-size: 16px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); }
+  .am-inline input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #am-code { font-family: "JetBrains Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  #am-code::placeholder { text-transform: none; letter-spacing: 0; font-family: "Public Sans", sans-serif; }
+  .am-add .am-msg:empty { display: none; }

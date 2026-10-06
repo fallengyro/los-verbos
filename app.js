@@ -251,6 +251,48 @@
       nav_progress: "Progreso",
       nav_topics: "Temas",
       nav_play: "Jugar",
+      am_title: "Amigos",
+      am_desc: "Para Te reto. Agregá a alguien con su código o con tu enlace; la otra persona acepta. Nadie te encuentra por tu email ni por tu nombre.",
+      am_missing: "Amigos todavía no está listo: falta correr la SQL nueva (pending_2026-10-06_amigos.sql).",
+      am_you: "Tu nombre",
+      am_name_help: "Lo ven tus amigos, y aparece en tus listas compartidas.",
+      am_save: "Guardar",
+      am_your_code: "Tu código",
+      am_copy: "Copiar enlace",
+      am_share: "Compartir",
+      am_add_label: "Agregar a alguien",
+      am_code_ph: "Su código (ABCD-1234)",
+      am_add: "Agregar",
+      am_in: "Te quieren agregar",
+      am_out: "Esperando respuesta",
+      am_friends: "Tus amigos",
+      am_none: "Todavía no tenés amigos acá. Mandale tu enlace a alguien.",
+      am_soon: "Te reto llega pronto: la misma tanda de 20 tarjetas para los dos, en Hablar.",
+      am_wants: "quiere ser tu amigo",
+      am_waiting: "todavía no aceptó",
+      am_accept: "Aceptar",
+      am_decline: "Rechazar",
+      am_cancel: "Cancelar",
+      am_remove: "Quitar",
+      am_remove_sure: "¿Seguro? Quitar",
+      am_code_bad: "El código tiene 8 letras y números.",
+      am_sent: "Listo: le mandaste la solicitud a {name}.",
+      am_accepted_now: "{name} ya te había agregado: ahora son amigos.",
+      am_already: "Ya le mandaste una solicitud a {name}, o ya son amigos.",
+      am_self: "Ese es tu propio código.",
+      am_not_found: "No hay nadie con ese código.",
+      am_too_many: "Tenés muchas solicitudes esperando respuesta.",
+      am_now_friends: "Ahora vos y {name} son amigos.",
+      am_error: "No se pudo: {msg}",
+      am_name_bad: "Escribí un nombre (hasta 24 letras).",
+      am_name_saved: "Nombre guardado.",
+      am_link_copied: "Enlace copiado: pegáselo a quien quieras agregar.",
+      am_share_text: "Agregame en voseá ({name}):",
+      am_invited: "Te invitaron: tocá Agregar para mandar la solicitud.",
+      am_row_in: "{n} solicitudes nuevas",
+      am_row_in_one: "1 solicitud nueva",
+      am_row_friends: "{n} amigos",
+      am_row_friends_one: "1 amigo",
       cr_group_topics: "Temas",
       cr_group_mine: "Tu colección",
       cr_group_lists: "Tus listas",
@@ -300,7 +342,7 @@
       pt_crono_name: "Contrarreloj",
       pt_crono_def: "60 segundos, todas las que puedas. Cada Otra vez te saca 3. Un récord por tema y por parte de tu colección.",
       pt_reto_name: "Te reto",
-      pt_reto_def: "La misma tanda para los dos.",
+      pt_reto_def: "La misma tanda para los dos. Por ahora: agregá a tus amigos.",
       pt_nothing: "Todavía no hay nada para jugar: agregá verbos, palabras o frases, o practicá un tema.",
       pt_end: "Terminar",
       pt_why_due: "Para repasar",
@@ -880,6 +922,48 @@
       nav_progress: "Progress",
       nav_topics: "Topics",
       nav_play: "Play",
+      am_title: "Friends",
+      am_desc: "For Te reto. Add someone with their code or your link; they accept. Nobody can find you by email or name.",
+      am_missing: "Friends isn't ready yet: the new SQL (pending_2026-10-06_amigos.sql) still needs to be run.",
+      am_you: "Your name",
+      am_name_help: "Your friends see it, and it shows on your shared lists.",
+      am_save: "Save",
+      am_your_code: "Your code",
+      am_copy: "Copy link",
+      am_share: "Share",
+      am_add_label: "Add someone",
+      am_code_ph: "Their code (ABCD-1234)",
+      am_add: "Add",
+      am_in: "Want to add you",
+      am_out: "Waiting for an answer",
+      am_friends: "Your friends",
+      am_none: "No friends here yet. Send someone your link.",
+      am_soon: "Te reto is coming: the same 20 cards for both of you, spoken.",
+      am_wants: "wants to be friends",
+      am_waiting: "hasn't accepted yet",
+      am_accept: "Accept",
+      am_decline: "Decline",
+      am_cancel: "Cancel",
+      am_remove: "Remove",
+      am_remove_sure: "Sure? Remove",
+      am_code_bad: "A code has 8 letters and numbers.",
+      am_sent: "Done: request sent to {name}.",
+      am_accepted_now: "{name} had already added you: you're friends now.",
+      am_already: "You've already asked {name}, or you're already friends.",
+      am_self: "That's your own code.",
+      am_not_found: "Nobody has that code.",
+      am_too_many: "You have too many requests waiting for an answer.",
+      am_now_friends: "You and {name} are friends now.",
+      am_error: "Couldn't do that: {msg}",
+      am_name_bad: "Type a name (up to 24 characters).",
+      am_name_saved: "Name saved.",
+      am_link_copied: "Link copied: send it to whoever you want to add.",
+      am_share_text: "Add me on voseá ({name}):",
+      am_invited: "You were invited: tap Add to send the request.",
+      am_row_in: "{n} new requests",
+      am_row_in_one: "1 new request",
+      am_row_friends: "{n} friends",
+      am_row_friends_one: "1 friend",
       cr_group_topics: "Topics",
       cr_group_mine: "Your collection",
       cr_group_lists: "Your lists",
@@ -929,7 +1013,7 @@
       pt_crono_name: "Against the clock",
       pt_crono_def: "60 seconds, as many as you can. Each Again costs 3. A record for each topic and part of your collection.",
       pt_reto_name: "Challenge",
-      pt_reto_def: "The same cards for both of you.",
+      pt_reto_def: "The same cards for both of you. For now: add your friends.",
       pt_nothing: "Nothing to play yet: add some verbs, words or phrases, or practise a topic.",
       pt_end: "Finish",
       pt_why_due: "Due",
@@ -2573,6 +2657,25 @@
     crBien: document.getElementById("cr-bien"),
     crHint: document.getElementById("cr-hint"),
     crPanel: document.getElementById("cr-panel"),
+    playAmigos: document.getElementById("play-amigos"),
+    amBack: document.getElementById("am-back"),
+    amMissing: document.getElementById("am-missing"),
+    amBody: document.getElementById("am-body"),
+    amName: document.getElementById("am-name"),
+    amNameSave: document.getElementById("am-name-save"),
+    amCodeShown: document.getElementById("am-code-shown"),
+    amCopy: document.getElementById("am-copy"),
+    amShare: document.getElementById("am-share"),
+    amCode: document.getElementById("am-code"),
+    amAdd: document.getElementById("am-add"),
+    amMsg: document.getElementById("am-msg"),
+    amInLab: document.getElementById("am-in-lab"),
+    amIn: document.getElementById("am-in"),
+    amOutLab: document.getElementById("am-out-lab"),
+    amOut: document.getElementById("am-out"),
+    amFriendsLab: document.getElementById("am-friends-lab"),
+    amFriends: document.getElementById("am-friends"),
+    amNone: document.getElementById("am-none"),
     topicsPanel: document.getElementById("topics-panel"),
     topicList: document.getElementById("topic-list"),
     topicDetail: document.getElementById("topic-detail"),
@@ -3767,13 +3870,15 @@
     }
     if (tab === "progress") renderProgress();
     if (tab === "play") {
-      albumOpen = false; // the tab always opens on its home; the album and
-      cronoOpen = false; // Contrarreloj's list are one tap in
+      albumOpen = false; // the tab always opens on its home; the album,
+      cronoOpen = false; // Contrarreloj's list and Amigos are one tap in
+      amigosOpen = false;
       renderPlay();
       if (currentUser) {
         loadPracticeHistory(false).then(function () { if (!el.playPanel.hidden) { renderPlay(); playCheckRacha(); } });
         loadRewards();
         loadGameRecords();
+        loadAmigos();
       }
     }
     if (tab === "topics") {
@@ -8395,10 +8500,12 @@
   // ---- the tab ----
   function renderPlay() {
     if (!el.playPanel || el.playPanel.hidden) return;
-    el.playHome.hidden = albumOpen || cronoOpen;
+    el.playHome.hidden = albumOpen || cronoOpen || amigosOpen;
     el.playAlbum.hidden = !albumOpen;
     el.playCrono.hidden = !cronoOpen;
+    el.playAmigos.hidden = !amigosOpen;
     if (!currentUser) { el.playRacha.textContent = ""; return; }
+    if (amigosOpen) { drawAmigos(); return; }
     if (cronoOpen) { drawCrono(); return; }
     var m = playModel();
     if (albumOpen) { drawAlbum(); return; }
@@ -8409,7 +8516,7 @@
   }
   function openAlbum(open) {
     albumOpen = !!open;
-    if (open) cronoOpen = false;
+    if (open) { cronoOpen = false; amigosOpen = false; }
     renderPlay();
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
@@ -8580,7 +8687,7 @@
     album: ALBUM, streak: playStreak, sessions: playSessionStats, dayStr: playDayStr, weekOf: playWeekOf,
     rewards: function () { return rewardsForUser().slice(); }, goal: function () { return playGoal; },
     earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech,
-    partida: function () { return partida; }, crono: function () { return crono; }, crScopes: function () { return crScopes(); }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
+    partida: function () { return partida; }, crono: function () { return crono; }, amigos: function () { return amigos; }, crScopes: function () { return crScopes(); }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
   };
 
   // ================= Partida (2026-10-06) =================
@@ -9112,7 +9219,10 @@
     p.id = "play-partida";
     var cb = crBestOverall();
     row(t("pt_crono_name"), cb.best ? t("cr_row_stat", { n: cb.best, what: crScopeName(String(cb.scope).replace(/^(leer|hablar):/, "")) }) : "", t("pt_crono_def"), function () { openCrono(true); }).id = "play-crono-row";
-    row(t("pt_reto_name"), t("pt_soon"), t("pt_reto_def"), null);
+    var retoStat = amigosRowStat();
+    var reto = row(t("pt_reto_name"), retoStat, t("pt_reto_def"), function () { openAmigos(true); });
+    reto.id = "play-reto-row";
+    if (amigosIncoming().length) reto.querySelector(".stat").classList.add("is-new");
   }
 
   // ================= Contrarreloj (2026-10-06) =================
@@ -9243,7 +9353,7 @@
   // ---- the picker (on the Jugar tab) ----
   function openCrono(open) {
     cronoOpen = !!open;
-    if (open) albumOpen = false;
+    if (open) { albumOpen = false; amigosOpen = false; }
     renderPlay();
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
@@ -9528,6 +9638,210 @@
     btns.appendChild(again);
     e.appendChild(btns);
     box.appendChild(e);
+  }
+
+  // ================= Amigos: profiles + friends (2026-10-06) =================
+  // The first step towards Te reto (mason: "code or link, then they
+  // accept"; no public directory). From the Te reto row on the Jugar tab:
+  //   · Your profile: a display name (friends see it; your shared lists
+  //     show it instead of the email) and a friend code, XXXX-XXXX, with an
+  //     invite link (…/?amigo=CODE) to copy or share.
+  //   · Agregar: someone's code sends a request; they accept or decline.
+  //     A link opens this page with the code filled in — nothing is sent
+  //     until you tap Agregar.
+  //   · Requests to you (Aceptar / Rechazar), yours that are waiting
+  //     (Cancelar), and your friends (Quitar, after a second tap).
+  // Server side: public.profiles, public.friendships and the functions
+  // ensure_profile / friend_request / friend_accept / friends_list
+  // (pending_2026-10-06_amigos.sql). Te reto itself comes next.
+  var AMIGO_PENDING_KEY = "iv-amigo-pending";
+  var amigos = { userId: null, profile: null, list: [], loaded: false, loading: null, missing: false };
+  var amigosOpen = false;
+  var amigoConfirm = null; // friendship id whose "Quitar" is waiting for a second tap
+
+  function amigoCodeShown(code) { code = String(code || ""); return code.length === 8 ? code.slice(0, 4) + "-" + code.slice(4) : code; }
+  function amigoCodeClean(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+  function amigoInviteLink(code) { return location.origin + location.pathname + "?amigo=" + encodeURIComponent(code); }
+  function amigoNameClean(s) { return String(s || "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, 24); }
+
+  function loadAmigos(force) {
+    if (!currentUser) return Promise.resolve();
+    var uid = currentUser.id;
+    if (amigos.userId !== uid) amigos = { userId: uid, profile: null, list: [], loaded: false, loading: null, missing: false };
+    if (amigos.loading) return amigos.loading;
+    if (amigos.loaded && !force) return Promise.resolve();
+    var suggested = amigoNameClean((currentUser.email || "").split("@")[0]) || "yo";
+    amigos.loading = supabaseClient.rpc("ensure_profile", { p_name: suggested }).then(function (res) {
+      if (amigos.userId !== uid) return;
+      if (res.error) throw res.error;
+      amigos.profile = res.data || null;
+      return supabaseClient.rpc("friends_list").then(function (r2) {
+        if (r2.error) throw r2.error;
+        amigos.list = r2.data || [];
+      });
+    }).then(function () {
+      amigos.loading = null; amigos.loaded = true; amigos.missing = false;
+      renderAmigosEverywhere();
+    }, function (err) {
+      amigos.loading = null; amigos.loaded = true; amigos.missing = true;
+      console.warn("[amigos] not available yet:", err && err.message);
+      renderAmigosEverywhere();
+    });
+    return amigos.loading;
+  }
+  function renderAmigosEverywhere() {
+    if (!el.playPanel || el.playPanel.hidden) return;
+    if (amigosOpen) drawAmigos(); else if (!albumOpen && !cronoOpen) drawPlayModes();
+  }
+  function amigosIncoming() { return amigos.list.filter(function (f) { return f.status === "pending" && f.incoming; }); }
+  function amigosFriends() { return amigos.list.filter(function (f) { return f.status === "accepted"; }); }
+
+  function openAmigos(open) {
+    amigosOpen = !!open;
+    if (open) { albumOpen = false; cronoOpen = false; amigoConfirm = null; }
+    renderPlay();
+    if (open) loadAmigos(true);
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+
+  // ---- actions ----
+  function amigoMsg(text, warn) { el.amMsg.textContent = text || ""; el.amMsg.classList.toggle("is-warn", !!warn); }
+  function amigoAdd() {
+    var code = amigoCodeClean(el.amCode.value);
+    if (code.length !== 8) { amigoMsg(t("am_code_bad"), true); return; }
+    el.amAdd.disabled = true;
+    supabaseClient.rpc("friend_request", { p_code: code }).then(function (res) {
+      el.amAdd.disabled = false;
+      if (res.error) { amigoMsg(t("am_error", { msg: res.error.message }), true); return; }
+      var d = res.data || {};
+      var name = d.name || "";
+      var key = { sent: "am_sent", accepted: "am_accepted_now", already: "am_already", self: "am_self", not_found: "am_not_found", too_many: "am_too_many" }[d.result] || "am_not_found";
+      amigoMsg(t(key, { name: name }), !(d.result === "sent" || d.result === "accepted"));
+      if (d.result === "sent" || d.result === "accepted") { el.amCode.value = ""; try { localStorage.removeItem(AMIGO_PENDING_KEY); } catch (e) {} }
+      loadAmigos(true);
+    }, function (err) { el.amAdd.disabled = false; amigoMsg(t("am_error", { msg: (err && err.message) || "" }), true); });
+  }
+  function amigoAccept(f) {
+    supabaseClient.rpc("friend_accept", { p_id: f.id }).then(function (res) {
+      if (res.error) { amigoMsg(t("am_error", { msg: res.error.message }), true); return; }
+      amigoMsg(t("am_now_friends", { name: f.display_name }));
+      loadAmigos(true);
+    });
+  }
+  function amigoRemove(f) {
+    supabaseClient.from("friendships").delete().eq("id", f.id).then(function (res) {
+      if (res.error) { amigoMsg(t("am_error", { msg: res.error.message }), true); return; }
+      amigoConfirm = null;
+      amigoMsg("");
+      loadAmigos(true);
+    });
+  }
+  function amigoSaveName() {
+    var name = amigoNameClean(el.amName.value);
+    if (!name) { amigoMsg(t("am_name_bad"), true); return; }
+    if (!amigos.profile || name === amigos.profile.display_name) { el.amName.value = name; return; }
+    el.amNameSave.disabled = true;
+    supabaseClient.from("profiles").update({ display_name: name, updated_at: new Date().toISOString() }).eq("user_id", currentUser.id).then(function (res) {
+      el.amNameSave.disabled = false;
+      if (res.error) { amigoMsg(t("am_error", { msg: res.error.message }), true); return; }
+      amigos.profile.display_name = name;
+      amigoMsg(t("am_name_saved"));
+      // your shared lists show the new name too
+      supabaseClient.from("lists").update({ owner_label: name }).eq("user_id", currentUser.id).then(function () { loadLists(); });
+      drawAmigos();
+    });
+  }
+  function amigoCopyLink() {
+    if (!amigos.profile) return;
+    var link = amigoInviteLink(amigos.profile.friend_code);
+    function done() { amigoMsg(t("am_link_copied")); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { amigoMsg(link); });
+    else amigoMsg(link);
+  }
+  function amigoShareLink() {
+    if (!amigos.profile || !navigator.share) return;
+    navigator.share({ title: "voseá", text: t("am_share_text", { name: amigos.profile.display_name }), url: amigoInviteLink(amigos.profile.friend_code) }).catch(function () {});
+  }
+
+  // ---- the page ----
+  function drawAmigos() {
+    var p = amigos.profile;
+    el.amMissing.hidden = !amigos.missing;
+    el.amBody.hidden = amigos.missing || !p;
+    if (!p) return;
+    if (document.activeElement !== el.amName) el.amName.value = p.display_name;
+    el.amCodeShown.textContent = amigoCodeShown(p.friend_code);
+    el.amShare.hidden = !navigator.share;
+    function section(box, rows, build) {
+      box.innerHTML = "";
+      box.hidden = !rows.length;
+      rows.forEach(function (f) { box.appendChild(build(f)); });
+    }
+    function line(f, sub) {
+      var li = progEl("li", "am-row");
+      var who = progEl("span", "am-who");
+      who.appendChild(progEl("b", null, f.display_name));
+      if (sub) who.appendChild(progEl("span", null, sub));
+      li.appendChild(who);
+      return li;
+    }
+    section(el.amIn, amigosIncoming(), function (f) {
+      var li = line(f, t("am_wants"));
+      li.appendChild(progButton(t("am_decline"), false, function () { amigoRemove(f); }));
+      li.appendChild(progButton(t("am_accept"), true, function () { amigoAccept(f); }));
+      return li;
+    });
+    el.amInLab.hidden = !amigosIncoming().length;
+    var out = amigos.list.filter(function (f) { return f.status === "pending" && !f.incoming; });
+    section(el.amOut, out, function (f) {
+      var li = line(f, t("am_waiting"));
+      li.appendChild(progButton(t("am_cancel"), false, function () { amigoRemove(f); }));
+      return li;
+    });
+    el.amOutLab.hidden = !out.length;
+    var fr = amigosFriends();
+    section(el.amFriends, fr, function (f) {
+      var li = line(f, "");
+      var confirm = amigoConfirm === f.id;
+      var b = progButton(t(confirm ? "am_remove_sure" : "am_remove"), false, function () {
+        if (amigoConfirm === f.id) amigoRemove(f); else { amigoConfirm = f.id; drawAmigos(); }
+      });
+      if (confirm) b.classList.add("is-danger");
+      li.appendChild(b);
+      return li;
+    });
+    el.amFriendsLab.hidden = false;
+    el.amNone.hidden = !!fr.length;
+  }
+
+  // The Te reto row on the Jugar tab: friends and requests waiting.
+  function amigosRowStat() {
+    if (!amigos.loaded || amigos.missing) return "";
+    var n = amigosIncoming().length;
+    if (n) return t(n === 1 ? "am_row_in_one" : "am_row_in", { n: n });
+    var f = amigosFriends().length;
+    return f ? t(f === 1 ? "am_row_friends_one" : "am_row_friends", { n: f }) : "";
+  }
+
+  // An invite link (…/?amigo=CODE): remembered until you're signed in,
+  // then this page opens with the code filled in.
+  (function readInviteLink() {
+    var code = null;
+    try { code = new URLSearchParams(window.location.search).get("amigo"); } catch (e) {}
+    code = amigoCodeClean(code);
+    if (code.length !== 8) return;
+    try { localStorage.setItem(AMIGO_PENDING_KEY, code); } catch (e) {}
+    try { var u = new URL(window.location.href); u.searchParams.delete("amigo"); history.replaceState(null, "", u.pathname + u.search + u.hash); } catch (e) {}
+  })();
+  function amigoHandlePendingInvite() {
+    var code = null;
+    try { code = localStorage.getItem(AMIGO_PENDING_KEY); } catch (e) {}
+    if (!code || !currentUser) return;
+    try { localStorage.removeItem(AMIGO_PENDING_KEY); } catch (e) {} // opens once
+    setMainTab("play");
+    openAmigos(true);
+    el.amCode.value = amigoCodeShown(code);
+    amigoMsg(t("am_invited"));
   }
 
   // ================= Progreso + Tu historial (2026-10-03) =================
@@ -12147,6 +12461,7 @@
       loadLists();
       loadRewards();
       loadGameRecords();
+      loadAmigos().then(amigoHandlePendingInvite);
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
@@ -12200,7 +12515,10 @@
   // email, never the address itself (risk review 2026-10-05, item 6;
   // get_shared_list() also strips anything after an "@" server-side, for
   // lists saved before this).
+  // Your display name once you have a profile (Amigos), else the part of
+  // your email before "@".
   function shareOwnerLabel() {
+    if (amigos.profile && currentUser && amigos.userId === currentUser.id) return amigos.profile.display_name;
     var email = (currentUser && currentUser.email) || "";
     return email.split("@")[0];
   }
@@ -12557,6 +12875,13 @@
   el.playAlbumEntry.addEventListener("click", function () { openAlbum(true); });
   el.playAlbumBack.addEventListener("click", function () { openAlbum(false); });
   el.crBack.addEventListener("click", function () { openCrono(false); });
+  el.amBack.addEventListener("click", function () { openAmigos(false); });
+  el.amAdd.addEventListener("click", amigoAdd);
+  el.amCode.addEventListener("keydown", function (e) { if (e.key === "Enter") amigoAdd(); });
+  el.amNameSave.addEventListener("click", amigoSaveName);
+  el.amName.addEventListener("keydown", function (e) { if (e.key === "Enter") amigoSaveName(); });
+  el.amCopy.addEventListener("click", amigoCopyLink);
+  el.amShare.addEventListener("click", amigoShareLink);
   el.crModeLeer.addEventListener("click", function () { setCrMode("leer"); });
   el.crModeHablar.addEventListener("click", function () { setCrMode("hablar"); });
   el.crOtra.addEventListener("click", function (e) { e.stopPropagation(); crGrade("otra"); });
