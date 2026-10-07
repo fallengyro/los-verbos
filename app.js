@@ -251,8 +251,72 @@
       nav_progress: "Progreso",
       nav_topics: "Temas",
       nav_play: "Jugar",
-      am_title: "Amigos",
-      am_desc: "Para Te reto. Agregá a alguien con su código o con tu enlace; la otra persona acepta. Nadie te encuentra por tu email ni por tu nombre.",
+      rt_missing: "Te reto todavía no está listo: falta correr la SQL nueva (pending_2026-10-06_reto.sql).",
+      rt_need_speak: "Te reto se juega hablando, y este navegador no puede grabar.",
+      rt_need_speak_quiet: "Te reto se juega hablando: desactivá el modo silencio para jugar.",
+      rt_wins: "ganados",
+      rt_losses: "perdidos",
+      rt_this_week: "esta semana",
+      rt_to_play: "Para jugar",
+      rt_waiting: "Esperando",
+      rt_done: "Terminados",
+      rt_new: "Retar a alguien",
+      rt_challenge: "Retar",
+      rt_challenged_you: "{name} te retó",
+      rt_play_sub: "{what} · {n} tarjetas · {when}",
+      rt_play: "Jugar",
+      rt_with: "{what}, con {name}",
+      rt_wait_sub: "vos: {n} · {name} todavía no jugó",
+      rt_won_sub: "ganaste",
+      rt_won_time_sub: "empate en Bien; ganaste por tiempo",
+      rt_lost_sub: "perdiste",
+      rt_tie_sub: "empate",
+      rt_they_didnt: "{name} no lo jugó",
+      rt_you_didnt: "no lo jugaste a tiempo",
+      rt_today: "hoy",
+      rt_yesterday: "ayer",
+      rt_week_short: "{w} – {l} esta semana",
+      rt_back: "‹ Te reto",
+      rt_new_title: "Nuevo reto",
+      rt_new_desc: "Hasta 20 tarjetas, en Hablar, en el mismo orden para los dos. Jugás tu parte ahora y después se la mandamos.",
+      rt_who: "A quién",
+      rt_what: "Con qué",
+      rt_new_pick: "Elegí a quién y con qué.",
+      rt_new_sum: "{name} · {what} · {n} tarjetas. Si son tuyas, viajan dentro del reto: no hace falta que las tenga.",
+      rt_send: "Enviar y jugar mi parte",
+      rt_hint: "Decilo · si no se entiende, probá de nuevo o deslizá para pasar",
+      rt_try_again: "No se entendió: probá de nuevo, o deslizá para pasar.",
+      rt_your_part: "Tu parte",
+      rt_of: "de {n}, en {time}",
+      rt_sending: "Enviando…",
+      rt_sent: "Listo: {name} lo va a ver en Te reto. Cuando juegue su parte, vas a ver quién ganó.",
+      rt_send_error: "No se pudo enviar: {msg}",
+      rt_expired_now: "el reto ya venció",
+      rt_retry: "Reintentar",
+      rt_ok: "Listo",
+      rt_cant_build: "No se pudieron armar las tarjetas de este reto.",
+      rt_won: "¡Ganaste!",
+      rt_lost: "Perdiste",
+      rt_tie: "Empate",
+      rt_vs: "a",
+      rt_you: "vos",
+      rt_you_short: "vos",
+      rt_card: "Tarjeta",
+      rt_tie_time_won: "Mismos Bien: ganaste por tiempo.",
+      rt_tie_time_lost: "Mismos Bien: ganó por tiempo.",
+      rt_week_line: "Esta semana: vos {w} – {l} {name}",
+      rt_unplayed_title: "No se jugó",
+      rt_unplayed: "{name} no lo jugó a tiempo.",
+      rt_row_toplay: "{n} retos para jugar",
+      rt_row_toplay_one: "1 reto para jugar",
+      rt_row_week: "esta semana {w} – {l}",
+      rt_row_def: "La misma tanda para los dos, en Hablar. Retá a un amigo.",
+      rt_row_def_toplay: "{name} te retó: {what}.",
+      play_how_reto: "reto ganado",
+      play_kick_reto: "¡Ganaste un reto!",
+      play_rule_reto: "Ganar un reto (una vez por día con cada amigo)",
+      am_title: "Te reto",
+      am_desc: "La misma tanda de tarjetas para los dos, en Hablar. Gana quien tenga más Bien; si empatan, quien terminó más rápido. Más abajo: tus amigos, tu nombre y tu código.",
       am_missing: "Amigos todavía no está listo: falta correr la SQL nueva (pending_2026-10-06_amigos.sql).",
       am_you: "Tu nombre",
       am_name_help: "Lo ven tus amigos, y aparece en tus listas compartidas.",
@@ -922,8 +986,72 @@
       nav_progress: "Progress",
       nav_topics: "Topics",
       nav_play: "Play",
-      am_title: "Friends",
-      am_desc: "For Te reto. Add someone with their code or your link; they accept. Nobody can find you by email or name.",
+      rt_missing: "Te reto isn't ready yet: the new SQL (pending_2026-10-06_reto.sql) still needs to be run.",
+      rt_need_speak: "Te reto is played out loud, and this browser can't record.",
+      rt_need_speak_quiet: "Te reto is played out loud: turn off quiet mode to play.",
+      rt_wins: "won",
+      rt_losses: "lost",
+      rt_this_week: "this week",
+      rt_to_play: "To play",
+      rt_waiting: "Waiting",
+      rt_done: "Finished",
+      rt_new: "Challenge someone",
+      rt_challenge: "Challenge",
+      rt_challenged_you: "{name} challenged you",
+      rt_play_sub: "{what} · {n} cards · {when}",
+      rt_play: "Play",
+      rt_with: "{what}, with {name}",
+      rt_wait_sub: "you: {n} · {name} hasn't played yet",
+      rt_won_sub: "you won",
+      rt_won_time_sub: "same Bien; you won on time",
+      rt_lost_sub: "you lost",
+      rt_tie_sub: "a tie",
+      rt_they_didnt: "{name} didn't play it",
+      rt_you_didnt: "you didn't play it in time",
+      rt_today: "today",
+      rt_yesterday: "yesterday",
+      rt_week_short: "{w} – {l} this week",
+      rt_back: "‹ Te reto",
+      rt_new_title: "New challenge",
+      rt_new_desc: "Up to 20 cards, spoken, in the same order for both of you. You play your part now and then we send it.",
+      rt_who: "Who",
+      rt_what: "What",
+      rt_new_pick: "Pick who and what.",
+      rt_new_sum: "{name} · {what} · {n} cards. If they're yours, they travel inside the challenge: they don't need to have them.",
+      rt_send: "Send and play my part",
+      rt_hint: "Say it · if it isn't understood, try again or swipe to skip",
+      rt_try_again: "Not understood: try again, or swipe to skip.",
+      rt_your_part: "Your part",
+      rt_of: "of {n}, in {time}",
+      rt_sending: "Sending…",
+      rt_sent: "Done: {name} will see it in Te reto. Once they play their part, you'll see who won.",
+      rt_send_error: "Couldn't send it: {msg}",
+      rt_expired_now: "the challenge has expired",
+      rt_retry: "Try again",
+      rt_ok: "Done",
+      rt_cant_build: "Couldn't build this challenge's cards.",
+      rt_won: "You won!",
+      rt_lost: "You lost",
+      rt_tie: "A tie",
+      rt_vs: "to",
+      rt_you: "you",
+      rt_you_short: "you",
+      rt_card: "Card",
+      rt_tie_time_won: "Same Bien: you won on time.",
+      rt_tie_time_lost: "Same Bien: they won on time.",
+      rt_week_line: "This week: you {w} – {l} {name}",
+      rt_unplayed_title: "Not played",
+      rt_unplayed: "{name} didn't play it in time.",
+      rt_row_toplay: "{n} challenges to play",
+      rt_row_toplay_one: "1 challenge to play",
+      rt_row_week: "this week {w} – {l}",
+      rt_row_def: "The same cards for both of you, spoken. Challenge a friend.",
+      rt_row_def_toplay: "{name} challenged you: {what}.",
+      play_how_reto: "challenge won",
+      play_kick_reto: "You won a challenge!",
+      play_rule_reto: "Win a challenge (once a day with each friend)",
+      am_title: "Te reto",
+      am_desc: "The same cards for both of you, spoken. More Bien wins; on a tie, whoever finished faster. Further down: your friends, your name and your code.",
       am_missing: "Friends isn't ready yet: the new SQL (pending_2026-10-06_amigos.sql) still needs to be run.",
       am_you: "Your name",
       am_name_help: "Your friends see it, and it shows on your shared lists.",
@@ -2676,6 +2804,24 @@
     amFriendsLab: document.getElementById("am-friends-lab"),
     amFriends: document.getElementById("am-friends"),
     amNone: document.getElementById("am-none"),
+    rtSpeakNote: document.getElementById("rt-speak-note"),
+    rtMissing: document.getElementById("rt-missing"),
+    rtArea: document.getElementById("rt-area"),
+    rtScore: document.getElementById("rt-score"),
+    rtPlayLab: document.getElementById("rt-play-lab"),
+    rtPlay: document.getElementById("rt-play"),
+    rtWaitLab: document.getElementById("rt-wait-lab"),
+    rtWait: document.getElementById("rt-wait"),
+    rtDoneLab: document.getElementById("rt-done-lab"),
+    rtDone: document.getElementById("rt-done"),
+    rtNew: document.getElementById("rt-new"),
+    playRtNew: document.getElementById("play-rt-new"),
+    rtNewBack: document.getElementById("rt-new-back"),
+    rtWho: document.getElementById("rt-who"),
+    rtWhat: document.getElementById("rt-what"),
+    rtNewSum: document.getElementById("rt-new-sum"),
+    rtSend: document.getElementById("rt-send"),
+    rtPanel: document.getElementById("rt-panel"),
     topicsPanel: document.getElementById("topics-panel"),
     topicList: document.getElementById("topic-list"),
     topicDetail: document.getElementById("topic-detail"),
@@ -3873,12 +4019,14 @@
       albumOpen = false; // the tab always opens on its home; the album,
       cronoOpen = false; // Contrarreloj's list and Amigos are one tap in
       amigosOpen = false;
+      rtNewOpen = false;
       renderPlay();
       if (currentUser) {
         loadPracticeHistory(false).then(function () { if (!el.playPanel.hidden) { renderPlay(); playCheckRacha(); } });
         loadRewards();
         loadGameRecords();
         loadAmigos();
+        loadRetos();
       }
     }
     if (tab === "topics") {
@@ -5870,6 +6018,7 @@
     el.flashArrowPrev.disabled = flashIndex === 0;
     renderPartidaFaces(card);
     renderCronoFaces(card);
+    renderRetoFaces(card);
     // force layout so the un-flip above is actually painted before we
     // re-enable the transition on the next frame
     void el.flashCard.offsetWidth;
@@ -6242,7 +6391,7 @@
     flashDeckSource = source || "setup";
     if (flashAutoPlayOn()) unlockTtsAudio();
     if (cards.some(function (c) { return c.speak; })) hablarPrepareMic(); // inside the tap, so iOS asks for the mic here
-    flashDeck = flashDeckSource === "partida" || flashDeckSource === "crono" ? cards : shuffleArray(cards); // the games keep their own order
+    flashDeck = flashDeckSource === "partida" || flashDeckSource === "crono" || flashDeckSource === "reto" ? cards : shuffleArray(cards); // the games keep their own order
     flashIndex = 0;
     el.flashOverlay.classList.remove("is-done");
     // only the card itself flips to the opposite theme — the overlay's
@@ -6263,6 +6412,7 @@
     practiceCloseView();
     if (ptActive()) { ptOnLeave(leaving); ptEnsureAhead(PT_AHEAD); } // Partida never reaches the end
     if (crActive() && !crBeforeNext()) return; // Contrarreloj: time may be up
+    if (rtActive() && !rtBeforeNext()) return; // Te reto: the last card ends your part
     flashIndex++;
     if (flashIndex >= flashDeck.length) {
       // End of a pass. Cards marked (or un-marked) Sabido during it stay put
@@ -6282,7 +6432,7 @@
   }
 
   function prevFlashCard() {
-    if (flashIndex <= 0 || crActive()) return; // no going back against the clock
+    if (flashIndex <= 0 || crActive() || rtActive()) return; // no going back in the games
     hablarAbort();
     practiceCloseView();
     flashIndex--;
@@ -6300,12 +6450,14 @@
     el.flashOverlay.classList.remove("is-done");
     ptEnd();
     crCleanup();
+    rtCleanup();
     renderFlashCombo();
     refreshPracticeViews();
   }
 
   function toggleFlashFlip() {
     if (hablarRec && hablarRec.card === flashDeck[flashIndex]) { hablarStop(); return; }
+    if (!el.flashCard.classList.contains("flipped")) rtNoteFlip(flashDeck[flashIndex]);
     el.flashCard.classList.toggle("flipped");
     practiceNoteFlip(el.flashCard.classList.contains("flipped"));
     // Leer + audio automático: the back's Spanish plays as it turns over
@@ -6567,7 +6719,7 @@
   // the first grade.
   function renderFlashTally() {
     if (!el.flashTally) return;
-    if (ptActive() || crActive()) { el.flashTally.hidden = true; return; } // the games show their own counts
+    if (ptActive() || crActive() || rtActive()) { el.flashTally.hidden = true; return; } // the games show their own counts
     var b = practiceTallyBase.bien, o = practiceTallyBase.otra;
     flashDeck.forEach(function (c) { if (c._grade === "bien") b++; else if (c._grade === "otra") o++; });
     el.flashTally.hidden = !(b || o);
@@ -6783,13 +6935,14 @@
       if (result.auto_grade && !card._gradeTouched) card._grade = result.auto_grade;
       playOnSpeech(card, result);
       crOnSpeech(card, result);
+      rtOnSpeech(card, result);
       if (practiceView && practiceView.card === card) practiceView.row.speech = Object.assign({}, result);
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden) return;
       renderSpeakState();
       renderHeard(card);
       renderFlashGrade(card);
       renderFlashTally();
-      if (!el.flashCard.classList.contains("flipped")) toggleFlashFlip();
+      if (!el.flashCard.classList.contains("flipped") && !(rtRunning() && card._rt !== undefined && !card._rtDone)) toggleFlashFlip();
     }
   }
 
@@ -8292,6 +8445,7 @@
       rewardsFlush();
       rewardsRetryAdds();
       playCheckRacha();
+      rtCheckWins();
       renderPlay();
     }, function (err) {
       rewardsState.loading = null;
@@ -8448,6 +8602,7 @@
     m = /^combo(\d+):/.exec(reason || "");
     if (m) return { kind: "combo", n: parseInt(m[1], 10) };
     if (/^crono:/.test(reason || "")) return { kind: "crono", n: 0 };
+    if (/^reto:/.test(reason || "")) return { kind: "reto", n: 0 };
     return { kind: "otro", n: 0 };
   }
   function rewardHow(reason) { var p = rewardParse(reason); return t("play_how_" + p.kind, { n: p.n }); }
@@ -8503,8 +8658,10 @@
     el.playHome.hidden = albumOpen || cronoOpen || amigosOpen;
     el.playAlbum.hidden = !albumOpen;
     el.playCrono.hidden = !cronoOpen;
-    el.playAmigos.hidden = !amigosOpen;
+    el.playAmigos.hidden = !amigosOpen || rtNewOpen;
+    el.playRtNew.hidden = !(amigosOpen && rtNewOpen);
     if (!currentUser) { el.playRacha.textContent = ""; return; }
+    if (amigosOpen && rtNewOpen) { drawRtNew(); return; }
     if (amigosOpen) { drawAmigos(); return; }
     if (cronoOpen) { drawCrono(); return; }
     var m = playModel();
@@ -8654,7 +8811,8 @@
     [[t("play_rule_racha", { a: PLAY_RACHA_STEP, b: 2 * PLAY_RACHA_STEP, c: 3 * PLAY_RACHA_STEP })],
      [t("play_rule_session", { a: PLAY_SESSION_STEPS[0], b: PLAY_SESSION_STEPS[1] })],
      [t("play_rule_combo", { n: PLAY_COMBO })],
-     [t("play_rule_crono")]].forEach(function (r) {
+     [t("play_rule_crono")],
+     [t("play_rule_reto")]].forEach(function (r) {
       how.appendChild(progEl("span", null, r[0]));
       how.appendChild(progEl("span", "plus", "+1"));
     });
@@ -8687,7 +8845,7 @@
     album: ALBUM, streak: playStreak, sessions: playSessionStats, dayStr: playDayStr, weekOf: playWeekOf,
     rewards: function () { return rewardsForUser().slice(); }, goal: function () { return playGoal; },
     earn: rewardEarn, check: playCheckRacha, onSpeech: playOnSpeech,
-    partida: function () { return partida; }, crono: function () { return crono; }, amigos: function () { return amigos; }, crScopes: function () { return crScopes(); }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
+    partida: function () { return partida; }, crono: function () { return crono; }, amigos: function () { return amigos; }, reto: function () { return reto; }, retos: function () { return retos; }, crScopes: function () { return crScopes(); }, deck: function () { return { deck: flashDeck, index: flashIndex }; }, ptStart: ptStart
   };
 
   // ================= Partida (2026-10-06) =================
@@ -9219,10 +9377,14 @@
     p.id = "play-partida";
     var cb = crBestOverall();
     row(t("pt_crono_name"), cb.best ? t("cr_row_stat", { n: cb.best, what: crScopeName(String(cb.scope).replace(/^(leer|hablar):/, "")) }) : "", t("pt_crono_def"), function () { openCrono(true); }).id = "play-crono-row";
-    var retoStat = amigosRowStat();
-    var reto = row(t("pt_reto_name"), retoStat, t("pt_reto_def"), function () { openAmigos(true); });
-    reto.id = "play-reto-row";
-    if (amigosIncoming().length) reto.querySelector(".stat").classList.add("is-new");
+    var toPlay = retos.loaded && !retos.missing ? rtToPlay() : [];
+    var wkT = retos.loaded && !retos.missing ? rtWeek().total : null;
+    var retoStat = toPlay.length ? t(toPlay.length === 1 ? "rt_row_toplay_one" : "rt_row_toplay", { n: toPlay.length })
+      : (amigosIncoming().length ? amigosRowStat() : (wkT && (wkT.w || wkT.l) ? t("rt_row_week", { w: wkT.w, l: wkT.l }) : amigosRowStat()));
+    var retoDef = toPlay.length ? t("rt_row_def_toplay", { name: rtOtherName(toPlay[0]), what: toPlay[0].title }) : t(amigosFriends().length ? "rt_row_def" : "pt_reto_def");
+    var retoRow = row(t("pt_reto_name"), retoStat, retoDef, function () { openAmigos(true); });
+    retoRow.id = "play-reto-row";
+    if (toPlay.length || amigosIncoming().length) retoRow.querySelector(".stat").classList.add("is-new");
   }
 
   // ================= Contrarreloj (2026-10-06) =================
@@ -9691,16 +9853,17 @@
   }
   function renderAmigosEverywhere() {
     if (!el.playPanel || el.playPanel.hidden) return;
-    if (amigosOpen) drawAmigos(); else if (!albumOpen && !cronoOpen) drawPlayModes();
+    if (amigosOpen && rtNewOpen) drawRtNew(); else if (amigosOpen) drawAmigos(); else if (!albumOpen && !cronoOpen) drawPlayModes();
   }
   function amigosIncoming() { return amigos.list.filter(function (f) { return f.status === "pending" && f.incoming; }); }
   function amigosFriends() { return amigos.list.filter(function (f) { return f.status === "accepted"; }); }
 
   function openAmigos(open) {
     amigosOpen = !!open;
+    rtNewOpen = false;
     if (open) { albumOpen = false; cronoOpen = false; amigoConfirm = null; }
     renderPlay();
-    if (open) loadAmigos(true);
+    if (open) { loadAmigos(true); loadRetos(true); }
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
 
@@ -9769,6 +9932,7 @@
     el.amMissing.hidden = !amigos.missing;
     el.amBody.hidden = amigos.missing || !p;
     if (!p) return;
+    drawRetos();
     if (document.activeElement !== el.amName) el.amName.value = p.display_name;
     el.amCodeShown.textContent = amigoCodeShown(p.friend_code);
     el.amShare.hidden = !navigator.share;
@@ -9800,8 +9964,15 @@
     });
     el.amOutLab.hidden = !out.length;
     var fr = amigosFriends();
+    var week = rtWeek().byFriend;
     section(el.amFriends, fr, function (f) {
-      var li = line(f, "");
+      var wk = week[f.other_id];
+      var li = line(f, retos.loaded && !retos.missing ? t("rt_week_short", { w: wk ? wk.w : 0, l: wk ? wk.l : 0 }) : "");
+      if (retos.loaded && !retos.missing) {
+        var rb = progButton(t("rt_challenge"), false, function () { openRtNew(f.other_id); });
+        rb.disabled = !crCanSpeak();
+        li.appendChild(rb);
+      }
       var confirm = amigoConfirm === f.id;
       var b = progButton(t(confirm ? "am_remove_sure" : "am_remove"), false, function () {
         if (amigoConfirm === f.id) amigoRemove(f); else { amigoConfirm = f.id; drawAmigos(); }
@@ -9842,6 +10013,492 @@
     openAmigos(true);
     el.amCode.value = amigoCodeShown(code);
     amigoMsg(t("am_invited"));
+  }
+
+  // ================= Te reto (2026-10-06) =================
+  // The third game (mockup te_reto_maqueta.png; mason: "the same 20 cards,
+  // Hablar"; Temas + your own cards; a weekly score). It lives on the
+  // Amigos page, which becomes the Te reto page.
+  //   · Retar: pick a friend and what (a Tema, your verbs by tense group,
+  //     Vocabulario, Frases, a list — anything with 5+ cards). Up to 20
+  //     cards are drawn; your own cards travel inside the challenge as
+  //     snapshots, so your friend doesn't need them. You play your part
+  //     straight away, then it's sent (challenge_send).
+  //   · Playing: Hablar only, like Contrarreloj's Hablar but untimed — the
+  //     clock counts up and only breaks ties. The automatic grade decides;
+  //     nothing heard / not sure → try again or swipe to skip. Turning the
+  //     card over by hand before answering shows the answer, so that card
+  //     scores nothing.
+  //   · Your friend sees it under "Para jugar" (and a red dot on the Jugar
+  //     row), plays the same cards in the same order, and submits
+  //     (challenge_submit). Then both see the result: scores, times, card
+  //     by card. More Bien wins; with the same Bien, less time wins.
+  //   · Challenges expire after 7 days unplayed ("no lo jugó", no points).
+  //   · Weekly score (Mon–Sun) per friend; winning wins an album item, once
+  //     a day per friend (reason "reto:<friend id>:<day>").
+  // Server side: public.challenges + challenge_send / challenge_submit
+  // (pending_2026-10-06_reto.sql).
+  var RT_CARDS = 20, RT_MIN_CARDS = 5;
+  var RT_NEXT_BIEN_MS = 900, RT_NEXT_OTRA_MS = 1500;
+  var retos = { userId: null, rows: [], loaded: false, loading: null, missing: false };
+  var reto = null;        // the challenge being played
+  var rtNewOpen = false;  // the "Nuevo reto" view
+  var rtPick = { friend: null, scope: null };
+
+  // ---- cards in a challenge ----
+  // A snapshot small enough to travel inside the row; rtCard() turns it
+  // back into a Hablar card on either phone.
+  function rtSnap(card) {
+    if (card.kind === "topic") return { k: "topic", t: card.topicId, f: card.formKey };
+    var d = card.data || {};
+    if (card.kind === "verb") {
+      var en = verbFormGloss(d, card.formKey);
+      return { k: "verb", inf: card.frontMain, sub: card.frontSub, es: card.backMain, def: en || d.definition || "", fk: card.formKey };
+    }
+    if (card.kind === "word") return { k: "word", es: d.word, def: d.definition || "", pos: d.partOfSpeech || "", g: d.gender || "", ex: d.example || "" };
+    return { k: "phrase", es: d.phrase, def: d.definition || "", fn: d.function || "otro", reg: d.register || "neutro", ex: d.example || "" };
+  }
+  function rtCard(s) {
+    var c = null;
+    if (!s) return null;
+    if (s.k === "topic") { var tp = topicById(s.t); c = tp && s.f ? topicCard(tp, s.f) : null; }
+    else if (s.k === "verb") c = { kind: "verb", data: { infinitive: s.inf, definition: s.def }, formKey: s.fk, frontMain: s.inf, frontSub: s.sub, backMain: s.es, backSub: s.def ? "(" + s.def + ")" : "", frontSpeak: s.inf, backSpeak: s.es };
+    else if (s.k === "word") c = wordCard({ word: s.es, definition: s.def, partOfSpeech: s.pos || "", gender: s.g || "", example: s.ex || "" }, "def2word");
+    else if (s.k === "phrase") c = phraseCard({ phrase: s.es, definition: s.def, function: s.fn || "otro", register: s.reg || "neutro", example: s.ex || "" }, "def2word");
+    return c ? speakCard(c) : null;
+  }
+  function rtSnapLabel(s) {
+    var c = rtCard(s);
+    return c ? ptLabel(c) : "?";
+  }
+  // What can be raced, for a challenge: Contrarreloj's list, with 5+ cards.
+  function rtScopes() {
+    var saved = crono;
+    crono = { mode: "hablar" }; // so collection cards are built meaning → Spanish
+    var groups;
+    try {
+      groups = crScopes().map(function (g) {
+        return { label: g.label, rows: g.rows.filter(function (r) { return r.build().length >= RT_MIN_CARDS; }) };
+      }).filter(function (g) { return g.rows.length; });
+    } finally { crono = saved; }
+    return groups;
+  }
+  function rtBuildCards(scope) {
+    var saved = crono;
+    crono = { mode: "hablar" };
+    try {
+      var row = null;
+      rtScopes().some(function (g) { return g.rows.some(function (r) { if (r.scope === scope) { row = r; return true; } return false; }); });
+      if (!row) return [];
+      var all = shuffleArray(row.build().slice());
+      var seen = {}, out = [];
+      all.forEach(function (c) { var k = practiceCardKey(c); if (!seen[k] && out.length < RT_CARDS) { seen[k] = true; out.push(c); } });
+      return out;
+    } finally { crono = saved; }
+  }
+
+  // ---- loading ----
+  function loadRetos(force) {
+    if (!currentUser) return Promise.resolve();
+    var uid = currentUser.id;
+    if (retos.userId !== uid) retos = { userId: uid, rows: [], loaded: false, loading: null, missing: false };
+    if (retos.loading) return retos.loading;
+    if (retos.loaded && !force) return Promise.resolve();
+    retos.loading = supabaseClient.from("challenges").select("*").then(function (res) {
+      if (retos.userId !== uid) return;
+      retos.loading = null; retos.loaded = true;
+      if (res.error) { retos.missing = true; console.warn("[reto] not available yet:", res.error.message); }
+      else {
+        retos.missing = false;
+        retos.rows = (res.data || []).slice().sort(function (a, b) { return Date.parse(b.created_at) - Date.parse(a.created_at); });
+      }
+      rtCheckWins();
+      renderAmigosEverywhere();
+    }, function (err) {
+      retos.loading = null; retos.loaded = true; retos.missing = true;
+      console.warn("[reto] not available yet:", err && err.message);
+    });
+    return retos.loading;
+  }
+
+  // ---- reading a challenge ----
+  function rtMine(ch) { return currentUser && ch.sender === currentUser.id; }
+  function rtOtherId(ch) { return rtMine(ch) ? ch.recipient : ch.sender; }
+  function rtOtherName(ch) {
+    var id = rtOtherId(ch);
+    var f = amigos.list.find(function (x) { return x.other_id === id; });
+    return (f && f.display_name) || (rtMine(ch) ? ch.recipient_name : ch.sender_name) || "?";
+  }
+  function rtMyResult(ch) { return rtMine(ch) ? ch.sender_result : ch.recipient_result; }
+  function rtTheirResult(ch) { return rtMine(ch) ? ch.recipient_result : ch.sender_result; }
+  function rtExpired(ch) { return !ch.recipient_result && Date.parse(ch.expires_at) <= Date.now(); }
+  function rtState(ch) {
+    if (ch.recipient_result) return "done";
+    if (rtExpired(ch)) return "expired";
+    return rtMine(ch) ? "waiting" : "toplay";
+  }
+  // +1 you won, -1 you lost, 0 a tie
+  function rtOutcome(ch) {
+    var a = rtMyResult(ch), b = rtTheirResult(ch);
+    if (!a || !b) return null;
+    if (a.bien !== b.bien) return a.bien > b.bien ? 1 : -1;
+    if (a.ms !== b.ms) return a.ms < b.ms ? 1 : -1;
+    return 0;
+  }
+  function rtWeekStartMs() {
+    var d = new Date(); d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d.getTime();
+  }
+  // This week's finished challenges: { total: {w, l}, byFriend: {id: {w, l}} }
+  function rtWeek() {
+    var since = rtWeekStartMs();
+    var out = { total: { w: 0, l: 0 }, byFriend: {} };
+    retos.rows.forEach(function (ch) {
+      if (!ch.completed_at || Date.parse(ch.completed_at) < since) return;
+      var o = rtOutcome(ch);
+      if (o === null || o === 0) return;
+      var f = out.byFriend[rtOtherId(ch)] || (out.byFriend[rtOtherId(ch)] = { w: 0, l: 0 });
+      if (o > 0) { f.w++; out.total.w++; } else { f.l++; out.total.l++; }
+    });
+    return out;
+  }
+  function rtToPlay() { return retos.rows.filter(function (ch) { return rtState(ch) === "toplay"; }); }
+  function rtClock(ms) { var s = Math.round((ms || 0) / 1000); return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); }
+  function rtWhen(iso) {
+    var d = new Date(iso), today = progToday(), day = progDayNum(d);
+    if (day === today) return t("rt_today");
+    if (day === today - 1) return t("rt_yesterday");
+    if (today - day < 7) return d.toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { weekday: "long" });
+    return d.toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { day: "numeric", month: "short" });
+  }
+
+  // Wins earn an album item, once a day per friend. Checked whenever the
+  // challenges load (you may have won while you were away).
+  function rtCheckWins() {
+    if (!currentUser || !rewardsState.loaded || rewardsState.userId !== currentUser.id) return;
+    retos.rows.forEach(function (ch) {
+      if (rtOutcome(ch) !== 1 || !ch.completed_at) return;
+      rewardEarn("reto:" + rtOtherId(ch) + ":" + playDayStr(progDayNum(new Date(ch.completed_at))));
+    });
+  }
+
+  // ---- playing ----
+  function rtStartSend(friendId, scope) {
+    if (!crCanSpeak()) return;
+    var cards = rtBuildCards(scope);
+    if (cards.length < RT_MIN_CARDS) return;
+    var f = amigos.list.find(function (x) { return x.other_id === friendId && x.status === "accepted"; });
+    rtNewOpen = false; // afterwards you're back on the Te reto page
+    unlockTtsAudio(); hablarPrepareMic();
+    rtPlay({ kind: "send", friendId: friendId, friendName: f ? f.display_name : "?", scope: scope, title: crScopeName(scope), snaps: cards.map(rtSnap) });
+  }
+  function rtStartAnswer(ch) {
+    if (!crCanSpeak()) return;
+    unlockTtsAudio(); hablarPrepareMic();
+    rtPlay({ kind: "answer", challenge: ch, friendId: ch.sender, friendName: rtOtherName(ch), scope: ch.scope, title: ch.title, snaps: ch.cards });
+  }
+  function rtPlay(r) {
+    var cards = r.snaps.map(rtCard);
+    if (cards.some(function (c) { return !c; })) { amigoMsg(t("rt_cant_build"), true); return; }
+    cards.forEach(function (c, i) { c._rt = i; });
+    reto = Object.assign(r, { phase: "run", grades: cards.map(function () { return "-"; }), bien: 0, startedAt: Date.now(), timer: null, nextTimer: null, cards: cards });
+    el.flashCard.setAttribute("data-theme", ambientIsDark() ? "light" : "dark");
+    el.flashOverlay.classList.remove("is-done", "is-summary", "is-reto-panel");
+    el.flashOverlay.classList.add("is-reto");
+    openFlashDeck(cards.slice(), "reto");
+    clearInterval(reto.timer);
+    reto.timer = setInterval(rtTick, 250);
+    rtTick();
+  }
+  function rtActive() { return !!reto && !el.flashOverlay.hidden; }
+  function rtRunning() { return rtActive() && reto.phase === "run"; }
+  function rtTick() {
+    if (!rtRunning()) return;
+    el.crClock.textContent = rtClock(Date.now() - reto.startedAt);
+  }
+  // From hablarAnalyse's finish: the first automatic grade counts.
+  function rtOnSpeech(card, result) {
+    if (!rtRunning() || !card || card._rt === undefined || card._rtDone) return;
+    var g = result && result.auto_grade;
+    if (g !== "bien" && g !== "otra") { hablarHint(card, t("rt_try_again")); return; } // not sure / nothing heard: try again, or swipe on
+    card._rtDone = true;
+    if (card._rtPeeked) { reto.grades[card._rt] = "-"; }
+    else { reto.grades[card._rt] = g === "bien" ? "b" : "o"; if (g === "bien") reto.bien++; }
+    rtRenderTop();
+    clearTimeout(reto.nextTimer);
+    reto.nextTimer = setTimeout(function () { if (flashDeck[flashIndex] === card) nextFlashCard(); }, g === "bien" ? RT_NEXT_BIEN_MS : RT_NEXT_OTRA_MS);
+  }
+  // Turning the card over by hand before an answer counts shows the answer.
+  function rtNoteFlip(card) {
+    if (rtRunning() && card && card._rt !== undefined && !card._rtDone) card._rtPeeked = true;
+  }
+  // From nextFlashCard(): the last card ends your part. Returns false then.
+  function rtBeforeNext() {
+    if (!rtRunning()) return true;
+    clearTimeout(reto.nextTimer);
+    var card = flashDeck[flashIndex];
+    if (card) card._rtDone = true;
+    if (flashIndex >= reto.cards.length - 1) { rtFinish(); return false; }
+    return true;
+  }
+  function rtFinish() {
+    if (!reto || reto.phase !== "run") return;
+    reto.phase = "sending";
+    reto.ms = Date.now() - reto.startedAt;
+    clearInterval(reto.timer);
+    hablarAbort();
+    practiceCloseView();
+    practiceFlush();
+    el.flashOverlay.classList.add("is-reto-panel");
+    el.flashCombo.hidden = true;
+    rtRenderTop();
+    drawRtPanel();
+    rtSubmit();
+  }
+  function rtSubmit() {
+    var r = reto;
+    if (!r) return;
+    var grades = r.grades.join("");
+    var call = r.kind === "send"
+      ? supabaseClient.rpc("challenge_send", { p_to: r.friendId, p_scope: r.scope, p_title: r.title, p_cards: r.snaps, p_bien: r.bien, p_ms: r.ms, p_grades: grades })
+      : supabaseClient.rpc("challenge_submit", { p_id: r.challenge.id, p_bien: r.bien, p_ms: r.ms, p_grades: grades });
+    call.then(function (res) {
+      if (reto !== r) return;
+      if (res.error || (r.kind === "answer" && res.data === false)) { r.phase = "error"; r.error = res.error ? res.error.message : t("rt_expired_now"); drawRtPanel(); return; }
+      r.phase = "end";
+      // show the result at once (the reload below brings the stored row)
+      if (r.kind === "answer") r.challenge = Object.assign({}, r.challenge, { recipient_result: { bien: r.bien, ms: r.ms, grades: grades }, completed_at: new Date().toISOString() });
+      loadRetos(true).then(function () {
+        if (reto !== r) return;
+        if (r.kind === "answer") r.challenge = retos.rows.find(function (x) { return x.id === r.challenge.id; }) || r.challenge;
+        drawRtPanel();
+      });
+      drawRtPanel();
+    }, function (err) {
+      if (reto !== r) return;
+      r.phase = "error"; r.error = (err && err.message) || ""; drawRtPanel();
+    });
+  }
+  function rtCleanup() {
+    if (!reto) return;
+    clearInterval(reto.timer);
+    clearTimeout(reto.nextTimer);
+    reto = null;
+    el.flashOverlay.classList.remove("is-reto", "is-reto-panel");
+    el.rtPanel.innerHTML = "";
+    rtRenderTop();
+    if (el.playPanel && !el.playPanel.hidden) renderPlay();
+  }
+
+  // ---- on screen ----
+  function rtRenderTop() {
+    var run = !!reto && reto.phase === "run";
+    if (!crono) { el.crHud.hidden = !run; el.crBarWrap.hidden = true; }
+    if (run) {
+      el.crScore.textContent = "";
+      el.crScore.appendChild(progEl("b", null, String(Math.min(flashIndex + 1, reto.cards.length))));
+      el.crScore.appendChild(document.createTextNode(" / " + reto.cards.length));
+    }
+    var lab = el.flashCloseBtn && el.flashCloseBtn.querySelector("[data-i18n]");
+    if (lab && reto) lab.textContent = t(run ? "cr_quit" : "close");
+  }
+  // Called at the end of renderFlashCard().
+  function renderRetoFaces(card) {
+    var on = rtActive() && card && card._rt !== undefined;
+    if (!on) return;
+    el.flashHintLine.hidden = true;
+    el.flashKnownToggle.style.display = "none";
+    el.flashTally.hidden = true;
+    el.flashProgress.textContent = "";
+    el.crHint.hidden = false;
+    el.crHint.textContent = t("rt_hint");
+    el.ptWhy.hidden = false;
+    el.ptWhy.textContent = "";
+    el.ptWhy.appendChild(progEl("b", null, t("pt_reto_name")));
+    el.ptWhy.appendChild(document.createTextNode(" · " + reto.friendName + " · " + reto.title));
+    rtRenderTop();
+  }
+  function drawRtPanel() {
+    var box = el.rtPanel;
+    box.innerHTML = "";
+    if (!reto) return;
+    var r = reto;
+    if (r.phase === "sending" || r.phase === "error" || (r.kind === "send" && r.phase === "end")) {
+      var w = progEl("div", "rt-wait");
+      w.appendChild(progEl("p", "cr-k", t("rt_your_part") + " · " + r.title));
+      w.appendChild(progEl("p", "rt-n", String(r.bien)));
+      w.appendChild(progEl("p", null, t("rt_of", { n: r.cards.length, time: rtClock(r.ms) })));
+      if (r.phase === "sending") w.appendChild(progEl("p", null, t("rt_sending")));
+      else if (r.phase === "error") {
+        w.appendChild(progEl("p", "form-msg is-warn", t("rt_send_error", { msg: r.error || "" })));
+        w.appendChild(progButton(t("rt_retry"), true, function () { r.phase = "sending"; drawRtPanel(); rtSubmit(); }));
+      } else w.appendChild(progEl("p", null, t("rt_sent", { name: r.friendName })));
+      if (r.phase !== "sending") {
+        var b = progButton(t("rt_ok"), r.phase !== "error", closeFlashcards);
+        b.id = "rt-ok";
+        w.appendChild(b);
+      }
+      box.appendChild(w);
+      return;
+    }
+    box.appendChild(rtResultBlock(r.challenge, true));
+  }
+  // The result of a finished challenge (also opened from "Terminados").
+  function rtResultBlock(ch, withButtons) {
+    var e = progEl("div", "rt-end");
+    var o = rtOutcome(ch);
+    var mine = rtMyResult(ch), theirs = rtTheirResult(ch);
+    var name = rtOtherName(ch);
+    e.appendChild(progEl("p", "cr-k" + (o === 1 ? " is-record" : ""), t("pt_reto_name") + " · " + ch.title));
+    if (!theirs) {
+      e.appendChild(progEl("h2", null, t("rt_unplayed_title")));
+      e.appendChild(progEl("p", "rt-sum", t("rt_unplayed", { name: name })));
+    } else {
+      e.appendChild(progEl("h2", null, t(o === 1 ? "rt_won" : (o === -1 ? "rt_lost" : "rt_tie"))));
+      var vs = progEl("div", "rt-vs");
+      var me = progEl("div", "me"); me.appendChild(progEl("b", null, String(mine.bien))); me.appendChild(progEl("span", null, t("rt_you") + " · " + rtClock(mine.ms)));
+      var them = progEl("div"); them.appendChild(progEl("b", null, String(theirs.bien))); them.appendChild(progEl("span", null, name + " · " + rtClock(theirs.ms)));
+      vs.appendChild(me); vs.appendChild(progEl("div", "x", t("rt_vs"))); vs.appendChild(them);
+      e.appendChild(vs);
+      if (mine.bien === theirs.bien && o !== 0) e.appendChild(progEl("p", "rt-sum", t(o === 1 ? "rt_tie_time_won" : "rt_tie_time_lost")));
+      var wk = rtWeek().byFriend[rtOtherId(ch)] || { w: 0, l: 0 };
+      e.appendChild(progEl("p", "rt-sum", t("rt_week_line", { w: wk.w, l: wk.l, name: name })));
+      var ul = progEl("ul", "rt-cmp");
+      var head = progEl("li");
+      head.appendChild(progEl("span", null, t("rt_card")));
+      head.appendChild(progEl("span", null, t("rt_you_short")));
+      head.appendChild(progEl("span", null, name.slice(0, 2) + "."));
+      ul.appendChild(head);
+      var mg = String(mine.grades || ""), tg = String(theirs.grades || "");
+      (ch.cards || []).forEach(function (s, i) {
+        var li = progEl("li");
+        li.appendChild(progEl("span", null, rtSnapLabel(s)));
+        [mg.charAt(i), tg.charAt(i)].forEach(function (g) { li.appendChild(progEl("i", g === "b" ? "b" : (g === "o" ? "o" : "n"), g === "b" ? "✓" : (g === "o" ? "✗" : "–"))); });
+        ul.appendChild(li);
+      });
+      e.appendChild(ul);
+    }
+    if (withButtons) {
+      var btns = progEl("div", "pt-btns");
+      btns.appendChild(progButton(t("close"), false, closeFlashcards));
+      var friendOk = amigosFriends().some(function (f) { return f.other_id === rtOtherId(ch); });
+      if (friendOk && crCanSpeak() && rtScopes().some(function (g) { return g.rows.some(function (r) { return r.scope === ch.scope; }); })) {
+        var again = progButton(t("cr_again"), true, function () { var fid = rtOtherId(ch), sc = ch.scope; closeFlashcards(); rtStartSend(fid, sc); });
+        again.id = "rt-again";
+        btns.appendChild(again);
+      }
+      e.appendChild(btns);
+    }
+    return e;
+  }
+  function rtShowResult(ch) {
+    reto = { kind: "view", phase: "end", challenge: ch, cards: ch.cards || [] };
+    el.flashOverlay.classList.remove("is-done", "is-summary");
+    el.flashOverlay.classList.add("is-reto", "is-reto-panel");
+    el.flashOverlay.hidden = false;
+    rtRenderTop();
+    drawRtPanel();
+  }
+
+  // ---- the Te reto page (the Amigos page, extended) ----
+  function drawRetos() {
+    var on = !amigos.missing && !!amigos.profile;
+    el.rtArea.hidden = !on || retos.missing;
+    el.rtMissing.hidden = !(on && retos.missing);
+    if (!on || retos.missing) return;
+    var canSpeak = crCanSpeak();
+    el.rtSpeakNote.hidden = canSpeak;
+    el.rtSpeakNote.textContent = canSpeak ? "" : t(quietMode ? "rt_need_speak_quiet" : "rt_need_speak");
+    // the week
+    var wk = rtWeek().total;
+    el.rtScore.innerHTML = "";
+    var a = progEl("div", wk.w > wk.l ? "lead" : null); a.appendChild(progEl("b", null, String(wk.w))); a.appendChild(progEl("span", null, t("rt_wins")));
+    var b = progEl("div", wk.l > wk.w ? "lead" : null); b.appendChild(progEl("b", null, String(wk.l))); b.appendChild(progEl("span", null, t("rt_losses")));
+    el.rtScore.appendChild(a); el.rtScore.appendChild(progEl("div", "x", t("rt_this_week"))); el.rtScore.appendChild(b);
+    function list(ul, lab, rows, build) {
+      ul.innerHTML = "";
+      rows.forEach(function (ch) { ul.appendChild(build(ch)); });
+      ul.hidden = !rows.length; lab.hidden = !rows.length;
+    }
+    function rowEl(main, sub, dot) {
+      var li = progEl("li", "am-row rt-row");
+      var who = progEl("span", "am-who");
+      var bEl = progEl("b", null, main);
+      if (dot) bEl.insertBefore(progEl("span", "rt-dot"), bEl.firstChild);
+      who.appendChild(bEl);
+      if (sub) who.appendChild(progEl("span", null, sub));
+      li.appendChild(who);
+      return li;
+    }
+    list(el.rtPlay, el.rtPlayLab, rtToPlay(), function (ch) {
+      var li = rowEl(t("rt_challenged_you", { name: rtOtherName(ch) }), t("rt_play_sub", { what: ch.title, n: (ch.cards || []).length, when: rtWhen(ch.created_at) }), true);
+      var btn = progButton(t("rt_play"), true, function () { rtStartAnswer(ch); });
+      btn.disabled = !canSpeak;
+      li.appendChild(btn);
+      return li;
+    });
+    list(el.rtWait, el.rtWaitLab, retos.rows.filter(function (ch) { return rtState(ch) === "waiting"; }), function (ch) {
+      return rowEl(t("rt_with", { what: ch.title, name: rtOtherName(ch) }), t("rt_wait_sub", { n: ch.sender_result.bien, name: rtOtherName(ch) }));
+    });
+    var done = retos.rows.filter(function (ch) { var s = rtState(ch); return s === "done" || s === "expired"; }).slice(0, 10);
+    list(el.rtDone, el.rtDoneLab, done, function (ch) {
+      var o = rtOutcome(ch), st = rtState(ch);
+      var sub = st === "expired" ? (rtMine(ch) ? t("rt_they_didnt", { name: rtOtherName(ch) }) : t("rt_you_didnt")) : t(o === 1 ? (rtMyResult(ch).bien === rtTheirResult(ch).bien ? "rt_won_time_sub" : "rt_won_sub") : (o === -1 ? "rt_lost_sub" : "rt_tie_sub"));
+      var li = rowEl(t("rt_with", { what: ch.title, name: rtOtherName(ch) }), sub + " · " + rtWhen(ch.completed_at || ch.expires_at));
+      if (st === "done") {
+        li.appendChild(progEl("span", "rt-res " + (o === 1 ? "w" : (o === -1 ? "l" : "")), rtMyResult(ch).bien + " – " + rtTheirResult(ch).bien));
+        li.classList.add("is-tap");
+        li.tabIndex = 0;
+        li.addEventListener("click", function () { rtShowResult(ch); });
+      }
+      return li;
+    });
+    el.rtNew.disabled = !canSpeak || !amigosFriends().length;
+  }
+  // "Retar" from a friend's row, or "Retar a alguien".
+  function openRtNew(friendId) {
+    rtNewOpen = true;
+    rtPick = { friend: friendId || (amigosFriends().length === 1 ? amigosFriends()[0].other_id : null), scope: rtPick.scope };
+    renderPlay();
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+  function drawRtNew() {
+    var fr = amigosFriends();
+    el.rtWho.innerHTML = "";
+    fr.forEach(function (f) {
+      var c = progEl("button", "chip" + (rtPick.friend === f.other_id ? " active" : ""), f.display_name);
+      c.type = "button";
+      c.setAttribute("aria-pressed", rtPick.friend === f.other_id ? "true" : "false");
+      c.addEventListener("click", function () { rtPick.friend = f.other_id; drawRtNew(); });
+      el.rtWho.appendChild(c);
+    });
+    var ul = el.rtWhat;
+    ul.innerHTML = "";
+    var valid = false;
+    rtScopes().forEach(function (g) {
+      var lab = progEl("li", "cr-lab", g.label);
+      lab.setAttribute("role", "presentation");
+      ul.appendChild(lab);
+      g.rows.forEach(function (r) {
+        if (r.scope === rtPick.scope) valid = true;
+        var li = document.createElement("li");
+        var btn = progEl("button", "card-row cr-row rt-opt" + (r.scope === rtPick.scope ? " sel" : ""));
+        btn.type = "button";
+        btn.dataset.scope = r.scope;
+        btn.setAttribute("aria-pressed", r.scope === rtPick.scope ? "true" : "false");
+        btn.appendChild(progEl("span", "inf", r.name));
+        if (r.sub) btn.appendChild(progEl("span", "def", r.sub));
+        btn.addEventListener("click", function () { rtPick.scope = r.scope; drawRtNew(); });
+        li.appendChild(btn);
+        ul.appendChild(li);
+      });
+    });
+    if (!valid) rtPick.scope = null;
+    var f = fr.find(function (x) { return x.other_id === rtPick.friend; });
+    var ready = !!(f && rtPick.scope && crCanSpeak());
+    el.rtNewSum.textContent = ready ? t("rt_new_sum", { name: f.display_name, what: crScopeName(rtPick.scope), n: Math.min(RT_CARDS, rtBuildCards(rtPick.scope).length) }) : t("rt_new_pick");
+    el.rtSend.disabled = !ready;
   }
 
   // ================= Progreso + Tu historial (2026-10-03) =================
@@ -12462,6 +13119,7 @@
       loadRewards();
       loadGameRecords();
       loadAmigos().then(amigoHandlePendingInvite);
+      loadRetos();
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
@@ -12876,6 +13534,9 @@
   el.playAlbumBack.addEventListener("click", function () { openAlbum(false); });
   el.crBack.addEventListener("click", function () { openCrono(false); });
   el.amBack.addEventListener("click", function () { openAmigos(false); });
+  el.rtNew.addEventListener("click", function () { openRtNew(null); });
+  el.rtNewBack.addEventListener("click", function () { rtNewOpen = false; renderPlay(); });
+  el.rtSend.addEventListener("click", function () { if (rtPick.friend && rtPick.scope) rtStartSend(rtPick.friend, rtPick.scope); });
   el.amAdd.addEventListener("click", amigoAdd);
   el.amCode.addEventListener("keydown", function (e) { if (e.key === "Enter") amigoAdd(); });
   el.amNameSave.addEventListener("click", amigoSaveName);

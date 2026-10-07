@@ -1375,3 +1375,108 @@ grant execute on function public.ensure_profile(text) to authenticated;
 grant execute on function public.friend_request(text) to authenticated;
 grant execute on function public.friend_accept(uuid) to authenticated;
 grant execute on function public.friends_list() to authenticated;
+
+
+-- ---------------------------------------------------------------------------
+-- Te reto (2026-10-06): challenges between friends. mason's picks: the same
+-- cards (up to 20) for both, in Hablar, decided by the automatic grade —
+-- more Bien wins, less time breaks a tie; made from Temas or your own cards,
+-- which travel inside the challenge (`cards`, like a shared list's
+-- snapshot); a weekly score per pair of friends (worked out in the app).
+--
+-- The sender plays first and sends the challenge with their result
+-- (challenge_send); the recipient plays the same cards and submits
+-- (challenge_submit) within 7 days. Only the two people can see a row;
+-- nobody writes to the table directly.
+create table if not exists public.challenges (
+  id uuid primary key default gen_random_uuid(),
+  sender uuid not null references auth.users(id) on delete cascade,
+  recipient uuid not null references auth.users(id) on delete cascade,
+  sender_name text not null default '',
+  recipient_name text not null default '',
+  scope text not null,
+  title text not null,
+  cards jsonb not null,
+  sender_result jsonb not null,
+  recipient_result jsonb,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default now() + interval '7 days',
+  completed_at timestamptz,
+  constraint challenges_not_self check (sender <> recipient)
+);
+alter table public.challenges drop constraint if exists challenges_shape_check;
+alter table public.challenges add constraint challenges_shape_check
+  check (char_length(scope) between 1 and 60 and char_length(title) between 1 and 60
+         and jsonb_typeof(cards) = 'array' and jsonb_array_length(cards) between 5 and 20
+         and octet_length(cards::text) <= 20000);
+create index if not exists challenges_sender_idx on public.challenges (sender, created_at desc);
+create index if not exists challenges_recipient_idx on public.challenges (recipient, created_at desc);
+alter table public.challenges enable row level security;
+drop policy if exists "select own challenges" on public.challenges;
+create policy "select own challenges" on public.challenges for select using (auth.uid() in (sender, recipient));
+revoke insert, update, delete on public.challenges from anon, authenticated;
+
+-- A result: bien = the number of 'b' in grades; grades has one letter per
+-- card (b = Bien, o = Otra vez, - = no grade); ms = time taken.
+create or replace function public.challenge_result_ok(p_n int, p_bien int, p_ms int, p_grades text)
+returns boolean language sql immutable as $$
+  select p_grades ~ '^[bo-]+$' and char_length(p_grades) = p_n
+     and p_bien = char_length(p_grades) - char_length(replace(p_grades, 'b', ''))
+     and p_ms between 0 and 3600000;
+$$;
+
+-- Send a challenge to a friend, with your own result. Returns its id.
+create or replace function public.challenge_send(p_to uuid, p_scope text, p_title text, p_cards jsonb, p_bien int, p_ms int, p_grades text)
+returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  me uuid := auth.uid();
+  new_id uuid;
+begin
+  if me is null then raise exception 'sign_in_required'; end if;
+  if not exists (select 1 from public.friendships where status = 'accepted'
+                 and least(requester, addressee) = least(me, p_to) and greatest(requester, addressee) = greatest(me, p_to)) then
+    raise exception 'not_friends';
+  end if;
+  if jsonb_typeof(p_cards) <> 'array' or not public.challenge_result_ok(jsonb_array_length(p_cards), p_bien, p_ms, p_grades) then
+    raise exception 'bad_result';
+  end if;
+  if (select count(*) from public.challenges where sender = me and recipient_result is null and expires_at > now()) >= 30 then
+    raise exception 'too_many_open';
+  end if;
+  insert into public.challenges (sender, recipient, sender_name, recipient_name, scope, title, cards, sender_result)
+  values (me, p_to,
+          coalesce((select display_name from public.profiles where user_id = me), ''),
+          coalesce((select display_name from public.profiles where user_id = p_to), ''),
+          p_scope, p_title, p_cards,
+          jsonb_build_object('bien', p_bien, 'ms', p_ms, 'grades', p_grades, 'at', now()))
+  returning id into new_id;
+  return new_id;
+end $$;
+
+-- Play your part of a challenge sent to you (once, before it expires).
+create or replace function public.challenge_submit(p_id uuid, p_bien int, p_ms int, p_grades text)
+returns boolean
+language plpgsql security definer set search_path = public as $$
+declare
+  c public.challenges;
+begin
+  select * into c from public.challenges where id = p_id and recipient = auth.uid();
+  if not found or c.recipient_result is not null or c.expires_at <= now() then return false; end if;
+  if not public.challenge_result_ok(jsonb_array_length(c.cards), p_bien, p_ms, p_grades) then raise exception 'bad_result'; end if;
+  update public.challenges
+    set recipient_result = jsonb_build_object('bien', p_bien, 'ms', p_ms, 'grades', p_grades, 'at', now()), completed_at = now()
+    where id = p_id;
+  return true;
+end $$;
+
+revoke execute on function public.challenge_send(uuid, text, text, jsonb, int, int, text) from public, anon;
+revoke execute on function public.challenge_submit(uuid, int, int, text) from public, anon;
+grant execute on function public.challenge_send(uuid, text, text, jsonb, int, int, text) to authenticated;
+grant execute on function public.challenge_submit(uuid, int, int, text) to authenticated;
+
+-- Winning a challenge can win an album item (once a day per friend):
+-- reward reason "reto:<friend's id>:<day>".
+alter table public.rewards drop constraint if exists rewards_reason_check;
+alter table public.rewards add constraint rewards_reason_check
+  check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2}|crono:[a-z0-9:-]{1,48}:\d{4}-\d{2}-\d{2}|reto:[0-9a-f-]{36}:\d{4}-\d{2}-\d{2})$');

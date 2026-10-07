@@ -789,17 +789,37 @@
       <ul class="card-list cr-list" id="cr-list"></ul>
       <p class="play-fine" data-i18n="cr_fine"></p>
     </section>
-    <!-- Amigos (profiles + friends, for Te reto). See app.js's "Amigos". -->
+    <!-- Te reto + Amigos (profiles, friends, challenges). See app.js's
+         "Amigos" and "Te reto" sections. -->
     <section class="detail play-amigos" id="play-amigos" hidden>
       <button type="button" class="icon-btn play-album-back" id="am-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
       <div class="detail-head">
         <div class="detail-head-text">
-          <h2 data-i18n="am_title">Amigos</h2>
+          <h2 data-i18n="am_title">Te reto</h2>
           <p class="definition" data-i18n="am_desc"></p>
         </div>
       </div>
       <p class="form-msg is-warn" id="am-missing" data-i18n="am_missing" hidden></p>
       <div id="am-body" hidden>
+        <p class="flash-mode-note is-warn" id="rt-speak-note" hidden></p>
+        <p class="form-msg is-warn" id="rt-missing" data-i18n="rt_missing" hidden></p>
+        <div id="rt-area">
+          <div class="rt-score" id="rt-score"></div>
+          <p class="flash-group-label" id="rt-play-lab" data-i18n="rt_to_play" hidden>Para jugar</p>
+          <ul class="am-list" id="rt-play" hidden></ul>
+          <p class="flash-group-label" id="rt-wait-lab" data-i18n="rt_waiting" hidden>Esperando</p>
+          <ul class="am-list" id="rt-wait" hidden></ul>
+          <p class="flash-group-label" id="rt-done-lab" data-i18n="rt_done" hidden>Terminados</p>
+          <ul class="am-list" id="rt-done" hidden></ul>
+          <button type="button" class="btn-primary rt-new-btn" id="rt-new" data-i18n="rt_new">Retar a alguien</button>
+        </div>
+        <p class="flash-group-label" id="am-in-lab" data-i18n="am_in" hidden>Te quieren agregar</p>
+        <ul class="am-list" id="am-in" hidden></ul>
+        <p class="flash-group-label" id="am-friends-lab" data-i18n="am_friends">Tus amigos</p>
+        <ul class="am-list" id="am-friends" hidden></ul>
+        <p class="play-fine" id="am-none" data-i18n="am_none"></p>
+        <p class="flash-group-label" id="am-out-lab" data-i18n="am_out" hidden>Esperando respuesta</p>
+        <ul class="am-list" id="am-out" hidden></ul>
         <div class="am-me">
           <label class="am-lab" for="am-name" data-i18n="am_you">Tu nombre</label>
           <div class="am-inline">
@@ -822,15 +842,23 @@
           </div>
           <p class="form-msg am-msg" id="am-msg" aria-live="polite"></p>
         </div>
-        <p class="flash-group-label" id="am-in-lab" data-i18n="am_in" hidden>Te quieren agregar</p>
-        <ul class="am-list" id="am-in" hidden></ul>
-        <p class="flash-group-label" id="am-out-lab" data-i18n="am_out" hidden>Esperando respuesta</p>
-        <ul class="am-list" id="am-out" hidden></ul>
-        <p class="flash-group-label" id="am-friends-lab" data-i18n="am_friends">Tus amigos</p>
-        <ul class="am-list" id="am-friends" hidden></ul>
-        <p class="play-fine" id="am-none" data-i18n="am_none"></p>
-        <p class="play-fine am-soon" data-i18n="am_soon"></p>
       </div>
+    </section>
+    <!-- Te reto: a new challenge (who + what). -->
+    <section class="detail play-rt-new" id="play-rt-new" hidden>
+      <button type="button" class="icon-btn play-album-back" id="rt-new-back" data-i18n="rt_back">&lsaquo; Te reto</button>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 data-i18n="rt_new_title">Nuevo reto</h2>
+          <p class="definition" data-i18n="rt_new_desc"></p>
+        </div>
+      </div>
+      <p class="flash-group-label" data-i18n="rt_who">A quién</p>
+      <div class="rt-chips" id="rt-who"></div>
+      <p class="flash-group-label" data-i18n="rt_what">Con qué</p>
+      <ul class="card-list cr-list rt-pick" id="rt-what"></ul>
+      <p class="rt-sum" id="rt-new-sum"></p>
+      <button type="button" class="btn-primary rt-send" id="rt-send" data-i18n="rt_send">Enviar y jugar mi parte</button>
     </section>
     <section class="detail play-album" id="play-album" hidden>
       <button type="button" class="icon-btn play-album-back" id="play-album-back" data-i18n="play_album_back">&lsaquo; Jugar</button>
@@ -1153,6 +1181,8 @@
   <div class="pt-summary" id="pt-summary"></div>
   <!-- Contrarreloj: the ready and time's-up screens. -->
   <div class="cr-panel" id="cr-panel"></div>
+  <!-- Te reto: your part done / the result. -->
+  <div class="rt-panel" id="rt-panel"></div>
   <div class="flash-done" id="flash-done">
     <p class="flash-done-title" data-i18n="flash_done_title">¡Listo!</p>
     <p class="flash-done-text" id="flash-done-text">Marcaste todas las tarjetas como sabidas.</p>
