@@ -2369,3 +2369,9 @@
   .rt-cmp i.n { color: var(--ink-soft); }
   .rt-wait .rt-n { font-size: 64px; }
   .rt-wait .cr-k { font-size: 11.5px; margin: 0; }
+
+/* ---- Temas: introduction, parts in «Ver oraciones», no-match (2026-10-10) ---- */
+.topic-intro { font-size: 15px; line-height: 1.55; color: var(--ink); margin: 4px 0 14px; }
+.topic-sentence-part { font-family: "JetBrains Mono", monospace; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin: 14px 0 4px; }
+.topic-sentence-part:first-child { margin-top: 2px; }
+.topic-no-match { font-size: 14px; color: var(--ink-soft); padding: 14px 4px; }

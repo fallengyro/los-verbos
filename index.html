@@ -626,8 +626,38 @@
        opens its detail page (lesson, practice, Tu historial). See app.js's
        "Temas" section. -->
   <section id="topics-panel" hidden>
+  <div class="search-card">
+    <div class="search-box">
+      <input type="text" id="topic-search" data-i18n-placeholder="topic_search_placeholder" placeholder="Buscá un tema… (ej. pasado)" autocomplete="off" />
+      <span class="count" id="topic-count"></span>
+    </div>
+    <div class="filter-chips" id="topic-filters">
+      <p class="chip-hint" data-i18n="chip_hint_exclude">Tocá un chip para incluir, dos veces para excluir</p>
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_family">Familia</span>
+        <button type="button" class="chip" data-facet="fam" data-value="sonidos" data-i18n="topic_fam_sonidos">sonidos y letras</button>
+        <button type="button" class="chip" data-facet="fam" data-value="numeros" data-i18n="topic_fam_numeros">números y tiempo</button>
+        <button type="button" class="chip" data-facet="fam" data-value="pronombres" data-i18n="topic_fam_pronombres">pronombres</button>
+        <button type="button" class="chip" data-facet="fam" data-value="articulos" data-i18n="topic_fam_articulos">artículos y adjetivos</button>
+        <button type="button" class="chip" data-facet="fam" data-value="ser-estar" data-i18n="topic_fam_ser-estar">ser, estar y hay</button>
+        <button type="button" class="chip" data-facet="fam" data-value="presente" data-i18n="topic_fam_presente">el presente</button>
+        <button type="button" class="chip" data-facet="fam" data-value="pasado" data-i18n="topic_fam_pasado">el pasado</button>
+        <button type="button" class="chip" data-facet="fam" data-value="futuro" data-i18n="topic_fam_futuro">el futuro</button>
+        <button type="button" class="chip" data-facet="fam" data-value="subjuntivo" data-i18n="topic_fam_subjuntivo">subjuntivo e imperativo</button>
+        <button type="button" class="chip" data-facet="fam" data-value="conectores" data-i18n="topic_fam_conectores">preguntas y conectores</button>
+      </div>
+      <div class="chip-group">
+        <span class="chip-label" data-i18n="chip_group_level">Nivel</span>
+        <button type="button" class="chip" data-facet="level" data-value="A1">A1</button>
+        <button type="button" class="chip" data-facet="level" data-value="A2">A2</button>
+        <button type="button" class="chip" data-facet="level" data-value="B1">B1</button>
+      </div>
+      <button type="button" class="chip-clear" id="topic-filters-clear" hidden data-i18n="filters_clear">Limpiar filtros</button>
+    </div>
+  </div>
     <p class="flash-setup-note topics-intro" data-i18n="topics_intro">Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.</p>
     <ul class="card-list topic-list" id="topic-list"></ul>
+    <p class="empty-msg topic-no-match" id="topic-no-match" hidden data-i18n="topic_none_match">Ningún tema coincide con la búsqueda o los filtros.</p>
     <section class="detail topic-detail" id="topic-detail" hidden>
       <div class="detail-head">
         <div class="detail-head-text">
@@ -635,6 +665,7 @@
           <p class="definition" id="td-desc"></p>
         </div>
       </div>
+      <p class="topic-intro" id="td-intro" hidden></p>
       <div class="topic-lesson" id="td-lesson"></div>
       <div class="topic-practice">
         <div id="td-ranges-wrap">
@@ -1252,6 +1283,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+<script src="temas.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
