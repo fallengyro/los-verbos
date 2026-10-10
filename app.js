@@ -714,6 +714,7 @@
       usage_rules: "Límites por persona y por día: {stt} min de Hablar y {tts} caracteres de audio nuevo. Cuando el mes gratis de Azure pasa el {pct} %, solo siguen ustedes dos hasta que se renueve.",
       usage_setup: "Falta configurar: {what}",
       usage_failed: "No se pudo leer: {what}",
+      usage_source_vosea: "Azure no publica este número para este recurso: es lo que contó voseá.",
       warm_title: "Audio por adelantado",
       warm_intro: "Con el recurso de Speech pago (S0) conectado, esto genera ahora el audio que la app va a pedir igual, y queda guardado para siempre. Dejá esta página abierta mientras corre.",
       warm_calc: "Ver qué se puede generar",
@@ -1539,6 +1540,7 @@
       usage_rules: "Daily limits per person: {stt} min of Hablar and {tts} characters of new audio. Once Azure's free month passes {pct}%, only you two can keep going until it renews.",
       usage_setup: "Not set up yet: {what}",
       usage_failed: "Couldn't read: {what}",
+      usage_source_vosea: "Azure doesn't publish this number for this resource: it's what voseá counted.",
       warm_title: "Make audio ahead of time",
       warm_intro: "With the paid (S0) Speech resource connected, this makes the audio the app will ask for anyway, now, and keeps it for good. Keep this page open while it runs.",
       warm_calc: "See what can be made",
@@ -2274,6 +2276,9 @@
     return box;
   }
 
+  function usageSourceLine(m) {
+    return m && m.source === "vosea" ? uNode("p", "usage-note", t("usage_source_vosea")) : null;
+  }
   function usageWindowLine(m) {
     if (!m || !m.window) return null;
     return uNode("p", "usage-note", t(m.window.kind === "created" ? "usage_window_created" : "usage_window_calendar",
@@ -2308,6 +2313,8 @@
       var st = az.speech.stt_seconds, ts = az.speech.tts_chars;
       if (st) sec.appendChild(usageMeter(t("usage_stt"), t("usage_of_min", { used: progNum(st.used / 60, st.used < 600 ? 1 : 0), free: progNum(st.free / 60) }), st.used, st.free, { reservePct: reserve, end: st.window && st.window.end }));
       if (ts) sec.appendChild(usageMeter(t("usage_tts"), t("usage_of_chars", { used: progNum(ts.used), free: progNum(ts.free) }), ts.used, ts.free, { reservePct: reserve, end: ts.window && ts.window.end }));
+      var srcl = usageSourceLine((st && st.source === "vosea") ? st : ts);
+      if (srcl) sec.appendChild(srcl);
       var wl = usageWindowLine(st || ts);
       if (wl) sec.appendChild(wl);
     }
@@ -2318,6 +2325,8 @@
       var tr = az.translator.chars;
       var sec2 = usageSection(t("usage_translator"));
       sec2.appendChild(usageMeter(t("usage_translator_chars"), t("usage_of_chars", { used: progNum(tr.used), free: progNum(tr.free) }), tr.used, tr.free, { reservePct: reserve, end: tr.window && tr.window.end }));
+      var srcl2 = usageSourceLine(tr);
+      if (srcl2) sec2.appendChild(srcl2);
       var wl2 = usageWindowLine(tr);
       if (wl2) sec2.appendChild(wl2);
       body.appendChild(sec2);
@@ -2592,8 +2601,16 @@
       var job = jobs[next++];
       return supabaseClient.functions.invoke("tts", { body: { text: job.text, voice: job.voice } }).then(function (res) {
         if (res.error || !res.data || !res.data.url) {
-          var st = res.error && res.error.context && res.error.context.status;
-          throw new Error(st ? "HTTP " + st : ((res.error && res.error.message) || "no_url"));
+          // the function's own answer says what Azure said (status + detail)
+          var ctx = res.error && res.error.context, st = ctx && ctx.status;
+          var body = ctx && typeof ctx.json === "function" ? Promise.resolve(ctx.clone ? ctx.clone().json() : ctx.json()).catch(function () { return null; }) : Promise.resolve(null);
+          return body.then(function (b) {
+            var bits = [st ? "HTTP " + st : ((res.error && res.error.message) || "no_url")];
+            if (b && b.error) bits.push(b.error);
+            if (b && b.status) bits.push("Azure " + b.status);
+            if (b && b.detail) bits.push(String(b.detail).slice(0, 160));
+            throw new Error(bits.join(" · "));
+          });
         }
         // a new clip made on the free resource would use up the free month
         if (!res.data.cached && !res.data.paid) { run.miss++; run.stop = true; run.lastError = t("warm_not_paid"); return; }
