@@ -714,6 +714,31 @@
       usage_rules: "Límites por persona y por día: {stt} min de Hablar y {tts} caracteres de audio nuevo. Cuando el mes gratis de Azure pasa el {pct} %, solo siguen ustedes dos hasta que se renueve.",
       usage_setup: "Falta configurar: {what}",
       usage_failed: "No se pudo leer: {what}",
+      warm_title: "Audio por adelantado",
+      warm_intro: "Con el recurso de Speech pago (S0) conectado, esto genera ahora el audio que la app va a pedir igual, y queda guardado para siempre. Dejá esta página abierta mientras corre.",
+      warm_calc: "Ver qué se puede generar",
+      warm_set_coleccion: "Tu colección (verbos, palabras, frases)",
+      warm_set_album: "Álbum",
+      warm_set_oraciones: "Temas: oraciones",
+      warm_set_sonidos: "Temas: sonidos y letras",
+      warm_set_numeros: "Números (0–999, años, millones, ordinales)",
+      warm_set_miles: "Números 1.000–9.999",
+      warm_set_precios: "Precios",
+      warm_set_hora: "La hora",
+      warm_set_fechas: "Fechas (sin año)",
+      warm_set_count: "{n} clips · ~{mb} MB",
+      warm_voices_both: "Las dos voces",
+      warm_total: "Total: {n} clips · {chars} caracteres · ~{mb} MB",
+      warm_storage_ok: "Archivos: {now} MB ahora → ~{after} MB después (de {free} MB gratis).",
+      warm_storage_over: "Eso dejaría los archivos en ~{after} MB, demasiado cerca de los {free} MB gratis. Sacá algún grupo.",
+      warm_paid_note: "Lo que ya está guardado no se vuelve a generar. Usalo solo mientras la función tts usa el recurso S0: si hace un clip nuevo con el gratis (F0), se para sola.",
+      warm_start: "Generar",
+      warm_stop: "Parar",
+      warm_progress: "Generando: {done} de {total} · {miss} nuevos · {hit} ya estaban · {err} errores",
+      warm_done: "Listo: {miss} nuevos · {hit} ya estaban · {err} errores",
+      warm_stopped: "Parado en {done} de {total} ({miss} nuevos, {err} errores). Podés seguir: lo hecho no se repite.",
+      warm_error: "Último error: «{text}» — {msg}",
+      warm_not_paid: "La función tts todavía usa el recurso gratis (F0), así que paré para no gastar el mes gratis. Conectá el S0 y poné VOSEA_SPEECH_TIER=paid.",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu colección — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
@@ -1514,6 +1539,31 @@
       usage_rules: "Daily limits per person: {stt} min of Hablar and {tts} characters of new audio. Once Azure's free month passes {pct}%, only you two can keep going until it renews.",
       usage_setup: "Not set up yet: {what}",
       usage_failed: "Couldn't read: {what}",
+      warm_title: "Make audio ahead of time",
+      warm_intro: "With the paid (S0) Speech resource connected, this makes the audio the app will ask for anyway, now, and keeps it for good. Keep this page open while it runs.",
+      warm_calc: "See what can be made",
+      warm_set_coleccion: "Your collection (verbs, words, phrases)",
+      warm_set_album: "Album",
+      warm_set_oraciones: "Temas: sentences",
+      warm_set_sonidos: "Temas: sounds and letters",
+      warm_set_numeros: "Numbers (0–999, years, millions, ordinals)",
+      warm_set_miles: "Numbers 1,000–9,999",
+      warm_set_precios: "Prices",
+      warm_set_hora: "Telling time",
+      warm_set_fechas: "Dates (without the year)",
+      warm_set_count: "{n} clips · ~{mb} MB",
+      warm_voices_both: "Both voices",
+      warm_total: "Total: {n} clips · {chars} characters · ~{mb} MB",
+      warm_storage_ok: "Files: {now} MB now → ~{after} MB after (of {free} MB free).",
+      warm_storage_over: "That would put files at ~{after} MB, too close to the {free} MB free. Leave out a group.",
+      warm_paid_note: "Clips that are already saved aren't made again. Only use this while the tts function runs on the S0 resource: if it makes a new clip on the free one (F0), it stops by itself.",
+      warm_start: "Start",
+      warm_stop: "Stop",
+      warm_progress: "Working: {done} of {total} · {miss} new · {hit} already saved · {err} errors",
+      warm_done: "Done: {miss} new · {hit} already saved · {err} errors",
+      warm_stopped: "Stopped at {done} of {total} ({miss} new, {err} errors). You can start again: what's done isn't repeated.",
+      warm_error: "Last error: “{text}” — {msg}",
+      warm_not_paid: "The tts function is still on the free (F0) resource, so it stopped to save the free month. Connect the S0 resource and set VOSEA_SPEECH_TIER=paid.",
       lists_intro: "Build a list out of any verbs, words, and phrases from your collection — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
@@ -2136,6 +2186,7 @@
   function openUsage() {
     el.usageOverlay.hidden = false;
     renderUsage();
+    renderWarm();
     refreshUsage();
   }
   function closeUsage() { el.usageOverlay.hidden = true; }
@@ -2155,6 +2206,7 @@
     }, function () { usageError = "usage_error"; }).then(function () {
       usageLoading = false;
       renderUsage();
+      if (!(warmRun && warmRun.running)) renderWarm();
     });
   }
 
@@ -2340,6 +2392,238 @@
       stt: progNum((lim.stt_seconds_day || 600) / 60), tts: progNum(lim.tts_chars_day || 5000), pct: reserve })));
   }
 
+  // ================= Audio por adelantado (2026-10-10) =================
+  // mason has a few days of Azure trial credit left. With a temporary paid
+  // (S0) Speech resource behind the tts function, the audio the app will
+  // ask for anyway can be made now, on credit, and kept in the shared
+  // cache for good: every Temas sentence, the number / price / time / date
+  // values, the sounds and letters, the album and your own collection, in
+  // one or both voices. The texts come from the app's own card builders,
+  // so they are exactly the strings a card will ask for later (the cache
+  // key is voice + text). Owner-only: it sits on the Uso page.
+  var warmPlan = null;      // { sets: [{key, texts}] }
+  var warmRun = null;       // { total, done, hit, miss, error, stop, running }
+  var warmVoices = "both";  // "both" | "elena" | "tomas"
+  var warmPicked = { oraciones: true, sonidos: true, numeros: true, precios: true, hora: true, fechas: true, album: true, coleccion: true, miles: false };
+  var WARM_BYTES_PER_CHAR = 560; // 64 kbit/s mp3 ≈ 8 KB a second; Spanish TTS ≈ 14 characters a second
+  var WARM_CONCURRENCY = 4;
+
+  function warmCardTexts(c, out) {
+    if (!c) return;
+    [c.frontSpeak, c.backSpeak, c.audio].forEach(function (s) {
+      s = String(s || "").trim();
+      if (s) out.push(s);
+    });
+  }
+  function warmRange(lo, hi, step) { var a = []; for (var v = lo; v <= hi; v += (step || 1)) a.push(v); return a; }
+  // Values each generated range can produce. Small fixed lists are found by
+  // asking the range's own generator until nothing new turns up; the two
+  // open-ended ones (10.000+, a date with any year) are left out.
+  function warmValues(tp, r) {
+    var id = tp.id, k = r.key, i, out = [];
+    function hours(mins) { for (var h = 0; h < 24; h++) mins.forEach(function (m) { out.push(horaFront(h, m)); }); return out; }
+    function days(withYear) { for (var m = 1; m <= 12; m++) for (var d = 1; d <= DIAS_MES[m - 1]; d++) out.push(d + "/" + m); return out; }
+    if (id === "numeros") {
+      if (k === "0-20") return warmRange(0, 20);
+      if (k === "21-99") return warmRange(21, 99);
+      if (k === "cientos") return warmRange(100, 999);
+      if (k === "miles") return warmRange(1000, 9999);
+      if (k === "anios") return warmRange(1900, 2035);
+      if (k === "millones") { for (i = 1; i <= 20; i++) { out.push(i * 1000000); for (var j = 1; j <= 9; j++) out.push(i * 1000000 + j * 100000); } return out; }
+      if (k === "grandes") return [];
+    }
+    if (id === "precios") {
+      if (k === "hasta-1000") return warmRange(2, 99).map(function (x) { return x * 10; });
+      if (k === "miles") return warmRange(20, 199).map(function (x) { return x * 50; });
+      if (k === "decenas") return warmRange(20, 199).map(function (x) { return x * 500; });
+      if (k === "cientos-mil") return warmRange(20, 199).map(function (x) { return x * 5000; });
+    }
+    if (id === "hora") {
+      if (k === "faciles") return hours([0, 15, 30, 45]);
+      if (k === "cada5") return hours(warmRange(0, 55, 5));
+      if (k === "partes") return hours([0, 30]);
+    }
+    if (id === "fechas") {
+      if (k === "dia-mes" || k === "con-dia") return days();
+      if (k === "con-anio") return [];
+    }
+    if (r.items) return r.items.map(function (it) { return topicPlain(it.w); });
+    var seen = {}, quiet = 0;
+    for (i = 0; i < 2000 && quiet < 200; i++) {
+      var v = String(r.gen());
+      if (seen[v]) quiet++; else { seen[v] = true; quiet = 0; out.push(v); }
+    }
+    return out;
+  }
+  function warmSetOf(tp, r) {
+    if (tp.id === "numeros") return r.key === "miles" ? "miles" : "numeros";
+    if (tp.id === "precios" || tp.id === "hora" || tp.id === "fechas") return tp.id;
+    return "sonidos";
+  }
+  function buildWarmPlan() {
+    var by = { oraciones: [], sonidos: [], numeros: [], miles: [], precios: [], hora: [], fechas: [], album: [], coleccion: [] };
+    TOPICS.forEach(function (tp) {
+      if (tp.type === "pack") { (tp.items || []).forEach(function (it) { warmCardTexts(topicCard(tp, it.id), by.oraciones); }); return; }
+      (tp.ranges || []).forEach(function (r) {
+        var set = warmSetOf(tp, r);
+        warmValues(tp, r).forEach(function (v) { warmCardTexts(topicCard(tp, r.key + ":" + v), by[set]); });
+      });
+    });
+    ALBUM.forEach(function (a) { if (a.es) by.album.push(String(a.es).trim()); });
+    // your collection: the same texts as warmTtsCache() (it walks the verb
+    // detail page, so the page is put back afterwards)
+    var sel = selectedId, tab = detailGustarTab, was = warmTtsCacheRunning;
+    warmTtsCacheRunning = true;
+    try { by.coleccion = collectAllSpeakableTexts().filter(Boolean); } catch (e) { by.coleccion = []; }
+    warmTtsCacheRunning = was;
+    if (sel && allVerbs.some(function (v) { return v.id === sel; })) { detailGustarTab = tab; selectVerb(sel); }
+    else { selectedId = null; detailGustarTab = "personal"; el.detail.hidden = true; }
+    // each text once, in the first set that has it
+    var taken = {};
+    var order = ["coleccion", "album", "oraciones", "sonidos", "numeros", "precios", "hora", "fechas", "miles"];
+    var sets = order.map(function (key) {
+      var texts = [];
+      by[key].forEach(function (s) { if (!taken[s]) { taken[s] = true; texts.push(s); } });
+      var chars = 0;
+      texts.forEach(function (s) { chars += s.length; });
+      return { key: key, texts: texts, chars: chars };
+    });
+    return { sets: sets };
+  }
+  function warmVoiceList() {
+    if (warmVoices === "elena") return [TTS_VOICES.elena];
+    if (warmVoices === "tomas") return [TTS_VOICES.tomas];
+    return Object.keys(TTS_VOICES).map(function (k) { return TTS_VOICES[k]; });
+  }
+  function warmTotals() {
+    var n = 0, chars = 0, nv = warmVoiceList().length;
+    (warmPlan ? warmPlan.sets : []).forEach(function (s) { if (warmPicked[s.key]) { n += s.texts.length * nv; chars += s.chars * nv; } });
+    return { clips: n, chars: chars, bytes: chars * WARM_BYTES_PER_CHAR };
+  }
+  function warmStorageNow() {
+    var sb = usageData && usageData.supabase;
+    if (!sb || sb.error) return null;
+    var b = 0;
+    (sb.storage || []).forEach(function (x) { b += Number(x.bytes) || 0; });
+    return { used: b, free: (sb.free && sb.free.storage_bytes) || 1073741824 };
+  }
+
+  function renderWarm() {
+    var box = el.usageWarm;
+    if (!box) return;
+    box.textContent = "";
+    var sec = usageSection(t("warm_title"));
+    sec.appendChild(uNode("p", "usage-note", t("warm_intro")));
+    if (!warmPlan) {
+      var calc = uNode("button", "btn-secondary", t("warm_calc"));
+      calc.type = "button";
+      calc.addEventListener("click", function () { warmPlan = buildWarmPlan(); renderWarm(); });
+      sec.appendChild(calc);
+      box.appendChild(sec);
+      return;
+    }
+    var running = !!(warmRun && warmRun.running);
+    var nv = warmVoiceList().length;
+    var list = uNode("div", "warm-sets");
+    warmPlan.sets.forEach(function (s) {
+      var lab = uNode("label", "warm-set");
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!warmPicked[s.key];
+      cb.disabled = running || !s.texts.length;
+      cb.addEventListener("change", function () { warmPicked[s.key] = cb.checked; renderWarm(); });
+      lab.appendChild(cb);
+      var txt = uNode("span", "warm-set-name", t("warm_set_" + s.key));
+      lab.appendChild(txt);
+      lab.appendChild(uNode("span", "count", t("warm_set_count", { n: progNum(s.texts.length * nv), mb: progNum(s.chars * nv * WARM_BYTES_PER_CHAR / 1048576) })));
+      list.appendChild(lab);
+    });
+    sec.appendChild(list);
+    var vt = uNode("div", "lang-toggle warm-voices");
+    [["both", t("warm_voices_both")], ["elena", "Elena"], ["tomas", "Tomás"]].forEach(function (o) {
+      var b = uNode("button", "lang-option" + (warmVoices === o[0] ? " active" : ""), o[1]);
+      b.type = "button";
+      b.disabled = running;
+      b.setAttribute("aria-pressed", warmVoices === o[0] ? "true" : "false");
+      b.addEventListener("click", function () { warmVoices = o[0]; renderWarm(); });
+      vt.appendChild(b);
+    });
+    sec.appendChild(vt);
+    var tot = warmTotals();
+    sec.appendChild(uNode("p", "usage-note warm-total", t("warm_total", { n: progNum(tot.clips), chars: progNum(tot.chars), mb: progNum(tot.bytes / 1048576) })));
+    var st = warmStorageNow();
+    var tooBig = false;
+    if (st) {
+      var after = st.used + tot.bytes;
+      tooBig = after > st.free * 0.9;
+      sec.appendChild(uNode("p", tooBig ? "usage-problem" : "usage-note", t(tooBig ? "warm_storage_over" : "warm_storage_ok", { now: usageMb(st.used), after: usageMb(after), free: progNum(st.free / 1048576) })));
+    }
+    sec.appendChild(uNode("p", "usage-note", t("warm_paid_note")));
+    var actions = uNode("div", "form-actions");
+    var go = uNode("button", "btn-primary", running ? t("warm_stop") : t("warm_start"));
+    go.type = "button";
+    go.disabled = !running && (!tot.clips || tooBig);
+    go.addEventListener("click", function () { if (running) { warmRun.stop = true; go.disabled = true; } else startWarm(); });
+    actions.appendChild(go);
+    sec.appendChild(actions);
+    if (warmRun) {
+      var r = warmRun;
+      sec.appendChild(uNode("p", "warm-progress", t(r.running ? "warm_progress" : (r.stopped ? "warm_stopped" : "warm_done"), {
+        done: progNum(r.done), total: progNum(r.total), miss: progNum(r.miss), hit: progNum(r.hit), err: progNum(r.error) })));
+      if (r.lastError) sec.appendChild(uNode("p", "usage-problem", r.lastError));
+    }
+    box.appendChild(sec);
+  }
+
+  function startWarm() {
+    if (!warmPlan || (warmRun && warmRun.running)) return;
+    var voices = warmVoiceList(), jobs = [];
+    warmPlan.sets.forEach(function (s) {
+      if (!warmPicked[s.key]) return;
+      voices.forEach(function (voice) { s.texts.forEach(function (text) { jobs.push({ text: text, voice: voice }); }); });
+    });
+    if (!jobs.length) return;
+    var run = warmRun = { total: jobs.length, done: 0, hit: 0, miss: 0, error: 0, fails: 0, stop: false, running: true, stopped: false, lastError: "" };
+    warmTtsCacheRunning = true;
+    var next = 0, paint = 0;
+    function repaint(force) { var now = Date.now(); if (force || now - paint > 400) { paint = now; renderWarm(); } }
+    function worker() {
+      if (run.stop || next >= jobs.length) return Promise.resolve();
+      var job = jobs[next++];
+      return supabaseClient.functions.invoke("tts", { body: { text: job.text, voice: job.voice } }).then(function (res) {
+        if (res.error || !res.data || !res.data.url) {
+          var st = res.error && res.error.context && res.error.context.status;
+          throw new Error(st ? "HTTP " + st : ((res.error && res.error.message) || "no_url"));
+        }
+        // a new clip made on the free resource would use up the free month
+        if (!res.data.cached && !res.data.paid) { run.miss++; run.stop = true; run.lastError = t("warm_not_paid"); return; }
+        if (res.data.cached) run.hit++; else run.miss++;
+        run.fails = 0;
+        // remembered on this device too, so these play without asking again
+        ttsUrlMemo[job.voice + "\u0000" + job.text] = res.data.url;
+      }).catch(function (e) {
+        run.error++; run.fails++;
+        run.lastError = t("warm_error", { text: job.text, msg: (e && e.message) || "" });
+        if (run.fails >= 12) run.stop = true; // something is wrong (key, quota): don't keep hammering
+      }).then(function () {
+        run.done++;
+        repaint(false);
+        return worker();
+      });
+    }
+    var ws = [];
+    for (var i = 0; i < WARM_CONCURRENCY; i++) ws.push(worker());
+    renderWarm();
+    Promise.all(ws).then(function () {
+      run.running = false;
+      run.stopped = run.stop && run.done < run.total;
+      warmTtsCacheRunning = false;
+      saveTtsUrlMemo();
+      console.log("[warm] " + run.done + "/" + run.total + " — " + run.miss + " made, " + run.hit + " already there, " + run.error + " errors");
+      repaint(true);
+    });
+  }
+
   // Account menu (2026-09-25) — the kebab trigger opposite the "voseá"
   // wordmark that replaced the old always-visible email/settings/logout
   // row. Unlike the app's modals (settings, list filter, etc.), which sit
@@ -2369,7 +2653,7 @@
   function refreshAllTranslatedViews() {
     applyGrammarLabels();
     applyI18n();
-    if (el.usageOverlay && !el.usageOverlay.hidden) renderUsage();
+    if (el.usageOverlay && !el.usageOverlay.hidden) { renderUsage(); renderWarm(); }
     refreshListFilterUI();
     renderList();
     renderWordList();
@@ -2895,6 +3179,7 @@
     usageBody: document.getElementById("usage-body"),
     usageRefresh: document.getElementById("usage-refresh"),
     usageClose: document.getElementById("usage-close"),
+    usageWarm: document.getElementById("usage-warm"),
     acctMenuLogout: document.getElementById("acct-menu-logout"),
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
