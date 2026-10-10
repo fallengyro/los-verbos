@@ -1,6 +1,29 @@
 (function () {
   "use strict";
 
+  // ================= the old "iv-" names (2026-10-10) =================
+  // Everything this app keeps on the device used to be called "iv-…" (from
+  // its first name, Índice Verbal). mason: "vosea is the present and the
+  // future", so it's all "vosea-…" now. On every start, anything still
+  // under an old name is moved over (a newer value always wins) and the
+  // old one removed, so settings, filters, unsent practice and offline
+  // copies carry over untouched.
+  (function moveOldKeys() {
+    try {
+      var old = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf("iv-") === 0) old.push(k);
+      }
+      old.forEach(function (k) {
+        // removed first, so a nearly full storage still has room for the copy
+        var nk = "vosea-" + k.slice(3), v = localStorage.getItem(k);
+        localStorage.removeItem(k);
+        try { if (localStorage.getItem(nk) === null) localStorage.setItem(nk, v); } catch (e) {}
+      });
+    } catch (e) {}
+  })();
+
   // ================= Supabase client =================
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var currentUser = null;
@@ -29,7 +52,7 @@
   // synced) preference loads — see loadUserSettings(). Default is "en"
   // (2026-09-26, mason's ask) — see loadUserSettings()/schema.sql for the
   // other two places this same default lives.
-  var LANG_LOCAL_KEY = "iv-lang";
+  var LANG_LOCAL_KEY = "vosea-lang";
   var currentLang = (function () {
     try {
       var saved = localStorage.getItem(LANG_LOCAL_KEY);
@@ -49,7 +72,7 @@
   // is likewise just a fast device-level guess used to avoid picking the
   // wrong voice before loadUserSettings() returns the real, synced value.
   var TTS_VOICES = { elena: "es-AR-ElenaNeural", tomas: "es-AR-TomasNeural" };
-  var TTS_VOICE_LOCAL_KEY = "iv-tts-voice";
+  var TTS_VOICE_LOCAL_KEY = "vosea-tts-voice";
   var ttsVoiceKey = (function () {
     try {
       var saved = localStorage.getItem(TTS_VOICE_LOCAL_KEY);
@@ -69,7 +92,7 @@
   // muted one. Device-local on purpose (unlike the voice, which is synced
   // to the account): it's about where this phone is right now, so turning
   // it on in a plane shouldn't also silence the other person's device.
-  var QUIET_MODE_LOCAL_KEY = "iv-quiet-mode";
+  var QUIET_MODE_LOCAL_KEY = "vosea-quiet-mode";
   var quietMode = (function () {
     try { return localStorage.getItem(QUIET_MODE_LOCAL_KEY) === "1"; } catch (e) { return false; }
   })();
@@ -641,7 +664,7 @@
       rae_lookup_translation_unavailable: " La traducción automática no está disponible ahora, así que la definición quedó en español.",
       rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
       rae_lookup_daily_limit: "Llegaste al límite de búsquedas de hoy. Mañana podés seguir.",
-      lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu índice — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
+      lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu colección — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
       list_form_title: "Nueva lista",
@@ -655,7 +678,7 @@
       list_picker_new_label: "O creá una lista nueva",
       placeholder_new_list_name: "ej. Adjetivos de comida",
       btn_create_and_add: "Crear y agregar",
-      share_login_note: "Iniciá sesión o creá una cuenta para importar esta lista a tu índice.",
+      share_login_note: "Iniciá sesión o creá una cuenta para importar esta lista a tu colección.",
       btn_import: "Importar a mi colección",
       settings_title: "Configuración",
       settings_lang_label: "Idioma de la app",
@@ -678,7 +701,7 @@
       settings_quiet_on: "Activado",
       settings_quiet_note: "Silencia toda la pronunciación de la app (por ejemplo, en un avión). Solo en este dispositivo.",
       settings_backup_label: "Respaldo",
-      settings_backup_note: "Guarda en el servidor una copia de tus verbos, palabras, frases y listas, incluido lo marcado como sabido. Hay un solo respaldo: uno nuevo reemplaza al anterior.",
+      settings_backup_note: "Guarda en el servidor una copia de tus verbos, palabras, frases y listas, incluido lo marcado como sabido, y de tu progreso: el historial de práctica, la racha, el álbum y los récords. Hay un solo respaldo: uno nuevo reemplaza al anterior.",
       backup_create: "Crear respaldo",
       backup_restore: "Restaurar…",
       backup_delete: "Borrar mi contenido…",
@@ -687,7 +710,7 @@
       backup_last: "Último respaldo: {date} — {summary}.",
       backup_loading: "Buscando tu respaldo…",
       backup_unavailable: "El respaldo todavía no está disponible (falta actualizar la base de datos).",
-      backup_unit_verb: "verbo|verbos", backup_unit_word: "palabra|palabras", backup_unit_phrase: "frase|frases", backup_unit_list: "lista|listas",
+      backup_unit_verb: "verbo|verbos", backup_unit_word: "palabra|palabras", backup_unit_phrase: "frase|frases", backup_unit_list: "lista|listas", backup_unit_practice: "tarjeta practicada|tarjetas practicadas",
       backup_and: "y", backup_nothing: "nada",
       backup_prefer_backup: "Usar el respaldo",
       backup_prefer_backup_sub: "reemplaza lo que tenés en la app (incluido lo marcado como sabido)",
@@ -698,7 +721,7 @@
       backup_working: "Un momento…",
       backup_done: "Listo: respaldo guardado ({summary}).",
       backup_err_empty: "No hay nada para respaldar: tu cuenta no tiene contenido.",
-      backup_delete_text: "Se van a borrar de la app {current}. Tu respaldo no se toca.",
+      backup_delete_text: "Se van a borrar de la app {current}. Tu respaldo y tu historial de práctica no se tocan.",
       backup_delete_has_backup: "Tu respaldo es del {date} ({summary}).",
       backup_delete_no_backup: "Ojo: no tenés respaldo, así que no vas a poder recuperarlo.",
       backup_delete_word: "BORRAR",
@@ -708,6 +731,9 @@
       backup_restore_text: "Respaldo del {date}: {summary}.",
       backup_restore_conflicts: "{n} ya están en la app. ¿Qué versión querés?",
       backup_restore_no_conflicts: "Nada de esto está en la app ahora: se agrega todo.",
+      backup_restore_practice: "Se suman las {n} tarjetas de práctica que no están en la app (el historial nunca se duplica).",
+      backup_restore_practice_one: "Se suma 1 tarjeta de práctica que no está en la app.",
+      backup_restored_practice: " Historial: {n} tarjetas de práctica recuperadas.",
       backup_restore_confirm: "Restaurar",
       backup_restored: "Restaurado: {ins} agregados, {ovw} reemplazados por el respaldo, {kept} sin cambios.",
       backup_err_none: "No hay ningún respaldo para restaurar.",
@@ -725,7 +751,7 @@
       msg_falta_infinitivo: "Falta el infinitivo.",
       msg_guardando: "Guardando…",
       msg_error_guardar: "Error al guardar: {msg}",
-      confirm_delete_verb: "¿Eliminar este verbo de tu índice?",
+      confirm_delete_verb: "¿Eliminar este verbo de tu colección?",
       msg_no_pudo_eliminar: "No se pudo eliminar: {msg}",
       msg_ya_tenes_verbos_ejemplo: "Ya tenés todos los verbos de ejemplo en tu cuenta.",
       msg_no_pudieron_cargar_verbos: "No se pudieron cargar los verbos de ejemplo: {msg}",
@@ -1388,7 +1414,7 @@
       rae_lookup_translation_unavailable: " Automatic translation isn't available right now, so the definition stayed in Spanish.",
       rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
       rae_lookup_daily_limit: "You've reached today's lookup limit. You can look up more tomorrow.",
-      lists_intro: "Build a list out of any verbs, words, and phrases from your index — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
+      lists_intro: "Build a list out of any verbs, words, and phrases from your collection — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
       list_form_title: "New list",
@@ -1402,7 +1428,7 @@
       list_picker_new_label: "Or create a new list",
       placeholder_new_list_name: "e.g., Food adjectives",
       btn_create_and_add: "Create and add",
-      share_login_note: "Log in or create an account to import this list into your index.",
+      share_login_note: "Log in or create an account to import this list into your collection.",
       btn_import: "Import to my collection",
       settings_title: "Settings",
       settings_lang_label: "App language",
@@ -1425,7 +1451,7 @@
       settings_quiet_on: "On",
       settings_quiet_note: "Mutes all pronunciation audio in the app (on a plane, say). This device only.",
       settings_backup_label: "Backup",
-      settings_backup_note: "Keeps a copy of your verbs, words, phrases, and lists on the server, including what you've marked as known. There's one backup: a new one replaces the old.",
+      settings_backup_note: "Keeps a copy of your verbs, words, phrases, and lists on the server, including what you've marked as known, plus your progress: your practice history, streak, album, and records. There's one backup: a new one replaces the old.",
       backup_create: "Back up now",
       backup_restore: "Restore…",
       backup_delete: "Delete my content…",
@@ -1434,7 +1460,7 @@
       backup_last: "Last backup: {date} — {summary}.",
       backup_loading: "Looking for your backup…",
       backup_unavailable: "Backup isn't available yet (the database still needs updating).",
-      backup_unit_verb: "verb|verbs", backup_unit_word: "word|words", backup_unit_phrase: "phrase|phrases", backup_unit_list: "list|lists",
+      backup_unit_verb: "verb|verbs", backup_unit_word: "word|words", backup_unit_phrase: "phrase|phrases", backup_unit_list: "list|lists", backup_unit_practice: "card practiced|cards practiced",
       backup_and: "and", backup_nothing: "nothing",
       backup_prefer_backup: "Use the backup",
       backup_prefer_backup_sub: "replaces what's in the app (including what's marked as known)",
@@ -1445,7 +1471,7 @@
       backup_working: "One moment…",
       backup_done: "Done: backup saved ({summary}).",
       backup_err_empty: "Nothing to back up: your account has no content.",
-      backup_delete_text: "This deletes {current} from the app. Your backup isn't touched.",
+      backup_delete_text: "This deletes {current} from the app. Your backup and your practice history aren't touched.",
       backup_delete_has_backup: "Your backup is from {date} ({summary}).",
       backup_delete_no_backup: "Careful: you have no backup, so this can't be undone.",
       backup_delete_word: "DELETE",
@@ -1455,6 +1481,9 @@
       backup_restore_text: "Backup from {date}: {summary}.",
       backup_restore_conflicts: "{n} of these are already in the app. Which version do you want?",
       backup_restore_no_conflicts: "None of this is in the app right now: everything gets added.",
+      backup_restore_practice: "The {n} practice cards that aren't in the app get added (history is never duplicated).",
+      backup_restore_practice_one: "1 practice card that isn't in the app gets added.",
+      backup_restored_practice: " History: {n} practice cards recovered.",
       backup_restore_confirm: "Restore",
       backup_restored: "Restored: {ins} added, {ovw} replaced by the backup, {kept} left as they were.",
       backup_err_none: "There's no backup to restore.",
@@ -1472,7 +1501,7 @@
       msg_falta_infinitivo: "The infinitive is required.",
       msg_guardando: "Saving…",
       msg_error_guardar: "Error saving: {msg}",
-      confirm_delete_verb: "Delete this verb from your index?",
+      confirm_delete_verb: "Delete this verb from your collection?",
       msg_no_pudo_eliminar: "Couldn't delete: {msg}",
       msg_ya_tenes_verbos_ejemplo: "You already have all the example verbs in your account.",
       msg_no_pudieron_cargar_verbos: "Couldn't load the example verbs: {msg}",
@@ -1748,15 +1777,19 @@
   // "2 verbos, 15 palabras y 1 frase" — zeros left out, singular/plural.
   function backupCountsText(c) {
     c = c || {};
-    var parts = [["verbs", "backup_unit_verb"], ["words", "backup_unit_word"], ["phrases", "backup_unit_phrase"], ["lists", "backup_unit_list"]]
+    var parts = [["verbs", "backup_unit_verb"], ["words", "backup_unit_word"], ["phrases", "backup_unit_phrase"], ["lists", "backup_unit_list"], ["practice", "backup_unit_practice"]]
       .filter(function (x) { return (c[x[0]] || 0) > 0; })
-      .map(function (x) { var n = c[x[0]]; var u = t(x[1]).split("|"); return n + " " + (n === 1 ? u[0] : u[1]); });
+      .map(function (x) { var n = c[x[0]]; var u = t(x[1]).split("|"); return progNum(n) + " " + (n === 1 ? u[0] : u[1]); });
     if (!parts.length) return t("backup_nothing");
     if (parts.length === 1) return parts[0];
     return parts.slice(0, -1).join(", ") + (currentLang === "en" && parts.length > 2 ? "," : "") + " " + t("backup_and") + " " + parts[parts.length - 1];
   }
-  function currentContentCounts() {
-    return { verbs: allVerbs.length, words: allWords.length, phrases: allPhrases.length, lists: allLists.length };
+  // withHistory: the practice cards too (a backup holds them; Borrar
+  // contenido doesn't touch them, so its warning leaves them out).
+  function currentContentCounts(withHistory) {
+    var c = { verbs: allVerbs.length, words: allWords.length, phrases: allPhrases.length, lists: allLists.length };
+    if (withHistory) c.practice = practiceHistory.rows ? practiceAllRows().length : 0;
+    return c;
   }
   function backupDateText(iso) {
     try {
@@ -1815,7 +1848,7 @@
     closeBackupPanel();
     setBackupMsg("");
     backupAction = action;
-    var cur = backupCountsText(currentContentCounts());
+    var cur = backupCountsText(currentContentCounts(action === "backup"));
     var text = "";
     if (action === "backup") {
       text = t("backup_replace_text", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts), current: cur });
@@ -1832,7 +1865,8 @@
     } else {
       var n = backupConflictTotal();
       text = t("backup_restore_text", { date: backupDateText(backupInfo.created_at), summary: backupCountsText(backupInfo.counts) }) + "\n" +
-        (n > 0 ? t("backup_restore_conflicts", { n: n }) : t("backup_restore_no_conflicts"));
+        (n > 0 ? t("backup_restore_conflicts", { n: n }) : t("backup_restore_no_conflicts")) +
+        (backupInfo.practice_new ? "\n" + t(backupInfo.practice_new === 1 ? "backup_restore_practice_one" : "backup_restore_practice", { n: progNum(backupInfo.practice_new) }) : "");
       el.backupChoice.hidden = n === 0;
       el.backupConfirm.textContent = t("backup_restore_confirm");
     }
@@ -1853,6 +1887,13 @@
     loadWords();
     loadPhrases();
     loadLists();
+    // the progress may have come back too: history, album, records
+    loadPracticeHistory(true).then(function () {
+      if (el.progressPanel && !el.progressPanel.hidden) renderProgress();
+      if (el.playPanel && !el.playPanel.hidden) renderPlay();
+    });
+    loadRewards();
+    loadGameRecords();
   }
   function runBackupOp(promise, onOk) {
     backupBusy = true;
@@ -1879,8 +1920,8 @@
   }
   function onBackupCreateClick() {
     if (!backupInfo || backupBusy) return;
-    var c = currentContentCounts();
-    if (!(c.verbs + c.words + c.phrases + c.lists)) { closeBackupPanel(); setBackupMsg(t("backup_err_empty"), true); return; }
+    var c = currentContentCounts(true);
+    if (!(c.verbs + c.words + c.phrases + c.lists + c.practice)) { closeBackupPanel(); setBackupMsg(t("backup_err_empty"), true); return; }
     if (backupInfo.exists) openBackupPanel("backup"); else doBackupCreate();
   }
   function onBackupRestoreClick() {
@@ -1904,7 +1945,8 @@
       var prefer = backupConflictTotal() > 0 && picked ? picked.value : "active";
       runBackupOp(supabaseClient.rpc("vosea_restore_content", { p_prefer: prefer }), function (d) {
         reloadAllContentAfterBackupOp();
-        setBackupMsg(t("backup_restored", { ins: d.inserted || 0, ovw: d.overwritten || 0, kept: d.kept || 0 }));
+        setBackupMsg(t("backup_restored", { ins: d.inserted || 0, ovw: d.overwritten || 0, kept: d.kept || 0 }) +
+          (d.practice_added ? t("backup_restored_practice", { n: progNum(d.practice_added) }) : ""));
       });
     }
   }
@@ -2428,9 +2470,9 @@
   // loadFilters() helpers, all written against a facets-keyed object, work
   // on it completely unchanged; "list" is just this object's only key.
   var sharedListFilter = { list: { include: new Set(), exclude: new Set() } };
-  var SHARED_LIST_STORAGE_KEY = "iv-filters-lists-shared";
+  var SHARED_LIST_STORAGE_KEY = "vosea-filters-lists-shared";
   // One-time upgrade path from the old per-tab list state (each tab's own
-  // now-removed activeFilters.list, still sitting in iv-filters-verbs/
+  // now-removed activeFilters.list, still sitting in vosea-filters-verbs/
   // words/phrases from before this feature) into the new shared state —
   // union of every tab's includes, excludes winning on conflict, same
   // precedence listFacetOk() already gives excludes generally. Runs once,
@@ -2497,8 +2539,8 @@
   // Leer / Escuchar and auto-play (2026-10-03). Both remembered per device,
   // like quiet mode. "Escuchar" can't be used while quiet mode is on — see
   // effectiveFlashMode().
-  var FLASH_MODE_LOCAL_KEY = "iv-flash-mode";
-  var FLASH_AUTOPLAY_LOCAL_KEY = "iv-flash-autoplay";
+  var FLASH_MODE_LOCAL_KEY = "vosea-flash-mode";
+  var FLASH_AUTOPLAY_LOCAL_KEY = "vosea-flash-autoplay";
   var flashMode = (function () { try { var m = localStorage.getItem(FLASH_MODE_LOCAL_KEY); return m === "escuchar" || m === "hablar" ? m : "leer"; } catch (e) { return "leer"; } })();
   var flashAutoPlay = (function () { try { return localStorage.getItem(FLASH_AUTOPLAY_LOCAL_KEY) === "1"; } catch (e) { return false; } })();
   var flashAutoToken = 0; // bumps on every card render, so a late auto-play for an old card is dropped
@@ -2963,7 +3005,7 @@
   // deliberately read-only: adding, editing, sharing and importing still
   // require a live connection, and just show their normal error message
   // if they don't have one.
-  var CACHE_PREFIX = "iv-cache-";
+  var CACHE_PREFIX = "vosea-cache-";
   var offlineKinds = {}; // kind ("verbs"/"words"/"lists") -> savedAt, present only while that kind is showing cached data
 
   function cacheKey(kind) {
@@ -3120,7 +3162,7 @@
     Object.keys(activeFilters).forEach(function (f) { activeFilters[f].exclude.clear(); });
   }
 
-  function filtersStorageKey(tabName) { return "iv-filters-" + tabName; }
+  function filtersStorageKey(tabName) { return "vosea-filters-" + tabName; }
 
   function saveFilters(storageKey, activeFilters) {
     try {
@@ -4063,7 +4105,7 @@
       renderTopicList();
       if (currentUser) loadPracticeHistory(false).then(function () { if (!el.topicsPanel.hidden) { renderTopicList(); if (selectedTopicId) renderItemHistory("topic"); } });
     }
-    try { localStorage.setItem("iv-main-tab", tab); } catch (e) {}
+    try { localStorage.setItem("vosea-main-tab", tab); } catch (e) {}
   }
 
   function wordCardRow(id, data) {
@@ -5424,7 +5466,7 @@
   //  - any load already in flight, so a play that arrives mid-prefetch
   //    waits for that same load instead of starting another.
   // Flashcards also prefetch the next two cards, not just the current one.
-  var TTS_URL_LOCAL_KEY = "iv-tts-urls";
+  var TTS_URL_LOCAL_KEY = "vosea-tts-urls";
   var TTS_URL_MAX = 3000;
   var TTS_BLOB_MAX = 80;
   var ttsUrlMemo = (function () {
@@ -6531,8 +6573,8 @@
   // signing in. Each row carries a client-made id, so re-sending a batch
   // after a dropped connection can't create duplicates.
 
-  var PRACTICE_QUEUE_KEY = "iv-practice-queue";
-  var PRACTICE_OPEN_KEY = "iv-practice-open";
+  var PRACTICE_QUEUE_KEY = "vosea-practice-queue";
+  var PRACTICE_OPEN_KEY = "vosea-practice-open";
   var PRACTICE_QUEUE_MAX = 1500;
   var PRACTICE_FLUSH_AT = 20;
   var PRACTICE_BATCH = 100;
@@ -8025,7 +8067,7 @@
   });
   TOPICS.sort(function (a, b) { return a.order - b.order; });
   var TOPIC_DECK_SIZE = 20;
-  var TOPIC_RANGES_KEY = "iv-topic-ranges";
+  var TOPIC_RANGES_KEY = "vosea-topic-ranges";
   var topicData = {}; // id -> { topic: id } (the card's data object, shared per topic)
   TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
   function topicById(id) { return TOPICS.find(function (tp) { return tp.id === id; }) || null; }
@@ -8620,11 +8662,11 @@
   var ALBUM_LIST_NAME = "Álbum";
   var PLAY_GOALS = [10, 20, 30, 50];
   var PLAY_GOAL_DEFAULT = 20;
-  var PLAY_GOAL_KEY = "iv-daily-goal";
+  var PLAY_GOAL_KEY = "vosea-daily-goal";
   var PLAY_RACHA_STEP = 7;
   var PLAY_SESSION_STEPS = [50, 100];
   var PLAY_COMBO = 20;
-  var REWARDS_LOCAL_KEY = "iv-rewards";
+  var REWARDS_LOCAL_KEY = "vosea-rewards";
   var REWARD_COLS = ["id", "user_id", "reason", "item_id", "earned_at"];
 
   var playGoal = PLAY_GOAL_DEFAULT;
@@ -9241,7 +9283,7 @@
   var PT_SAME = 10;          // no grade → back this much later
   var PT_TOPIC_EVERY = 8;
   var PT_PATTERN = ["due", "hard", "new", "due", "new", "due", "hard"];
-  var PT_RECORDS_KEY = "iv-partidas";
+  var PT_RECORDS_KEY = "vosea-partidas";
   var PT_RECORDS_MAX = 50;
   var partida = null;
 
@@ -9534,7 +9576,7 @@
   // ---- records, per account ----
   // One row per game in public.game_records (pending_2026-10-06_records.sql;
   // mason: "i want the records to be per account"). This device keeps a
-  // copy of its own games (iv-partidas) and sends any the server hasn't got
+  // copy of its own games (vosea-partidas) and sends any the server hasn't got
   // yet — offline, or before the SQL has run — on load, on `online` and
   // after each save. The Partida row's "más larga · combo" is the best of
   // the server's rows and this device's.
@@ -9775,7 +9817,7 @@
   var CR_MS = 60000;
   var CR_PENALTY_MS = 3000;
   var CR_NEXT_BIEN_MS = 900, CR_NEXT_OTRA_MS = 1500, CR_NEXT_NONE_MS = 1100;
-  var CR_MODE_KEY = "iv-crono-mode";
+  var CR_MODE_KEY = "vosea-crono-mode";
   var crono = null;
   var cronoOpen = false;
   var crMode = "hablar";
@@ -10182,7 +10224,7 @@
   // Server side: public.profiles, public.friendships and the functions
   // ensure_profile / friend_request / friend_accept / friends_list
   // (pending_2026-10-06_amigos.sql). Te reto itself comes next.
-  var AMIGO_PENDING_KEY = "iv-amigo-pending";
+  var AMIGO_PENDING_KEY = "vosea-amigo-pending";
   var amigos = { userId: null, profile: null, list: [], loaded: false, loading: null, missing: false };
   var amigosOpen = false;
   var amigoConfirm = null; // friendship id whose "Quitar" is waiting for a second tap
@@ -10891,7 +10933,7 @@
   var PROG_STRUGGLE_DAYS = 14;
   var PROG_GRID_DAYS = 60;
   var PROG_DECK_MAX = 40;
-  var HISTORY_OPEN_KEY = "iv-history-open";
+  var HISTORY_OPEN_KEY = "vosea-history-open";
   var PROG_COLS = "id,session_id,shown_at,item_kind,item_key,form_key,mode,direction,pass,grade,grade_auto,flipped,ms_to_flip,ms_front,ms_back";
   var PROG_GRID_TENSES = ["presente", "preterito", "imperfecto", "futuro", "condicional", "subjPresente", "subjPasado", "imperativo"];
   var PROG_GRID_PERSONS = ["yo", "vos", "el", "nosotros", "ellos"];
@@ -13978,7 +14020,7 @@
 
   (function restoreMainTab() {
     var saved = null;
-    try { saved = localStorage.getItem("iv-main-tab"); } catch (e) {}
+    try { saved = localStorage.getItem("vosea-main-tab"); } catch (e) {}
     if (saved === "words") setMainTab("words");
     else if (saved === "phrases") setMainTab("phrases");
     else if (saved === "flashcards") setMainTab("flashcards");

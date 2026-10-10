@@ -359,7 +359,7 @@
   /* ---------- search / list ---------- */
   /* Search + its filter chips are grouped as their own card, set off from
      the tab bar above and the results list below — search is a way to get
-     into your índice, not the main event, so it shouldn't visually compete
+     into your collection, not the main event, so it shouldn't visually compete
      with the verb/word content itself. */
   .search-card {
     border: 1px solid var(--line);

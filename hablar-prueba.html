@@ -149,8 +149,8 @@
   var recording = null; // the one recording in progress
 
   var whoEl = document.getElementById("who");
-  try { whoEl.value = localStorage.getItem("iv-hablar-who") || ""; } catch (e) {}
-  whoEl.addEventListener("input", function () { try { localStorage.setItem("iv-hablar-who", whoEl.value); } catch (e) {} });
+  try { whoEl.value = localStorage.getItem("vosea-hablar-who") || localStorage.getItem("iv-hablar-who") || ""; } catch (e) {}
+  whoEl.addEventListener("input", function () { try { localStorage.setItem("vosea-hablar-who", whoEl.value); } catch (e) {} });
 
   client.auth.getSession().then(function (res) {
     var s = res.data && res.data.session;
@@ -431,11 +431,11 @@
     var tb = document.getElementById("tab-bien"), tm = document.getElementById("tab-mal");
     tb.classList.toggle("active", bien); tm.classList.toggle("active", !bien);
     tb.setAttribute("aria-selected", bien ? "true" : "false"); tm.setAttribute("aria-selected", bien ? "false" : "true");
-    try { localStorage.setItem("iv-hablar-tab", bien ? "bien" : "mal"); } catch (e) {}
+    try { localStorage.setItem("vosea-hablar-tab", bien ? "bien" : "mal"); } catch (e) {}
   }
   document.getElementById("tab-bien").addEventListener("click", function () { showTab("bien"); });
   document.getElementById("tab-mal").addEventListener("click", function () { showTab("mal"); });
-  try { showTab(localStorage.getItem("iv-hablar-tab") || "bien"); } catch (e) { showTab("bien"); }
+  try { showTab(localStorage.getItem("vosea-hablar-tab") || localStorage.getItem("iv-hablar-tab") || "bien"); } catch (e) { showTab("bien"); }
 
   // ---- "Copiar resultados" ----
   function summary() {
