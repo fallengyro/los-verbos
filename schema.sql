@@ -1713,3 +1713,190 @@ revoke execute on function public.vosea_restore_content(text) from public, anon;
 grant execute on function public.vosea_backup_content() to authenticated;
 grant execute on function public.vosea_restore_preview() to authenticated;
 grant execute on function public.vosea_restore_content(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Uso page + Azure allowance limits (2026-10-10). Same as
+-- pending_2026-10-10_uso.sql.
+-- ---------------------------------------------------------------------------
+-- 1. Who is never limited (and who can open Uso).
+--    RLS on, no policies: only the Edge Functions (service role) and the
+--    functions below can read it. To add or remove someone later, edit the
+--    rows here in the Table Editor.
+create table if not exists public.app_owners (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  can_view_usage boolean not null default false,
+  note text not null default ''
+);
+alter table public.app_owners enable row level security;
+revoke all on public.app_owners from anon, authenticated;
+
+insert into public.app_owners (user_id, can_view_usage, note)
+select id, true, 'mason' from auth.users where lower(email) = lower('mason.c.edwards@gmail.com')
+on conflict (user_id) do update set can_view_usage = true;
+
+insert into public.app_owners (user_id, can_view_usage, note)
+select id, false, 'esposa' from auth.users where lower(email) = lower('CORREO-DE-TU-ESPOSA@ejemplo.com')
+on conflict (user_id) do nothing;
+
+-- What the signed-in person is: { exempt, can_view_usage }. The app uses it
+-- to show the Uso item in the account menu (the usage function checks
+-- app_owners again itself, so hiding the item is not the protection).
+create or replace function public.vosea_my_role()
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select jsonb_build_object(
+    'exempt', o.user_id is not null,
+    'can_view_usage', coalesce(o.can_view_usage, false))
+  from (select auth.uid() as uid) me
+  left join public.app_owners o on o.user_id = me.uid;
+$$;
+revoke all on function public.vosea_my_role() from public, anon;
+grant execute on function public.vosea_my_role() to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 2. The latest official Azure numbers (written by the usage function each
+--    time Uso is opened). The limits below start from these and add what
+--    voseá has used since. Service role only.
+create table if not exists public.usage_snapshot (
+  metric text primary key,
+  value numeric not null default 0,
+  window_start timestamptz not null,
+  window_end timestamptz,
+  fetched_at timestamptz not null default now()
+);
+alter table public.usage_snapshot enable row level security;
+revoke all on public.usage_snapshot from anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 3. The existing daily caps (dle-lookup 150, verb-gloss 120) never stop
+--    the people in app_owners. Their calls are still counted.
+create or replace function public.api_usage_bump(p_user uuid, p_fn text, p_limit int)
+returns boolean
+language sql
+as $$
+  with up as (
+    insert into public.api_usage as u (user_id, day, fn, count)
+    values (p_user, (now() at time zone 'utc')::date, p_fn, 1)
+    on conflict (user_id, day, fn) do update set count = u.count + 1
+    returning u.count as n
+  )
+  select n <= p_limit or exists (select 1 from public.app_owners o where o.user_id = p_user) from up;
+$$;
+revoke all on function public.api_usage_bump(uuid, text, int) from public, anon, authenticated;
+grant execute on function public.api_usage_bump(uuid, text, int) to service_role;
+
+-- 4. Spending Azure allowance. Called by tts (new audio, in characters),
+--    stt (Hablar, in milliseconds of audio) and dle-lookup (translation, in
+--    characters) before they call Azure. Returns:
+--      'ok'              — go ahead (and it's been counted)
+--      'daily_limit'     — this person used their share for today
+--      'monthly_reserve' — the month's free allowance is past the reserve
+--                          line; only app_owners carry on until it resets
+--    People in app_owners always get 'ok'. p_force counts without checking
+--    (the second, scoring call of one Hablar card).
+--    How much of the month is used: the larger of (a) everything voseá
+--    counted since the free month started and (b) the last official Azure
+--    number plus what voseá counted since it was read.
+create or replace function public.api_usage_spend(
+  p_user uuid, p_fn text, p_amount int,
+  p_day_limit int, p_month_free bigint, p_reserve_pct int,
+  p_force boolean default false)
+returns text
+language plpgsql
+as $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  is_owner boolean;
+  used_today bigint;
+  s public.usage_snapshot%rowtype;
+  have_snap boolean := false;
+  win_start timestamptz;
+  ours bigint;
+  since bigint;
+  month_used numeric;
+begin
+  if p_user is null or p_amount is null or p_amount <= 0 then return 'ok'; end if;
+  is_owner := exists (select 1 from public.app_owners o where o.user_id = p_user);
+  if not is_owner and not p_force then
+    select coalesce(sum(count), 0) into used_today
+      from public.api_usage where user_id = p_user and day = today and fn = p_fn;
+    if p_day_limit > 0 and used_today + p_amount > p_day_limit then return 'daily_limit'; end if;
+
+    if p_month_free > 0 and p_reserve_pct > 0 then
+      select * into s from public.usage_snapshot where metric = p_fn;
+      have_snap := found;
+      win_start := date_trunc('month', now() at time zone 'utc') at time zone 'utc';
+      if have_snap then
+        win_start := s.window_start;
+        -- that free month is over: a new one started where it ended
+        if s.window_end is not null and now() >= s.window_end then
+          win_start := s.window_end;
+          have_snap := false;
+        end if;
+      end if;
+      select coalesce(sum(count), 0) into ours
+        from public.api_usage where fn = p_fn and day >= (win_start at time zone 'utc')::date;
+      month_used := ours;
+      if have_snap then
+        select coalesce(sum(count), 0) into since
+          from public.api_usage where fn = p_fn and day >= (s.fetched_at at time zone 'utc')::date;
+        month_used := greatest(month_used, s.value + since);
+      end if;
+      if month_used + p_amount > p_month_free::numeric * p_reserve_pct / 100.0 then return 'monthly_reserve'; end if;
+    end if;
+  end if;
+  insert into public.api_usage as u (user_id, day, fn, count)
+  values (p_user, today, p_fn, p_amount)
+  on conflict (user_id, day, fn) do update set count = u.count + p_amount;
+  return 'ok';
+end;
+$$;
+revoke all on function public.api_usage_spend(uuid, text, int, int, bigint, int, boolean) from public, anon, authenticated;
+grant execute on function public.api_usage_spend(uuid, text, int, int, bigint, int, boolean) to service_role;
+
+-- ---------------------------------------------------------------------------
+-- 5. The Supabase side of Uso: database and storage size, accounts, and
+--    each person's use this month. Called by the usage function (service
+--    role) only after it has checked the caller is in app_owners.
+create or replace function public.vosea_usage_db(p_since timestamptz)
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select jsonb_build_object(
+    'db_bytes', pg_database_size(current_database()),
+    'storage', coalesce((
+      select jsonb_agg(jsonb_build_object('bucket', b.bucket_id, 'bytes', b.bytes, 'files', b.files) order by b.bytes desc)
+      from (select bucket_id, sum(coalesce((metadata->>'size')::bigint, 0)) as bytes, count(*) as files
+            from storage.objects group by bucket_id) b), '[]'::jsonb),
+    'accounts', (select count(*) from auth.users),
+    'signed_in', (select count(*) from auth.users where last_sign_in_at >= p_since),
+    'practiced', (select count(distinct user_id) from public.practice_log where shown_at >= p_since),
+    'people', coalesce((
+      select jsonb_agg(p order by (p->>'cards')::bigint desc)
+      from (
+        select jsonb_build_object(
+          'name', coalesce(pr.display_name, split_part(u.email, '@', 1)),
+          'exempt', o.user_id is not null,
+          'cards', (select count(*) from public.practice_log pl where pl.user_id = u.id and pl.shown_at >= p_since),
+          'usage', coalesce((select jsonb_object_agg(a.fn, a.n) from (
+              select fn, sum(count) as n from public.api_usage
+              where user_id = u.id and day >= (p_since at time zone 'utc')::date group by fn) a), '{}'::jsonb)
+        ) as p
+        from auth.users u
+        left join public.profiles pr on pr.user_id = u.id
+        left join public.app_owners o on o.user_id = u.id
+        where exists (select 1 from public.api_usage a where a.user_id = u.id and a.day >= (p_since at time zone 'utc')::date)
+           or exists (select 1 from public.practice_log pl where pl.user_id = u.id and pl.shown_at >= p_since)
+           or o.user_id is not null
+      ) x), '[]'::jsonb)
+  );
+$$;
+revoke all on function public.vosea_usage_db(timestamptz) from public, anon, authenticated;
+grant execute on function public.vosea_usage_db(timestamptz) to service_role;

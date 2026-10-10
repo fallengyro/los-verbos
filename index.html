@@ -76,6 +76,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
           <span data-i18n="settings_title">Configuración</span>
         </button>
+        <!-- Uso (2026-10-10): only for accounts in app_owners with
+             can_view_usage; app.js shows it after vosea_my_role(). -->
+        <button type="button" class="acct-menu-item" id="acct-menu-usage" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
+          <span data-i18n="usage_menu">Uso</span>
+        </button>
         <div class="acct-menu-divider"></div>
         <button type="button" class="acct-menu-item danger" id="acct-menu-logout">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -1066,6 +1072,18 @@
     <p class="form-msg" id="settings-msg"></p>
     <div class="form-actions">
       <button type="button" class="btn-secondary" id="settings-close" data-i18n="close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="usage-overlay" hidden>
+  <div class="modal-card modal-card-wide usage-card">
+    <h3 data-i18n="usage_title">Uso del mes</h3>
+    <p class="usage-updated" id="usage-updated" role="status" aria-live="polite"></p>
+    <div class="usage-body" id="usage-body"></div>
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" id="usage-refresh" data-i18n="usage_refresh">Actualizar</button>
+      <button type="button" class="btn-secondary" id="usage-close" data-i18n="close">Cerrar</button>
     </div>
   </div>
 </div>

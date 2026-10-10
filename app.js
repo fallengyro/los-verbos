@@ -664,6 +664,56 @@
       rae_lookup_translation_unavailable: " La traducción automática no está disponible ahora, así que la definición quedó en español.",
       rae_lookup_error: "No se pudo consultar el DLE ahora. Probá de nuevo.",
       rae_lookup_daily_limit: "Llegaste al límite de búsquedas de hoy. Mañana podés seguir.",
+      // Uso + límites del mes gratis (2026-10-10)
+      tts_limit_daily: "Llegaste al límite de audio nuevo de hoy. Lo que ya escuchaste sigue sonando.",
+      tts_limit_reserve: "El audio nuevo está en pausa hasta que se renueve el mes gratis. Lo que ya escuchaste sigue sonando.",
+      speak_limit_daily: "Llegaste al límite de Hablar de hoy. Mañana podés seguir.",
+      speak_limit_reserve: "Hablar está en pausa hasta que se renueve el mes gratis.",
+      usage_menu: "Uso",
+      usage_title: "Uso del mes",
+      usage_refresh: "Actualizar",
+      usage_loading: "Leyendo los números de cada servicio…",
+      usage_updated: "Actualizado: {time}",
+      usage_error: "No se pudo leer el uso. Probá de nuevo.",
+      usage_forbidden: "Esta página es solo para el dueño de la app.",
+      usage_sql_missing: "Falta correr pending_2026-10-10_uso.sql en Supabase.",
+      usage_not_deployed: "Falta publicar la función «usage» en Supabase.",
+      usage_azure: "Azure · voz",
+      usage_stt: "Hablar (reconocimiento de voz)",
+      usage_tts: "Audio nuevo (voces)",
+      usage_translator: "Azure · traductor",
+      usage_translator_chars: "Definiciones traducidas",
+      usage_of_min: "{used} de {free} min",
+      usage_of_chars: "{used} de {free} caracteres",
+      usage_of_mb: "{used} de {free} MB",
+      usage_of_usd: "US$ {used} de US$ {free}",
+      usage_window_calendar: "Mes gratis: {start} – {end}",
+      usage_window_created: "Mes gratis: {start} – {end} (30 días desde que se creó el recurso)",
+      usage_state_ok: "Queda el {pct} %",
+      usage_state_reserve: "Pasó la reserva: hasta el {end} solo siguen ustedes dos",
+      usage_state_full: "Se usó todo el mes gratis: vuelve el {end}",
+      usage_reserve_mark: "reserva",
+      usage_claude: "Claude (Anthropic)",
+      usage_claude_month: "US$ {usd} este mes",
+      usage_claude_today: "Hoy: US$ {usd}",
+      usage_claude_budget: "Presupuesto",
+      usage_supabase: "Supabase (plan gratis)",
+      usage_db: "Base de datos",
+      usage_storage: "Archivos (audio guardado)",
+      usage_accounts: "Cuentas: {n} · practicaron este mes: {p}",
+      usage_egress: "El tráfico de salida (egress) solo se ve en el panel de Supabase.",
+      usage_egress_link: "Abrir el panel",
+      usage_people: "Por persona, este mes",
+      usage_col_person: "Persona",
+      usage_col_hablar: "Hablar",
+      usage_col_audio: "Audio nuevo",
+      usage_col_rae: "RAE",
+      usage_col_cards: "Tarjetas",
+      usage_exempt: "sin límite",
+      usage_no_people: "Nadie usó la app todavía este mes.",
+      usage_rules: "Límites por persona y por día: {stt} min de Hablar y {tts} caracteres de audio nuevo. Cuando el mes gratis de Azure pasa el {pct} %, solo siguen ustedes dos hasta que se renueve.",
+      usage_setup: "Falta configurar: {what}",
+      usage_failed: "No se pudo leer: {what}",
       lists_intro: "Armá una lista con los verbos, las palabras y las frases que quieras de tu colección — podés mezclarlos, por ejemplo todo lo útil para \"la cocina\" — y compartila con un enlace. Quien lo abra puede ver la lista e importarla a su propia cuenta, sin tocar el resto de tus datos.",
       lists_empty: "Todavía no creaste ninguna lista.",
       btn_create_list_toggle: "+ Crear lista",
@@ -1414,6 +1464,56 @@
       rae_lookup_translation_unavailable: " Automatic translation isn't available right now, so the definition stayed in Spanish.",
       rae_lookup_error: "Couldn't reach the DLE right now. Try again.",
       rae_lookup_daily_limit: "You've reached today's lookup limit. You can look up more tomorrow.",
+      // Usage + free-month limits (2026-10-10)
+      tts_limit_daily: "You've reached today's limit for new audio. Clips you've already heard still play.",
+      tts_limit_reserve: "New audio is paused until the free month renews. Clips you've already heard still play.",
+      speak_limit_daily: "You've reached today's Hablar limit. You can keep going tomorrow.",
+      speak_limit_reserve: "Hablar is paused until the free month renews.",
+      usage_menu: "Usage",
+      usage_title: "This month's usage",
+      usage_refresh: "Refresh",
+      usage_loading: "Getting the numbers from each service…",
+      usage_updated: "Updated {time}",
+      usage_error: "Couldn't load the usage. Try again.",
+      usage_forbidden: "This page is only for the app's owner.",
+      usage_sql_missing: "Run pending_2026-10-10_uso.sql in Supabase first.",
+      usage_not_deployed: "The “usage” function isn't deployed in Supabase yet.",
+      usage_azure: "Azure · Speech",
+      usage_stt: "Hablar (speech recognition)",
+      usage_tts: "New audio (voices)",
+      usage_translator: "Azure · Translator",
+      usage_translator_chars: "Translated definitions",
+      usage_of_min: "{used} of {free} min",
+      usage_of_chars: "{used} of {free} characters",
+      usage_of_mb: "{used} of {free} MB",
+      usage_of_usd: "${used} of ${free}",
+      usage_window_calendar: "Free month: {start} – {end}",
+      usage_window_created: "Free month: {start} – {end} (30 days from when the resource was created)",
+      usage_state_ok: "{pct}% left",
+      usage_state_reserve: "Past the reserve: until {end}, only you two can keep going",
+      usage_state_full: "The free month is used up: back on {end}",
+      usage_reserve_mark: "reserve",
+      usage_claude: "Claude (Anthropic)",
+      usage_claude_month: "${usd} this month",
+      usage_claude_today: "Today: ${usd}",
+      usage_claude_budget: "Budget",
+      usage_supabase: "Supabase (free plan)",
+      usage_db: "Database",
+      usage_storage: "Files (saved audio)",
+      usage_accounts: "Accounts: {n} · practiced this month: {p}",
+      usage_egress: "Outbound traffic (egress) is only shown in the Supabase dashboard.",
+      usage_egress_link: "Open the dashboard",
+      usage_people: "Per person, this month",
+      usage_col_person: "Person",
+      usage_col_hablar: "Hablar",
+      usage_col_audio: "New audio",
+      usage_col_rae: "RAE",
+      usage_col_cards: "Cards",
+      usage_exempt: "no limit",
+      usage_no_people: "No one has used the app yet this month.",
+      usage_rules: "Daily limits per person: {stt} min of Hablar and {tts} characters of new audio. Once Azure's free month passes {pct}%, only you two can keep going until it renews.",
+      usage_setup: "Not set up yet: {what}",
+      usage_failed: "Couldn't read: {what}",
       lists_intro: "Build a list out of any verbs, words, and phrases from your collection — you can mix them, for example everything useful for \"the kitchen\" — and share it with a link. Whoever opens it can see the list and import it into their own account, without touching the rest of your data.",
       lists_empty: "You haven't created any lists yet.",
       btn_create_list_toggle: "+ Create list",
@@ -2013,6 +2113,233 @@
     el.settingsOverlay.hidden = true;
   }
 
+  // ================= Uso (2026-10-10) =================
+  // mason: one place for the month's usage of every service, from each
+  // one's own numbers, before sharing the app. The "usage" Edge Function
+  // reads Azure Monitor, Anthropic's Cost API and the database, and only
+  // answers accounts in app_owners with can_view_usage; the menu item is
+  // shown from vosea_my_role(). Everything here is built with text nodes.
+  var usageRole = { exempt: false, can_view_usage: false };
+  var usageData = null;
+  var usageLoading = false;
+  var usageError = "";
+
+  function loadUsageRole() {
+    el.acctMenuUsage.hidden = true;
+    if (!currentUser) return Promise.resolve();
+    return Promise.resolve(supabaseClient.rpc("vosea_my_role")).then(function (res) {
+      usageRole = (res && !res.error && res.data && typeof res.data === "object") ? res.data : { exempt: false, can_view_usage: false };
+      el.acctMenuUsage.hidden = !usageRole.can_view_usage;
+    }, function () { el.acctMenuUsage.hidden = true; });
+  }
+
+  function openUsage() {
+    el.usageOverlay.hidden = false;
+    renderUsage();
+    refreshUsage();
+  }
+  function closeUsage() { el.usageOverlay.hidden = true; }
+
+  function refreshUsage() {
+    if (usageLoading) return;
+    usageLoading = true;
+    usageError = "";
+    renderUsage();
+    supabaseClient.functions.invoke("usage", { body: {} }).then(function (res) {
+      if (res.error) {
+        var st = res.error.context && res.error.context.status;
+        usageError = st === 403 ? "usage_forbidden" : st === 503 ? "usage_sql_missing" : st === 404 ? "usage_not_deployed" : "usage_error";
+        return;
+      }
+      usageData = res.data || null;
+    }, function () { usageError = "usage_error"; }).then(function () {
+      usageLoading = false;
+      renderUsage();
+    });
+  }
+
+  function uNode(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = String(text);
+    return n;
+  }
+  function usageDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString(currentLang === "es" ? "es-AR" : "en-US", { day: "numeric", month: "short", timeZone: "UTC" });
+  }
+  function usageTime(iso) {
+    var d = new Date(iso);
+    return d.toLocaleTimeString(currentLang === "es" ? "es-AR" : "en-US", { hour: "numeric", minute: "2-digit" });
+  }
+  function usageMb(bytes) { return progNum(bytes / 1048576, bytes < 10485760 ? 1 : 0); }
+  function usageUsd(n) { return progNum(n || 0, 2); }
+  // A setup problem reads as "not set up yet: AZURE_…"; anything else as
+  // "couldn't read: …" with the service's own message.
+  function usageProblem(msg) {
+    var m = String(msg || "");
+    var setup = m.match(/^not_configured:\s*(.*)$/);
+    return setup ? t("usage_setup", { what: setup[1] }) : t("usage_failed", { what: m });
+  }
+
+  // One meter: label, "used of free", a track with the reserve line, and
+  // a state line in words (never colour alone).
+  function usageMeter(label, countText, used, free, opts) {
+    opts = opts || {};
+    var box = uNode("div", "usage-meter");
+    var top = uNode("div", "prog-bar-top");
+    top.appendChild(uNode("span", "", label));
+    top.appendChild(uNode("span", "count", countText));
+    box.appendChild(top);
+    var pct = free > 0 ? Math.max(0, used / free * 100) : 0;
+    var track = uNode("div", "usage-track");
+    var fill = uNode("i", "usage-fill");
+    fill.style.width = Math.min(100, pct).toFixed(1) + "%";
+    var state = "ok";
+    if (pct >= 100) state = "full";
+    else if (opts.reservePct && pct >= opts.reservePct) state = "reserve";
+    box.classList.add("is-" + state);
+    track.appendChild(fill);
+    if (opts.reservePct) {
+      var mark = uNode("b", "usage-reserve");
+      mark.style.left = opts.reservePct + "%";
+      mark.title = t("usage_reserve_mark") + " " + opts.reservePct + " %";
+      track.appendChild(mark);
+    }
+    track.setAttribute("role", "meter");
+    track.setAttribute("aria-valuemin", "0");
+    track.setAttribute("aria-valuemax", String(free));
+    track.setAttribute("aria-valuenow", String(Math.round(used)));
+    track.setAttribute("aria-label", label + ": " + countText);
+    box.appendChild(track);
+    if (opts.end) {
+      var line = state === "full" ? t("usage_state_full", { end: usageDate(opts.end) })
+        : state === "reserve" ? t("usage_state_reserve", { end: usageDate(opts.end) })
+        : t("usage_state_ok", { pct: progNum(Math.max(0, 100 - pct), 0) });
+      box.appendChild(uNode("p", "usage-state", line));
+    }
+    return box;
+  }
+
+  function usageWindowLine(m) {
+    if (!m || !m.window) return null;
+    return uNode("p", "usage-note", t(m.window.kind === "created" ? "usage_window_created" : "usage_window_calendar",
+      { start: usageDate(m.window.start), end: usageDate(m.window.end) }));
+  }
+
+  function usageSection(title) {
+    var sec = uNode("section", "usage-section");
+    sec.appendChild(uNode("h4", "", title));
+    return sec;
+  }
+
+  function renderUsage() {
+    if (!el.usageBody) return;
+    var body = el.usageBody;
+    body.textContent = "";
+    el.usageRefresh.disabled = usageLoading;
+    if (usageLoading) el.usageUpdated.textContent = t("usage_loading");
+    else if (usageError) el.usageUpdated.textContent = t(usageError);
+    else if (usageData && usageData.generated_at) el.usageUpdated.textContent = t("usage_updated", { time: usageTime(usageData.generated_at) });
+    else el.usageUpdated.textContent = "";
+    var d = usageData;
+    if (!d) return;
+    var lim = d.limits || {};
+    var reserve = lim.reserve_pct || 75;
+
+    // Azure · speech
+    var az = d.azure || {};
+    var sec = usageSection(t("usage_azure"));
+    if (az.error) sec.appendChild(uNode("p", "usage-problem", usageProblem(az.error)));
+    if (az.speech) {
+      var st = az.speech.stt_seconds, ts = az.speech.tts_chars;
+      if (st) sec.appendChild(usageMeter(t("usage_stt"), t("usage_of_min", { used: progNum(st.used / 60, st.used < 600 ? 1 : 0), free: progNum(st.free / 60) }), st.used, st.free, { reservePct: reserve, end: st.window && st.window.end }));
+      if (ts) sec.appendChild(usageMeter(t("usage_tts"), t("usage_of_chars", { used: progNum(ts.used), free: progNum(ts.free) }), ts.used, ts.free, { reservePct: reserve, end: ts.window && ts.window.end }));
+      var wl = usageWindowLine(st || ts);
+      if (wl) sec.appendChild(wl);
+    }
+    (az.errors || []).forEach(function (e) { sec.appendChild(uNode("p", "usage-problem", usageProblem(e))); });
+    body.appendChild(sec);
+
+    if (az.translator && az.translator.chars) {
+      var tr = az.translator.chars;
+      var sec2 = usageSection(t("usage_translator"));
+      sec2.appendChild(usageMeter(t("usage_translator_chars"), t("usage_of_chars", { used: progNum(tr.used), free: progNum(tr.free) }), tr.used, tr.free, { reservePct: reserve, end: tr.window && tr.window.end }));
+      var wl2 = usageWindowLine(tr);
+      if (wl2) sec2.appendChild(wl2);
+      body.appendChild(sec2);
+    }
+
+    // Claude
+    var an = d.anthropic || {};
+    var sec3 = usageSection(t("usage_claude"));
+    if (an.error) sec3.appendChild(uNode("p", "usage-problem", usageProblem(an.error)));
+    else {
+      sec3.appendChild(uNode("p", "usage-hero", t("usage_claude_month", { usd: usageUsd(an.month_usd) })));
+      sec3.appendChild(uNode("p", "usage-note", t("usage_claude_today", { usd: usageUsd(an.today_usd) })));
+      if (an.budget_usd) sec3.appendChild(usageMeter(t("usage_claude_budget"), t("usage_of_usd", { used: usageUsd(an.month_usd), free: usageUsd(an.budget_usd) }), an.month_usd, an.budget_usd, {}));
+    }
+    body.appendChild(sec3);
+
+    // Supabase
+    var sb = d.supabase || {};
+    var sec4 = usageSection(t("usage_supabase"));
+    if (sb.error) sec4.appendChild(uNode("p", "usage-problem", usageProblem(sb.error)));
+    else {
+      var free = sb.free || {};
+      var stBytes = 0;
+      (sb.storage || []).forEach(function (b) { stBytes += Number(b.bytes) || 0; });
+      sec4.appendChild(usageMeter(t("usage_db"), t("usage_of_mb", { used: usageMb(sb.db_bytes || 0), free: progNum((free.db_bytes || 0) / 1048576) }), sb.db_bytes || 0, free.db_bytes || 0, {}));
+      sec4.appendChild(usageMeter(t("usage_storage"), t("usage_of_mb", { used: usageMb(stBytes), free: progNum((free.storage_bytes || 0) / 1048576) }), stBytes, free.storage_bytes || 0, {}));
+      sec4.appendChild(uNode("p", "usage-note", t("usage_accounts", { n: progNum(sb.accounts || 0), p: progNum(sb.practiced || 0) })));
+      var eg = uNode("p", "usage-note");
+      eg.appendChild(document.createTextNode(t("usage_egress") + " "));
+      var a = uNode("a", "", t("usage_egress_link"));
+      a.href = "https://supabase.com/dashboard/project/gxbylqrszrsvpjnrscsk";
+      a.target = "_blank";
+      a.rel = "noopener";
+      eg.appendChild(a);
+      sec4.appendChild(eg);
+    }
+    body.appendChild(sec4);
+
+    // Per person
+    if (!sb.error) {
+      var sec5 = usageSection(t("usage_people"));
+      var people = sb.people || [];
+      if (!people.length) sec5.appendChild(uNode("p", "usage-note", t("usage_no_people")));
+      else {
+        var wrap = uNode("div", "usage-table-wrap");
+        var tbl = uNode("table", "usage-table");
+        var thead = uNode("thead"), hr = uNode("tr");
+        ["usage_col_person", "usage_col_hablar", "usage_col_audio", "usage_col_rae", "usage_col_cards"].forEach(function (k) { hr.appendChild(uNode("th", "", t(k))); });
+        thead.appendChild(hr);
+        tbl.appendChild(thead);
+        var tb = uNode("tbody");
+        people.forEach(function (p) {
+          var u = p.usage || {};
+          var tr = uNode("tr");
+          var name = uNode("td", "usage-person", p.name || "—");
+          if (p.exempt) name.appendChild(uNode("span", "usage-exempt", t("usage_exempt")));
+          tr.appendChild(name);
+          tr.appendChild(uNode("td", "num", u["azure-stt-ms"] ? progNum(u["azure-stt-ms"] / 60000, 1) + " min" : "—"));
+          tr.appendChild(uNode("td", "num", u["azure-tts-chars"] ? progNum(u["azure-tts-chars"]) : "—"));
+          tr.appendChild(uNode("td", "num", u["dle-lookup"] ? progNum(u["dle-lookup"]) : "—"));
+          tr.appendChild(uNode("td", "num", progNum(p.cards || 0)));
+          tb.appendChild(tr);
+        });
+        tbl.appendChild(tb);
+        wrap.appendChild(tbl);
+        sec5.appendChild(wrap);
+      }
+      body.appendChild(sec5);
+    }
+
+    body.appendChild(uNode("p", "flash-setup-note usage-rules", t("usage_rules", {
+      stt: progNum((lim.stt_seconds_day || 600) / 60), tts: progNum(lim.tts_chars_day || 5000), pct: reserve })));
+  }
+
   // Account menu (2026-09-25) — the kebab trigger opposite the "voseá"
   // wordmark that replaced the old always-visible email/settings/logout
   // row. Unlike the app's modals (settings, list filter, etc.), which sit
@@ -2042,6 +2369,7 @@
   function refreshAllTranslatedViews() {
     applyGrammarLabels();
     applyI18n();
+    if (el.usageOverlay && !el.usageOverlay.hidden) renderUsage();
     refreshListFilterUI();
     renderList();
     renderWordList();
@@ -2561,6 +2889,12 @@
     acctMenu: document.getElementById("acct-menu"),
     acctMenuEmail: document.getElementById("acct-menu-email"),
     acctMenuSettings: document.getElementById("acct-menu-settings"),
+    acctMenuUsage: document.getElementById("acct-menu-usage"),
+    usageOverlay: document.getElementById("usage-overlay"),
+    usageUpdated: document.getElementById("usage-updated"),
+    usageBody: document.getElementById("usage-body"),
+    usageRefresh: document.getElementById("usage-refresh"),
+    usageClose: document.getElementById("usage-close"),
     acctMenuLogout: document.getElementById("acct-menu-logout"),
     settingsOverlay: document.getElementById("settings-overlay"),
     settingsMsg: document.getElementById("settings-msg"),
@@ -5437,7 +5771,8 @@
       .catch(function (err) {
         var elapsedMs = msSince(ttsStartedAt);
         console.log("[tts] request failed — " + elapsedMs + "ms — \"" + text + "\"", err);
-        if (!silentErrors) msgEl.textContent = t("tts_error");
+        if (err && err.limit) msgEl.textContent = t(err.limit === "monthly_reserve" ? "tts_limit_reserve" : "tts_limit_daily");
+        else if (!silentErrors) msgEl.textContent = t("tts_error");
         if (btn) btn.classList.remove("tts-active");
         if (ttsActiveEl === btn) ttsActiveEl = null;
       })
@@ -5479,6 +5814,20 @@
 
   function ttsKey(text) { return TTS_VOICES[ttsVoiceKey] + "\u0000" + String(text || "").trim(); }
 
+  // ---- Free-month limits (2026-10-10) ----
+  // tts and stt answer 429 {error: "daily_limit" | "monthly_reserve"} when
+  // this person has used today's share of the free Azure allowance, or the
+  // month is past the reserve line (only the app's owners carry on).
+  var ttsLimitHit = null; // { code, until }
+  function limitCodeOf(err) {
+    var ctx = err && err.context;
+    if (!ctx || typeof ctx.json !== "function") return Promise.resolve("daily_limit");
+    return Promise.resolve(ctx.clone ? ctx.clone().json() : ctx.json()).then(function (b) {
+      return b && b.error === "monthly_reserve" ? "monthly_reserve" : "daily_limit";
+    }, function () { return "daily_limit"; });
+  }
+  function ttsLimitError(code) { var e = new Error(code); e.limit = code; return e; }
+
   function saveTtsUrlMemo() {
     clearTimeout(ttsUrlSaveTimer);
     ttsUrlSaveTimer = setTimeout(function () {
@@ -5493,8 +5842,17 @@
   function ttsResolveUrl(text, force) {
     var key = ttsKey(text);
     if (!force && ttsUrlMemo[key]) return Promise.resolve({ url: ttsUrlMemo[key], how: "url remembered" });
+    // Over a limit (see "Free-month limits" below): don't ask again for a
+    // while; clips already known keep playing.
+    if (ttsLimitHit && Date.now() < ttsLimitHit.until) return Promise.reject(ttsLimitError(ttsLimitHit.code));
     return supabaseClient.functions.invoke("tts", { body: { text: String(text).trim(), voice: TTS_VOICES[ttsVoiceKey] } })
       .then(function (res) {
+        if (res.error && res.error.context && res.error.context.status === 429) {
+          return limitCodeOf(res.error).then(function (code) {
+            ttsLimitHit = { code: code, until: Date.now() + 30 * 60000 };
+            throw ttsLimitError(code);
+          });
+        }
         if (res.error || !res.data || !res.data.url) throw (res.error || new Error("no_url"));
         ttsUrlMemo[key] = res.data.url;
         saveTtsUrlMemo();
@@ -7055,6 +7413,7 @@
           var status = ctx && ctx.status;
           // a sign-in that went stale while the phone slept: refresh it once and retry
           if (status === 401 && !retried) return supabaseClient.auth.refreshSession().then(function () { return send(true); }, function () { throw new Error("HTTP 401"); });
+          if (status === 429) return limitCodeOf(res.error).then(function (code) { var le = new Error(code); le.limit = code; throw le; });
           throw new Error(status ? "HTTP " + status : (res.error.message || "error"));
         }
         return res;
@@ -7072,6 +7431,14 @@
       return hablarJudge(card, res.data);
     }).then(finish, function (err) {
       if (err && err.local) { hablarMicFailed(card, err.message || "decode"); renderSpeakState(); return; }
+      // Over a limit: nothing was checked, so the card stays as it is and
+      // says why (no grade, nothing logged as a Hablar result).
+      if (err && err.limit) {
+        if (hablarBusyCard === card) hablarBusyCard = null;
+        if (flashDeck[flashIndex] === card && !el.flashOverlay.hidden) hablarHint(card, t(err.limit === "monthly_reserve" ? "speak_limit_reserve" : "speak_limit_daily"));
+        renderSpeakState();
+        return;
+      }
       console.warn("[hablar] couldn't analyse the recording:", err && err.message);
       finish({ heard: "", recognition: "error", error: String((err && err.message) || err).slice(0, 120), auto_grade: null, rule: "error" });
     });
@@ -13526,12 +13893,17 @@
       loadLists();
       loadRewards();
       loadGameRecords();
+      loadUsageRole();
       loadAmigos().then(amigoHandlePendingInvite);
       loadRetos();
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
       el.appScreen.hidden = true;
+      el.acctMenuUsage.hidden = true;
+      el.usageOverlay.hidden = true;
+      usageData = null;
+      usageRole = { exempt: false, can_view_usage: false };
       allVerbs = [];
       selectedId = null;
       el.detail.hidden = true;
@@ -13631,6 +14003,12 @@
     closeAcctMenu();
     openSettings();
   });
+  el.acctMenuUsage.addEventListener("click", function () {
+    closeAcctMenu();
+    openUsage();
+  });
+  el.usageRefresh.addEventListener("click", function () { refreshUsage(); });
+  el.usageClose.addEventListener("click", closeUsage);
   el.acctMenuLogout.addEventListener("click", function () {
     closeAcctMenu();
     supabaseClient.auth.signOut();
