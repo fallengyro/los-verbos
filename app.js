@@ -242,6 +242,7 @@
       speak_play_aria: "Escuchar tu grabación",
       speak_nothing: "No se escuchó nada",
       speak_error: "No se pudo analizar",
+      speak_mic_nothing: "El micrófono no grabó nada. Tocalo de nuevo para volver a intentar.",
       update_toast_text: "Hay una versión nueva de voseá.",
       update_toast_btn: "Actualizar",
       update_toast_later: "Más tarde",
@@ -977,6 +978,7 @@
       speak_play_aria: "Play your recording",
       speak_nothing: "Nothing heard",
       speak_error: "Couldn't check it",
+      speak_mic_nothing: "The mic didn't record anything. Tap it again to retry.",
       update_toast_text: "A new version of voseá is ready.",
       update_toast_btn: "Update",
       update_toast_later: "Later",
@@ -4830,7 +4832,21 @@
     updateFlashDeckCount();
   }
 
+  // The switches and direction radios are the source of truth (mason,
+  // 2026-10-09: Frases showed off but the deck still had every phrase).
+  // When the phone reloads the app — a tab it discarded, or back to it —
+  // the browser puts the switches back the way you left them without any
+  // change event, while activeFlashSources starts again all on. So the
+  // state is read back from the inputs before it's used.
+  function readFlashSetupInputs() {
+    activeFlashSources.verbs = el.flashSrcVerbs.checked;
+    activeFlashSources.words = el.flashSrcWords.checked;
+    activeFlashSources.phrases = el.flashSrcPhrases.checked;
+    flashDirection = el.flashDirWord.checked ? "word2def" : "def2word";
+  }
+
   function renderFlashSetup() {
+    readFlashSetupInputs();
     updateFlashCounts();
     el.flashVerbOptions.hidden = !activeFlashSources.verbs;
     // The "card direction" panel is shared by words AND phrases — both are
@@ -6372,6 +6388,7 @@
   }
 
   function startFlashcards() {
+    readFlashSetupInputs();
     var mode = effectiveFlashMode();
     var cards = mode === "escuchar" ? buildListenDeck() : (mode === "hablar" ? buildSpeakDeck() : buildFlashDeck());
     if (cards.length === 0) {
@@ -6774,6 +6791,7 @@
   var HABLAR_MIN_ACCURACY = 90;
   var HABLAR_MIN_PHONEME = 60;
   var HABLAR_UNSURE_FLOOR = 75;
+  var HABLAR_TIMEOUT_MS = 20000;
   var hablarStream = null;
   var hablarStreamPromise = null;
   var hablarRec = null;      // the recording in progress: { card, mr, chunks, started, tick, auto, cancelled }
@@ -6787,11 +6805,32 @@
   // One microphone stream for the whole deck (asked for during the Empezar
   // tap, so the permission prompt comes up there, not mid-deck); released
   // when the deck closes or the app goes to the background.
+  //
+  // A stream can go bad while it still looks "live" (mason, 2026-10-09: on
+  // the iPhone the mic got stuck — every try came back "No se pudo
+  // analizar" and the phone's mic light stayed on). iOS mutes the track
+  // when its audio session is interrupted (our own audio playing, a call, a
+  // notification), and a muted track records silence or nothing at all; we
+  // kept reusing that same stream for every card. Now a muted or ended
+  // track marks the stream bad, and a bad stream is dropped and asked for
+  // again on the next tap.
+  function hablarStreamOk(st) {
+    return !!st && !st._bad && st.getAudioTracks().some(function (tr) { return tr.readyState === "live" && !tr.muted && tr.enabled; });
+  }
+  function hablarDropStream() {
+    if (hablarStream) { hablarStream.getTracks().forEach(function (tr) { try { tr.stop(); } catch (e) {} }); hablarStream = null; }
+  }
   function hablarGetStream() {
-    if (hablarStream && hablarStream.getAudioTracks().some(function (tr) { return tr.readyState === "live"; })) return Promise.resolve(hablarStream);
+    if (hablarStreamOk(hablarStream)) return Promise.resolve(hablarStream);
     if (hablarStreamPromise) return hablarStreamPromise;
-    hablarStreamPromise = navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (s) {
-      hablarStream = s; hablarStreamPromise = null; return s;
+    hablarDropStream();
+    hablarStreamPromise = navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (st) {
+      st.getAudioTracks().forEach(function (tr) {
+        function bad() { st._bad = true; }
+        tr.addEventListener("mute", bad);
+        tr.addEventListener("ended", bad);
+      });
+      hablarStream = st; hablarStreamPromise = null; return st;
     }, function (err) { hablarStreamPromise = null; throw err; });
     return hablarStreamPromise;
   }
@@ -6801,7 +6840,7 @@
   }
   function hablarRelease() {
     hablarAbort();
-    if (hablarStream) { hablarStream.getTracks().forEach(function (tr) { tr.stop(); }); hablarStream = null; }
+    hablarDropStream();
   }
   document.addEventListener("visibilitychange", function () { if (document.hidden) hablarRelease(); });
 
@@ -6883,18 +6922,28 @@
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden || hablarRec) return;
       var mr;
       try { mr = new MediaRecorder(stream); } catch (e) { hablarHint(card, t("speak_unsupported")); return; }
-      var rec = { card: card, mr: mr, chunks: [], started: Date.now(), cancelled: false };
+      var rec = { card: card, mr: mr, chunks: [], started: Date.now(), cancelled: false, done: false };
       mr.ondataavailable = function (e) { if (e.data && e.data.size) rec.chunks.push(e.data); };
-      mr.onstop = function () {
-        clearTimeout(rec.auto);
+      // Runs once, from onstop — or from the watchdog in hablarStop() if
+      // the browser never fires onstop, so the mic can't stay stuck on.
+      rec.finish = function (failed) {
+        if (rec.done) return;
+        rec.done = true;
+        clearTimeout(rec.auto); clearTimeout(rec.watch);
         if (hablarRec === rec) hablarRec = null;
         if (!rec.cancelled) {
-          var blob = new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" });
-          hablarKeepRecording(card, blob);
-          hablarAnalyse(card, blob, Date.now() - rec.started);
+          var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
+          if (failed || size < 400) hablarMicFailed(card, failed ? "recorder_error" : "empty_recording");
+          else {
+            var blob = new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" });
+            hablarKeepRecording(card, blob);
+            hablarAnalyse(card, blob, Date.now() - rec.started);
+          }
         }
         renderSpeakState();
       };
+      mr.onstop = function () { rec.finish(false); };
+      mr.onerror = function () { try { if (mr.state !== "inactive") mr.stop(); } catch (e) {} rec.finish(true); };
       rec.auto = setTimeout(hablarStop, HABLAR_MAX_MS);
       hablarRec = rec;
       hablarHintOverride = null;
@@ -6904,25 +6953,55 @@
       hablarHint(card, t(err && (err.name === "NotAllowedError" || err.name === "SecurityError") ? "speak_mic_denied" : "speak_mic_error"));
     });
   }
-  function hablarStop() { if (hablarRec && hablarRec.mr.state !== "inactive") hablarRec.mr.stop(); }
+  function hablarStop() {
+    var rec = hablarRec;
+    if (!rec) return;
+    try { if (rec.mr.state !== "inactive") rec.mr.stop(); } catch (e) {}
+    clearTimeout(rec.watch);
+    rec.watch = setTimeout(function () { rec.finish(false); }, 1500);
+  }
+  // The mic gave us nothing usable (no data, silence from a muted track,
+  // audio the browser can't decode): nothing is sent or graded and the card
+  // doesn't flip; the stream is dropped so the next tap gets a fresh one.
+  function hablarMicFailed(card, why) {
+    console.warn("[hablar] the mic didn't record anything usable:", why);
+    if (hablarBusyCard === card) hablarBusyCard = null;
+    hablarDropStream();
+    if (flashDeck[flashIndex] === card && !el.flashOverlay.hidden) hablarHint(card, t("speak_mic_nothing"));
+  }
   function hablarAbort() { if (hablarRec) { hablarRec.cancelled = true; hablarStop(); } }
 
   function hablarAnalyse(card, blob, recMs) {
     hablarBusyCard = card;
     var t0 = Date.now();
     var answers = speakAnswers(card);
-    speechToWav16k(blob).then(function (wav) {
+    var payload = null;
+    function send(retried) {
       // answers/digits let the function skip the scoring call when the plain
       // transcript already matches (one Azure call instead of two).
-      return supabaseClient.functions.invoke("stt", { body: { text: answers[0] || card.backMain, answers: answers, digits: card.digits || undefined, audio: speechBytesToBase64(wav), assess: ["es-AR"] } });
+      var call = supabaseClient.functions.invoke("stt", { body: payload }).then(function (res) {
+        if (res.error) {
+          var ctx = res.error.context;
+          var status = ctx && ctx.status;
+          // a sign-in that went stale while the phone slept: refresh it once and retry
+          if (status === 401 && !retried) return supabaseClient.auth.refreshSession().then(function () { return send(true); }, function () { throw new Error("HTTP 401"); });
+          throw new Error(status ? "HTTP " + status : (res.error.message || "error"));
+        }
+        return res;
+      });
+      return Promise.race([call, new Promise(function (_, reject) { setTimeout(function () { reject(new Error("timeout")); }, HABLAR_TIMEOUT_MS); })]);
+    }
+    speechToWav16k(blob).then(function (wav) {
+      payload = { text: answers[0] || card.backMain, answers: answers, digits: card.digits || undefined, audio: speechBytesToBase64(wav), assess: ["es-AR"] };
+      return send(false);
+    }, function (err) {
+      err = err || new Error("decode");
+      err.local = true;
+      throw err;
     }).then(function (res) {
-      if (res.error) {
-        var ctx = res.error.context;
-        var status = ctx && ctx.status;
-        throw new Error(status ? "HTTP " + status : (res.error.message || "error"));
-      }
       return hablarJudge(card, res.data);
     }).then(finish, function (err) {
+      if (err && err.local) { hablarMicFailed(card, err.message || "decode"); renderSpeakState(); return; }
       console.warn("[hablar] couldn't analyse the recording:", err && err.message);
       finish({ heard: "", recognition: "error", error: String((err && err.message) || err).slice(0, 120), auto_grade: null, rule: "error" });
     });
@@ -6961,12 +7040,24 @@
     }
     return new Uint8Array(buf);
   }
+  // The AudioContext is closed whatever happens: iOS only allows a few at
+  // once, and one left open by each failed decode would make every later
+  // decode fail too. Pure silence (what a muted track gives) is rejected
+  // here as a mic failure rather than sent off to be graded.
   function speechToWav16k(blob) {
     return blob.arrayBuffer().then(function (ab) {
       var AC = window.AudioContext || window.webkitAudioContext;
       var ctx = new AC();
-      return new Promise(function (resolve, reject) { ctx.decodeAudioData(ab, resolve, reject); }).then(function (decoded) {
-        try { ctx.close(); } catch (e) {}
+      function closeCtx() { try { if (ctx.state !== "closed") ctx.close(); } catch (e) {} }
+      return new Promise(function (resolve, reject) {
+        // newer browsers also return a promise; it's caught here so a failed decode isn't reported twice
+        var pr = ctx.decodeAudioData(ab, resolve, function (e) { reject(e || new Error("decode")); });
+        if (pr && pr.catch) pr.catch(function () {});
+      }).then(function (decoded) {
+        closeCtx();
+        var peak = 0, ch = decoded.getChannelData(0);
+        for (var i = 0; i < ch.length; i += 7) { var a = Math.abs(ch[i]); if (a > peak) peak = a; }
+        if (!(decoded.duration > 0.15) || peak < 0.0005) throw new Error(peak < 0.0005 ? "silent" : "too_short");
         var rate = 16000;
         var off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * rate)), rate);
         var src = off.createBufferSource();
@@ -6974,7 +7065,7 @@
         src.connect(off.destination);
         src.start();
         return off.startRendering().then(function (rendered) { return speechEncodeWav(rendered.getChannelData(0), rate); });
-      });
+      }, function (e) { closeCtx(); throw e; });
     });
   }
   function speechBytesToBase64(bytes) {
@@ -7126,7 +7217,7 @@
     if (sp.rule === "error" || sp.rule === "nothing") {
       grid.classList.add("is-none");
       el.flashBackHeard.classList.add("is-msg");
-      el.flashBackHeard.textContent = sp.rule === "error" ? t("speak_error") : "—";
+      el.flashBackHeard.textContent = sp.rule === "error" ? t("speak_error") + (sp.error ? " (" + String(sp.error).slice(0, 40) + ")" : "") : "—";
     } else {
       var parts = speechAlign(card, sp);
       el.flashBackSaidPre.textContent = parts.pre;
@@ -13453,6 +13544,7 @@
   el.flashDirDef.addEventListener("change", function () { if (el.flashDirDef.checked) flashDirection = "def2word"; });
   el.flashDirWord.addEventListener("change", function () { if (el.flashDirWord.checked) flashDirection = "word2def"; });
   el.flashStartBtn.addEventListener("click", startFlashcards);
+  window.addEventListener("pageshow", function () { if (!el.flashcardsPanel.hidden) renderFlashSetup(); });
   // In a Partida, × is "Terminar": the summary first (closing is from there).
   el.flashCloseBtn.addEventListener("click", function () { if (ptActive() && !partida.paused) ptShowSummary(); else closeFlashcards(); });
   // stopPropagation on both speaker buttons — without it, a tap would also
