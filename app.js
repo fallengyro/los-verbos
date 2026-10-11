@@ -10934,6 +10934,50 @@
     return out;
   }
 
+  // ---- picks: a choice that doesn't change the story, taken both ways ----
+  // (mason, 2026-10-11: "the choices that aren't too consequential should
+  // be able to be prompted both ways (for example pay by card vs pay in
+  // efectivo, should alternate in the prompt)".) A scene can declare
+  // picks: { pago: ["tarjeta", "efectivo"] }; a step with pick: "pago" may
+  // give any of its fields (you, ok, best, alts, wrong, prep, es, q) as an
+  // object keyed by the options, and the play uses the one chosen. Each
+  // pick takes the next option every time the scene is played (the first
+  // time at random), remembered per scene on this device.
+  var ESC_PICKS_KEY = "vosea-escenas-picks";
+  var ESC_PICK_FIELDS = ["you", "ok", "best", "alts", "wrong", "prep", "es", "q"];
+  function escChoosePicks(sc) {
+    var names = Object.keys(sc.picks || {});
+    if (!names.length) return {};
+    var all = {};
+    try { all = JSON.parse(localStorage.getItem(ESC_PICKS_KEY) || "{}") || {}; } catch (e) { all = {}; }
+    var last = all[sc.id] || {}, out = {}, keep = {};
+    names.forEach(function (n) {
+      var opts = sc.picks[n] || [];
+      if (!opts.length) return;
+      var i = opts.indexOf(last[n]);
+      var next = i === -1 ? Math.floor(Math.random() * opts.length) : (i + 1) % opts.length;
+      out[n] = opts[next]; keep[n] = opts[next];
+    });
+    all[sc.id] = keep;
+    try { localStorage.setItem(ESC_PICKS_KEY, JSON.stringify(all)); } catch (e) {}
+    return out;
+  }
+  function escApplyPicks(sc, chosen) {
+    sc.steps = sc.steps.map(function (st) {
+      if (!st.pick || !chosen[st.pick]) return st;
+      var key = chosen[st.pick], o = Object.assign({}, st), opts = (sc.picks || {})[st.pick] || [];
+      ESC_PICK_FIELDS.forEach(function (f) {
+        var v = o[f];
+        if (!v || typeof v !== "object" || Array.isArray(v)) return;
+        // keyed by the options (an option it doesn't list gets nothing)
+        if (opts.some(function (k) { return Object.prototype.hasOwnProperty.call(v, k); })) o[f] = v[key];
+      });
+      return o;
+    });
+    sc._picks = chosen;
+    return sc;
+  }
+
   // ---- records + unlocking ----
   function escStars(ok, total) { if (!total) return 0; var f = ok / total; return f >= 1 ? 3 : (f >= 0.7 ? 2 : 1); }
   function escRecords(id) {
@@ -11131,7 +11175,7 @@
   }
   function escStart(sc) {
     if (!escCanPlay()) return;
-    sc = escCast(sc);
+    sc = escApplyPicks(escCast(sc), escChoosePicks(sc._base || sc));
     hablarPrepareMic(); // the permission prompt comes up on this tap
     unlockTtsAudio();
     var lead = escRuidoStart(sc);
@@ -11140,7 +11184,8 @@
     escPlay = {
       sc: sc, id: practiceUuid(), session: practiceUuid(), started: Date.now(), voices: escVoices(sc), vals: vals,
       lines: {}, i: 0, turnN: 0, total: escSceneTurns(sc), results: [], pending: [], cur: null, rec: null, busy: false, done: false,
-      phone: escRuidoLevel() !== "off" && sc.ruido && sc.ruido.phone ? sc.ruido.phone.slice() : null
+      phone: escRuidoLevel() !== "off" && sc.ruido && sc.ruido.phone ? sc.ruido.phone.slice() : null,
+      picks: sc._picks || {}
     };
     if (currentUser && (!rewardsState.loaded || rewardsState.userId !== currentUser.id)) loadRewards();
     el.escOverlay.hidden = false;
@@ -11516,7 +11561,7 @@
       flipped: false, flips: 0, ms_to_flip: null, ms_front: Math.min(600000, Date.now() - p.cur.t0), ms_back: 0,
       audio_plays: p.replays || 0, known_before: false, known_after: false, device: practiceDevice()
     };
-    if (speech) row.speech = Object.assign({ scene: p.sc.id, peeked: !!p.peeked }, speech, { wrong: speech.wrong ? true : undefined });
+    if (speech) row.speech = Object.assign({ scene: p.sc.id, peeked: !!p.peeked }, speech, { wrong: speech.wrong ? true : undefined }, p.cur && p.cur.step && p.cur.step.pick ? { pick: p.cur.step.pick + ":" + (p.picks || {})[p.cur.step.pick] } : {});
     practiceQueue.push(row);
     savePracticeQueue();
     if (practiceQueue.length >= PRACTICE_FLUSH_AT) practiceFlush();
