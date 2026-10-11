@@ -540,7 +540,7 @@
       esc_your_turn: "Tu turno",
       esc_your_turn_listen: "Tu turno · escuchá",
       esc_tap_mic: "Decilo en castellano: tocá el micrófono.",
-      esc_recording: "Te escucho… tocá de nuevo cuando termines.",
+      esc_recording: "Te escucho… se corta solo cuando terminás (o tocá para cortar).",
       esc_checking: "Escuchando lo que dijiste…",
       esc_heard_nothing: "No se escuchó nada. Tocá el micrófono de nuevo.",
       esc_analyse_error: "No se pudo analizar ({why}). Probá de nuevo.",
@@ -770,6 +770,33 @@
       usage_exempt: "sin límite",
       usage_no_people: "Nadie usó la app todavía este mes.",
       usage_rules: "Límites por persona y por día: {stt} min de Hablar y {tts} caracteres de audio nuevo. Cuando el mes gratis de Azure pasa el {pct} %, solo siguen ustedes dos hasta que se renueve.",
+      usage_diag: "Reconocimiento de voz (compartido)",
+      usage_diag_sharing: "Comparten {n} · últimos {days} días",
+      usage_diag_none: "Todavía nadie compartió intentos.",
+      usage_diag_missing: "Falta correr pending_2026-10-11_diagnosticos.sql en Supabase.",
+      usage_diag_loading: "Cargando…",
+      usage_diag_recent: "Últimos intentos",
+      usage_diag_problems: "Solo problemas",
+      usage_diag_all: "Todos",
+      usage_diag_no_problems: "Ningún problema en los últimos intentos.",
+      usage_col_device: "Dispositivo",
+      usage_diag_dev_sub: "{n} intentos",
+      usage_diag_dev_acc: " · precisión {acc}",
+      usage_col_ok: "Bien",
+      usage_col_nothing: "Nada",
+      usage_col_mic: "Mic",
+      usage_col_err: "Error",
+      diag_out_bien: "bien",
+      diag_out_otra: "otra vez",
+      diag_out_unsure: "dudoso",
+      diag_out_nothing: "no oyó nada",
+      diag_out_mic_empty: "mic vacío",
+      diag_out_mic_silent: "mic mudo",
+      diag_out_mic_decode: "no se decodifica",
+      diag_out_recorder_error: "falla al grabar",
+      diag_out_stt_error: "error de Azure",
+      diag_out_limit: "límite",
+      diag_out_timeout: "tardó demasiado",
       usage_setup: "Falta configurar: {what}",
       usage_failed: "No se pudo leer: {what}",
       usage_source_vosea: "Azure no publica este número para este recurso: es lo que contó voseá.",
@@ -834,6 +861,13 @@
       settings_quiet_off: "Apagado",
       settings_quiet_on: "Activado",
       settings_quiet_note: "Silencia toda la pronunciación de la app (por ejemplo, en un avión). Solo en este dispositivo.",
+      settings_diag_label: "Ayudar a mejorar el reconocimiento de voz",
+      settings_diag_off: "No",
+      settings_diag_on: "Sí",
+      settings_diag_note: "Si lo activás, cada vez que hablás en Hablar o en Escenas se guarda un registro del intento: qué se esperaba, qué se entendió, los puntajes, el resultado y datos técnicos del micrófono y del navegador. Nunca el audio. Solo lo ve quien administra voseá, y se borra solo a los 90 días.",
+      settings_diag_clear: "Borrar lo que compartí",
+      settings_diag_cleared: "Listo: se borró todo lo que compartiste.",
+      settings_diag_missing: "Esto todavía no está disponible.",
       settings_backup_label: "Respaldo",
       settings_backup_note: "Guarda en el servidor una copia de tus verbos, palabras, frases y listas, incluido lo marcado como sabido, y de tu progreso: el historial de práctica, la racha, el álbum y los récords. Hay un solo respaldo: uno nuevo reemplaza al anterior.",
       backup_create: "Crear respaldo",
@@ -1424,7 +1458,7 @@
       esc_your_turn: "Your turn",
       esc_your_turn_listen: "Your turn · listen",
       esc_tap_mic: "Say it in Spanish: tap the mic.",
-      esc_recording: "Listening… tap again when you're done.",
+      esc_recording: "Listening… it stops by itself when you're done (or tap to stop).",
       esc_checking: "Checking what you said…",
       esc_heard_nothing: "Nothing was heard. Tap the mic again.",
       esc_analyse_error: "Couldn't check it ({why}). Try again.",
@@ -1654,6 +1688,33 @@
       usage_exempt: "no limit",
       usage_no_people: "No one has used the app yet this month.",
       usage_rules: "Daily limits per person: {stt} min of Hablar and {tts} characters of new audio. Once Azure's free month passes {pct}%, only you two can keep going until it renews.",
+      usage_diag: "Speech recognition (shared)",
+      usage_diag_sharing: "{n} sharing · last {days} days",
+      usage_diag_none: "No one has shared any attempts yet.",
+      usage_diag_missing: "Run pending_2026-10-11_diagnosticos.sql in Supabase first.",
+      usage_diag_loading: "Loading…",
+      usage_diag_recent: "Latest attempts",
+      usage_diag_problems: "Problems only",
+      usage_diag_all: "All",
+      usage_diag_no_problems: "No problems in the latest attempts.",
+      usage_col_device: "Device",
+      usage_diag_dev_sub: "{n} attempts",
+      usage_diag_dev_acc: " · accuracy {acc}",
+      usage_col_ok: "Right",
+      usage_col_nothing: "Nothing",
+      usage_col_mic: "Mic",
+      usage_col_err: "Error",
+      diag_out_bien: "right",
+      diag_out_otra: "try again",
+      diag_out_unsure: "unsure",
+      diag_out_nothing: "heard nothing",
+      diag_out_mic_empty: "mic empty",
+      diag_out_mic_silent: "mic silent",
+      diag_out_mic_decode: "won't decode",
+      diag_out_recorder_error: "recorder failed",
+      diag_out_stt_error: "Azure error",
+      diag_out_limit: "limit",
+      diag_out_timeout: "timed out",
       usage_setup: "Not set up yet: {what}",
       usage_failed: "Couldn't read: {what}",
       usage_source_vosea: "Azure doesn't publish this number for this resource: it's what voseá counted.",
@@ -1718,6 +1779,13 @@
       settings_quiet_off: "Off",
       settings_quiet_on: "On",
       settings_quiet_note: "Mutes all pronunciation audio in the app (on a plane, say). This device only.",
+      settings_diag_label: "Help improve speech recognition",
+      settings_diag_off: "No",
+      settings_diag_on: "Yes",
+      settings_diag_note: "When it's on, each time you speak in Hablar or Escenas a record of the attempt is saved: what was expected, what was heard, the scores, the result, and technical details about the mic and the browser. Never the audio. Only voseá's owner can see it, and it's deleted after 90 days.",
+      settings_diag_clear: "Delete what I've shared",
+      settings_diag_cleared: "Done: everything you shared was deleted.",
+      settings_diag_missing: "This isn't available yet.",
       settings_backup_label: "Backup",
       settings_backup_note: "Keeps a copy of your verbs, words, phrases, and lists on the server, including what you've marked as known, plus your progress: your practice history, streak, album, and records. There's one backup: a new one replaces the old.",
       backup_create: "Back up now",
@@ -2269,6 +2337,8 @@
     renderLangButtons();
     renderVoiceButtons();
     applyQuietMode();
+    if (el.settingsDiagMsg) el.settingsDiagMsg.textContent = "";
+    renderSpeechDiagButtons();
     closeBackupPanel();
     setBackupMsg("");
     backupInfo = null;
@@ -2314,6 +2384,7 @@
     usageLoading = true;
     usageError = "";
     renderUsage();
+    refreshSpeechDiag();
     supabaseClient.functions.invoke("usage", { body: {} }).then(function (res) {
       if (res.error) {
         var st = res.error.context && res.error.context.status;
@@ -2515,6 +2586,121 @@
 
     body.appendChild(uNode("p", "flash-setup-note usage-rules", t("usage_rules", {
       stt: progNum((lim.stt_seconds_day || 600) / 60), tts: progNum(lim.tts_chars_day || 5000), pct: reserve })));
+  }
+
+  // ---- Uso · speech recognition (shared attempts) ----
+  // What people who turned on "Ayudar a mejorar el reconocimiento de voz"
+  // sent: attempts by device (so "iPhone · Safari" failing every time
+  // stands out), then the latest attempts with what was expected, heard and
+  // the mic details. From vosea_speech_report(), owners only.
+  var diagData = null, diagLoading = false, diagError = "";
+  var diagShowAll = false;
+  var DIAG_DAYS = 30;
+
+  function refreshSpeechDiag() {
+    if (!el.usageDiag || diagLoading) return;
+    diagLoading = true;
+    diagError = "";
+    renderSpeechDiag();
+    Promise.resolve(supabaseClient.rpc("vosea_speech_report", { p_days: DIAG_DAYS })).then(function (res) {
+      if (res && res.error) {
+        var m = String(res.error.message || "");
+        diagError = /forbidden/.test(m) ? "usage_forbidden" : (res.error.code === "PGRST202" || /vosea_speech_report|does not exist|schema cache/i.test(m)) ? "usage_diag_missing" : "usage_error";
+        return;
+      }
+      diagData = (res && res.data && typeof res.data === "object") ? res.data : null;
+    }, function () { diagError = "usage_error"; }).then(function () {
+      diagLoading = false;
+      renderSpeechDiag();
+    });
+  }
+  function diagOutcomeKey(e) {
+    if (e.outcome === "graded") return e.grade === "bien" ? "bien" : "otra";
+    return e.outcome || "stt_error";
+  }
+  function diagIsProblem(e) { return diagOutcomeKey(e) !== "bien"; }
+
+  function renderSpeechDiag() {
+    var box = el.usageDiag;
+    if (!box) return;
+    box.textContent = "";
+    var sec = usageSection(t("usage_diag"));
+    box.appendChild(sec);
+    if (diagLoading && !diagData) { sec.appendChild(uNode("p", "usage-note", t("usage_diag_loading"))); return; }
+    if (diagError) { sec.appendChild(uNode("p", diagError === "usage_diag_missing" ? "usage-note" : "usage-problem", t(diagError))); return; }
+    var d = diagData;
+    if (!d) return;
+    sec.appendChild(uNode("p", "usage-note", t("usage_diag_sharing", { n: progNum(d.sharing || 0), days: DIAG_DAYS })));
+    var devs = d.devices || [];
+    if (!devs.length) { sec.appendChild(uNode("p", "usage-note", t("usage_diag_none"))); return; }
+
+    var wrap = uNode("div", "usage-table-wrap");
+    var tbl = uNode("table", "usage-table diag-table");
+    var thead = uNode("thead"), hr = uNode("tr");
+    ["usage_col_device", "usage_col_ok", "usage_col_nothing", "usage_col_mic", "usage_col_err"].forEach(function (k) { hr.appendChild(uNode("th", "", t(k))); });
+    thead.appendChild(hr);
+    tbl.appendChild(thead);
+    var tb = uNode("tbody");
+    devs.forEach(function (r) {
+      var n = r.n || 0;
+      function pct(x) { return n && x ? progNum(Math.round(x / n * 100)) + " %" : "—"; }
+      var tr = uNode("tr");
+      var dev = uNode("td", "usage-person", r.device || "?");
+      dev.appendChild(uNode("span", "usage-exempt", t("usage_diag_dev_sub", { n: progNum(n) }) + (r.accuracy !== null && r.accuracy !== undefined ? t("usage_diag_dev_acc", { acc: progNum(r.accuracy) }) : "")));
+      tr.appendChild(dev);
+      tr.appendChild(uNode("td", "num", pct(r.bien)));
+      tr.appendChild(uNode("td", "num", pct(r.nothing)));
+      var mic = uNode("td", "num" + (n && r.mic / n >= 0.3 ? " diag-bad" : ""), pct(r.mic));
+      tr.appendChild(mic);
+      tr.appendChild(uNode("td", "num" + (n && r.errors / n >= 0.3 ? " diag-bad" : ""), pct(r.errors)));
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb);
+    wrap.appendChild(tbl);
+    sec.appendChild(wrap);
+
+    // the latest attempts
+    var head = uNode("div", "diag-recent-head");
+    head.appendChild(uNode("h5", "", t("usage_diag_recent")));
+    var tog = uNode("div", "lang-toggle diag-filter");
+    [[false, "usage_diag_problems"], [true, "usage_diag_all"]].forEach(function (o) {
+      var b = uNode("button", "lang-option" + (diagShowAll === o[0] ? " active" : ""), t(o[1]));
+      b.type = "button";
+      b.setAttribute("aria-pressed", diagShowAll === o[0] ? "true" : "false");
+      b.addEventListener("click", function () { diagShowAll = o[0]; renderSpeechDiag(); });
+      tog.appendChild(b);
+    });
+    head.appendChild(tog);
+    sec.appendChild(head);
+    var list = (d.recent || []).filter(function (e) { return diagShowAll || diagIsProblem(e); });
+    if (!list.length) { sec.appendChild(uNode("p", "usage-note", t(diagShowAll ? "usage_diag_none" : "usage_diag_no_problems"))); return; }
+    var ul = uNode("ul", "diag-list");
+    list.forEach(function (e) {
+      var k = diagOutcomeKey(e);
+      var li = uNode("li", "diag-row is-" + (k === "bien" ? "ok" : (k === "otra" || k === "unsure") ? "miss" : "fail"));
+      var top = uNode("div", "diag-top");
+      top.appendChild(uNode("span", "diag-chip", t("diag_out_" + k)));
+      top.appendChild(uNode("span", "diag-when", usageDate(e.at) + " " + usageTime(e.at)));
+      top.appendChild(uNode("span", "diag-who", [e.who, e.device].filter(Boolean).join(" · ")));
+      li.appendChild(top);
+      li.appendChild(uNode("div", "diag-item", (e.source === "escena" ? "Escena " : "Hablar ") + String(e.item || "").replace(/\|+$/, "").replace(/\|/g, " · ")));
+      if (e.expected || e.heard) {
+        var said = uNode("div", "diag-said");
+        said.appendChild(uNode("span", "diag-exp", "«" + (e.expected || "—") + "»"));
+        said.appendChild(document.createTextNode(" → "));
+        said.appendChild(uNode("span", "diag-heard", e.heard ? "«" + e.heard + "»" : "—"));
+        if (e.heard_scored) said.appendChild(uNode("span", "diag-heard2", " (" + e.heard_scored + ")"));
+        li.appendChild(said);
+      }
+      var bits = [];
+      if (e.rule) bits.push(e.rule);
+      if (e.accuracy !== null && e.accuracy !== undefined) bits.push(progNum(Math.round(e.accuracy)) + " %");
+      if (e.rec_ms) bits.push(progNum(e.rec_ms / 1000, 1) + " s");
+      if (e.detail) bits.push(e.detail);
+      if (bits.length) li.appendChild(uNode("div", "diag-detail", bits.join(" · ")));
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul);
   }
 
   // ================= Audio por adelantado (2026-10-10) =================
@@ -2846,6 +3032,7 @@
       }
       renderVoiceButtons();
     });
+    loadSpeechDiagSetting();
     loadPlayGoal();
   }
 
@@ -3352,6 +3539,11 @@
     settingsClose: document.getElementById("settings-close"),
     settingsQuietOn: document.getElementById("settings-quiet-on"),
     settingsQuietOff: document.getElementById("settings-quiet-off"),
+    settingsDiagOn: document.getElementById("settings-diag-on"),
+    settingsDiagOff: document.getElementById("settings-diag-off"),
+    settingsDiagClear: document.getElementById("settings-diag-clear"),
+    settingsDiagMsg: document.getElementById("settings-diag-msg"),
+    usageDiag: document.getElementById("usage-diag"),
     quietToast: document.getElementById("quiet-toast"),
     quietToastSettings: document.getElementById("quiet-toast-settings"),
     backupStatus: document.getElementById("backup-status"),
@@ -7754,6 +7946,259 @@
   // (practice_log.speech), so they can be re-tuned from real practice.
   // Audio is never stored: it goes to the "stt" Edge Function and back.
   var HABLAR_MAX_MS = 6000;
+  var ESC_MAX_MS = 8000; // scenes: longer answers (mason, 2026-10-11: "let's open it up to 8 seconds")
+
+  // ---- stop by itself when you stop talking (2026-10-11) ----
+  // An analyser on the mic stream: the room's level is the quietest moment
+  // so far (the scene's background noise, a fan…); speech is three times
+  // that for 150 ms; once you've spoken, ~1.1 s back under it stops the
+  // recording. Nothing heard at all: the time limit still stops
+  // it. If the analyser can't run, recording works as before (tap to stop).
+  var HABLAR_VAD_SILENCE_MS = 1100;
+  var hablarVadCtx = null;
+  function hablarVadContext() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!hablarVadCtx || hablarVadCtx.state === "closed") { try { hablarVadCtx = new AC(); } catch (e) { hablarVadCtx = null; } }
+    return hablarVadCtx;
+  }
+  // called on the mic tap itself, so iOS lets the context run
+  function hablarVadWake() { var c = hablarVadContext(); try { if (c && c.state === "suspended") c.resume(); } catch (e) {} }
+  function hablarWatchSilence(stream, onDone) {
+    var ctx = hablarVadContext();
+    if (!ctx || !stream) return { stop: function () {}, info: function () { return null; } };
+    var src, an, buf, timer, t0 = Date.now(), floor = [], hist = [], minLevel = null, thr = 0, run = 0, spoke = false, quietSince = 0, peak = 0, stopped = false;
+    try {
+      src = ctx.createMediaStreamSource(stream);
+      an = ctx.createAnalyser(); an.fftSize = 1024;
+      src.connect(an);
+      buf = new Float32Array(an.fftSize);
+    } catch (e) { return { stop: function () {}, info: function () { return { vad: "off" }; } }; }
+    function rms() {
+      if (an.getFloatTimeDomainData) an.getFloatTimeDomainData(buf);
+      else { var b8 = new Uint8Array(an.fftSize); an.getByteTimeDomainData(b8); for (var j = 0; j < b8.length; j++) buf[j] = (b8[j] - 128) / 128; }
+      var sum = 0; for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+      return Math.sqrt(sum / buf.length);
+    }
+    timer = setInterval(function () {
+      if (stopped) return;
+      var v = rms(), el2 = Date.now() - t0;
+      if (v > peak) peak = v;
+      // the room level: the quietest moment so far (smoothed over 3 frames),
+      // so it works even if you start talking the moment you tap
+      floor.push(v); if (floor.length > 3) floor.shift();
+      var sm = floor.reduce(function (a, b) { return a + b; }, 0) / floor.length;
+      if (minLevel === null || sm < minLevel) minLevel = sm;
+      if (window.__vadTrace) window.__vadTrace.push([el2, Math.round(v * 1000) / 1000]);
+      hist.push(v);
+      if (el2 < 300) return;
+      thr = Math.max(minLevel * 3, 0.01);
+      if (!spoke) {
+        // talking from the very first moment: the room level only shows up
+        // later, so look back over everything heard so far
+        var r2 = 0;
+        for (var k = 0; k < hist.length; k++) { r2 = hist[k] > thr ? r2 + 1 : 0; if (r2 >= 3) { spoke = true; break; } }
+      }
+      if (v > thr) { run++; if (run >= 3) { spoke = true; quietSince = 0; } }
+      else { run = 0; if (spoke) { if (!quietSince) quietSince = Date.now(); else if (Date.now() - quietSince >= HABLAR_VAD_SILENCE_MS) { stop(); onDone(); } } }
+    }, 50);
+    function stop() { if (stopped) return; stopped = true; clearInterval(timer); try { src.disconnect(); } catch (e) {} }
+    return { stop: stop, info: function () { return { vad: spoke ? "spoke" : (thr ? "quiet" : "short"), floor: minLevel !== null ? Math.round(minLevel * 1000) / 1000 : null, peak: Math.round(peak * 1000) / 1000, ctx: ctx.state }; } };
+  }
+  // What the mic gave us, for the message when nothing usable came back
+  // (her iPhone, 2026-10-11: "no grabó nada" on every try) — so a
+  // screenshot tells us why.
+  function hablarMicDetail(stream, rec, why) {
+    var tr = stream && stream.getAudioTracks ? stream.getAudioTracks()[0] : null;
+    var size = rec ? rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0) : 0;
+    var bits = [why || "", size + " B", (rec && rec.mr && rec.mr.mimeType) || "?", tr ? (tr.readyState + (tr.muted ? " · muda" : "") + (tr.enabled ? "" : " · off")) : "sin pista"];
+    if (rec && rec.vad) { var vi = rec.vad.info(); if (vi) bits.push("vad " + vi.vad + (vi.peak != null ? " " + vi.peak : "") + (vi.ctx ? " " + vi.ctx : "")); }
+    if (escRuido) bits.push("ruido " + escRuido.level);
+    if (stream && stream._at) bits.push("mic " + Math.round((Date.now() - stream._at) / 100) / 10 + " s");
+    return bits.filter(Boolean).join(" · ");
+  }
+  // ================= Diagnósticos de voz (2026-10-11) =================
+  // mason: "would it be of value to 'log' more information about the
+  // recordings, their stt results, etc across users (opt in only)?" —
+  // after his wife's "no grabó nada" on every try on her iPhone and a "Sí"
+  // tacked onto her answers on her Samsung. With "Ayudar a mejorar el
+  // reconocimiento de voz" on in Settings (off by default), every speaking
+  // attempt — in Hablar and in Escenas, failures included — is written to
+  // speech_events: where, the outcome, what was expected and heard, the
+  // scores, the recording's length, the device and the mic details line.
+  // Never audio. Fire-and-forget: a failed write never gets in the way.
+  // The database only accepts a row while its owner has the setting on;
+  // rows go after 90 days; only app owners see them (Uso page).
+  var speechDiagOn = false;
+  var speechDiagAvail = null; // false: the column isn't there yet (SQL not run)
+  var speechDeviceCache = null;
+
+  function speechDevice() {
+    if (speechDeviceCache) return speechDeviceCache;
+    var ua = String(navigator.userAgent || "");
+    var touchMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+    var os = /iPhone/.test(ua) ? "iPhone" : (/iPad/.test(ua) || touchMac) ? "iPad" : /Android/.test(ua) ? "Android"
+      : /Windows/.test(ua) ? "Windows" : /Mac OS X/.test(ua) ? "Mac" : /CrOS/.test(ua) ? "ChromeOS" : /Linux/.test(ua) ? "Linux" : "?";
+    var m, br = "?";
+    if ((m = ua.match(/SamsungBrowser\/(\d+)/))) br = "Samsung Internet " + m[1];
+    else if ((m = ua.match(/CriOS\/(\d+)/))) br = "Chrome " + m[1];
+    else if ((m = ua.match(/FxiOS\/(\d+)/))) br = "Firefox " + m[1];
+    else if ((m = ua.match(/EdgiOS\/(\d+)|EdgA\/(\d+)|Edg\/(\d+)/))) br = "Edge " + (m[1] || m[2] || m[3]);
+    else if ((m = ua.match(/OPR\/(\d+)/))) br = "Opera " + m[1];
+    else if ((m = ua.match(/Firefox\/(\d+)/))) br = "Firefox " + m[1];
+    else if ((m = ua.match(/Chrome\/(\d+)/))) br = "Chrome " + m[1];
+    else if ((m = ua.match(/Version\/(\d+(?:\.\d+)?).*Safari/))) br = "Safari " + m[1];
+    else if (os === "iPhone" || os === "iPad") br = "WebView";
+    var pwa = false;
+    try { pwa = !!((window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone); } catch (e) {}
+    speechDeviceCache = {
+      label: os + " · " + br + (pwa ? " · app" : ""),
+      os: os, browser: br, pwa: pwa, kind: practiceDevice(),
+      ua: ua.slice(0, 300)
+    };
+    return speechDeviceCache;
+  }
+  function speechClip(x, n) {
+    if (x === undefined || x === null || x === "") return null;
+    x = String(x);
+    return x.length > n ? x.slice(0, n) : x;
+  }
+  function speechNum(x) { return typeof x === "number" && isFinite(x) ? x : null; }
+  // A thrown error from the analysis step, as an outcome.
+  function speechDiagErrOutcome(err) {
+    var m = String((err && err.message) || "");
+    if (err && err.local) return m === "silent" ? "mic_silent" : m === "too_short" ? "mic_empty" : "mic_decode";
+    if (err && err.limit) return "limit";
+    if (m === "timeout") return "timeout";
+    return "stt_error";
+  }
+  // A judged result (hablarJudge / escJudge), as an outcome.
+  function speechDiagFromResult(r) {
+    r = r || {};
+    var out = { rule: r.rule || null, grade: null, heard: r.heard_display || r.heard || "", heard_scored: r.heard_scored || null, accuracy: r.accuracy, pron: r.pron };
+    if (r.rule === "error") out.outcome = "stt_error";
+    else if (r.rule === "nothing") out.outcome = "nothing";
+    else if (!r.auto_grade) out.outcome = "unsure";
+    else { out.outcome = "graded"; out.grade = r.auto_grade; }
+    return out;
+  }
+  function speechDiagResultExtra(r) {
+    r = r || {};
+    var x = {};
+    if (r.heard && r.heard_display && speechNorm(r.heard) !== speechNorm(r.heard_display)) x.lexical = speechClip(r.heard, 300);
+    if (r.recognition) x.recognition = r.recognition;
+    if (r.min_phoneme !== null && r.min_phoneme !== undefined) x.min_phoneme = r.min_phoneme;
+    if (r.word_error) x.word_error = true;
+    if (r.assessed !== undefined) x.assessed = !!r.assessed;
+    return x;
+  }
+  function hablarDiagBase(card, evt) {
+    return Object.assign({
+      source: "hablar",
+      item: practiceCardKey(card),
+      expected: speakAnswers(card)[0] || card.backMain || ""
+    }, evt, { extra: Object.assign({ kind: card.kind, contrarreloj: rtRunning() ? true : undefined }, evt.extra || {}) });
+  }
+  function escDiagBase(p, evt) {
+    var step = p && p.cur && p.cur.step;
+    var pick = step && step.pick ? step.pick + ":" + (p.picks || {})[step.pick] : undefined;
+    return Object.assign({
+      source: "escena",
+      item: (p && p.sc ? p.sc.id : "?") + ":t" + (p && p.cur ? p.cur.i : "?"),
+      expected: step ? step.best : ""
+    }, evt, { extra: Object.assign({ ruido: escRuido ? escRuido.level : "off", try: p && p.cur ? (p.cur.tries || 0) + 1 : undefined, pick: pick }, evt.extra || {}) });
+  }
+  function speechDiagLog(evt) {
+    if (!speechDiagOn || !currentUser || !evt) return;
+    var extra = {};
+    Object.keys(evt.extra || {}).forEach(function (k) {
+      var v = evt.extra[k];
+      if (v === undefined || v === null || v === "") return;
+      extra[k] = typeof v === "string" ? v.slice(0, 200) : v;
+    });
+    try { if (JSON.stringify(extra).length > 1500) extra = { cut: true }; } catch (e) { extra = {}; }
+    var rec = speechNum(evt.rec_ms);
+    var row = {
+      user_id: currentUser.id,
+      source: evt.source === "escena" ? "escena" : "hablar",
+      item: speechClip(evt.item, 120) || "",
+      outcome: evt.outcome,
+      grade: evt.grade === "bien" || evt.grade === "otra" ? evt.grade : null,
+      rule: speechClip(evt.rule, 40),
+      expected: speechClip(evt.expected, 300),
+      heard: speechClip(evt.heard, 500),
+      heard_scored: speechClip(evt.heard_scored, 500),
+      accuracy: speechNum(evt.accuracy),
+      pron: speechNum(evt.pron),
+      rec_ms: rec === null ? null : Math.max(0, Math.min(120000, Math.round(rec))),
+      device: speechDevice(),
+      detail: speechClip(evt.detail, 400),
+      extra: extra
+    };
+    if (window.__speechDiag) window.__speechDiag.push(row);
+    try {
+      Promise.resolve(supabaseClient.from("speech_events").insert(row)).then(function (res) {
+        if (res && res.error) console.warn("[diag] not saved:", res.error.message);
+      }, function () {});
+    } catch (e) {}
+  }
+
+  // ---- the setting ----
+  // Read on its own, so a database without the column yet can't break the
+  // language / voice load.
+  function loadSpeechDiagSetting() {
+    speechDiagOn = false;
+    if (!currentUser) return Promise.resolve();
+    var uid = currentUser.id;
+    return Promise.resolve(supabaseClient.from("user_settings").select("share_speech_diag").eq("user_id", uid).maybeSingle()).then(function (res) {
+      if (!currentUser || currentUser.id !== uid) return;
+      if (res && res.error) { speechDiagAvail = false; speechDiagOn = false; }
+      else { speechDiagAvail = true; speechDiagOn = !!(res && res.data && res.data.share_speech_diag); }
+      renderSpeechDiagButtons();
+    }, function () { speechDiagAvail = false; renderSpeechDiagButtons(); });
+  }
+  function renderSpeechDiagButtons() {
+    if (!el.settingsDiagOn) return;
+    el.settingsDiagOn.classList.toggle("active", speechDiagOn);
+    el.settingsDiagOff.classList.toggle("active", !speechDiagOn);
+    el.settingsDiagOn.setAttribute("aria-pressed", speechDiagOn ? "true" : "false");
+    el.settingsDiagOff.setAttribute("aria-pressed", speechDiagOn ? "false" : "true");
+  }
+  function speechDiagMissing(err) {
+    return /share_speech_diag|speech_events|schema cache|does not exist/i.test(String((err && err.message) || ""));
+  }
+  function setSpeechDiag(on) {
+    if (!currentUser || on === speechDiagOn) return;
+    if (speechDiagAvail === false && on) { el.settingsDiagMsg.textContent = t("settings_diag_missing"); return; }
+    speechDiagOn = on;
+    el.settingsDiagMsg.textContent = "";
+    renderSpeechDiagButtons();
+    Promise.resolve(supabaseClient.from("user_settings")
+      .upsert({ user_id: currentUser.id, share_speech_diag: on, updated_at: new Date().toISOString() }, { onConflict: "user_id" }))
+      .then(function (res) {
+        if (res && res.error) {
+          speechDiagOn = !on;
+          renderSpeechDiagButtons();
+          el.settingsDiagMsg.textContent = speechDiagMissing(res.error) ? t("settings_diag_missing") : t("msg_error_guardar", { msg: res.error.message });
+        }
+      }, function (e) {
+        speechDiagOn = !on;
+        renderSpeechDiagButtons();
+        el.settingsDiagMsg.textContent = t("msg_error_guardar", { msg: (e && e.message) || "" });
+      });
+  }
+  function clearSpeechDiag() {
+    if (!currentUser) return;
+    el.settingsDiagClear.disabled = true;
+    Promise.resolve(supabaseClient.from("speech_events").delete().eq("user_id", currentUser.id)).then(function (res) {
+      el.settingsDiagClear.disabled = false;
+      if (res && res.error) el.settingsDiagMsg.textContent = speechDiagMissing(res.error) ? t("settings_diag_missing") : t("msg_error_guardar", { msg: res.error.message });
+      else el.settingsDiagMsg.textContent = t("settings_diag_cleared");
+    }, function (e) {
+      el.settingsDiagClear.disabled = false;
+      el.settingsDiagMsg.textContent = t("msg_error_guardar", { msg: (e && e.message) || "" });
+    });
+  }
   var HABLAR_MIN_ACCURACY = 90;
   var HABLAR_MIN_PHONEME = 60;
   var HABLAR_UNSURE_FLOOR = 75;
@@ -7895,6 +8340,7 @@
     if (!hablarSupported()) { hablarHint(card, t("speak_unsupported")); return; }
     if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } // don't record our own voice
     hablarStopPlayback();
+    hablarVadWake();
     hablarGetStream().then(function (stream) {
       if (flashDeck[flashIndex] !== card || el.flashOverlay.hidden || hablarRec) return;
       var mr;
@@ -7908,13 +8354,16 @@
         rec.done = true;
         clearTimeout(rec.auto); clearTimeout(rec.watch);
         if (hablarRec === rec) hablarRec = null;
+        if (rec.vad) rec.vad.stop();
         if (!rec.cancelled) {
           var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
-          if (failed || size < 400) hablarMicFailed(card, failed ? "recorder_error" : "empty_recording");
-          else {
+          if (failed || size < 400) {
+            speechDiagLog(hablarDiagBase(card, { outcome: failed ? "recorder_error" : "mic_empty", rec_ms: Date.now() - rec.started, detail: hablarMicDetail(stream, rec, failed ? "recorder_error" : "empty"), extra: { mime: mr.mimeType || "" } }));
+            hablarMicFailed(card, failed ? "recorder_error" : "empty_recording");
+          } else {
             var blob = new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" });
             hablarKeepRecording(card, blob);
-            hablarAnalyse(card, blob, Date.now() - rec.started);
+            hablarAnalyse(card, blob, Date.now() - rec.started, { detail: hablarMicDetail(stream, rec, ""), mime: mr.mimeType || "" });
           }
         }
         renderSpeakState();
@@ -7925,6 +8374,7 @@
       hablarRec = rec;
       hablarHintOverride = null;
       mr.start();
+      rec.vad = hablarWatchSilence(stream, function () { if (hablarRec === rec) hablarStop(); });
       renderSpeakState();
     }, function (err) {
       hablarHint(card, t(err && (err.name === "NotAllowedError" || err.name === "SecurityError") ? "speak_mic_denied" : "speak_mic_error"));
@@ -7948,7 +8398,8 @@
   }
   function hablarAbort() { if (hablarRec) { hablarRec.cancelled = true; hablarStop(); } }
 
-  function hablarAnalyse(card, blob, recMs) {
+  function hablarAnalyse(card, blob, recMs, recInfo) {
+    recInfo = recInfo || {};
     hablarBusyCard = card;
     var t0 = Date.now();
     var answers = speakAnswers(card);
@@ -7979,6 +8430,7 @@
     }).then(function (res) {
       return hablarJudge(card, res.data);
     }).then(finish, function (err) {
+      if (err && (err.local || err.limit)) speechDiagLog(hablarDiagBase(card, { outcome: speechDiagErrOutcome(err), rec_ms: recMs, detail: [(err && err.message) || "", recInfo.detail].filter(Boolean).join(" · "), extra: { mime: recInfo.mime } }));
       if (err && err.local) { hablarMicFailed(card, err.message || "decode"); renderSpeakState(); return; }
       // Over a limit: nothing was checked, so the card stays as it is and
       // says why (no grade, nothing logged as a Hablar result).
@@ -7997,6 +8449,7 @@
       result.latency_ms = Date.now() - t0;
       result.attempt = ((card._speech && card._speech.attempt) || 0) + 1;
       card._speech = result;
+      speechDiagLog(hablarDiagBase(card, Object.assign(speechDiagFromResult(result), { rec_ms: recMs, detail: [result.rule === "error" ? result.error : "", recInfo.detail].filter(Boolean).join(" · "), extra: Object.assign(speechDiagResultExtra(result), { mime: recInfo.mime, attempt: result.attempt, latency_ms: result.latency_ms }) })));
       if (result.auto_grade && !card._gradeTouched) card._grade = result.auto_grade;
       playOnSpeech(card, result);
       crOnSpeech(card, result);
@@ -11363,6 +11816,7 @@
       var hint = progEl("p", "esc-hint", (extra && extra.hint) || t("esc_tap_mic"));
       hint.id = "esc-hint";
       box.appendChild(hint);
+      if (extra && extra.detail) { var dg = progEl("p", "esc-diag", extra.detail); dg.id = "esc-diag"; box.appendChild(dg); }
       var mic = progEl("button", "esc-mic" + (p.rec ? " is-recording" : "") + (p.busy ? " is-busy" : ""));
       mic.type = "button"; mic.id = "esc-mic";
       mic.setAttribute("aria-label", t("speak_mic_aria"));
@@ -11415,6 +11869,7 @@
     if (!escAlive(p) || !p.cur || p.busy) return;
     if (p.rec) { escStopRec(); return; }
     escStopAudio();
+    hablarVadWake();
     hablarGetStream().then(function (stream) {
       if (!escAlive(p) || p.rec || !p.cur) return;
       var mr;
@@ -11427,15 +11882,19 @@
         clearTimeout(rec.auto); clearTimeout(rec.watch);
         if (p.rec === rec) p.rec = null;
         escRuidoDuck(false);
+        if (rec.vad) rec.vad.stop();
         var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
-        if (failed || size < 400) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing") }); return; }
-        escAnalyse(p, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
+        if (failed || size < 400) { var det = hablarMicDetail(stream, rec, failed ? "recorder_error" : "empty"); speechDiagLog(escDiagBase(p, { outcome: failed ? "recorder_error" : "mic_empty", rec_ms: Date.now() - rec.started, detail: det, extra: { mime: mr.mimeType || "" } })); hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing"), detail: det }); return; }
+        rec.detail = hablarMicDetail(stream, rec, "");
+        rec.mime = mr.mimeType || "";
+        escAnalyse(p, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started, rec);
       };
       mr.onstop = function () { rec.finish(false); };
       mr.onerror = function () { try { if (mr.state !== "inactive") mr.stop(); } catch (e) {} rec.finish(true); };
-      rec.auto = setTimeout(escStopRec, HABLAR_MAX_MS);
+      rec.auto = setTimeout(escStopRec, ESC_MAX_MS);
       p.rec = rec;
       mr.start();
+      rec.vad = hablarWatchSilence(stream, function () { if (p.rec === rec) escStopRec(); });
       escRuidoDuck(true);
       escTurnPanel("speak", { hint: t("esc_recording") });
     }, function (err) {
@@ -11456,7 +11915,34 @@
     if (Array.isArray(spec)) return spec.every(function (piece) { return h.indexOf(speechNorm(piece)) !== -1; });
     return speechMatches(spec, heard);
   }
+  // Azure sometimes runs two sentences together ("por favor.Sí") and, with
+  // background voices in the room, adds a lone word at the end that nobody
+  // said (mason's wife, 2026-10-11: "Sí" appended on most answers). A lone
+  // sí / no / eh / mm after a full stop is dropped when the answer reads
+  // the same or better without it.
+  var ESC_TAIL_WORDS = /^(s[ií]|no|eh+|ah+|aj[aá]|m+|mhm+|este)$/i;
+  function escTidyHeard(h) {
+    if (!h || !h.ok) return { h: h, cut: null };
+    var d = String(h.display || "").replace(/([.?!…])(?=\p{L})/gu, "$1 ").replace(/(\p{Ll})(\p{Lu}\p{Ll}*[.?!…]*)\s*$/u, "$1. $2"); // "esSí" too
+    var h2 = Object.assign({}, h, { display: d });
+    var m = d.match(/^(.*\S[.?!…])\s*([\p{L}]+)[.?!…]*\s*$/u);
+    if (!m || !ESC_TAIL_WORDS.test(m[2])) return { h: h2, cut: null };
+    var lw = String(h.lexical || "").trim().split(/\s+/);
+    if (lw.length > 1 && speechNorm(lw[lw.length - 1]) === speechNorm(m[2])) lw.pop();
+    return { h: h2, cut: Object.assign({}, h2, { display: m[1], lexical: lw.join(" "), tail: m[2] }) };
+  }
   function escJudge(step, data) {
+    var td = escTidyHeard(data && data.heard);
+    var d1 = Object.assign({}, data, { heard: td.h });
+    var r1 = escJudgeHeard(step, d1);
+    if (!td.cut) return r1;
+    var r2 = escJudgeHeard(step, Object.assign({}, data, { heard: td.cut }));
+    // keep the cut unless it turns a right answer into a miss
+    if (r1.auto_grade === "bien" && r2.auto_grade !== "bien") return r1;
+    r2.tail_dropped = td.cut.tail;
+    return r2;
+  }
+  function escJudgeHeard(step, data) {
     var res = hablarJudge({ answers: [step.best] }, data);
     var heard = res.heard || res.heard_display || "";
     var wrong = null;
@@ -11464,9 +11950,14 @@
     if (wrong) { res.auto_grade = "otra"; res.rule = "wrong"; res.wrong = wrong; return res; }
     if (heard && (step.ok || []).some(function (spec) { return escSpec(spec, heard); })) { res.auto_grade = "bien"; res.rule = "transcript"; return res; }
     if (heard && [step.best].concat(step.alts || []).some(function (x) { return speechMatches(x, heard); })) { res.auto_grade = "bien"; res.rule = "transcript"; return res; }
+    // second chance: the scoring pass hears with the model answer in mind
+    // ("media docena de marinas" the first time, medialunas the second)
+    var pa = ((data && data.assessments) || [])[0] || {};
+    var paText = pa.ok ? String(pa.lexical || pa.display || "") : "";
+    if (paText && paText !== heard && (pa.scores && pa.scores.accuracy >= 60) && (step.ok || []).some(function (spec) { return escSpec(spec, paText); })) { res.auto_grade = "bien"; res.rule = "assessed_text"; res.heard_scored = paText; return res; }
     return res; // score / unsure / nothing / none, as in Hablar
   }
-  function escAnalyse(p, blob, recMs) {
+  function escAnalyse(p, blob, recMs, recInfo) {
     var step = p.cur.step;
     p.busy = true;
     escTurnPanel("speak", { hint: t("esc_checking") });
@@ -11492,6 +11983,7 @@
       p.busy = false;
       var r = escJudge(step, res.data);
       r.rec_ms = recMs;
+      speechDiagLog(escDiagBase(p, Object.assign(speechDiagFromResult(r), { rec_ms: recMs, detail: recInfo && recInfo.detail, extra: Object.assign(speechDiagResultExtra(r), { mime: recInfo && recInfo.mime, tail_dropped: r.tail_dropped || undefined, wrong: r.wrong ? true : undefined }) })));
       if (r.rule === "nothing") { hablarDropStream(); escTurnPanel("speak", { hint: t("esc_heard_nothing") }); return; }
       if (r.auto_grade === "bien") { escResolve("bien", r, {}); return; }
       if (r.auto_grade === "otra") { escResolve("otra", r, {}); return; }
@@ -11501,7 +11993,8 @@
     }, function (err) {
       if (!escAlive(p)) return;
       p.busy = false;
-      if (err && err.local) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing") }); return; }
+      speechDiagLog(escDiagBase(p, { outcome: speechDiagErrOutcome(err), rec_ms: recMs, detail: [(err && err.message) || "", recInfo && recInfo.detail].filter(Boolean).join(" · "), extra: { mime: recInfo && recInfo.mime } }));
+      if (err && err.local) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing"), detail: [(err && err.message) || "decode", recInfo && recInfo.detail].filter(Boolean).join(" · ") }); return; }
       if (err && err.limit) { escTurnPanel("speak", { hint: t(err.limit === "monthly_reserve" ? "speak_limit_reserve" : "speak_limit_daily"), skip: true }); return; }
       escTurnPanel("speak", { hint: t("esc_analyse_error", { why: (err && err.message) || "" }), skip: true });
     });
@@ -15501,6 +15994,9 @@
   el.settingsVoiceTomas.addEventListener("click", function () { setTtsVoice("tomas"); });
   el.settingsQuietOn.addEventListener("click", function () { setQuietMode(true); });
   el.settingsQuietOff.addEventListener("click", function () { setQuietMode(false); });
+  el.settingsDiagOn.addEventListener("click", function () { setSpeechDiag(true); });
+  el.settingsDiagOff.addEventListener("click", function () { setSpeechDiag(false); });
+  el.settingsDiagClear.addEventListener("click", clearSpeechDiag);
   el.quietToastSettings.addEventListener("click", function () { hideQuietToast(); openSettings(); });
   el.backupCreate.addEventListener("click", onBackupCreateClick);
   el.backupRestore.addEventListener("click", onBackupRestoreClick);

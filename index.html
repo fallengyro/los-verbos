@@ -1058,6 +1058,18 @@
       </div>
     </div>
     <p class="flash-setup-note" data-i18n="settings_quiet_note">Silencia toda la pronunciación de la app (por ejemplo, en un avión). Solo en este dispositivo.</p>
+    <div class="field diag-field">
+      <label data-i18n="settings_diag_label">Ayudar a mejorar el reconocimiento de voz</label>
+      <div class="lang-toggle">
+        <button type="button" class="lang-option" id="settings-diag-off" data-i18n="settings_diag_off">No</button>
+        <button type="button" class="lang-option" id="settings-diag-on" data-i18n="settings_diag_on">Sí</button>
+      </div>
+    </div>
+    <p class="flash-setup-note" data-i18n="settings_diag_note">Si lo activás, cada vez que hablás en Hablar o en Escenas se guarda un registro del intento: qué se esperaba, qué se entendió, los puntajes, el resultado y datos técnicos del micrófono y del navegador. Nunca el audio. Solo lo ve quien administra voseá, y se borra solo a los 90 días.</p>
+    <div class="diag-actions">
+      <button type="button" class="btn-secondary" id="settings-diag-clear" data-i18n="settings_diag_clear">Borrar lo que compartí</button>
+      <p class="diag-msg" id="settings-diag-msg" role="status" aria-live="polite"></p>
+    </div>
     <div class="field backup-field">
       <label data-i18n="settings_backup_label">Respaldo</label>
       <p class="backup-status" id="backup-status"></p>
@@ -1096,6 +1108,7 @@
     <h3 data-i18n="usage_title">Uso del mes</h3>
     <p class="usage-updated" id="usage-updated" role="status" aria-live="polite"></p>
     <div class="usage-body" id="usage-body"></div>
+    <div class="usage-diag" id="usage-diag"></div>
     <div class="usage-warm" id="usage-warm"></div>
     <div class="form-actions">
       <button type="button" class="btn-secondary" id="usage-refresh" data-i18n="usage_refresh">Actualizar</button>

@@ -2174,3 +2174,116 @@ end $$;
 
 -- every other dative verb (one you added yourself) gets both uses too
 update public.verbs set also_personal_use = true where gustar_like and not also_personal_use;
+
+
+-- ===========================================================================
+-- 2026-10-11 — voice diagnostics, opt-in (commit 81)
+-- ===========================================================================
+-- mason: "would it be of value to 'log' more information about the
+-- recordings, their stt results, etc across users (opt in only) to help
+-- improve the stt and audio scoring?" — "Yeah let's build it!"
+--
+-- Graded answers were already in practice_log (heard, scores, rule), but
+-- failures never were: "no grabó nada", recognition errors, timeouts. This
+-- logs every speaking attempt — in Escenas and in Hablar — for the people
+-- who turn it on in Settings ("Ayudar a mejorar el reconocimiento de voz",
+-- off by default):
+--   - user_settings.share_speech_diag: the opt-in.
+--   - speech_events: one row per attempt: where (scene turn / card), the
+--     outcome, the grade and rule, what was expected and what was heard,
+--     the scores, how long the recording was, the device ("iPhone · Safari
+--     18"), and the mic details line. NEVER audio.
+--   - A row can only be written while its owner has the opt-in on (RLS);
+--     anyone can read and delete their own; rows older than 90 days are
+--     removed on every insert.
+--   - vosea_speech_report(days): for the people in app_owners who can view
+--     usage (the Uso page): attempts by device, and the latest 60 attempts.
+-- Safe to run twice.
+-- ===========================================================================
+
+alter table public.user_settings add column if not exists share_speech_diag boolean not null default false;
+
+create table if not exists public.speech_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  source text not null check (source in ('escena', 'hablar')),
+  item text not null default '' check (char_length(item) <= 120),
+  outcome text not null check (outcome in ('graded', 'unsure', 'nothing', 'mic_empty', 'mic_silent', 'mic_decode', 'recorder_error', 'stt_error', 'limit', 'timeout')),
+  grade text check (grade in ('bien', 'otra')),
+  rule text check (char_length(rule) <= 40),
+  expected text check (char_length(expected) <= 300),
+  heard text check (char_length(heard) <= 500),
+  heard_scored text check (char_length(heard_scored) <= 500),
+  accuracy real,
+  pron real,
+  rec_ms integer check (rec_ms between 0 and 120000),
+  device jsonb not null default '{}'::jsonb check (pg_column_size(device) < 1000),
+  detail text check (char_length(detail) <= 400),
+  extra jsonb not null default '{}'::jsonb check (pg_column_size(extra) < 2000)
+);
+create index if not exists speech_events_created_idx on public.speech_events (created_at);
+create index if not exists speech_events_user_idx on public.speech_events (user_id, created_at);
+
+alter table public.speech_events enable row level security;
+drop policy if exists "insert own while sharing" on public.speech_events;
+create policy "insert own while sharing" on public.speech_events for insert to authenticated
+  with check (user_id = auth.uid() and exists (select 1 from public.user_settings s where s.user_id = auth.uid() and s.share_speech_diag));
+drop policy if exists "read own" on public.speech_events;
+create policy "read own" on public.speech_events for select to authenticated using (user_id = auth.uid());
+drop policy if exists "delete own" on public.speech_events;
+create policy "delete own" on public.speech_events for delete to authenticated using (user_id = auth.uid());
+revoke all on public.speech_events from anon;
+grant select, insert, delete on public.speech_events to authenticated;
+
+-- 90 days, then gone
+create or replace function public.speech_events_prune()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  delete from public.speech_events where created_at < now() - interval '90 days';
+  return null;
+end $$;
+drop trigger if exists speech_events_prune on public.speech_events;
+create trigger speech_events_prune after insert on public.speech_events
+  for each statement execute function public.speech_events_prune();
+
+-- the Uso page's report (owners who can view usage only)
+create or replace function public.vosea_speech_report(p_days integer default 30)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  uid uuid := auth.uid();
+  since timestamptz := now() - make_interval(days => greatest(1, least(coalesce(p_days, 30), 90)));
+  dev jsonb; rec jsonb; ppl integer;
+begin
+  if uid is null or not exists (select 1 from public.app_owners o where o.user_id = uid and o.can_view_usage) then
+    raise exception 'forbidden';
+  end if;
+  select coalesce(jsonb_agg(x.j order by x.n desc), '[]'::jsonb) into dev from (
+    select count(*) as n, jsonb_build_object(
+      'device', coalesce(nullif(e.device->>'label', ''), '?'),
+      'n', count(*),
+      'graded', count(*) filter (where e.outcome in ('graded', 'unsure')),
+      'bien', count(*) filter (where e.grade = 'bien'),
+      'nothing', count(*) filter (where e.outcome = 'nothing'),
+      'mic', count(*) filter (where e.outcome in ('mic_empty', 'mic_silent', 'mic_decode', 'recorder_error')),
+      'errors', count(*) filter (where e.outcome in ('stt_error', 'timeout', 'limit')),
+      'accuracy', round(avg(e.accuracy)::numeric, 0)
+    ) as j
+    from public.speech_events e where e.created_at >= since
+    group by coalesce(nullif(e.device->>'label', ''), '?')
+  ) x;
+  select coalesce(jsonb_agg(q.j order by q.at desc), '[]'::jsonb) into rec from (
+    select e.created_at as at, jsonb_build_object(
+      'at', e.created_at, 'who', coalesce(split_part(u.email, '@', 1), '?'), 'device', e.device->>'label',
+      'source', e.source, 'item', e.item, 'outcome', e.outcome, 'grade', e.grade, 'rule', e.rule,
+      'expected', e.expected, 'heard', e.heard, 'heard_scored', e.heard_scored,
+      'accuracy', e.accuracy, 'rec_ms', e.rec_ms, 'detail', e.detail
+    ) as j
+    from public.speech_events e left join auth.users u on u.id = e.user_id
+    where e.created_at >= since order by e.created_at desc limit 60
+  ) q;
+  select count(*) filter (where share_speech_diag) into ppl from public.user_settings;
+  return jsonb_build_object('since', since, 'devices', dev, 'recent', rec, 'sharing', ppl);
+end $$;
+revoke all on function public.vosea_speech_report(integer) from public, anon;
+grant execute on function public.vosea_speech_report(integer) to authenticated;
