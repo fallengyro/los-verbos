@@ -11816,6 +11816,20 @@
     escUpdateTop();
     escTurnPanel(s.you ? "speak" : "check");
   }
+  // The line said to you right before a turn, for the end-of-scene recap
+  // (mason, 2026-10-11: "in addition to the phrases that you said, it
+  // would be good if it showed the phrase that was said to you before
+  // it"): the last line before the turn that wasn't one person talking to
+  // the other, exactly as it was played this time.
+  function escPromptBefore(p, i) {
+    var steps = p.sc.steps, pick = -1;
+    for (var j = i - 1; j >= 0 && steps[j].r; j--) {
+      if (!steps[j].to) { pick = j; break; }
+      if (pick < 0) pick = j;
+    }
+    if (pick < 0 || p.lines[pick] === undefined) return null;
+    return { who: topicText(escRole(p.sc, steps[pick].r).name), text: p.lines[pick] };
+  }
   function escAdvance() {
     var p = escPlay;
     if (!escAlive(p)) return;
@@ -12046,7 +12060,7 @@
     if (mine && first) escAltsInto(mine, step, heardShown, grade !== "bien");
     escRevealPending(p);
     if (first) {
-      p.results.push({ kind: "speak", step: step, ok: grade === "bien", said: heardShown, skipped: !!how.skipped });
+      p.results.push({ kind: "speak", step: step, ok: grade === "bien", said: heardShown, skipped: !!how.skipped, prompt: escPromptBefore(p, p.cur.i) });
       escLog(p, grade, "hablar", r ? Object.assign({}, r, { user_graded: !!how.userGraded }) : { rule: how.skipped ? "skipped" : "none" }, !how.userGraded && !how.skipped);
     }
     if (grade === "bien") { escTurnPanel("listen"); setTimeout(escAdvance, 900); return; }
@@ -12065,7 +12079,7 @@
     p.cur.tries = 1;
     escMine(right ? "ok" : "miss", escShowValue(step.check, v), right ? "" : t("esc_it_was", { v: escShowValue(step.check, set[0]) }));
     escRevealPending(p);
-    p.results.push({ kind: "check", step: step, ok: right, said: escShowValue(step.check, v), answer: escShowValue(step.check, set[0]) });
+    p.results.push({ kind: "check", step: step, ok: right, said: escShowValue(step.check, v), answer: escShowValue(step.check, set[0]), prompt: escPromptBefore(p, p.cur.i) });
     escLog(p, right ? "bien" : "otra", "escuchar", null, true);
     escTurnPanel("listen");
     setTimeout(escAdvance, right ? 900 : 1600);
@@ -12118,7 +12132,14 @@
     p.results.forEach(function (r) {
       var line = progEl("div", "esc-recap-row" + (r.ok ? " is-ok" : " is-miss"));
       line.appendChild(progEl("span", "esc-mark", r.ok ? "✓" : "≠"));
-      var main = progEl("span", null, r.kind === "check" ? r.answer : r.step.best);
+      var main = progEl("span", "esc-recap-main");
+      if (r.prompt) {
+        var them = progEl("span", "esc-recap-them");
+        them.appendChild(progEl("span", "esc-recap-who", r.prompt.who + ": "));
+        them.appendChild(document.createTextNode(r.prompt.text));
+        main.appendChild(them);
+      }
+      main.appendChild(progEl("span", "esc-recap-you", r.kind === "check" ? r.answer : r.step.best));
       if (!r.ok) main.appendChild(progEl("span", "esc-said", r.kind === "check" ? t("esc_you_chose", { v: r.said }) : (r.skipped ? t("esc_skipped") : t("esc_you_said", { said: r.said || "—" }))));
       if (r.kind === "speak" && (r.step.alts || []).length) main.appendChild(progEl("span", "esc-said esc-also", t("esc_also", { list: r.step.alts.map(function (x) { return "«" + x + "»"; }).join(" · ") })));
       line.appendChild(main);

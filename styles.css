@@ -2550,6 +2550,10 @@
   .esc-recap-row.is-ok .esc-mark { color: var(--teal); }
   .esc-recap-row.is-miss .esc-mark { color: var(--danger); }
   .esc-said { display: block; color: var(--ink-soft); font-size: 12.5px; }
+  .esc-recap-main { display: block; min-width: 0; }
+  .esc-recap-them { display: block; color: var(--ink-soft); font-size: 12.5px; margin-bottom: 2px; }
+  .esc-recap-who { font-weight: 600; }
+  .esc-recap-you { display: block; }
   .esc-end-btns { display: flex; gap: 8px; }
   .esc-end-btns > * { flex: 1; padding: 11px; border-radius: 12px; }
   .esc-end-close { display: block; width: 100%; margin-top: 8px; padding: 11px; border-radius: 12px; }
