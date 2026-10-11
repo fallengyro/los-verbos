@@ -524,7 +524,6 @@
       esc_noise_off: "No",
       esc_noise_low: "Bajo",
       esc_noise_high: "Alto",
-      esc_noise_vol: "Volumen",
       esc_swap: "Cambiar voces",
       esc_uses: "Usa",
       esc_best: "Tu mejor vuelta:",
@@ -1409,7 +1408,6 @@
       esc_noise_off: "Off",
       esc_noise_low: "Low",
       esc_noise_high: "High",
-      esc_noise_vol: "Volume",
       esc_swap: "Swap voices",
       esc_uses: "Uses",
       esc_best: "Your best run:",
@@ -10769,10 +10767,11 @@
   // spoken… louder even than I would want the high setting to be". Now
   // Alto is about 5 dB under the old Bajo, and Bajo about 8 dB under Alto.
   // Then (same day, at 0.06 / 0.16): "now i'm barely hearing the
-  // background noise even on alto". So: in between, and a Volumen slider
-  // (±9 dB, remembered) for the rest, with a short preview as you move it.
-  var ESC_RUIDO_GAIN = { bajo: 0.12, alto: 0.24 };
-  var ESC_RUIDO_VOL_KEY = "vosea-escenas-ruido-db";
+  // background noise even on alto". Commit 77 tried 0.12 / 0.24 plus a
+  // ±9 dB Volumen slider; mason found the slider redundant next to Bajo /
+  // Alto and set the levels with it: Alto ≈ the slider at 90 %, Bajo ≈
+  // 50–60 % (on Bajo's 0.12 base: +7 dB and +1 dB). The slider is gone.
+  var ESC_RUIDO_GAIN = { bajo: 0.135, alto: 0.275 };
   var ESC_RUIDO_LEAD_MS = 2000; // the place plays a moment before anyone talks
   var ESC_RUIDO_DUCK = 0.6;   // while you speak: a small dip (about −4 dB)
   var ESC_RUIDO_FADE = 1.2;   // seconds, in and out
@@ -10786,13 +10785,7 @@
     return v === "bajo" || v === "alto" ? v : "off";
   }
   function escSetRuidoLevel(v) { try { localStorage.setItem(ESC_RUIDO_KEY, v); } catch (e) {} }
-  function escRuidoDb() {
-    var v = 0;
-    try { v = Number(localStorage.getItem(ESC_RUIDO_VOL_KEY) || 0); } catch (e) {}
-    return isFinite(v) ? Math.max(-9, Math.min(9, Math.round(v))) : 0;
-  }
-  function escSetRuidoDb(v) { try { localStorage.setItem(ESC_RUIDO_VOL_KEY, String(v)); } catch (e) {} }
-  function escRuidoGain(level) { return (ESC_RUIDO_GAIN[level] || 0) * Math.pow(10, escRuidoDb() / 20); }
+  function escRuidoGain(level) { return ESC_RUIDO_GAIN[level] || 0; }
   function escRuidoContext() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -10840,17 +10833,6 @@
       escRuidoApply(r, ESC_RUIDO_FADE);
       return true;
     }).catch(function (err) { console.warn("[escenas] background noise:", err && err.message); return false; });
-  }
-  // A few seconds of the place at the chosen level, from the start screen
-  // (moving the Volumen slider), so you can set it before you play.
-  var escRuidoPreviewTimer = null;
-  function escRuidoPreview(sc) {
-    if (escPlay) return;
-    clearTimeout(escRuidoPreviewTimer);
-    var level = escRuidoLevel();
-    if (escRuido && escRuido.preview && escRuido.scene === sc.id && escRuido.level === level) escRuidoApply(escRuido, 0.15);
-    else escRuidoStart(sc, { level: level }).then(function () { if (escRuido) escRuido.preview = true; });
-    escRuidoPreviewTimer = setTimeout(function () { if (escRuido && escRuido.preview) escRuidoStop(); }, 3000);
   }
   function escRuidoApply(r, secs) {
     if (!r || r.stopped) return;
@@ -11099,17 +11081,6 @@
       });
       nz.appendChild(nseg);
       box.appendChild(nz);
-      if (lvl !== "off") {
-        var vrow = progEl("label", "esc-noise-vol");
-        vrow.appendChild(progEl("span", "esc-noise-lbl", t("esc_noise_vol")));
-        var rng = document.createElement("input");
-        rng.type = "range"; rng.min = "-9"; rng.max = "9"; rng.step = "1"; rng.value = String(escRuidoDb());
-        rng.id = "esc-noise-vol";
-        rng.setAttribute("aria-label", t("esc_noise_vol"));
-        rng.addEventListener("input", function () { escSetRuidoDb(Number(rng.value)); escRuidoPreview(sc); });
-        vrow.appendChild(rng);
-        box.appendChild(vrow);
-      }
       if (lvl !== "off") box.appendChild(progEl("p", "esc-noise-where", topicText(sc.ruido.where || { es: "", en: "" })));
     }
     var tp = escTopic(sc);
@@ -11163,7 +11134,6 @@
     sc = escCast(sc);
     hablarPrepareMic(); // the permission prompt comes up on this tap
     unlockTtsAudio();
-    clearTimeout(escRuidoPreviewTimer);
     var lead = escRuidoStart(sc);
     var vals = {};
     Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escPick(sc.vars[k]); });
