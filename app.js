@@ -505,6 +505,56 @@
       play_album_left: "Quedan {n} por descubrir.",
       play_album_how: "Cómo se ganan",
       play_album_back: "‹ Jugar",
+      // Escenas (2026-10-10)
+      esc_title: "Escenas",
+      esc_row_def: "Conversaciones cortas de todos los días, hablando. Se abren a medida que sabés lo que usan.",
+      esc_row_stat: "{n} de {total} · ★ {stars}",
+      esc_desc: "Hablás con alguien en una situación de todos los días. Cada escena se abre cuando ya sabés la mayoría de lo que usa.",
+      esc_fine: "Lo que dicen los demás se escucha, no se lee: el texto aparece cuando contestaste (o con «ver texto»). Las estrellas cuentan lo que dijiste bien al primer intento.",
+      esc_two_voices: "2 voces",
+      esc_turns: "{n} turnos",
+      esc_missing_n: "Te faltan {n}",
+      esc_missing_intro: "Te faltan {n} de lo que usa esta escena:",
+      esc_practice_these: "Practicar estas {n}",
+      esc_practice_all: "Practicar lo que usa",
+      esc_who: "Quién habla",
+      esc_swap: "Cambiar voces",
+      esc_uses: "Usa",
+      esc_best: "Tu mejor vuelta:",
+      esc_first_try: "{ok} de {total} al primer intento",
+      esc_before: "antes: {n}",
+      esc_stars_aria: "{n} de 3 estrellas",
+      esc_needs_sound: "Las escenas necesitan sonido: desactivá el modo silencio en Configuración.",
+      esc_start: "Empezar",
+      esc_exit: "× Salir",
+      esc_count: "{n} / {total}",
+      esc_play_aria: "Escuchar de nuevo",
+      esc_see_text: "ver texto",
+      esc_listening: "Escuchá…",
+      esc_your_turn: "Tu turno",
+      esc_your_turn_listen: "Tu turno · escuchá",
+      esc_tap_mic: "Decilo en castellano: tocá el micrófono.",
+      esc_recording: "Te escucho… tocá de nuevo cuando termines.",
+      esc_checking: "Escuchando lo que dijiste…",
+      esc_heard_nothing: "No se escuchó nada. Tocá el micrófono de nuevo.",
+      esc_analyse_error: "No se pudo analizar ({why}). Probá de nuevo.",
+      esc_tap_heard: "Tocá lo que escuchaste.",
+      esc_better: "Mejor: «{best}»",
+      esc_it_was: "Era {v}",
+      esc_try_again: "Probar de nuevo",
+      esc_continue: "Seguir",
+      esc_skip: "Seguir sin contestar",
+      esc_unsure_q: "No estoy seguro de haberte entendido. ¿Lo dijiste bien?",
+      esc_unsure_no: "No",
+      esc_unsure_yes: "Sí, lo dije bien",
+      esc_done_title: "¡Escena completa!",
+      esc_you_said: "Dijiste: «{said}»",
+      esc_you_chose: "Elegiste {v}",
+      esc_skipped: "Sin contestar",
+      esc_review_n: "Repasar ({n})",
+      esc_again: "Otra vez",
+      play_how_escena: "terminaste una escena",
+      play_kick_escena: "¡Escena completa!",
       play_rule_racha: "Racha de {a}, {b}, {c}… días",
       play_rule_session: "{a} Bien hablando en una sesión (y {b})",
       play_rule_combo: "{n} Bien seguidos hablando",
@@ -1331,6 +1381,56 @@
       play_album_left: "{n} left to discover.",
       play_album_how: "How to win them",
       play_album_back: "‹ Play",
+      // Escenas (2026-10-10)
+      esc_title: "Escenas",
+      esc_row_def: "Short everyday conversations, spoken. They open up as you learn what they use.",
+      esc_row_stat: "{n} of {total} · ★ {stars}",
+      esc_desc: "You talk with someone in an everyday situation. Each scene opens once you know most of what it uses.",
+      esc_fine: "What the others say is heard, not read: the text shows once you've answered (or with “see text”). Stars count what you said right on the first try.",
+      esc_two_voices: "2 voices",
+      esc_turns: "{n} turns",
+      esc_missing_n: "{n} to go",
+      esc_missing_intro: "You still need {n} of the things this scene uses:",
+      esc_practice_these: "Practice these {n}",
+      esc_practice_all: "Practice what it uses",
+      esc_who: "Who's talking",
+      esc_swap: "Swap voices",
+      esc_uses: "Uses",
+      esc_best: "Your best run:",
+      esc_first_try: "{ok} of {total} on the first try",
+      esc_before: "before: {n}",
+      esc_stars_aria: "{n} of 3 stars",
+      esc_needs_sound: "Scenes need sound: turn off quiet mode in Settings.",
+      esc_start: "Start",
+      esc_exit: "× Exit",
+      esc_count: "{n} / {total}",
+      esc_play_aria: "Play again",
+      esc_see_text: "see text",
+      esc_listening: "Listen…",
+      esc_your_turn: "Your turn",
+      esc_your_turn_listen: "Your turn · listen",
+      esc_tap_mic: "Say it in Spanish: tap the mic.",
+      esc_recording: "Listening… tap again when you're done.",
+      esc_checking: "Checking what you said…",
+      esc_heard_nothing: "Nothing was heard. Tap the mic again.",
+      esc_analyse_error: "Couldn't check it ({why}). Try again.",
+      esc_tap_heard: "Tap what you heard.",
+      esc_better: "Better: “{best}”",
+      esc_it_was: "It was {v}",
+      esc_try_again: "Try again",
+      esc_continue: "Continue",
+      esc_skip: "Continue without answering",
+      esc_unsure_q: "I'm not sure I understood you. Did you say it right?",
+      esc_unsure_no: "No",
+      esc_unsure_yes: "Yes, I said it right",
+      esc_done_title: "Scene complete!",
+      esc_you_said: "You said: “{said}”",
+      esc_you_chose: "You picked {v}",
+      esc_skipped: "Not answered",
+      esc_review_n: "Review ({n})",
+      esc_again: "Play again",
+      play_how_escena: "finished a scene",
+      play_kick_escena: "Scene complete!",
       play_rule_racha: "A streak of {a}, {b}, {c}… days",
       play_rule_session: "{a} right in one session, speaking (and {b})",
       play_rule_combo: "{n} right in a row, speaking",
@@ -3465,6 +3565,19 @@
     rewardMsg: document.getElementById("reward-msg"),
     flashCombo: document.getElementById("flash-combo"),
     playModes: document.getElementById("play-modes"),
+    playEscenas: document.getElementById("play-escenas"),
+    escBack: document.getElementById("esc-back"),
+    escHeadTitle: document.getElementById("esc-head-title"),
+    escHeadDesc: document.getElementById("esc-head-desc"),
+    escBody: document.getElementById("esc-body"),
+    escOverlay: document.getElementById("esc-overlay"),
+    escTitle: document.getElementById("esc-title"),
+    escCount: document.getElementById("esc-count"),
+    escBarFill: document.getElementById("esc-bar-fill"),
+    escChat: document.getElementById("esc-chat"),
+    escTurn: document.getElementById("esc-turn"),
+    escEnd: document.getElementById("esc-end"),
+    escClose: document.getElementById("esc-close"),
     playMsg: document.getElementById("play-msg"),
     ptWhy: document.getElementById("pt-why"),
     ptNote: document.getElementById("pt-note"),
@@ -6114,7 +6227,10 @@
   var ttsBlobOrder = [];  // keys, oldest first (for trimming)
   var ttsLoading = {};    // key -> Promise of {src, how}
 
-  function ttsKey(text) { return TTS_VOICES[ttsVoiceKey] + "\u0000" + String(text || "").trim(); }
+  // vk: an optional voice key ("elena" / "tomas"); Escenas give each role
+  // its own voice. Without it, the voice from Configuración.
+  function ttsVoiceName(vk) { return TTS_VOICES[vk && TTS_VOICES[vk] ? vk : ttsVoiceKey]; }
+  function ttsKey(text, vk) { return ttsVoiceName(vk) + "\u0000" + String(text || "").trim(); }
 
   // ---- Free-month limits (2026-10-10) ----
   // tts and stt answer 429 {error: "daily_limit" | "monthly_reserve"} when
@@ -6141,13 +6257,13 @@
 
   // The clip's public URL: remembered, or asked of the Edge Function (which
   // synthesizes it first if nobody has heard this text in this voice yet).
-  function ttsResolveUrl(text, force) {
-    var key = ttsKey(text);
+  function ttsResolveUrl(text, force, vk) {
+    var key = ttsKey(text, vk);
     if (!force && ttsUrlMemo[key]) return Promise.resolve({ url: ttsUrlMemo[key], how: "url remembered" });
     // Over a limit (see "Free-month limits" below): don't ask again for a
     // while; clips already known keep playing.
     if (ttsLimitHit && Date.now() < ttsLimitHit.until) return Promise.reject(ttsLimitError(ttsLimitHit.code));
-    return supabaseClient.functions.invoke("tts", { body: { text: String(text).trim(), voice: TTS_VOICES[ttsVoiceKey] } })
+    return supabaseClient.functions.invoke("tts", { body: { text: String(text).trim(), voice: ttsVoiceName(vk) } })
       .then(function (res) {
         if (res.error && res.error.context && res.error.context.status === 429) {
           return limitCodeOf(res.error).then(function (code) {
@@ -6185,11 +6301,11 @@
   // Resolves to {src, how}: src is a blob: URL when the bytes could be
   // downloaded, or the plain public URL as a fallback (the <audio> element
   // then streams it itself).
-  function ttsLoadAudio(text) {
-    var key = ttsKey(text);
+  function ttsLoadAudio(text, vk) {
+    var key = ttsKey(text, vk);
     if (ttsBlobUrls[key]) return Promise.resolve({ src: ttsBlobUrls[key], how: "already downloaded" });
     if (ttsLoading[key]) return ttsLoading[key];
-    var p = ttsResolveUrl(text).then(function (r) {
+    var p = ttsResolveUrl(text, false, vk).then(function (r) {
       return ttsFetchBlob(r.url).then(function (src) {
         rememberTtsBlob(key, src);
         return { src: src, how: r.how };
@@ -6198,7 +6314,7 @@
         // forget it and ask the Edge Function once more.
         if (r.how === "url remembered" && err && err.status) {
           delete ttsUrlMemo[key]; saveTtsUrlMemo();
-          return ttsResolveUrl(text, true).then(function (r2) {
+          return ttsResolveUrl(text, true, vk).then(function (r2) {
             return ttsFetchBlob(r2.url).then(function (src) { rememberTtsBlob(key, src); return { src: src, how: r2.how }; },
               function () { return { src: r2.url, how: r2.how }; });
           });
@@ -8739,7 +8855,18 @@
   var TOPIC_RANGES_KEY = "vosea-topic-ranges";
   var topicData = {}; // id -> { topic: id } (the card's data object, shared per topic)
   TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
-  function topicById(id) { return TOPICS.find(function (tp) { return tp.id === id; }) || null; }
+  // Escenas (2026-10-10, escenas.js): what each scene uses is a sentence
+  // Tema of its own, "esc-<id>", kept out of the Temas list (and out of
+  // TOPICS): it's practised from the scene ("Practicar estas") and logged
+  // like any Tema, so its progress decides when the scene unlocks.
+  var ESCENAS = window.VOSEA_ESCENAS || [];
+  var SCENE_TOPICS = ESCENAS.map(function (sc) {
+    return { id: "esc-" + sc.id, type: "pack", hidden: true, scene: sc.id, level: sc.level,
+      name: L("Escena · " + sc.name.es, "Scene · " + sc.name.en), desc: L(sc.sub.es, sc.sub.en), tag: L("escena", "scene"),
+      items: (sc.prep || []).map(function (it) { return Object.assign({}, it); }) };
+  });
+  SCENE_TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
+  function topicById(id) { return TOPICS.find(function (tp) { return tp.id === id; }) || SCENE_TOPICS.find(function (tp) { return tp.id === id; }) || null; }
   function topicRange(tp, key) { return (tp.ranges || []).find(function (r) { return r.key === key; }) || null; }
 
   // "Este café es [más] caro [que] …" → pieces [{text, fill}]
@@ -9680,6 +9807,7 @@
     if (m) return { kind: "combo", n: parseInt(m[1], 10) };
     if (/^crono:/.test(reason || "")) return { kind: "crono", n: 0 };
     if (/^reto:/.test(reason || "")) return { kind: "reto", n: 0 };
+    if (/^escena:/.test(reason || "")) return { kind: "escena", n: 0 };
     return { kind: "otro", n: 0 };
   }
   function rewardHow(reason) { var p = rewardParse(reason); return t("play_how_" + p.kind, { n: p.n }); }
@@ -9719,25 +9847,27 @@
     el.rewardWhere.hidden = !item;
     el.rewardListen.hidden = !item;
     el.rewardMsg.textContent = "";
-    var inDeck = !el.flashOverlay.hidden;
+    var inDeck = !el.flashOverlay.hidden || (el.escOverlay && !el.escOverlay.hidden);
     el.rewardGo.textContent = s.view ? t("close") : (inDeck ? t("play_keep_playing") : t("play_to_album"));
   }
   function closeReward(toAlbum) {
     if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} }
     var s = rewardShowing;
-    if (toAlbum && s && !s.view && el.flashOverlay.hidden) { setMainTab("play"); openAlbum(true); }
+    if (toAlbum && s && !s.view && el.flashOverlay.hidden && el.escOverlay.hidden) { setMainTab("play"); openAlbum(true); }
     nextReward();
   }
 
   // ---- the tab ----
   function renderPlay() {
     if (!el.playPanel || el.playPanel.hidden) return;
-    el.playHome.hidden = albumOpen || cronoOpen || amigosOpen;
+    el.playHome.hidden = albumOpen || cronoOpen || amigosOpen || escOpen;
+    el.playEscenas.hidden = !escOpen;
     el.playAlbum.hidden = !albumOpen;
     el.playCrono.hidden = !cronoOpen;
     el.playAmigos.hidden = !amigosOpen || rtNewOpen;
     el.playRtNew.hidden = !(amigosOpen && rtNewOpen);
     if (!currentUser) { el.playRacha.textContent = ""; return; }
+    if (escOpen) { drawEscenas(); return; }
     if (amigosOpen && rtNewOpen) { drawRtNew(); return; }
     if (amigosOpen) { drawAmigos(); return; }
     if (cronoOpen) { drawCrono(); return; }
@@ -9750,7 +9880,7 @@
   }
   function openAlbum(open) {
     albumOpen = !!open;
-    if (open) { cronoOpen = false; amigosOpen = false; }
+    if (open) { cronoOpen = false; amigosOpen = false; escOpen = false; }
     renderPlay();
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
@@ -10462,6 +10592,637 @@
     var retoRow = row(t("pt_reto_name"), retoStat, retoDef, function () { openAmigos(true); });
     retoRow.id = "play-reto-row";
     if (toPlay.length || amigosIncoming().length) retoRow.querySelector(".stat").classList.add("is-new");
+    if (ESCENAS.length) row(t("esc_title"), escRowStat(), t("esc_row_def"), function () { openEscenas(true); }).id = "play-escenas-row";
+  }
+
+  // ================= Escenas (2026-10-10) =================
+  // Short everyday conversations, played in Hablar: the fourth game on the
+  // Jugar tab. Content in escenas.js (window.VOSEA_ESCENAS). mason's picks:
+  // solo; each role's voice selectable; some scenes with two people who
+  // also talk to each other; the other person's line is heard, not read
+  // (its text shows once you've answered, or on "ver texto"); the cue is
+  // in English; a missed turn only costs stars.
+  //
+  // What a scene uses is a hidden sentence Tema ("esc-<id>", see
+  // SCENE_TOPICS): it's what "Practicar estas" drills, and the scene
+  // unlocks when most of it was last answered Bien (the first scene is
+  // open from the start). Every turn is logged like a card (item_kind
+  // "topic", item_key "esc-<id>", form_key "t<step>"), so it counts for
+  // the racha; each play is a game_records row (game "escena", scope the
+  // scene id); the first time a scene is finished wins an album item
+  // (reason "escena:<id>").
+  var ESC_READY_SHARE = 0.7;
+  var ESC_VOICES_KEY = "vosea-escenas-voces";
+  var ESC_PAUSE_MS = 350;
+  var escOpen = false;  // the Escenas page on the Jugar tab
+  var escSel = null;    // the scene on the start screen (null = the list)
+  var escPlay = null;   // the scene being played
+  var escAudio = null;
+
+  function escById(id) { return ESCENAS.find(function (s) { return s.id === id; }) || null; }
+  function escTopic(sc) { return topicById("esc-" + sc.id); }
+  function escSceneTurns(sc) { return sc.steps.filter(function (s) { return s.you || s.check; }).length; }
+  function escRole(sc, key) { return sc.roles.find(function (r) { return r.key === key; }) || sc.roles[0]; }
+  function escRoleIndex(sc, key) { var i = sc.roles.indexOf(escRole(sc, key)); return i < 0 ? 0 : i; }
+  // "El mozo" → M, "La señora" → S: the article isn't the person.
+  function escInitial(role) { return topicText(role.name).replace(/^(el|la|los|las|the)\s+/i, "").charAt(0).toUpperCase(); }
+
+  // ---- voices per role (remembered per scene, on this device) ----
+  function escVoicesAll() { try { return JSON.parse(localStorage.getItem(ESC_VOICES_KEY) || "{}") || {}; } catch (e) { return {}; } }
+  function escVoices(sc) {
+    var saved = escVoicesAll()[sc.id] || {}, out = {};
+    sc.roles.forEach(function (r) { out[r.key] = TTS_VOICES[saved[r.key]] ? saved[r.key] : (r.voice || ttsVoiceKey); });
+    return out;
+  }
+  function escSetVoice(sc, roleKey, vk) {
+    var all = escVoicesAll(), v = escVoices(sc);
+    v[roleKey] = vk;
+    all[sc.id] = v;
+    try { localStorage.setItem(ESC_VOICES_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+
+  // ---- records + unlocking ----
+  function escStars(ok, total) { if (!total) return 0; var f = ok / total; return f >= 1 ? 3 : (f >= 0.7 ? 2 : 1); }
+  function escRecords(id) {
+    var uid = currentUser ? currentUser.id : null, out = [], seen = {};
+    function add(rid, cards, best) { if (seen[rid]) return; seen[rid] = true; out.push({ cards: cards || 0, best: best || 0 }); }
+    if (ptServer.userId === uid) ptServer.rows.forEach(function (r) { if (r.game === "escena" && r.scope === id) add(r.id, r.cards, r.best); });
+    ptRecords().forEach(function (r) { if (r.user === uid && r.game === "escena" && r.scope === id) add(r.id, r.cards, r.best); });
+    return out;
+  }
+  function escBest(id) {
+    var b = { stars: 0, ok: 0, total: 0, plays: 0 };
+    escRecords(id).forEach(function (r) {
+      b.plays++;
+      var s = escStars(r.best, r.cards);
+      if (s > b.stars || (s === b.stars && r.best > b.ok)) { b.stars = s; b.ok = r.best; b.total = r.cards; }
+    });
+    return b;
+  }
+  // The prep items not yet "ready": never answered, or last answered Otra vez.
+  function escMissing(sc) {
+    var tp = escTopic(sc);
+    if (!tp) return [];
+    var st = topicStats(tp), byId = {};
+    st.units.forEach(function (u) { byId[u.formKey] = u; });
+    return tp.items.filter(function (it) { var u = byId[it.id]; return !(u && u.last && u.last.grade === "bien"); });
+  }
+  function escUnlocked(sc) {
+    if (sc.open || escBest(sc.id).plays) return true;
+    var tp = escTopic(sc);
+    if (!tp || !tp.items.length) return true;
+    return 1 - escMissing(sc).length / tp.items.length >= ESC_READY_SHARE;
+  }
+  function escGaps(it) { var g = []; topicPieces(it.es).forEach(function (pc) { if (pc.fill) g.push(pc.text); }); return g.length ? g.join(" … ") : topicPlain(it.es); }
+  function escPrepDeck(sc, ids) {
+    var tp = escTopic(sc);
+    if (!tp) return [];
+    var its = ids && ids.length ? tp.items.filter(function (it) { return ids.indexOf(it.id) !== -1; }) : tp.items;
+    return progModeCards(its.map(function (it) { return topicCard(tp, it.id); }).filter(Boolean));
+  }
+  function escCanPlay() { return !quietMode && hablarSupported(); }
+
+  // ---- the Jugar page: list + start screen ----
+  function openEscenas(open, id) {
+    escOpen = !!open;
+    escSel = open ? (id || null) : null;
+    if (open) { albumOpen = false; cronoOpen = false; amigosOpen = false; if (currentUser) { loadPracticeHistory(false); loadGameRecords(); } }
+    renderPlay();
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+  function escRowStat() {
+    var done = 0, stars = 0;
+    ESCENAS.forEach(function (sc) { var b = escBest(sc.id); if (b.plays) done++; stars += b.stars; });
+    return done ? t("esc_row_stat", { n: done, total: ESCENAS.length, stars: stars }) : "";
+  }
+  function escStarsNode(n, cls) {
+    var sp = progEl("span", cls || "esc-stars");
+    for (var i = 0; i < 3; i++) sp.appendChild(progEl("i", i < n ? "on" : "", "★"));
+    sp.setAttribute("aria-label", t("esc_stars_aria", { n: n }));
+    return sp;
+  }
+  function drawEscenas() {
+    var box = el.escBody;
+    box.textContent = "";
+    if (escSel && escById(escSel)) { drawEscStart(escById(escSel)); return; }
+    el.escHeadTitle.textContent = t("esc_title");
+    el.escHeadDesc.textContent = t("esc_desc");
+    el.escBack.textContent = t("play_album_back");
+    var list = progEl("div", "esc-list");
+    ESCENAS.forEach(function (sc) {
+      var open = escUnlocked(sc), b = escBest(sc.id);
+      var row = progEl(open ? "button" : "div", "esc-row" + (open ? "" : " is-locked"));
+      if (open) { row.type = "button"; row.addEventListener("click", function () { openEscenas(true, sc.id); }); }
+      row.setAttribute("data-scene", sc.id);
+      var top = progEl("div", "esc-row-top");
+      var name = progEl("span", "esc-row-name", (open ? "" : "🔒 ") + topicText(sc.name));
+      if (sc.roles.length > 1) name.appendChild(progEl("span", "esc-two", t("esc_two_voices")));
+      top.appendChild(name);
+      top.appendChild(escStarsNode(b.stars));
+      row.appendChild(top);
+      var miss = open ? [] : escMissing(sc);
+      row.appendChild(progEl("div", "esc-row-sub", open ? topicText(sc.sub) + " · " + t("esc_turns", { n: escSceneTurns(sc) }) : t("esc_missing_n", { n: miss.length })));
+      if (!open) {
+        var lb = progEl("div", "esc-lock");
+        lb.appendChild(progEl("p", null, t("esc_missing_intro", { n: miss.length })));
+        var chips = progEl("div", "esc-chips");
+        miss.forEach(function (it) { chips.appendChild(progEl("span", "esc-chip", escGaps(it))); });
+        lb.appendChild(chips);
+        var go = progButton(t("esc_practice_these", { n: miss.length }), false, function () { startPracticeDeck(escPrepDeck(sc, miss.map(function (it) { return it.id; }))); });
+        lb.appendChild(go);
+        row.appendChild(lb);
+      }
+      list.appendChild(row);
+    });
+    box.appendChild(list);
+    box.appendChild(progEl("p", "play-fine", t("esc_fine")));
+  }
+  function drawEscStart(sc) {
+    var box = el.escBody;
+    el.escHeadTitle.textContent = topicText(sc.name);
+    el.escHeadDesc.textContent = topicText(sc.desc);
+    el.escBack.textContent = "‹ " + t("esc_title");
+    var voices = escVoices(sc);
+    box.appendChild(progEl("div", "esc-label", t("esc_who")));
+    sc.roles.forEach(function (r, i) {
+      var row = progEl("div", "esc-role");
+      row.appendChild(progEl("span", "esc-av esc-av-" + i, escInitial(r)));
+      var nm = progEl("span", "esc-role-n", topicText(r.name));
+      nm.appendChild(progEl("small", null, topicText(r.sub)));
+      row.appendChild(nm);
+      var seg = progEl("div", "lang-toggle esc-voice");
+      Object.keys(TTS_VOICES).forEach(function (vk) {
+        var b = progEl("button", "lang-option" + (voices[r.key] === vk ? " active" : ""), vk === "elena" ? "Elena" : "Tomás");
+        b.type = "button";
+        b.setAttribute("aria-pressed", voices[r.key] === vk ? "true" : "false");
+        b.setAttribute("data-role", r.key); b.setAttribute("data-voice", vk);
+        b.addEventListener("click", function () { escSetVoice(sc, r.key, vk); renderPlay(); });
+        seg.appendChild(b);
+      });
+      row.appendChild(seg);
+      box.appendChild(row);
+    });
+    if (sc.roles.length > 1) {
+      var sw = progEl("button", "esc-swap", "⇄ " + t("esc_swap"));
+      sw.type = "button";
+      sw.addEventListener("click", function () {
+        var v = escVoices(sc), keys = sc.roles.map(function (r) { return r.key; });
+        var first = v[keys[0]];
+        keys.forEach(function (k, i) { escSetVoice(sc, k, i < keys.length - 1 ? v[keys[i + 1]] : first); });
+        renderPlay();
+      });
+      box.appendChild(sw);
+    }
+    var tp = escTopic(sc);
+    if (tp) {
+      box.appendChild(progEl("div", "esc-label", t("esc_uses")));
+      var chips = progEl("div", "esc-chips");
+      tp.items.forEach(function (it) { chips.appendChild(progEl("span", "esc-chip", escGaps(it))); });
+      box.appendChild(chips);
+    }
+    var b = escBest(sc.id);
+    if (b.plays) {
+      var best = progEl("p", "esc-best", t("esc_best") + " ");
+      best.appendChild(escStarsNode(b.stars));
+      best.appendChild(document.createTextNode(" · " + t("esc_first_try", { ok: b.ok, total: b.total })));
+      box.appendChild(best);
+    }
+    if (!escCanPlay()) box.appendChild(progEl("p", "form-msg is-warn", t(quietMode ? "esc_needs_sound" : "speak_unsupported")));
+    var start = progButton(t("esc_start"), true, function () { escStart(sc); });
+    start.id = "esc-start";
+    start.classList.add("esc-start");
+    start.disabled = !escCanPlay();
+    box.appendChild(start);
+    if (tp) {
+      var pr = progButton(t("esc_practice_all"), false, function () { startPracticeDeck(escPrepDeck(sc)); });
+      pr.classList.add("esc-practice");
+      box.appendChild(pr);
+    }
+  }
+
+  // ---- playing ----
+  function escPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function escSayValue(name, v) {
+    if (typeof v === "number") return name === "precio" ? pesosWords(v) : numWords(v);
+    var m = /^(\d{1,2}):(\d{2})$/.exec(String(v));
+    if (m) return horaWords(Number(m[1]), Number(m[2]))[0];
+    return String(v);
+  }
+  function escShowValue(name, v) {
+    if (typeof v === "number") return name === "precio" ? "$" + numDigits(v) : String(v);
+    return String(v);
+  }
+  function escLine(p, i) {
+    if (p.lines[i] !== undefined) return p.lines[i];
+    var s = p.sc.steps[i];
+    var line = escPick(s.es).replace(/\{(\w+)\}/g, function (_, name) { var set = p.vals[name]; return set ? escSayValue(name, set[0]) : ""; });
+    p.lines[i] = line;
+    return line;
+  }
+  function escStart(sc) {
+    if (!escCanPlay()) return;
+    hablarPrepareMic(); // the permission prompt comes up on this tap
+    unlockTtsAudio();
+    var vals = {};
+    Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escPick(sc.vars[k]); });
+    escPlay = {
+      sc: sc, id: practiceUuid(), session: practiceUuid(), started: Date.now(), voices: escVoices(sc), vals: vals,
+      lines: {}, i: 0, turnN: 0, total: escSceneTurns(sc), results: [], pending: [], cur: null, rec: null, busy: false, done: false
+    };
+    if (currentUser && (!rewardsState.loaded || rewardsState.userId !== currentUser.id)) loadRewards();
+    el.escOverlay.hidden = false;
+    document.body.classList.add("esc-open");
+    el.escOverlay.classList.remove("is-end");
+    el.escTitle.textContent = topicText(sc.name);
+    el.escChat.textContent = "";
+    el.escEnd.textContent = "";
+    escUpdateTop();
+    escNext();
+  }
+  function escUpdateTop() {
+    var p = escPlay;
+    if (!p) return;
+    el.escCount.textContent = p.done ? "" : t("esc_count", { n: Math.min(p.turnN + 1, p.total), total: p.total });
+    el.escBarFill.style.width = Math.round(p.turnN / Math.max(1, p.total) * 100) + "%";
+  }
+  function escAlive(p) { return p && escPlay === p && !el.escOverlay.hidden; }
+  function escScroll() { try { el.escChat.scrollTop = el.escChat.scrollHeight; } catch (e) {} }
+
+  function escStopAudio() { if (escAudio) { try { escAudio.pause(); } catch (e) {} } if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } }
+  // Plays one line in one voice; resolves when it has finished (or failed:
+  // then the text shows, so the scene can go on).
+  function escSay(text, vk, bubble) {
+    escStopAudio();
+    return ttsLoadAudio(text, vk).then(function (r) {
+      return new Promise(function (resolve) {
+        if (!escAudio) escAudio = new Audio();
+        var a = escAudio, done = false;
+        function fin() { if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; if (bubble) bubble.classList.remove("is-playing"); resolve(true); }
+        var guard = setTimeout(fin, 15000);
+        a.onended = fin; a.onerror = fin;
+        a.src = r.src;
+        if (bubble) bubble.classList.add("is-playing");
+        var pr = a.play();
+        if (pr && pr.catch) pr.catch(function () { if (bubble) bubble.reveal(); fin(); });
+      });
+    }).catch(function (err) {
+      console.warn("[escenas] couldn't play a line:", err && err.message);
+      if (bubble) bubble.reveal();
+      return false;
+    });
+  }
+
+  function escBubble(p, roleKey, text, toKey) {
+    var sc = p.sc, role = escRole(sc, roleKey), ri = escRoleIndex(sc, roleKey);
+    var wrap = progEl("div", "esc-msg esc-them");
+    var who = progEl("div", "esc-who", topicText(role.name) + (toKey && sc.roles.length > 1 ? " → " + topicText(escRole(sc, toKey).name) : ""));
+    wrap.appendChild(who);
+    var line = progEl("div", "esc-line");
+    line.appendChild(progEl("span", "esc-av esc-av-" + ri, escInitial(role)));
+    var bub = progEl("div", "esc-bub is-hidden");
+    var play = progEl("button", "esc-play", "▶");
+    play.type = "button";
+    play.setAttribute("aria-label", t("esc_play_aria"));
+    var wave = progEl("span", "esc-wave");
+    var seed = 0;
+    for (var i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) % 9973;
+    for (var j = 0; j < 12; j++) { var bar = progEl("i"); seed = (seed * 37 + 11) % 9973; bar.style.height = (7 + seed % 15) + "px"; wave.appendChild(bar); }
+    var see = progEl("button", "esc-see", t("esc_see_text"));
+    see.type = "button";
+    var txt = progEl("span", "esc-text", text);
+    bub.appendChild(play); bub.appendChild(wave); bub.appendChild(see); bub.appendChild(txt);
+    line.appendChild(bub);
+    wrap.appendChild(line);
+    wrap.reveal = function () { bub.classList.remove("is-hidden"); };
+    wrap.classList.remove("is-playing");
+    play.addEventListener("click", function () { if (escPlay) escPlay.replays = (escPlay.replays || 0) + 1; escSay(text, p.voices[roleKey], wrap); });
+    see.addEventListener("click", function () { wrap.reveal(); if (escPlay) escPlay.peeked = true; });
+    el.escChat.appendChild(wrap);
+    escScroll();
+    return wrap;
+  }
+  function escMine(kind, text, sub) {
+    var wrap = progEl("div", "esc-msg esc-me is-" + kind);
+    var bub = progEl("div", "esc-bub");
+    bub.appendChild(progEl("span", "esc-mark", kind === "ok" ? "✓" : (kind === "unsure" ? "?" : "≠")));
+    bub.appendChild(document.createTextNode(" " + (text || "—")));
+    if (sub) bub.appendChild(progEl("span", "esc-sub", sub));
+    wrap.appendChild(bub);
+    el.escChat.appendChild(wrap);
+    escScroll();
+    return wrap;
+  }
+  function escRevealPending(p) { p.pending.forEach(function (b) { b.reveal(); }); p.pending = []; }
+
+  function escNext() {
+    var p = escPlay;
+    if (!escAlive(p)) return;
+    var steps = p.sc.steps;
+    if (p.i >= steps.length) { escFinish(); return; }
+    var s = steps[p.i];
+    if (s.r) {
+      var run = [];
+      while (p.i < steps.length && steps[p.i].r) { run.push(p.i); p.i++; }
+      escTurnPanel("listen");
+      var chain = Promise.resolve();
+      run.forEach(function (i) {
+        chain = chain.then(function () {
+          if (!escAlive(p)) return;
+          var st = steps[i], text = escLine(p, i);
+          var b = escBubble(p, st.r, text, st.to);
+          p.pending.push(b);
+          return escSay(text, p.voices[st.r], b).then(function () { return new Promise(function (r) { setTimeout(r, ESC_PAUSE_MS); }); });
+        });
+      });
+      chain.then(function () { if (escAlive(p)) escNext(); });
+      return;
+    }
+    p.cur = { i: p.i, step: s, tries: 0, shownAt: new Date().toISOString(), t0: Date.now(), logged: false };
+    p.replays = 0; p.peeked = false;
+    escUpdateTop();
+    escTurnPanel(s.you ? "speak" : "check");
+  }
+  function escAdvance() {
+    var p = escPlay;
+    if (!escAlive(p)) return;
+    p.turnN++;
+    p.i++;
+    p.cur = null;
+    escUpdateTop();
+    escNext();
+  }
+
+  // The bottom panel: listening (while lines play), your spoken turn, a
+  // listening check, or the buttons after a result.
+  function escTurnPanel(mode, extra) {
+    var p = escPlay, box = el.escTurn;
+    box.textContent = "";
+    box.className = "esc-turn is-" + mode;
+    if (mode === "listen") { box.appendChild(progEl("div", "esc-turn-lbl", t("esc_listening"))); return; }
+    var s = p.cur && p.cur.step;
+    if (mode === "speak" || mode === "retry") {
+      box.appendChild(progEl("div", "esc-turn-lbl", t("esc_your_turn")));
+      box.appendChild(progEl("p", "esc-cue", s.you));
+      var hint = progEl("p", "esc-hint", (extra && extra.hint) || t("esc_tap_mic"));
+      hint.id = "esc-hint";
+      box.appendChild(hint);
+      var mic = progEl("button", "esc-mic" + (p.rec ? " is-recording" : "") + (p.busy ? " is-busy" : ""));
+      mic.type = "button"; mic.id = "esc-mic";
+      mic.setAttribute("aria-label", t("speak_mic_aria"));
+      mic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+      mic.disabled = p.busy;
+      mic.addEventListener("click", escToggleMic);
+      box.appendChild(mic);
+      if (extra && extra.skip) {
+        var sk = progButton(t("esc_skip"), false, function () { escResolve("otra", null, { skipped: true }); });
+        sk.classList.add("esc-skip");
+        box.appendChild(sk);
+      }
+      return;
+    }
+    if (mode === "check") {
+      box.appendChild(progEl("div", "esc-turn-lbl", t("esc_your_turn_listen")));
+      box.appendChild(progEl("p", "esc-cue", topicText(s.q)));
+      box.appendChild(progEl("p", "esc-hint", t("esc_tap_heard")));
+      var set = p.vals[s.check] || [];
+      var opts = progEl("div", "esc-opts");
+      shuffleArray(set.slice()).forEach(function (v) {
+        var b = progEl("button", "esc-opt", escShowValue(s.check, v));
+        b.type = "button";
+        b.setAttribute("data-right", v === set[0] ? "1" : "0");
+        b.addEventListener("click", function () { escChoose(v); });
+        opts.appendChild(b);
+      });
+      box.appendChild(opts);
+      return;
+    }
+    if (mode === "after") {
+      var row = progEl("div", "esc-after");
+      if (extra && extra.retry) row.appendChild(progButton(t("esc_try_again"), false, function () { escTurnPanel("retry"); }));
+      row.appendChild(progButton(t("esc_continue"), true, escAdvance));
+      box.appendChild(row);
+      return;
+    }
+    if (mode === "unsure") {
+      box.appendChild(progEl("p", "esc-cue", t("esc_unsure_q")));
+      var r2 = progEl("div", "esc-after");
+      r2.appendChild(progButton(t("esc_unsure_no"), false, function () { escResolve("otra", extra.result, { userGraded: true }); }));
+      r2.appendChild(progButton(t("esc_unsure_yes"), true, function () { escResolve("bien", extra.result, { userGraded: true }); }));
+      box.appendChild(r2);
+    }
+  }
+
+  // ---- your spoken turn ----
+  function escToggleMic() {
+    var p = escPlay;
+    if (!escAlive(p) || !p.cur || p.busy) return;
+    if (p.rec) { escStopRec(); return; }
+    escStopAudio();
+    hablarGetStream().then(function (stream) {
+      if (!escAlive(p) || p.rec || !p.cur) return;
+      var mr;
+      try { mr = new MediaRecorder(stream); } catch (e) { escTurnPanel("speak", { hint: t("speak_unsupported"), skip: true }); return; }
+      var rec = { mr: mr, chunks: [], started: Date.now(), done: false };
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) rec.chunks.push(e.data); };
+      rec.finish = function (failed) {
+        if (rec.done) return;
+        rec.done = true;
+        clearTimeout(rec.auto); clearTimeout(rec.watch);
+        if (p.rec === rec) p.rec = null;
+        var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
+        if (failed || size < 400) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing") }); return; }
+        escAnalyse(p, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
+      };
+      mr.onstop = function () { rec.finish(false); };
+      mr.onerror = function () { try { if (mr.state !== "inactive") mr.stop(); } catch (e) {} rec.finish(true); };
+      rec.auto = setTimeout(escStopRec, HABLAR_MAX_MS);
+      p.rec = rec;
+      mr.start();
+      escTurnPanel("speak", { hint: t("esc_recording") });
+    }, function (err) {
+      escTurnPanel("speak", { hint: t(err && (err.name === "NotAllowedError" || err.name === "SecurityError") ? "speak_mic_denied" : "speak_mic_error"), skip: true });
+    });
+  }
+  function escStopRec() {
+    var p = escPlay, rec = p && p.rec;
+    if (!rec) return;
+    try { if (rec.mr.state !== "inactive") rec.mr.stop(); } catch (e) {}
+    clearTimeout(rec.watch);
+    rec.watch = setTimeout(function () { rec.finish(false); }, 1500);
+  }
+  function escSpec(spec, heard) {
+    var h = speechNorm(heard);
+    if (!h) return false;
+    if (Array.isArray(spec)) return spec.every(function (piece) { return h.indexOf(speechNorm(piece)) !== -1; });
+    return speechMatches(spec, heard);
+  }
+  function escJudge(step, data) {
+    var res = hablarJudge({ answers: [step.best] }, data);
+    var heard = res.heard || res.heard_display || "";
+    var wrong = null;
+    (step.wrong || []).forEach(function (w) { if (!wrong && (w.said || []).some(function (x) { return escSpec(x, heard); })) wrong = w; });
+    if (wrong) { res.auto_grade = "otra"; res.rule = "wrong"; res.wrong = wrong; return res; }
+    if (heard && (step.ok || []).some(function (spec) { return escSpec(spec, heard); })) { res.auto_grade = "bien"; res.rule = "transcript"; return res; }
+    return res; // score / unsure / nothing / none, as in Hablar
+  }
+  function escAnalyse(p, blob, recMs) {
+    var step = p.cur.step;
+    p.busy = true;
+    escTurnPanel("speak", { hint: t("esc_checking") });
+    var answers = (step.ok || []).filter(function (x) { return typeof x === "string"; });
+    var payload = null;
+    function send(retried) {
+      var call = supabaseClient.functions.invoke("stt", { body: payload }).then(function (res) {
+        if (res.error) {
+          var st = res.error.context && res.error.context.status;
+          if (st === 401 && !retried) return supabaseClient.auth.refreshSession().then(function () { return send(true); }, function () { throw new Error("HTTP 401"); });
+          if (st === 429) return limitCodeOf(res.error).then(function (code) { var le = new Error(code); le.limit = code; throw le; });
+          throw new Error(st ? "HTTP " + st : (res.error.message || "error"));
+        }
+        return res;
+      });
+      return Promise.race([call, new Promise(function (_, reject) { setTimeout(function () { reject(new Error("timeout")); }, HABLAR_TIMEOUT_MS); })]);
+    }
+    speechToWav16k(blob).then(function (wav) {
+      payload = { text: step.best, answers: answers.length ? answers : undefined, audio: speechBytesToBase64(wav), assess: ["es-AR"] };
+      return send(false);
+    }, function (err) { err = err || new Error("decode"); err.local = true; throw err; }).then(function (res) {
+      if (!escAlive(p)) return;
+      p.busy = false;
+      var r = escJudge(step, res.data);
+      r.rec_ms = recMs;
+      if (r.rule === "nothing") { escTurnPanel("speak", { hint: t("esc_heard_nothing") }); return; }
+      if (r.auto_grade === "bien") { escResolve("bien", r, {}); return; }
+      if (r.auto_grade === "otra") { escResolve("otra", r, {}); return; }
+      // not sure: you decide
+      escMine("unsure", speechCleanShown(r.heard_display || r.heard));
+      escTurnPanel("unsure", { result: r });
+    }, function (err) {
+      if (!escAlive(p)) return;
+      p.busy = false;
+      if (err && err.local) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing") }); return; }
+      if (err && err.limit) { escTurnPanel("speak", { hint: t(err.limit === "monthly_reserve" ? "speak_limit_reserve" : "speak_limit_daily"), skip: true }); return; }
+      escTurnPanel("speak", { hint: t("esc_analyse_error", { why: (err && err.message) || "" }), skip: true });
+    });
+  }
+  // A spoken turn has its result. Only the first try counts (for the stars
+  // and the log); a retry after a miss just lets you say it right.
+  function escResolve(grade, r, how) {
+    var p = escPlay;
+    if (!escAlive(p) || !p.cur) return;
+    var step = p.cur.step;
+    p.cur.tries++;
+    var first = p.cur.tries === 1;
+    var heardShown = r ? speechCleanShown(r.heard_display || r.heard) : "";
+    if (!how.userGraded) {
+      if (grade === "bien") escMine("ok", heardShown || step.best);
+      else if (!how.skipped) escMine("miss", heardShown, t("esc_better", { best: step.best }));
+    } else {
+      var last = el.escChat.lastElementChild;
+      if (last && last.classList.contains("is-unsure")) { last.classList.remove("is-unsure"); last.classList.add(grade === "bien" ? "is-ok" : "is-miss"); var mk = last.querySelector(".esc-mark"); if (mk) mk.textContent = grade === "bien" ? "✓" : "≠"; if (grade !== "bien") last.firstChild.appendChild(progEl("span", "esc-sub", t("esc_better", { best: step.best }))); }
+    }
+    escRevealPending(p);
+    if (first) {
+      p.results.push({ kind: "speak", step: step, ok: grade === "bien", said: heardShown, skipped: !!how.skipped });
+      escLog(p, grade, "hablar", r ? Object.assign({}, r, { user_graded: !!how.userGraded }) : { rule: how.skipped ? "skipped" : "none" }, !how.userGraded && !how.skipped);
+    }
+    if (grade === "bien") { escTurnPanel("listen"); setTimeout(escAdvance, 900); return; }
+    var after = function () { if (escAlive(p)) escTurnPanel("after", { retry: !how.skipped }); };
+    if (r && r.wrong && first) {
+      var w = r.wrong, text = escPick(w.es);
+      var b = escBubble(p, w.r, text);
+      escTurnPanel("listen");
+      escSay(text, p.voices[w.r], b).then(function () { b.reveal(); after(); });
+    } else after();
+  }
+  function escChoose(v) {
+    var p = escPlay;
+    if (!escAlive(p) || !p.cur || p.cur.tries) return;
+    var step = p.cur.step, set = p.vals[step.check] || [], right = v === set[0];
+    p.cur.tries = 1;
+    escMine(right ? "ok" : "miss", escShowValue(step.check, v), right ? "" : t("esc_it_was", { v: escShowValue(step.check, set[0]) }));
+    escRevealPending(p);
+    p.results.push({ kind: "check", step: step, ok: right, said: escShowValue(step.check, v), answer: escShowValue(step.check, set[0]) });
+    escLog(p, right ? "bien" : "otra", "escuchar", null, true);
+    escTurnPanel("listen");
+    setTimeout(escAdvance, right ? 900 : 1600);
+  }
+  function escLog(p, grade, mode, speech, auto) {
+    if (!currentUser || p.cur.logged) return;
+    p.cur.logged = true;
+    var row = {
+      id: practiceUuid(), user_id: currentUser.id, session_id: p.session, shown_at: p.cur.shownAt,
+      item_kind: "topic", item_id: null, item_key: "esc-" + p.sc.id, form_key: "t" + p.cur.i,
+      mode: mode, direction: "topic", pass: 1, position: p.turnN + 1, revisit: false,
+      grade: grade, grade_auto: !!auto, grade_changes: 0,
+      flipped: false, flips: 0, ms_to_flip: null, ms_front: Math.min(600000, Date.now() - p.cur.t0), ms_back: 0,
+      audio_plays: p.replays || 0, known_before: false, known_after: false, device: practiceDevice()
+    };
+    if (speech) row.speech = Object.assign({ scene: p.sc.id, peeked: !!p.peeked }, speech, { wrong: speech.wrong ? true : undefined });
+    practiceQueue.push(row);
+    savePracticeQueue();
+    if (practiceQueue.length >= PRACTICE_FLUSH_AT) practiceFlush();
+    playAfterRow(row);
+  }
+
+  // ---- the end ----
+  function escFinish() {
+    var p = escPlay;
+    if (!escAlive(p) || p.done) return;
+    p.done = true;
+    escStopAudio();
+    hablarRelease();
+    var ok = p.results.filter(function (r) { return r.ok; }).length, total = p.results.length || p.total;
+    var before = escBest(p.sc.id);
+    var stars = escStars(ok, total);
+    if (currentUser) {
+      var all = ptRecords().filter(function (r) { return r.id !== p.id; });
+      all.push({ id: p.id, user: currentUser.id, game: "escena", scope: p.sc.id, at: new Date(p.started).toISOString(),
+        cards: total, best: ok, ms: Date.now() - p.started, bien: ok, otra: total - ok, sent: false });
+      ptSaveLocal(all);
+      ptFlushRecords();
+      practiceFlush();
+    }
+    escUpdateTop();
+    el.escOverlay.classList.add("is-end");
+    var box = el.escEnd;
+    box.textContent = "";
+    box.appendChild(progEl("h2", null, t("esc_done_title")));
+    box.appendChild(escStarsNode(stars, "esc-stars esc-stars-big"));
+    box.appendChild(progEl("p", "esc-end-sub", t("esc_first_try", { ok: ok, total: total }) + (before.plays ? " · " + t("esc_before", { n: before.ok }) : "")));
+    var recap = progEl("div", "esc-recap");
+    p.results.forEach(function (r) {
+      var line = progEl("div", "esc-recap-row" + (r.ok ? " is-ok" : " is-miss"));
+      line.appendChild(progEl("span", "esc-mark", r.ok ? "✓" : "≠"));
+      var main = progEl("span", null, r.kind === "check" ? r.answer : r.step.best);
+      if (!r.ok) main.appendChild(progEl("span", "esc-said", r.kind === "check" ? t("esc_you_chose", { v: r.said }) : (r.skipped ? t("esc_skipped") : t("esc_you_said", { said: r.said || "—" }))));
+      line.appendChild(main);
+      recap.appendChild(line);
+    });
+    box.appendChild(recap);
+    var missedPrep = [];
+    p.results.forEach(function (r) { if (!r.ok && r.step.prep) r.step.prep.forEach(function (id) { if (missedPrep.indexOf(id) === -1) missedPrep.push(id); }); });
+    var btns = progEl("div", "esc-end-btns");
+    var sc = p.sc;
+    if (missedPrep.length) btns.appendChild(progButton(t("esc_review_n", { n: missedPrep.length }), false, function () { escClose(); startPracticeDeck(escPrepDeck(sc, missedPrep)); }));
+    btns.appendChild(progButton(t("esc_again"), true, function () { escStart(sc); }));
+    box.appendChild(btns);
+    var close = progButton(t("close"), false, escClose);
+    close.classList.add("esc-end-close");
+    box.appendChild(close);
+    // the first time this scene is finished: an album item
+    rewardEarn("escena:" + sc.id);
+  }
+  function escClose() {
+    var p = escPlay;
+    escStopAudio();
+    if (p && p.rec) { try { p.rec.done = true; if (p.rec.mr.state !== "inactive") p.rec.mr.stop(); } catch (e) {} }
+    hablarRelease();
+    escPlay = null;
+    el.escOverlay.hidden = true;
+    document.body.classList.remove("esc-open");
+    if (currentUser) practiceFlush();
+    renderPlay();
   }
 
   // ================= Contrarreloj (2026-10-06) =================
@@ -10592,7 +11353,7 @@
   // ---- the picker (on the Jugar tab) ----
   function openCrono(open) {
     cronoOpen = !!open;
-    if (open) { albumOpen = false; amigosOpen = false; }
+    if (open) { albumOpen = false; amigosOpen = false; escOpen = false; }
     renderPlay();
     try { window.scrollTo({ top: 0 }); } catch (e) {}
   }
@@ -10938,7 +11699,7 @@
   function openAmigos(open) {
     amigosOpen = !!open;
     rtNewOpen = false;
-    if (open) { albumOpen = false; cronoOpen = false; amigoConfirm = null; }
+    if (open) { albumOpen = false; cronoOpen = false; escOpen = false; amigoConfirm = null; }
     renderPlay();
     if (open) { loadAmigos(true); loadRetos(true); }
     try { window.scrollTo({ top: 0 }); } catch (e) {}
@@ -14641,6 +15402,8 @@
   el.crModeHablar.addEventListener("click", function () { setCrMode("hablar"); });
   el.crOtra.addEventListener("click", function (e) { e.stopPropagation(); crGrade("otra"); });
   el.crBien.addEventListener("click", function (e) { e.stopPropagation(); crGrade("bien"); });
+  el.escBack.addEventListener("click", function () { if (escSel) openEscenas(true); else openEscenas(false); });
+  el.escClose.addEventListener("click", escClose);
   el.rewardGo.addEventListener("click", function () { closeReward(true); });
   el.rewardClose.addEventListener("click", function () { closeReward(false); });
   el.rewardListen.addEventListener("click", function () {

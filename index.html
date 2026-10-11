@@ -826,6 +826,18 @@
       <ul class="card-list cr-list" id="cr-list"></ul>
       <p class="play-fine" data-i18n="cr_fine"></p>
     </section>
+    <!-- Escenas: the list of scenes and a scene's start screen (app.js's
+         "Escenas"; the scene itself plays in #esc-overlay). -->
+    <section class="detail play-escenas" id="play-escenas" hidden>
+      <button type="button" class="icon-btn play-album-back" id="esc-back">&lsaquo; Jugar</button>
+      <div class="detail-head">
+        <div class="detail-head-text">
+          <h2 id="esc-head-title">Escenas</h2>
+          <p class="definition" id="esc-head-desc"></p>
+        </div>
+      </div>
+      <div id="esc-body"></div>
+    </section>
     <!-- Te reto + Amigos (profiles, friends, challenges). See app.js's
          "Amigos" and "Te reto" sections. -->
     <section class="detail play-amigos" id="play-amigos" hidden>
@@ -1270,6 +1282,20 @@
 <!-- A reward (Jugar, 2026-10-06): what you just won, over whatever is on
      screen — mid-deck it says "Seguir jugando" and the deck carries on.
      Also shows an album item you tap. -->
+<!-- A scene being played (Escenas, 2026-10-10): the conversation as a
+     chat, your turn at the bottom, the end screen in place of both. -->
+<div class="esc-overlay" id="esc-overlay" role="dialog" aria-modal="true" aria-labelledby="esc-title" hidden>
+  <div class="esc-top">
+    <button type="button" class="esc-close" id="esc-close" data-i18n="esc_exit">× Salir</button>
+    <b id="esc-title"></b>
+    <span class="esc-count" id="esc-count"></span>
+  </div>
+  <div class="esc-bar"><i id="esc-bar-fill"></i></div>
+  <div class="esc-chat" id="esc-chat" aria-live="polite"></div>
+  <div class="esc-turn" id="esc-turn"></div>
+  <div class="esc-end" id="esc-end"></div>
+</div>
+
 <div class="reward-overlay" id="reward-overlay" role="dialog" aria-modal="true" aria-labelledby="reward-word" hidden>
   <div class="reward-box">
     <button type="button" class="icon-btn reward-close" id="reward-close"><span aria-hidden="true">&times;</span> <span data-i18n="close">Cerrar</span></button>
@@ -1303,6 +1329,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="temas.js"></script>
+<script src="escenas.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

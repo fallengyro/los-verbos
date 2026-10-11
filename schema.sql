@@ -1900,3 +1900,17 @@ as $$
 $$;
 revoke all on function public.vosea_usage_db(timestamptz) from public, anon, authenticated;
 grant execute on function public.vosea_usage_db(timestamptz) to service_role;
+
+-- ---------------------------------------------------------------------------
+-- Escenas (2026-10-10). Same as pending_2026-10-10_escenas.sql.
+-- 1. game_records also keeps Escenas: game 'escena', scope = the scene id,
+--    cards = its turns, best = turns right on the first try.
+alter table public.game_records drop constraint if exists game_records_game_check;
+alter table public.game_records add constraint game_records_game_check
+  check (game in ('partida', 'contrarreloj', 'escena'));
+
+-- 2. The first time a scene is finished wins an album item: reward reason
+--    'escena:<scene id>' (once per scene, ever).
+alter table public.rewards drop constraint if exists rewards_reason_check;
+alter table public.rewards add constraint rewards_reason_check
+  check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2}|crono:[a-z0-9:-]{1,48}:\d{4}-\d{2}-\d{2}|reto:[0-9a-f-]{36}:\d{4}-\d{2}-\d{2}|escena:[a-z0-9-]{1,40})$');

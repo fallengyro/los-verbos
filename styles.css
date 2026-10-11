@@ -2413,3 +2413,104 @@
   .warm-voices { margin: 0 0 10px; }
   .warm-total { color: var(--ink); font-weight: 600; }
   .warm-progress { font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; margin: 8px 0 0; }
+
+  /* ================= Escenas (2026-10-10) ================= */
+  /* The list and start screen (on the Jugar tab) */
+  .esc-list { border: 1px solid var(--line); border-radius: 14px; background: var(--paper-raised); overflow: hidden; margin: 4px 0 10px; }
+  .esc-row { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 11px 14px; border-bottom: 1px solid var(--line); font: inherit; color: inherit; }
+  button.esc-row { cursor: pointer; }
+  .esc-row:last-child { border-bottom: 0; }
+  .esc-row-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .esc-row-name { font-size: 15.5px; font-weight: 600; color: var(--ink); }
+  .esc-row.is-locked .esc-row-name { color: var(--ink-soft); }
+  .esc-row-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .esc-two { font-size: 10.5px; font-weight: 500; border: 1px solid var(--line); border-radius: 999px; padding: 0 6px; color: var(--ink-soft); margin-left: 6px; vertical-align: 1px; white-space: nowrap; }
+  .esc-stars { white-space: nowrap; letter-spacing: 1px; font-size: 14px; }
+  .esc-stars i { font-style: normal; color: var(--line); }
+  .esc-stars i.on { color: var(--gold); }
+  .esc-stars-big { display: block; font-size: 40px; letter-spacing: 6px; margin: 2px 0 4px; }
+  .esc-lock { margin-top: 8px; background: var(--paper-sunken); border-radius: 10px; padding: 9px 11px; font-size: 12.5px; color: var(--ink); }
+  .esc-lock p { margin: 0; }
+  .esc-lock .btn-secondary { padding: 6px 12px; font-size: 13px; }
+  .esc-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 8px; }
+  .esc-chip { font-size: 12px; border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 2px 8px; color: var(--ink); }
+  .esc-label { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; margin: 14px 0 6px; }
+  .esc-role { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .esc-role-n { flex: 1 1 auto; min-width: 0; font-size: 15px; color: var(--ink); }
+  .esc-role-n small { display: block; font-size: 12px; color: var(--ink-soft); }
+  .esc-voice { flex: none; }
+  .esc-swap { border: 0; background: none; font: inherit; font-size: 13px; color: var(--accent-deep); padding: 8px 0 0; cursor: pointer; }
+  .esc-best { font-size: 13.5px; color: var(--ink-soft); margin: 12px 0 0; }
+  .esc-start { display: block; width: 100%; margin-top: 14px; padding: 13px; font-size: 16px; border-radius: 12px; }
+  .esc-practice { display: block; width: 100%; margin-top: 8px; }
+  .esc-av { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex: none; }
+  .esc-av-0 { background: var(--accent); color: var(--accent-ink); }
+  .esc-av-1 { background: var(--teal); color: var(--paper); }
+
+  /* A scene being played */
+  .esc-overlay { position: fixed; inset: 0; background: var(--paper); z-index: 120; display: flex; flex-direction: column; }
+  body.esc-open { overflow: hidden; }
+  .esc-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink); }
+  .esc-top b { font-weight: 600; text-align: center; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .esc-close { border: 0; background: none; font: inherit; color: var(--ink); padding: 0; cursor: pointer; }
+  .esc-count { font-variant-numeric: tabular-nums; color: var(--ink-soft); min-width: 3em; text-align: right; }
+  .esc-bar { height: 3px; background: var(--paper-sunken); flex: none; }
+  .esc-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  .esc-chat { flex: 1 1 auto; overflow-y: auto; padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+  .esc-msg { display: flex; flex-direction: column; max-width: 88%; }
+  .esc-them { align-self: flex-start; }
+  .esc-me { align-self: flex-end; }
+  .esc-who { font-size: 11px; color: var(--ink-soft); margin: 0 0 2px 36px; }
+  .esc-line { display: flex; gap: 8px; align-items: flex-end; }
+  .esc-line .esc-av { width: 28px; height: 28px; font-size: 12px; }
+  .esc-bub { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 16px 16px 16px 4px; padding: 8px 12px; font-size: 15px; line-height: 1.35; color: var(--ink); display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .esc-me .esc-bub { display: block; border-radius: 16px 16px 4px 16px; background: color-mix(in srgb, var(--teal) 14%, var(--paper)); border-color: color-mix(in srgb, var(--teal) 35%, var(--line)); }
+  .esc-me.is-miss .esc-bub { background: color-mix(in srgb, var(--danger) 10%, var(--paper)); border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+  .esc-me.is-unsure .esc-bub { background: color-mix(in srgb, var(--gold) 14%, var(--paper)); border-color: color-mix(in srgb, var(--gold) 40%, var(--line)); }
+  .esc-mark { font-weight: 700; }
+  .esc-me.is-ok .esc-mark { color: var(--teal); }
+  .esc-me.is-miss .esc-mark { color: var(--danger); }
+  .esc-me.is-unsure .esc-mark { color: var(--gold); }
+  .esc-sub { display: block; font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .esc-play { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); font-size: 12px; flex: none; cursor: pointer; padding: 0; }
+  .esc-wave { display: none; gap: 2px; align-items: center; height: 22px; }
+  .esc-wave i { width: 3px; border-radius: 2px; background: var(--line); display: block; }
+  .esc-them.is-playing .esc-wave i { background: var(--accent-deep); animation: escWave .9s ease-in-out infinite alternate; }
+  .esc-them.is-playing .esc-wave i:nth-child(3n) { animation-delay: .2s; }
+  .esc-them.is-playing .esc-wave i:nth-child(3n+1) { animation-delay: .45s; }
+  @keyframes escWave { from { transform: scaleY(.55); } to { transform: scaleY(1); } }
+  @media (prefers-reduced-motion: reduce) { .esc-them.is-playing .esc-wave i { animation: none; } }
+  .esc-see { border: 0; background: none; font: inherit; font-size: 12px; color: var(--accent-deep); padding: 0; cursor: pointer; display: none; }
+  .esc-text { flex: 1 1 auto; min-width: 0; }
+  .esc-bub.is-hidden .esc-wave, .esc-bub.is-hidden .esc-see { display: flex; }
+  .esc-bub.is-hidden .esc-text { display: none; }
+  .esc-turn { flex: none; background: var(--paper-raised); border-top: 1px solid var(--line); padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px)); text-align: center; min-height: 64px; }
+  .esc-turn-lbl { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; margin: 0 0 4px; }
+  .esc-turn.is-listen { padding-top: 22px; }
+  .esc-cue { font-size: 17px; font-weight: 600; margin: 0 0 4px; color: var(--ink); }
+  .esc-hint { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+  .esc-mic { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px var(--shadow); cursor: pointer; }
+  .esc-mic svg { width: 30px; height: 30px; }
+  .esc-mic.is-recording { background: var(--danger); }
+  .esc-mic.is-busy { opacity: .7; animation: escPulse 1s ease-in-out infinite alternate; }
+  @keyframes escPulse { from { transform: scale(.94); } to { transform: scale(1); } }
+  .esc-skip { margin-top: 10px; font-size: 13px; padding: 6px 12px; }
+  .esc-opts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .esc-opt { border: 1px solid var(--line); background: var(--paper); border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); cursor: pointer; min-width: 84px; }
+  .esc-after { display: flex; gap: 8px; }
+  .esc-after > * { flex: 1; padding: 11px; border-radius: 12px; }
+  /* the end screen replaces the chat and the turn */
+  .esc-end { display: none; }
+  .esc-overlay.is-end .esc-chat, .esc-overlay.is-end .esc-turn, .esc-overlay.is-end .esc-bar { display: none; }
+  .esc-overlay.is-end .esc-end { display: block; flex: 1 1 auto; overflow-y: auto; padding: 22px 18px calc(22px + env(safe-area-inset-bottom, 0px)); text-align: center; }
+  .esc-end h2 { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 600; font-size: 30px; margin: 0 0 4px; color: var(--ink); }
+  .esc-end-sub { font-size: 14px; color: var(--ink-soft); margin: 0 0 14px; }
+  .esc-recap { text-align: left; border: 1px solid var(--line); border-radius: 14px; background: var(--paper-raised); margin: 0 0 14px; }
+  .esc-recap-row { display: flex; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 13.5px; color: var(--ink); }
+  .esc-recap-row:last-child { border-bottom: 0; }
+  .esc-recap-row.is-ok .esc-mark { color: var(--teal); }
+  .esc-recap-row.is-miss .esc-mark { color: var(--danger); }
+  .esc-said { display: block; color: var(--ink-soft); font-size: 12.5px; }
+  .esc-end-btns { display: flex; gap: 8px; }
+  .esc-end-btns > * { flex: 1; padding: 11px; border-radius: 12px; }
+  .esc-end-close { display: block; width: 100%; margin-top: 8px; padding: 11px; border-radius: 12px; }
