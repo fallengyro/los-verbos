@@ -10762,7 +10762,11 @@
   // like a phone call (a band-pass on their voice and on the noise, which
   // is their side of the line).
   var ESC_RUIDO_KEY = "vosea-escenas-ruido";
-  var ESC_RUIDO_GAIN = { bajo: 0.3, alto: 0.7 }; // the files are leveled to -20 LUFS
+  // the files are leveled to -20 LUFS. mason, 2026-10-11, first listen on
+  // the iPhone: at the old Bajo (0.3) "I didn't even know Elena had
+  // spoken… louder even than I would want the high setting to be". Now
+  // Alto is about 5 dB under the old Bajo, and Bajo about 8 dB under Alto.
+  var ESC_RUIDO_GAIN = { bajo: 0.06, alto: 0.16 };
   var ESC_RUIDO_DUCK = 0.6;   // while you speak: a small dip (about −4 dB)
   var ESC_RUIDO_FADE = 1.2;   // seconds, in and out
   var escRuido = null;        // { ctx, src, gain, filter, scene, level, ducked }
