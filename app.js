@@ -519,6 +519,10 @@
       esc_practice_these: "Practicar estas {n}",
       esc_practice_all: "Practicar lo que usa",
       esc_who: "Quién habla",
+      esc_noise: "Ruido de fondo",
+      esc_noise_off: "No",
+      esc_noise_low: "Bajo",
+      esc_noise_high: "Alto",
       esc_swap: "Cambiar voces",
       esc_uses: "Usa",
       esc_best: "Tu mejor vuelta:",
@@ -1398,6 +1402,10 @@
       esc_practice_these: "Practice these {n}",
       esc_practice_all: "Practice what it uses",
       esc_who: "Who's talking",
+      esc_noise: "Background noise",
+      esc_noise_off: "Off",
+      esc_noise_low: "Low",
+      esc_noise_high: "High",
       esc_swap: "Swap voices",
       esc_uses: "Uses",
       esc_best: "Your best run:",
@@ -7784,7 +7792,10 @@
     hablarAbort();
     hablarDropStream();
   }
-  document.addEventListener("visibilitychange", function () { if (document.hidden) hablarRelease(); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) hablarRelease();
+    if (escRuidoCtx) { try { if (document.hidden) escRuidoCtx.suspend(); else if (escRuido) escRuidoCtx.resume(); } catch (e) {} }
+  });
 
   // What the card expects, for matching: gustar-mode cells hold two
   // answers ("me gusta / me gustan").
@@ -10715,6 +10726,122 @@
   var escPlay = null;   // the scene being played
   var escAudio = null;
 
+  // ---- background noise (2026-10-11) ----
+  // mason: "keeping a conversation going with all of the other things going
+  // on around me makes it much harder to follow". A scene with
+  // `ruido: { src, phone? }` can play a looping recording of its place
+  // (CC0, from Freesound; see ruido/CREDITS.md) under the whole scene, at
+  // No / Bajo / Alto (one setting for every scene). While you record it
+  // dips a little and comes back when you stop. It plays through Web Audio
+  // (one context, a looping buffer and a gain), not an <audio> element, so
+  // it mixes with the voices. `phone: [roles]` makes those people sound
+  // like a phone call (a band-pass on their voice and on the noise, which
+  // is their side of the line).
+  var ESC_RUIDO_KEY = "vosea-escenas-ruido";
+  var ESC_RUIDO_GAIN = { bajo: 0.3, alto: 0.7 }; // the files are leveled to -20 LUFS
+  var ESC_RUIDO_DUCK = 0.6;   // while you speak: a small dip (about −4 dB)
+  var ESC_RUIDO_FADE = 1.2;   // seconds, in and out
+  var escRuido = null;        // { ctx, src, gain, filter, scene, level, ducked }
+  var escRuidoCtx = null;
+  var escRuidoBuffers = {};   // src → AudioBuffer (decoded once per session)
+  var escPhoneAudio = null, escPhoneNode = null;
+  function escRuidoLevel() {
+    var v = null;
+    try { v = localStorage.getItem(ESC_RUIDO_KEY); } catch (e) {}
+    return v === "bajo" || v === "alto" ? v : "off";
+  }
+  function escSetRuidoLevel(v) { try { localStorage.setItem(ESC_RUIDO_KEY, v); } catch (e) {} }
+  function escRuidoContext() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!escRuidoCtx || escRuidoCtx.state === "closed") { try { escRuidoCtx = new AC(); } catch (e) { escRuidoCtx = null; } }
+    return escRuidoCtx;
+  }
+  function escPhoneFilter(ctx, input) {
+    var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 320; hp.Q.value = 0.7;
+    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 3200; lp.Q.value = 0.7;
+    input.connect(hp); hp.connect(lp);
+    return lp;
+  }
+  // Called from the Empezar tap (a user gesture, so iOS lets it start).
+  function escRuidoStart(sc) {
+    escRuidoStop(true);
+    var level = escRuidoLevel();
+    if (level === "off" || !sc.ruido || !sc.ruido.src || quietMode) return;
+    var ctx = escRuidoContext();
+    if (!ctx) return;
+    try { if (ctx.state === "suspended") ctx.resume(); } catch (e) {}
+    var r = { ctx: ctx, scene: sc.id, level: level, ducked: false, src: null, gain: ctx.createGain(), stopped: false };
+    r.gain.gain.value = 0;
+    var out = r.gain;
+    if (sc.ruido.phone) { out = escPhoneFilter(ctx, r.gain); }
+    out.connect(ctx.destination);
+    escRuido = r;
+    var url = sc.ruido.src;
+    var have = escRuidoBuffers[url];
+    (have ? Promise.resolve(have) : fetch(url).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.arrayBuffer();
+    }).then(function (ab) {
+      return new Promise(function (resolve, reject) { var pr = ctx.decodeAudioData(ab, resolve, reject); if (pr && pr.then) pr.then(resolve, reject); });
+    })).then(function (buf) {
+      escRuidoBuffers[url] = buf;
+      if (escRuido !== r || r.stopped) return;
+      var node = ctx.createBufferSource();
+      node.buffer = buf; node.loop = true;
+      var lp = sc.ruido.loop; // [start, end] in seconds: the seamless part (the file has a little margin on each side)
+      if (lp && lp[1] > lp[0] && lp[1] <= buf.duration) { node.loopStart = lp[0]; node.loopEnd = lp[1]; }
+      node.connect(r.gain);
+      var from = lp ? lp[0] : 0, to = lp ? lp[1] : buf.duration;
+      node.start(0, from + Math.random() * Math.max(0, to - from - 1)); // a different moment of the place each time
+      r.src = node;
+      escRuidoApply(r, ESC_RUIDO_FADE);
+    }).catch(function (err) { console.warn("[escenas] background noise:", err && err.message); });
+  }
+  function escRuidoApply(r, secs) {
+    if (!r || r.stopped) return;
+    var target = (ESC_RUIDO_GAIN[r.level] || 0) * (r.ducked ? ESC_RUIDO_DUCK : 1);
+    var g = r.gain.gain, now = r.ctx.currentTime;
+    try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(target, now + (secs || 0.25)); } catch (e) { g.value = target; }
+    r.target = target;
+  }
+  function escRuidoDuck(on) {
+    var r = escRuido;
+    if (!r || r.ducked === !!on) return;
+    r.ducked = !!on;
+    escRuidoApply(r, on ? 0.2 : 0.6);
+  }
+  function escRuidoStop(now) {
+    var r = escRuido;
+    if (!r) return;
+    escRuido = null;
+    r.stopped = true;
+    var g = r.gain.gain, t0 = r.ctx.currentTime, secs = now ? 0.05 : 0.8;
+    try { g.cancelScheduledValues(t0); g.setValueAtTime(g.value, t0); g.linearRampToValueAtTime(0, t0 + secs); } catch (e) {}
+    setTimeout(function () { try { if (r.src) r.src.stop(); } catch (e) {} try { r.gain.disconnect(); } catch (e) {} }, secs * 1000 + 80);
+  }
+  // the people on the phone (delivery): their own <audio>, through the
+  // same context and a band-pass. Made once, on the Empezar tap.
+  function escPhoneAudioFor(p, roleKey) {
+    if (!p || !p.phone || p.phone.indexOf(roleKey) === -1) return null;
+    var ctx = escRuidoContext();
+    if (!ctx) return null;
+    if (!escPhoneAudio) {
+      try {
+        escPhoneAudio = new Audio();
+        var srcNode = ctx.createMediaElementSource(escPhoneAudio);
+        escPhoneNode = escPhoneFilter(ctx, srcNode);
+        escPhoneNode.connect(ctx.destination);
+      } catch (e) { escPhoneAudio = null; return null; }
+    }
+    try { if (ctx.state === "suspended") ctx.resume(); } catch (e) {}
+    return escPhoneAudio;
+  }
+  window.voseRuidoState = function () {
+    var r = escRuido;
+    return { level: escRuidoLevel(), playing: !!(r && r.src), scene: r ? r.scene : null, ducked: !!(r && r.ducked), target: r ? r.target : null, phone: !!(r && escPlay && escPlay.phone) };
+  };
+
   function escById(id) { return ESCENAS.find(function (s) { return s.id === id; }) || null; }
   function escTopic(sc) { return topicById("esc-" + sc.id); }
   function escSceneTurns(sc) { return sc.steps.filter(function (s) { return s.you || s.check; }).length; }
@@ -10904,6 +11031,22 @@
       });
       box.appendChild(sw);
     }
+    if (sc.ruido && sc.ruido.src) {
+      var nz = progEl("div", "esc-noise");
+      nz.appendChild(progEl("span", "esc-noise-lbl", t("esc_noise")));
+      var nseg = progEl("div", "lang-toggle esc-noise-seg");
+      var lvl = escRuidoLevel();
+      [["off", "esc_noise_off"], ["bajo", "esc_noise_low"], ["alto", "esc_noise_high"]].forEach(function (o) {
+        var b = progEl("button", "lang-option" + (lvl === o[0] ? " active" : ""), t(o[1]));
+        b.type = "button"; b.setAttribute("data-noise", o[0]);
+        b.setAttribute("aria-pressed", lvl === o[0] ? "true" : "false");
+        b.addEventListener("click", function () { escSetRuidoLevel(o[0]); renderPlay(); });
+        nseg.appendChild(b);
+      });
+      nz.appendChild(nseg);
+      box.appendChild(nz);
+      if (lvl !== "off") box.appendChild(progEl("p", "esc-noise-where", topicText(sc.ruido.where || { es: "", en: "" })));
+    }
     var tp = escTopic(sc);
     if (tp) {
       box.appendChild(progEl("div", "esc-label", t("esc_uses")));
@@ -10955,11 +11098,13 @@
     sc = escCast(sc);
     hablarPrepareMic(); // the permission prompt comes up on this tap
     unlockTtsAudio();
+    escRuidoStart(sc);
     var vals = {};
     Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escPick(sc.vars[k]); });
     escPlay = {
       sc: sc, id: practiceUuid(), session: practiceUuid(), started: Date.now(), voices: escVoices(sc), vals: vals,
-      lines: {}, i: 0, turnN: 0, total: escSceneTurns(sc), results: [], pending: [], cur: null, rec: null, busy: false, done: false
+      lines: {}, i: 0, turnN: 0, total: escSceneTurns(sc), results: [], pending: [], cur: null, rec: null, busy: false, done: false,
+      phone: escRuidoLevel() !== "off" && sc.ruido && sc.ruido.phone ? sc.ruido.phone.slice() : null
     };
     if (currentUser && (!rewardsState.loaded || rewardsState.userId !== currentUser.id)) loadRewards();
     el.escOverlay.hidden = false;
@@ -10980,15 +11125,15 @@
   function escAlive(p) { return p && escPlay === p && !el.escOverlay.hidden; }
   function escScroll() { try { el.escChat.scrollTop = el.escChat.scrollHeight; } catch (e) {} }
 
-  function escStopAudio() { if (escAudio) { try { escAudio.pause(); } catch (e) {} } if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } }
+  function escStopAudio() { if (escAudio) { try { escAudio.pause(); } catch (e) {} } if (escPhoneAudio) { try { escPhoneAudio.pause(); } catch (e) {} } if (ttsAudioEl) { try { ttsAudioEl.pause(); } catch (e) {} } }
   // Plays one line in one voice; resolves when it has finished (or failed:
   // then the text shows, so the scene can go on).
-  function escSay(text, vk, bubble) {
+  function escSay(text, vk, bubble, roleKey) {
     escStopAudio();
     return ttsLoadAudio(text, vk).then(function (r) {
       return new Promise(function (resolve) {
         if (!escAudio) escAudio = new Audio();
-        var a = escAudio, done = false;
+        var a = escPhoneAudioFor(escPlay, roleKey) || escAudio, done = false;
         function fin() {
           if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; if (bubble) bubble.classList.remove("is-playing");
           if (escPlay && escPlay.cur && escPlay.cur.step.you && !escPlay.rec && !escPlay.busy) hablarPrepareMic(); // a replay during your turn
@@ -11031,7 +11176,7 @@
     wrap.appendChild(line);
     wrap.reveal = function () { bub.classList.remove("is-hidden"); };
     wrap.classList.remove("is-playing");
-    play.addEventListener("click", function () { if (escPlay) escPlay.replays = (escPlay.replays || 0) + 1; escSay(text, p.voices[roleKey], wrap); });
+    play.addEventListener("click", function () { if (escPlay) escPlay.replays = (escPlay.replays || 0) + 1; escSay(text, p.voices[roleKey], wrap, roleKey); });
     see.addEventListener("click", function () { wrap.reveal(); if (escPlay) escPlay.peeked = true; });
     el.escChat.appendChild(wrap);
     escScroll();
@@ -11094,7 +11239,7 @@
           var st = steps[i], text = escLine(p, i);
           var b = escBubble(p, st.r, text, st.to);
           p.pending.push(b);
-          return escSay(text, p.voices[st.r], b).then(function () { return new Promise(function (r) { setTimeout(r, ESC_PAUSE_MS); }); });
+          return escSay(text, p.voices[st.r], b, st.r).then(function () { return new Promise(function (r) { setTimeout(r, ESC_PAUSE_MS); }); });
         });
       });
       chain.then(function () { if (escAlive(p)) escNext(); });
@@ -11195,6 +11340,7 @@
         rec.done = true;
         clearTimeout(rec.auto); clearTimeout(rec.watch);
         if (p.rec === rec) p.rec = null;
+        escRuidoDuck(false);
         var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
         if (failed || size < 400) { hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing") }); return; }
         escAnalyse(p, new Blob(rec.chunks, { type: mr.mimeType || "audio/mp4" }), Date.now() - rec.started);
@@ -11204,6 +11350,7 @@
       rec.auto = setTimeout(escStopRec, HABLAR_MAX_MS);
       p.rec = rec;
       mr.start();
+      escRuidoDuck(true);
       escTurnPanel("speak", { hint: t("esc_recording") });
     }, function (err) {
       escTurnPanel("speak", { hint: t(err && (err.name === "NotAllowedError" || err.name === "SecurityError") ? "speak_mic_denied" : "speak_mic_error"), skip: true });
@@ -11213,6 +11360,7 @@
     var p = escPlay, rec = p && p.rec;
     if (!rec) return;
     try { if (rec.mr.state !== "inactive") rec.mr.stop(); } catch (e) {}
+    escRuidoDuck(false);
     clearTimeout(rec.watch);
     rec.watch = setTimeout(function () { rec.finish(false); }, 1500);
   }
@@ -11301,7 +11449,7 @@
       var w = r.wrong, text = escPick(w.es);
       var b = escBubble(p, w.r, text);
       escTurnPanel("listen");
-      escSay(text, p.voices[w.r], b).then(function () { b.reveal(); after(); });
+      escSay(text, p.voices[w.r], b, w.r).then(function () { b.reveal(); after(); });
     } else after();
   }
   function escChoose(v) {
@@ -11340,6 +11488,7 @@
     if (!escAlive(p) || p.done) return;
     p.done = true;
     escStopAudio();
+    escRuidoStop();
     hablarRelease();
     var ok = p.results.filter(function (r) { return r.ok; }).length, total = p.results.length || p.total;
     var before = escBest(p.sc.id);
@@ -11386,6 +11535,7 @@
   function escClose() {
     var p = escPlay;
     escStopAudio();
+    escRuidoStop();
     if (p && p.rec) { try { p.rec.done = true; if (p.rec.mr.state !== "inactive") p.rec.mr.stop(); } catch (e) {} }
     hablarRelease();
     escPlay = null;

@@ -2472,6 +2472,10 @@
   .esc-me.is-miss .esc-mark { color: var(--danger); }
   .esc-me.is-unsure .esc-mark { color: var(--gold); }
   .esc-sub { display: block; font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .esc-noise { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 2px; }
+  .esc-noise-lbl { font-size: 14px; color: var(--ink); }
+  .esc-noise-where { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-soft); }
+  .esc-noise-where:empty { display: none; }
   .esc-alts-btn { display: block; margin-top: 4px; padding: 0; border: 0; background: none; font: inherit; font-size: 12px; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
   .esc-alts { display: block; font-size: 12.5px; margin-top: 3px; }
   .esc-alts[hidden] { display: none; }
