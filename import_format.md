@@ -35,7 +35,9 @@ app's shared starter content — the same as adding an item by hand.
 ```json
 {
   "infinitive": "escalar",
-  "definition": "to scale (a log curve)",
+  "definition": "to climb; to scale",
+  "notes": "en perfilaje: escalar una curva = to set a log curve's scale",
+  "example": "Escalamos el cerro en tres horas. / Escalá la resistividad en logarítmico.",
   "type": "-ar",
   "reflexive": false,
   "irregularity": "regular",
@@ -44,6 +46,8 @@ app's shared starter content — the same as adding an item by hand.
   "preposicion": "",
   "auxiliar": false,
   "gustar_like": false,
+  "personal_definition": "",
+  "personal_example": "",
   "forms": {
     "presente":     { "yo": "escalo",    "vos": "escalás",   "el": "escala",    "nosotros": "escalamos",    "ellos": "escalan" },
     "preterito":    { "yo": "escalé",    "vos": "escalaste", "el": "escaló",    "nosotros": "escalamos",    "ellos": "escalaron" },
@@ -65,6 +69,8 @@ Field notes:
 - `pattern` — a short free-text note on what's irregular (e.g. `"e→i en formas acentuadas"`), blank if fully regular.
 - `transitivity` — one of `transitivo` / `intransitivo` / `ambos`.
 - `preposicion` — a fixed preposition the verb idiomatically takes (`"a"`, `"de"`, `"en"`...), or `""`.
+- `gustar_like` — `true` for a dative ("tipo gustar") verb: gustar, encantar, doler, faltar, pasar, quedar, tocar, parecer, importar... Then `definition` and `example` are the **dative** use (pasar: `"to happen (to someone)"`, `"¿Qué te pasó en la mano?"`), and `personal_definition` and `personal_example` are the use with the person as the subject, in the indicative (`"to pass, to come by; to spend (time)"`, `"Paso por tu casa a las ocho."`). Put examples only in the example fields, never inside a definition. Every dative verb has both uses, and `forms` is the plain conjugation (yo paso, vos pasás…) — the app builds the "me pasa / me pasan" forms itself. Leave `personal_definition` and `personal_example` `""` for any other verb.
+- `notes` and `example` — optional free text, same rules as for words (see "Definitions, notes and examples" below).
 - `forms` — every tense object must have all five persons: `yo`, `vos`, `el`, `nosotros`, `ellos`. `imperativo` has only `vos`/`usted`/`nosotros`/`ustedes` (no `yo` — you can't command yourself). `gerundio` and `participio` are plain strings, not person tables.
 - Impersonal weather verbs (`llover`, `nevar`) skip the person tables entirely and use `"forms": { "impersonal": { "presente": "llueve", "subjPasado": "lloviera", ... } }` instead — there's no "yo llueve."
 - Reflexive verbs (e.g. `levantarse`) write `forms` WITH the reflexive pronoun already baked into every single-table cell (`"yo": "me levanto"`, NOT just `"levanto"`) — the app displays exactly what's stored here, it does not add the pronoun itself at display time. `imperativo` includes it too, wherever it attaches: enclitic on `vos` (`"vos": "levantate"`), proclitic on the other three (`"usted": "se levante"`, `"nosotros": "nos levantemos"`, `"ustedes": "se levanten"`).
@@ -77,8 +83,8 @@ Field notes:
   "definition": "porosity",
   "part_of_speech": "sustantivo",
   "gender": "femenino",
-  "notes": "petrofísica — measured via density or sonic logs",
-  "example": ""
+  "notes": "φ; se mide con los perfiles de densidad, neutrón o sónico",
+  "example": "Esta arenisca tiene buena porosidad."
 }
 ```
 
@@ -111,6 +117,39 @@ formal/slangy it is (`register`).
 - `idiomatic` — `true` if the meaning isn't guessable word-by-word (e.g. "ni en pedo" doesn't mean anything about being drunk), `false` if it's a plain, literal combination of words.
 - `literal` — only meaningful when `idiomatic` is `true`: a short word-by-word gloss, so both the real meaning and the literal words are visible. Leave `""` when `idiomatic` is `false`.
 - `notes` and `example` are both optional free text, same as for words.
+
+## Definitions, notes and examples (verbs, words and phrases)
+
+- Write every English field (`definition`, `literal`, English in `notes`)
+  in **American English**: American spelling ("practice", "color",
+  "canceled") and American words ("check" for a restaurant bill, "store",
+  "candy", "cookie", "soccer").
+- `definition` starts with the item's **everyday meaning**, never just
+  the list's topic: "carrito" is "cart" (not "luggage cart") even in an
+  airport list. One item can belong to several lists, and it has only one
+  definition.
+- When the list uses a word in a **genuinely different meaning** — not
+  just a narrower case of the everyday one — add that meaning after the
+  everyday one, with a short qualifier in parentheses:
+  `"revoque": "plaster (on a wall); mudcake (in a well)"`,
+  `"carrera": "race; career; logging run (in a well)"`. "Carrito" gets no
+  second meaning: an airport cart is still a cart. Keep it to one added
+  meaning. The definition is what a flashcard shows as the answer, so it
+  has to contain the meaning being studied.
+- **Verbs are the exception:** keep a verb's definition to its everyday
+  meaning ("correr": "to run") and put the list's sense in `notes` and
+  `example`. A verb's flashcards show the English of each conjugated form,
+  which is generated from the definition, so a second meaning there would
+  muddle every form.
+- The list's context also goes in `example` and `notes`. `example` gives a
+  typical sentence first; if the list's use is very different from the
+  everyday one, add a second, list-specific sentence after " / " (the
+  flashcards show that last sentence under the answer):
+  `"Agarrá un carrito en la entrada del súper. / Pusimos las valijas en un carrito."`
+- `notes` says what the item means in the list's world when that isn't
+  obvious from the definition: `"en perfilaje: una carrera = one logging run"`.
+  Don't use notes for bare topic labels ("petrofísica", "aeropuerto") —
+  the list itself already says that.
 
 ## ⚠️ Dialect requirement — this app uses Rioplatense Spanish (voseo)
 
@@ -149,7 +188,10 @@ plausible and still be wrong for this app:
   built-in *regular* conjugation pattern is highlighted — same highlight
   used everywhere else in the app for irregular verbs. If you marked
   something `"irregularity": "regular"` and cells still light up, that's
-  the LLM having made a mistake; fix it before confirming.
+  usually the LLM having made a mistake; fix it before confirming. The
+  exception is a spelling-only change (sacar → saqué, llegar → llegue,
+  empezar → empecé, surgir → surjo): those cells light up too, are
+  correct, and stay `"regular"` with the change described in `pattern`.
 - Duplicates are matched by infinitive/word/phrase (case- and
   accent-insensitive), same as the existing "add to list" flow — importing
   the same file twice won't create duplicate rows.

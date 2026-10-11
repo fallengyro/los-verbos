@@ -1942,10 +1942,16 @@ alter table public.rewards add constraint rewards_reason_check
 --        personal one is filled in, and its Sabido marks and practice
 --        history move to the personal-use keys, because that's what they
 --        were.
+--   4. (2026-10-11) verbs.personal_example: each use has its own example
+--      too, and the definitions no longer carry an example in parentheses
+--      (mason: "you've added the example usage with the definitions instead
+--      of examples"). Definitions and examples this file wrote earlier are
+--      replaced; ones you wrote yourself are left alone.
 -- Safe to run twice: the second run finds every verb already dative.
 -- ===========================================================================
 
 alter table public.verbs add column if not exists personal_definition text not null default '';
+alter table public.verbs add column if not exists personal_example text not null default '';
 
 create or replace function public.vosea_restore_content(p_prefer text)
 returns jsonb
@@ -1973,11 +1979,11 @@ begin
     select count(*) into n from public.verbs x where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(rv.infinitive);
     if n = 0 then
       insert into public.verbs (user_id, infinitive, definition, notes, example, type, irregularity, pattern, reflexive, transitivity,
-                                preposicion, auxiliar, gustar_like, also_personal_use, personal_definition, known, known_forms, forms_en, forms_en_sig, forms)
+                                preposicion, auxiliar, gustar_like, also_personal_use, personal_definition, personal_example, known, known_forms, forms_en, forms_en_sig, forms)
       values (uid, rv.infinitive, coalesce(rv.definition, ''), coalesce(rv.notes, ''), coalesce(rv.example, ''), coalesce(rv.type, '-ar'),
               coalesce(rv.irregularity, 'regular'), coalesce(rv.pattern, ''), coalesce(rv.reflexive, false),
               coalesce(rv.transitivity, 'transitivo'), coalesce(rv.preposicion, ''), coalesce(rv.auxiliar, false),
-              coalesce(rv.gustar_like, false), coalesce(rv.also_personal_use, false), coalesce(rv.personal_definition, ''), coalesce(rv.known, false),
+              coalesce(rv.gustar_like, false), coalesce(rv.also_personal_use, false), coalesce(rv.personal_definition, ''), coalesce(rv.personal_example, ''), coalesce(rv.known, false),
               coalesce(rv.known_forms, '{}'), coalesce(rv.forms_en, '{}'), coalesce(rv.forms_en_sig, ''), coalesce(rv.forms, '{}'));
       ins := ins + 1;
     elsif p_prefer = 'backup' then
@@ -1988,6 +1994,7 @@ begin
         transitivity = coalesce(rv.transitivity, 'transitivo'), preposicion = coalesce(rv.preposicion, ''),
         auxiliar = coalesce(rv.auxiliar, false), gustar_like = coalesce(rv.gustar_like, false),
         also_personal_use = coalesce(rv.also_personal_use, false), personal_definition = coalesce(rv.personal_definition, ''),
+        personal_example = coalesce(rv.personal_example, ''),
         known = coalesce(rv.known, false),
         known_forms = coalesce(rv.known_forms, '{}'), forms_en = coalesce(rv.forms_en, '{}'),
         forms_en_sig = coalesce(rv.forms_en_sig, ''), forms = coalesce(rv.forms, '{}')
@@ -2095,37 +2102,65 @@ $$;
 do $$
 declare r record; v record;
 begin
+  -- inf, definition, personal_definition, example, personal_example,
+  -- and what the first version of this file (and the import file) wrote:
+  -- old definition, old personal_definition, old "dativo / personal" example
   for r in select * from (values
-  ('gustar', 'to like (me gusta el café = I like coffee)', 'to be attractive to, to appeal to (someone) (vos me gustás = I like you, I''m into you)'),
-  ('encantar', 'to love, to really like (me encanta = I love it)', 'to delight, to charm (vos me encantás = I adore you)'),
-  ('apasionar', 'to be passionate about (me apasiona la música = I''m passionate about music)', 'to thrill, to inspire (someone) (ese profe apasiona a sus alumnos = that teacher inspires his students)'),
-  ('interesar', 'to be interested in (me interesa = I''m interested)', 'to interest (someone) (no me interesás = I''m not interested in you)'),
-  ('molestar', 'to be bothered by (me molesta el ruido = the noise bothers me)', 'to bother, to annoy (someone) (perdón, ¿te molesto? = sorry, am I bothering you?)'),
-  ('fascinar', 'to be fascinated by, to love (me fascina = it fascinates me, I love it)', 'to fascinate (someone) (vos me fascinás = you fascinate me)'),
-  ('faltar', 'to be missing, to be short of (me faltan mil pesos = I''m a thousand pesos short)', 'to be absent, to miss (an event) (falté a clase = I missed class)'),
-  ('doler', 'to hurt, to ache (me duele la cabeza = my head hurts)', 'to hurt (someone) emotionally (me dolés cuando me hablás así = it hurts me when you talk to me like that)'),
-  ('importar', 'to matter, to care (no me importa = I don''t care)', 'to matter (to someone) (vos me importás = I care about you)'),
-  ('parecer', 'to think, to seem (to someone) (me parece bien = I think it''s fine)', 'to seem, to look (parecés de acá = you seem like a local)'),
-  ('aburrir', 'to be bored by (me aburre = it bores me)', 'to bore (someone) (¿te aburro? = am I boring you?)'),
-  ('sorprender', 'to be surprised by (me sorprende = it surprises me)', 'to surprise (someone) (te sorprendí = I surprised you)'),
-  ('pasar', 'to happen (to someone) (¿qué te pasó? = what happened to you?)', 'to pass, to come by; to spend (time) (pasé por tu casa = I came by your place)'),
-  ('quedar', 'to have left; to fit, to suit (me quedan dos = I have two left; te queda bien = it suits you)', 'to agree (to do something); to end up (quedamos en vernos a las ocho = we agreed to meet at eight)'),
-  ('tocar', 'to be someone''s turn; to get (by luck or draw) (te toca a vos = it''s your turn)', 'to touch; to play (an instrument) (toco la guitarra = I play guitar)'),
-  ('caer', 'to come across (well or badly) to someone (me cae bien = I like him/her)', 'to fall; to show up (caí a la fiesta sin avisar = I showed up at the party unannounced)'),
-  ('preocupar', 'to be worried about (me preocupa = it worries me)', 'to worry (someone) (no te quiero preocupar = I don''t want to worry you)'),
-  ('costar', 'to be hard (for someone) (me cuesta = it''s hard for me)', 'to cost (¿cuánto cuesta? = how much does it cost?)'),
-  ('sobrar', 'to have extra, to be left over (me sobra tiempo = I have time to spare)', 'to be in the way, to be one too many (acá sobro = I''m in the way here)'),
-  ('convenir', 'to suit, to be good for (me conviene = it''s better for me)', 'to agree (on) (convinimos un precio = we agreed on a price)')
-  ) as d(inf, def, pdef) loop
-    for v in select x.id, x.user_id, x.gustar_like, x.known_forms from public.verbs x where lower(trim(x.infinitive)) = r.inf loop
+  ('gustar', 'to like', 'to be attractive to, to appeal to (someone)', 'Me gustan las medialunas.', 'Creo que le gustás.',
+   'to like (me gusta el café = I like coffee)', 'to be attractive to, to appeal to (someone) (vos me gustás = I like you, I''m into you)', 'Me gustan las medialunas. / Creo que le gustás.'),
+  ('encantar', 'to love, to really like', 'to delight, to charm', 'Me encanta Buenos Aires.', 'Tu abuela me encanta: es divina.',
+   'to love, to really like (me encanta = I love it)', 'to delight, to charm (vos me encantás = I adore you)', 'Me encanta Buenos Aires. / Tu abuela me encanta: es divina.'),
+  ('apasionar', 'to be passionate about', 'to thrill, to inspire (someone)', 'Me apasiona el tango.', 'Cuando habla de fútbol, apasiona a cualquiera.',
+   'to be passionate about (me apasiona la música = I''m passionate about music)', 'to thrill, to inspire (someone) (ese profe apasiona a sus alumnos = that teacher inspires his students)', 'Me apasiona el tango. / Cuando habla de fútbol, apasiona a cualquiera.'),
+  ('interesar', 'to be interested in', 'to interest (someone)', 'Me interesa la historia argentina.', 'Me parece que le interesás.',
+   'to be interested in (me interesa = I''m interested)', 'to interest (someone) (no me interesás = I''m not interested in you)', 'Me interesa la historia argentina. / Me parece que le interesás.'),
+  ('molestar', 'to be bothered by', 'to bother, to annoy (someone)', 'Me molesta el humo.', 'Perdón, ¿te molesto un segundo?',
+   'to be bothered by (me molesta el ruido = the noise bothers me)', 'to bother, to annoy (someone) (perdón, ¿te molesto? = sorry, am I bothering you?)', 'Me molesta el humo. / Perdón, ¿te molesto un segundo?'),
+  ('fascinar', 'to be fascinated by, to love', 'to fascinate (someone)', 'Me fascinan los mercados.', 'Ese mago fascina a los chicos.',
+   'to be fascinated by, to love (me fascina = it fascinates me, I love it)', 'to fascinate (someone) (vos me fascinás = you fascinate me)', 'Me fascinan los mercados. / Ese mago fascina a los chicos.'),
+  ('faltar', 'to be missing, to be short of', 'to be absent, to miss (an event)', 'Me falta un huevo para la torta.', 'Ayer falté a la clase de español.',
+   'to be missing, to be short of (me faltan mil pesos = I''m a thousand pesos short)', 'to be absent, to miss (an event) (falté a clase = I missed class)', 'Me falta un huevo para la torta. / Ayer falté a la clase de español.'),
+  ('doler', 'to hurt, to ache', 'to hurt (someone) emotionally', 'Me duelen los pies.', 'Me dolés cuando me hablás así.',
+   'to hurt, to ache (me duele la cabeza = my head hurts)', 'to hurt (someone) emotionally (me dolés cuando me hablás así = it hurts me when you talk to me like that)', 'Me duelen los pies. / Me dolés cuando me hablás así.'),
+  ('importar', 'to matter, to care', 'to matter (to someone)', 'No me importa el precio.', 'Vos me importás mucho.',
+   'to matter, to care (no me importa = I don''t care)', 'to matter (to someone) (vos me importás = I care about you)', 'No me importa el precio. / Vos me importás mucho.'),
+  ('parecer', 'to think, to seem (to someone)', 'to seem, to look', 'Me parece que va a llover.', 'Parecés de acá, eh.',
+   'to think, to seem (to someone) (me parece bien = I think it''s fine)', 'to seem, to look (parecés de acá = you seem like a local)', 'Me parece que va a llover. / Parecés de acá, eh.'),
+  ('aburrir', 'to be bored by', 'to bore (someone)', 'Me aburren las reuniones largas.', 'Perdón, ¿los aburro con esto?',
+   'to be bored by (me aburre = it bores me)', 'to bore (someone) (¿te aburro? = am I boring you?)', 'Me aburren las reuniones largas. / Perdón, ¿los aburro con esto?'),
+  ('sorprender', 'to be surprised by', 'to surprise (someone)', 'Me sorprendió el precio.', 'Te sorprendí con la torta, ¿no?',
+   'to be surprised by (me sorprende = it surprises me)', 'to surprise (someone) (te sorprendí = I surprised you)', 'Me sorprendió el precio. / Quiero sorprender a mi pareja.'),
+  ('pasar', 'to happen (to someone)', 'to pass, to come by; to spend (time)', '¿Qué te pasó en la mano?', 'Paso por tu casa a las ocho.',
+   'to happen (to someone) (¿qué te pasó? = what happened to you?)', 'to pass, to come by; to spend (time) (pasé por tu casa = I came by your place)', '¿Qué te pasó en la mano? / Paso por tu casa a las ocho.'),
+  ('quedar', 'to have left; to fit, to suit', 'to agree (to do something); to end up', 'Ese saco te queda bárbaro.', 'Quedamos en vernos en la esquina a las nueve.',
+   'to have left; to fit, to suit (me quedan dos = I have two left; te queda bien = it suits you)', 'to agree (to do something); to end up (quedamos en vernos a las ocho = we agreed to meet at eight)', 'Ese saco te queda bárbaro. / Quedamos en vernos en la esquina a las nueve.'),
+  ('tocar', 'to be someone''s turn; to get (by luck or draw)', 'to touch; to play (an instrument)', '¿A quién le toca pagar?', 'Mi vecino toca el piano.',
+   'to be someone''s turn; to get (by luck or draw) (te toca a vos = it''s your turn)', 'to touch; to play (an instrument) (toco la guitarra = I play guitar)', '¿A quién le toca pagar? / Mi vecino toca el piano.'),
+  ('caer', 'to come across (well or badly) to someone', 'to fall; to show up', 'Tu hermano me cae re bien.', 'Caí a tu casa sin avisar.',
+   'to come across (well or badly) to someone (me cae bien = I like him/her)', 'to fall; to show up (caí a la fiesta sin avisar = I showed up at the party unannounced)', 'Tu hermano me cae re bien. / Caí a tu casa sin avisar.'),
+  ('preocupar', 'to be worried about', 'to worry (someone)', 'Me preocupa la inflación.', 'Perdón, te preocupé con el mensaje.',
+   'to be worried about (me preocupa = it worries me)', 'to worry (someone) (no te quiero preocupar = I don''t want to worry you)', 'Me preocupa la inflación. / No quiero preocupar a mi mamá.'),
+  ('costar', 'to be hard (for someone)', 'to cost', 'Me cuesta entender el lunfardo.', '¿Cuánto cuesta el kilo de tomates?',
+   'to be hard (for someone) (me cuesta = it''s hard for me)', 'to cost (¿cuánto cuesta? = how much does it cost?)', 'Me cuesta entender el lunfardo. / ¿Cuánto cuesta el kilo de tomates?'),
+  ('sobrar', 'to have extra, to be left over', 'to be in the way, to be one too many', 'Nos sobró comida.', 'Me parece que sobramos en esta reunión.',
+   'to have extra, to be left over (me sobra tiempo = I have time to spare)', 'to be in the way, to be one too many (acá sobro = I''m in the way here)', 'Nos sobró comida. / Me parece que sobramos en esta reunión.'),
+  ('convenir', 'to suit, to be good for', 'to agree (on)', 'Te conviene sacar el turno hoy.', 'Convinimos un precio con el dueño.',
+   'to suit, to be good for (me conviene = it''s better for me)', 'to agree (on) (convinimos un precio = we agreed on a price)', 'Te conviene sacar el turno hoy. / Convinimos un precio con el dueño.')
+  ) as d(inf, def, pdef, ex, pex, odef, opdef, oex) loop
+    for v in select x.id, x.user_id, x.gustar_like, x.known_forms, x.example from public.verbs x where lower(trim(x.infinitive)) = r.inf loop
       if v.gustar_like then
-        update public.verbs set personal_definition = r.pdef, also_personal_use = true
-          where id = v.id and personal_definition = '';
+        update public.verbs set definition = r.def where id = v.id and definition = r.odef;
+        update public.verbs set personal_definition = r.pdef where id = v.id and personal_definition in ('', r.opdef);
+        update public.verbs set example = r.ex where id = v.id and example in ('', r.oex);
+        update public.verbs set personal_example = r.pex where id = v.id and personal_example = '';
         update public.verbs set also_personal_use = true where id = v.id;
       else
+        -- a plain verb until now: what you had was the personal use
         update public.verbs set
           gustar_like = true, also_personal_use = true,
           definition = r.def, personal_definition = r.pdef,
+          personal_example = case when coalesce(v.example, '') <> '' then v.example else r.pex end,
+          example = r.ex,
           known_forms = (select coalesce(jsonb_object_agg(case when e.k ~ '^(presente|preterito|imperfecto|futuro|condicional|subjPresente|subjPasado)\|(yo|vos|el|nosotros|ellos)$' then e.k || '|p' else e.k end, e.val), '{}'::jsonb)
                          from jsonb_each(coalesce(v.known_forms, '{}'::jsonb)) as e(k, val))
           where id = v.id;
