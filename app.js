@@ -526,6 +526,8 @@
       esc_noise_high: "Alto",
       esc_swap: "Cambiar voces",
       esc_uses: "Usa",
+      esc_temas: "Temas",
+      esc_tema_aria: "Abrir el tema {name}",
       esc_best: "Tu mejor vuelta:",
       esc_first_try: "{ok} de {total} al primer intento",
       esc_before: "antes: {n}",
@@ -1444,6 +1446,8 @@
       esc_noise_high: "High",
       esc_swap: "Swap voices",
       esc_uses: "Uses",
+      esc_temas: "Topics",
+      esc_tema_aria: "Open the topic {name}",
       esc_best: "Your best run:",
       esc_first_try: "{ok} of {total} on the first try",
       esc_before: "before: {n}",
@@ -11528,6 +11532,12 @@
     box.appendChild(list);
     box.appendChild(progEl("p", "play-fine", t("esc_fine")));
   }
+  function escOpenTema(id) {
+    if (!topicById(id)) return;
+    setMainTab("topics");
+    selectTopic(id);
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
   function drawEscStart(sc) {
     var box = el.escBody;
     var voices = escVoices(sc), cast = escCast(sc, voices);
@@ -11579,6 +11589,23 @@
       nz.appendChild(nseg);
       box.appendChild(nz);
       if (lvl !== "off") box.appendChild(progEl("p", "esc-noise-where", topicText(sc.ruido.where || { es: "", en: "" })));
+    }
+    // the Temas it uses (2026-10-11, mason: "better tie the escenas in to
+    // the rest of the app… tag them with the temas encountered in them"):
+    // each chip opens that Tema on the Temas tab.
+    var temas = (sc.temas || []).map(topicById).filter(Boolean);
+    if (temas.length) {
+      box.appendChild(progEl("div", "esc-label", t("esc_temas")));
+      var tchips = progEl("div", "esc-chips esc-temas");
+      temas.forEach(function (tm) {
+        var tb = progEl("button", "esc-chip esc-tema", topicText(tm.name));
+        tb.type = "button";
+        tb.setAttribute("data-tema", tm.id);
+        tb.setAttribute("aria-label", t("esc_tema_aria", { name: topicText(tm.name) }));
+        tb.addEventListener("click", function () { escOpenTema(tm.id); });
+        tchips.appendChild(tb);
+      });
+      box.appendChild(tchips);
     }
     var tp = escTopic(sc);
     if (tp) {
