@@ -540,6 +540,8 @@
       esc_analyse_error: "No se pudo analizar ({why}). Probá de nuevo.",
       esc_tap_heard: "Tocá lo que escuchaste.",
       esc_better: "Mejor: «{best}»",
+      esc_alts_n: "otras formas ({n})",
+      esc_also: "También: {list}",
       esc_it_was: "Era {v}",
       esc_try_again: "Probar de nuevo",
       esc_continue: "Seguir",
@@ -1416,6 +1418,8 @@
       esc_analyse_error: "Couldn't check it ({why}). Try again.",
       esc_tap_heard: "Tap what you heard.",
       esc_better: "Better: “{best}”",
+      esc_alts_n: "other ways ({n})",
+      esc_also: "Also: {list}",
       esc_it_was: "It was {v}",
       esc_try_again: "Try again",
       esc_continue: "Continue",
@@ -7639,6 +7643,7 @@
   var HABLAR_UNSURE_FLOOR = 75;
   var HABLAR_TIMEOUT_MS = 20000;
   var hablarStream = null;
+  var HABLAR_SETTLE_MS = 450;
   var hablarStreamPromise = null;
   var hablarRec = null;      // the recording in progress: { card, mr, chunks, started, tick, auto, cancelled }
   var hablarBusyCard = null; // the card whose recording is being analysed
@@ -7676,7 +7681,14 @@
         tr.addEventListener("mute", bad);
         tr.addEventListener("ended", bad);
       });
-      hablarStream = st; hablarStreamPromise = null; return st;
+      // A brand-new stream on the iPhone records silence for its first
+      // moments (mason, 2026-10-10: in Escenas the first try of every turn
+      // came back empty — the other person's line had muted the old stream,
+      // so each tap opened a new one). Let it settle before handing it out.
+      st._at = Date.now();
+      return new Promise(function (res) { setTimeout(res, HABLAR_SETTLE_MS); }).then(function () {
+        hablarStream = st; hablarStreamPromise = null; return st;
+      });
     }, function (err) { hablarStreamPromise = null; throw err; });
     return hablarStreamPromise;
   }
@@ -8862,7 +8874,7 @@
   var ESCENAS = window.VOSEA_ESCENAS || [];
   var SCENE_TOPICS = ESCENAS.map(function (sc) {
     return { id: "esc-" + sc.id, type: "pack", hidden: true, scene: sc.id, level: sc.level,
-      name: L("Escena · " + sc.name.es, "Scene · " + sc.name.en), desc: L(sc.sub.es, sc.sub.en), tag: L("escena", "scene"),
+      name: L("Escena · " + escG(sc.name.es, escDefG(sc)), "Scene · " + escG(sc.name.en, escDefG(sc))), desc: L(escG(sc.sub.es, escDefG(sc)), escG(sc.sub.en, escDefG(sc))), tag: L("escena", "scene"),
       items: (sc.prep || []).map(function (it) { return Object.assign({}, it); }) };
   });
   SCENE_TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
@@ -10641,6 +10653,40 @@
     try { localStorage.setItem(ESC_VOICES_KEY, JSON.stringify(all)); } catch (e) {}
   }
 
+  // ---- who the roles are: each role's gender follows its voice ----
+  // (mason, 2026-10-10: with Tomás as the clerk the cue still said "wish
+  // her the same".) Elena plays a woman and Tomás a man. A role has f / m
+  // forms of its name and sub, and any text in a scene can say
+  // {key:feminine|masculine} — the cue, the lines, the best answer. A
+  // scene is "cast" for the voices chosen before it's shown or played.
+  var ESC_VOICE_G = { elena: "f", tomas: "m" };
+  function escGenders(sc, voices) {
+    var g = {};
+    sc.roles.forEach(function (r) { g[r.key] = ESC_VOICE_G[voices[r.key] || r.voice] || "f"; });
+    return g;
+  }
+  function escDefG(sc) { var g = {}; sc.roles.forEach(function (r) { g[r.key] = r.voice === "tomas" ? "m" : "f"; }); return g; } // each role in its default voice
+  function escG(str, g) {
+    return String(str).replace(/\{(\w+):([^{}|]*)\|([^{}|]*)\}/g, function (all, k, f, m) { return g[k] === "m" ? m : (g[k] === "f" ? f : all); });
+  }
+  function escCast(sc, voices) {
+    var base = sc._base || sc, g = escGenders(base, voices || escVoices(base));
+    function walk(v) {
+      if (typeof v === "string") return escG(v, g);
+      if (Array.isArray(v)) return v.map(walk);
+      if (v && typeof v === "object") { var o = {}; Object.keys(v).forEach(function (k) { o[k] = walk(v[k]); }); return o; }
+      return v;
+    }
+    var out = walk(base);
+    out.roles = base.roles.map(function (r) {
+      var form = r[g[r.key]] || r, o = walk(r);
+      o.name = walk(form.name || r.name); o.sub = walk(form.sub || r.sub);
+      return o;
+    });
+    out._base = base; out._g = g;
+    return out;
+  }
+
   // ---- records + unlocking ----
   function escStars(ok, total) { if (!total) return 0; var f = ok / total; return f >= 1 ? 3 : (f >= 0.7 ? 2 : 1); }
   function escRecords(id) {
@@ -10715,13 +10761,14 @@
       if (open) { row.type = "button"; row.addEventListener("click", function () { openEscenas(true, sc.id); }); }
       row.setAttribute("data-scene", sc.id);
       var top = progEl("div", "esc-row-top");
-      var name = progEl("span", "esc-row-name", (open ? "" : "🔒 ") + topicText(sc.name));
+      var cs = escCast(sc);
+      var name = progEl("span", "esc-row-name", (open ? "" : "🔒 ") + topicText(cs.name));
       if (sc.roles.length > 1) name.appendChild(progEl("span", "esc-two", t("esc_two_voices")));
       top.appendChild(name);
       top.appendChild(escStarsNode(b.stars));
       row.appendChild(top);
       var miss = open ? [] : escMissing(sc);
-      row.appendChild(progEl("div", "esc-row-sub", open ? topicText(sc.sub) + " · " + t("esc_turns", { n: escSceneTurns(sc) }) : t("esc_missing_n", { n: miss.length })));
+      row.appendChild(progEl("div", "esc-row-sub", open ? topicText(cs.sub) + " · " + t("esc_turns", { n: escSceneTurns(sc) }) : t("esc_missing_n", { n: miss.length })));
       if (!open) {
         var lb = progEl("div", "esc-lock");
         lb.appendChild(progEl("p", null, t("esc_missing_intro", { n: miss.length })));
@@ -10739,12 +10786,12 @@
   }
   function drawEscStart(sc) {
     var box = el.escBody;
-    el.escHeadTitle.textContent = topicText(sc.name);
-    el.escHeadDesc.textContent = topicText(sc.desc);
+    var voices = escVoices(sc), cast = escCast(sc, voices);
+    el.escHeadTitle.textContent = topicText(cast.name);
+    el.escHeadDesc.textContent = topicText(cast.desc);
     el.escBack.textContent = "‹ " + t("esc_title");
-    var voices = escVoices(sc);
     box.appendChild(progEl("div", "esc-label", t("esc_who")));
-    sc.roles.forEach(function (r, i) {
+    cast.roles.forEach(function (r, i) {
       var row = progEl("div", "esc-role");
       row.appendChild(progEl("span", "esc-av esc-av-" + i, escInitial(r)));
       var nm = progEl("span", "esc-role-n", topicText(r.name));
@@ -10803,13 +10850,13 @@
   // ---- playing ----
   function escPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
   function escSayValue(name, v) {
-    if (typeof v === "number") return name === "precio" ? pesosWords(v) : numWords(v);
+    if (typeof v === "number") return /^precio/.test(name) ? pesosWords(v) : numWords(v);
     var m = /^(\d{1,2}):(\d{2})$/.exec(String(v));
     if (m) return horaWords(Number(m[1]), Number(m[2]))[0];
     return String(v);
   }
   function escShowValue(name, v) {
-    if (typeof v === "number") return name === "precio" ? "$" + numDigits(v) : String(v);
+    if (typeof v === "number") return /^precio/.test(name) ? "$" + numDigits(v) : String(v);
     return String(v);
   }
   function escLine(p, i) {
@@ -10821,6 +10868,7 @@
   }
   function escStart(sc) {
     if (!escCanPlay()) return;
+    sc = escCast(sc);
     hablarPrepareMic(); // the permission prompt comes up on this tap
     unlockTtsAudio();
     var vals = {};
@@ -10857,7 +10905,11 @@
       return new Promise(function (resolve) {
         if (!escAudio) escAudio = new Audio();
         var a = escAudio, done = false;
-        function fin() { if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; if (bubble) bubble.classList.remove("is-playing"); resolve(true); }
+        function fin() {
+          if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; if (bubble) bubble.classList.remove("is-playing");
+          if (escPlay && escPlay.cur && escPlay.cur.step.you && !escPlay.rec && !escPlay.busy) hablarPrepareMic(); // a replay during your turn
+          resolve(true);
+        }
         var guard = setTimeout(fin, 15000);
         a.onended = fin; a.onerror = fin;
         a.src = r.src;
@@ -10912,6 +10964,33 @@
     escScroll();
     return wrap;
   }
+  // Other ways to say a turn, behind a small "otras formas (n)" — the
+  // best answer (unless it was just shown as "Mejor") and the alts,
+  // minus what you said.
+  function escOtherWays(step, said, bestShown) {
+    var seen = {}, out = [];
+    var saidN = speechNorm(said || "");
+    [step.best].concat(step.alts || []).forEach(function (x, i) {
+      var n = speechNorm(x);
+      if (!n || seen[n] || n === saidN || (i === 0 && bestShown)) return;
+      seen[n] = true; out.push(x);
+    });
+    return out;
+  }
+  function escAltsInto(wrap, step, said, bestShown) {
+    var list = escOtherWays(step, said, bestShown);
+    if (!list.length) return;
+    var bub = wrap.querySelector(".esc-bub") || wrap;
+    var btn = progEl("button", "esc-alts-btn", t("esc_alts_n", { n: list.length }));
+    btn.type = "button";
+    var box = progEl("span", "esc-alts");
+    box.hidden = true;
+    list.forEach(function (x) { box.appendChild(progEl("span", "esc-alt", "«" + x + "»")); });
+    btn.addEventListener("click", function () { box.hidden = !box.hidden; btn.setAttribute("aria-expanded", box.hidden ? "false" : "true"); escScroll(); });
+    btn.setAttribute("aria-expanded", "false");
+    bub.appendChild(btn);
+    bub.appendChild(box);
+  }
   function escRevealPending(p) { p.pending.forEach(function (b) { b.reveal(); }); p.pending = []; }
 
   function escNext() {
@@ -10961,6 +11040,9 @@
     if (mode === "listen") { box.appendChild(progEl("div", "esc-turn-lbl", t("esc_listening"))); return; }
     var s = p.cur && p.cur.step;
     if (mode === "speak" || mode === "retry") {
+      // the lines just played may have muted the mic stream: get a good
+      // one now, while you read the cue, not when you tap
+      if (!p.rec && !p.busy) hablarPrepareMic();
       box.appendChild(progEl("div", "esc-turn-lbl", t("esc_your_turn")));
       box.appendChild(progEl("p", "esc-cue", s.you));
       var hint = progEl("p", "esc-hint", (extra && extra.hint) || t("esc_tap_mic"));
@@ -11063,13 +11145,14 @@
     (step.wrong || []).forEach(function (w) { if (!wrong && (w.said || []).some(function (x) { return escSpec(x, heard); })) wrong = w; });
     if (wrong) { res.auto_grade = "otra"; res.rule = "wrong"; res.wrong = wrong; return res; }
     if (heard && (step.ok || []).some(function (spec) { return escSpec(spec, heard); })) { res.auto_grade = "bien"; res.rule = "transcript"; return res; }
+    if (heard && [step.best].concat(step.alts || []).some(function (x) { return speechMatches(x, heard); })) { res.auto_grade = "bien"; res.rule = "transcript"; return res; }
     return res; // score / unsure / nothing / none, as in Hablar
   }
   function escAnalyse(p, blob, recMs) {
     var step = p.cur.step;
     p.busy = true;
     escTurnPanel("speak", { hint: t("esc_checking") });
-    var answers = (step.ok || []).filter(function (x) { return typeof x === "string"; });
+    var answers = (step.ok || []).filter(function (x) { return typeof x === "string"; }).concat(step.alts || []);
     var payload = null;
     function send(retried) {
       var call = supabaseClient.functions.invoke("stt", { body: payload }).then(function (res) {
@@ -11091,7 +11174,7 @@
       p.busy = false;
       var r = escJudge(step, res.data);
       r.rec_ms = recMs;
-      if (r.rule === "nothing") { escTurnPanel("speak", { hint: t("esc_heard_nothing") }); return; }
+      if (r.rule === "nothing") { hablarDropStream(); escTurnPanel("speak", { hint: t("esc_heard_nothing") }); return; }
       if (r.auto_grade === "bien") { escResolve("bien", r, {}); return; }
       if (r.auto_grade === "otra") { escResolve("otra", r, {}); return; }
       // not sure: you decide
@@ -11114,13 +11197,15 @@
     p.cur.tries++;
     var first = p.cur.tries === 1;
     var heardShown = r ? speechCleanShown(r.heard_display || r.heard) : "";
+    var mine = null;
     if (!how.userGraded) {
-      if (grade === "bien") escMine("ok", heardShown || step.best);
-      else if (!how.skipped) escMine("miss", heardShown, t("esc_better", { best: step.best }));
+      if (grade === "bien") mine = escMine("ok", heardShown || step.best);
+      else if (!how.skipped) mine = escMine("miss", heardShown, t("esc_better", { best: step.best }));
     } else {
       var last = el.escChat.lastElementChild;
-      if (last && last.classList.contains("is-unsure")) { last.classList.remove("is-unsure"); last.classList.add(grade === "bien" ? "is-ok" : "is-miss"); var mk = last.querySelector(".esc-mark"); if (mk) mk.textContent = grade === "bien" ? "✓" : "≠"; if (grade !== "bien") last.firstChild.appendChild(progEl("span", "esc-sub", t("esc_better", { best: step.best }))); }
+      if (last && last.classList.contains("is-unsure")) { mine = last; last.classList.remove("is-unsure"); last.classList.add(grade === "bien" ? "is-ok" : "is-miss"); var mk = last.querySelector(".esc-mark"); if (mk) mk.textContent = grade === "bien" ? "✓" : "≠"; if (grade !== "bien") last.firstChild.appendChild(progEl("span", "esc-sub", t("esc_better", { best: step.best }))); }
     }
+    if (mine && first) escAltsInto(mine, step, heardShown, grade !== "bien");
     escRevealPending(p);
     if (first) {
       p.results.push({ kind: "speak", step: step, ok: grade === "bien", said: heardShown, skipped: !!how.skipped });
@@ -11196,6 +11281,7 @@
       line.appendChild(progEl("span", "esc-mark", r.ok ? "✓" : "≠"));
       var main = progEl("span", null, r.kind === "check" ? r.answer : r.step.best);
       if (!r.ok) main.appendChild(progEl("span", "esc-said", r.kind === "check" ? t("esc_you_chose", { v: r.said }) : (r.skipped ? t("esc_skipped") : t("esc_you_said", { said: r.said || "—" }))));
+      if (r.kind === "speak" && (r.step.alts || []).length) main.appendChild(progEl("span", "esc-said esc-also", t("esc_also", { list: r.step.alts.map(function (x) { return "«" + x + "»"; }).join(" · ") })));
       line.appendChild(main);
       recap.appendChild(line);
     });
@@ -11205,7 +11291,7 @@
     var btns = progEl("div", "esc-end-btns");
     var sc = p.sc;
     if (missedPrep.length) btns.appendChild(progButton(t("esc_review_n", { n: missedPrep.length }), false, function () { escClose(); startPracticeDeck(escPrepDeck(sc, missedPrep)); }));
-    btns.appendChild(progButton(t("esc_again"), true, function () { escStart(sc); }));
+    btns.appendChild(progButton(t("esc_again"), true, function () { escStart(sc._base || sc); }));
     box.appendChild(btns);
     var close = progButton(t("close"), false, escClose);
     close.classList.add("esc-end-close");
