@@ -1914,3 +1914,228 @@ alter table public.game_records add constraint game_records_game_check
 alter table public.rewards drop constraint if exists rewards_reason_check;
 alter table public.rewards add constraint rewards_reason_check
   check (reason ~ '^(racha:\d{4}-\d{2}-\d{2}:\d{1,4}|hablar(50|100):\d{4}-\d{2}-\d{2}|combo20:\d{4}-\d{2}-\d{2}|crono:[a-z0-9:-]{1,48}:\d{4}-\d{2}-\d{2}|reto:[0-9a-f-]{36}:\d{4}-\d{2}-\d{2}|escena:[a-z0-9-]{1,40})$');
+
+-- ===========================================================================
+-- 2026-10-10 — dative verbs: two uses, two definitions (commit 72)
+-- ===========================================================================
+-- mason: "For the gustar-like verbs, I only identified one verb that was
+-- both dative and personal (standard indicative), but of course there are
+-- several... We need to make sure we capture the standard and gustar like
+-- conjugations for all of them. Furthermore, the definition changes subtly
+-- depending on how the verb is used."
+--
+-- Every dative ("tipo gustar") verb now has both uses in the app: the dative
+-- one ("me pasa / me pasan", verbs.definition) and the personal one, with
+-- the person as the subject ("paso, pasás…", the new
+-- verbs.personal_definition). Each use has its own flashcards; the
+-- personal-use ones are keyed "<tense>|<person>|p" in known_forms,
+-- forms_en and practice_log.form_key.
+--
+-- This file:
+--   1. adds verbs.personal_definition;
+--   2. teaches the restore function about it;
+--   3. for these 20 verbs in every account:
+--      - a verb that was already dative keeps its definition and gets the
+--        personal one (unless it already has one);
+--      - a verb that was a plain verb until now (pasar, quedar, tocar…)
+--        becomes dative: its definition becomes the dative meaning and the
+--        personal one is filled in, and its Sabido marks and practice
+--        history move to the personal-use keys, because that's what they
+--        were.
+-- Safe to run twice: the second run finds every verb already dative.
+-- ===========================================================================
+
+alter table public.verbs add column if not exists personal_definition text not null default '';
+
+create or replace function public.vosea_restore_content(p_prefer text)
+returns jsonb
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  b record;
+  r jsonb; it jsonb;
+  rv public.verbs; rw public.words; rp public.phrases;
+  ins int := 0; ovw int := 0; kept int := 0;
+  lnew int := 0; lmerged int := 0; iadd int := 0;
+  lid uuid; tok text; ikey text; n int;
+  padd int := 0; radd int := 0; gadd int := 0;
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  if p_prefer is null or p_prefer not in ('backup', 'active') then raise exception 'bad_prefer'; end if;
+  select * into b from public.content_backups where user_id = uid;
+  if not found then raise exception 'no_backup'; end if;
+
+  for r in select * from jsonb_array_elements(b.data->'verbs') loop
+    rv := jsonb_populate_record(null::public.verbs, r);
+    select count(*) into n from public.verbs x where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(rv.infinitive);
+    if n = 0 then
+      insert into public.verbs (user_id, infinitive, definition, notes, example, type, irregularity, pattern, reflexive, transitivity,
+                                preposicion, auxiliar, gustar_like, also_personal_use, personal_definition, known, known_forms, forms_en, forms_en_sig, forms)
+      values (uid, rv.infinitive, coalesce(rv.definition, ''), coalesce(rv.notes, ''), coalesce(rv.example, ''), coalesce(rv.type, '-ar'),
+              coalesce(rv.irregularity, 'regular'), coalesce(rv.pattern, ''), coalesce(rv.reflexive, false),
+              coalesce(rv.transitivity, 'transitivo'), coalesce(rv.preposicion, ''), coalesce(rv.auxiliar, false),
+              coalesce(rv.gustar_like, false), coalesce(rv.also_personal_use, false), coalesce(rv.personal_definition, ''), coalesce(rv.known, false),
+              coalesce(rv.known_forms, '{}'), coalesce(rv.forms_en, '{}'), coalesce(rv.forms_en_sig, ''), coalesce(rv.forms, '{}'));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.verbs x set definition = coalesce(rv.definition, ''), notes = coalesce(rv.notes, ''),
+        example = coalesce(rv.example, ''), type = coalesce(rv.type, '-ar'),
+        irregularity = coalesce(rv.irregularity, 'regular'),
+        pattern = coalesce(rv.pattern, ''), reflexive = coalesce(rv.reflexive, false),
+        transitivity = coalesce(rv.transitivity, 'transitivo'), preposicion = coalesce(rv.preposicion, ''),
+        auxiliar = coalesce(rv.auxiliar, false), gustar_like = coalesce(rv.gustar_like, false),
+        also_personal_use = coalesce(rv.also_personal_use, false), personal_definition = coalesce(rv.personal_definition, ''),
+        known = coalesce(rv.known, false),
+        known_forms = coalesce(rv.known_forms, '{}'), forms_en = coalesce(rv.forms_en, '{}'),
+        forms_en_sig = coalesce(rv.forms_en_sig, ''), forms = coalesce(rv.forms, '{}')
+      where x.user_id = uid and vosea_norm(x.infinitive) = vosea_norm(rv.infinitive);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'words') loop
+    rw := jsonb_populate_record(null::public.words, r);
+    select count(*) into n from public.words x where x.user_id = uid and vosea_norm(x.word) = vosea_norm(rw.word);
+    if n = 0 then
+      insert into public.words (user_id, word, definition, part_of_speech, gender, notes, example, known)
+      values (uid, rw.word, coalesce(rw.definition, ''), coalesce(rw.part_of_speech, 'sustantivo'), coalesce(rw.gender, ''),
+              coalesce(rw.notes, ''), coalesce(rw.example, ''), coalesce(rw.known, false));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.words x set definition = coalesce(rw.definition, ''), part_of_speech = coalesce(rw.part_of_speech, 'sustantivo'),
+        gender = coalesce(rw.gender, ''), notes = coalesce(rw.notes, ''), example = coalesce(rw.example, ''), known = coalesce(rw.known, false)
+      where x.user_id = uid and vosea_norm(x.word) = vosea_norm(rw.word);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'phrases') loop
+    rp := jsonb_populate_record(null::public.phrases, r);
+    select count(*) into n from public.phrases x where x.user_id = uid and vosea_norm(x.phrase) = vosea_norm(rp.phrase);
+    if n = 0 then
+      insert into public.phrases (user_id, phrase, definition, function, register, idiomatic, literal, notes, example, known)
+      values (uid, rp.phrase, coalesce(rp.definition, ''), coalesce(rp.function, 'otro'), coalesce(rp.register, 'neutro'),
+              coalesce(rp.idiomatic, false), coalesce(rp.literal, ''), coalesce(rp.notes, ''), coalesce(rp.example, ''), coalesce(rp.known, false));
+      ins := ins + 1;
+    elsif p_prefer = 'backup' then
+      update public.phrases x set definition = coalesce(rp.definition, ''), function = coalesce(rp.function, 'otro'),
+        register = coalesce(rp.register, 'neutro'), idiomatic = coalesce(rp.idiomatic, false), literal = coalesce(rp.literal, ''),
+        notes = coalesce(rp.notes, ''), example = coalesce(rp.example, ''), known = coalesce(rp.known, false)
+      where x.user_id = uid and vosea_norm(x.phrase) = vosea_norm(rp.phrase);
+      ovw := ovw + 1;
+    else
+      kept := kept + 1;
+    end if;
+  end loop;
+
+  for r in select * from jsonb_array_elements(b.data->'lists') loop
+    select x.id into lid from public.lists x where x.user_id = uid and vosea_norm(x.name) = vosea_norm(r->>'name') order by x.created_at limit 1;
+    if lid is null then
+      tok := r->>'share_token';
+      if tok is null or exists (select 1 from public.lists x where x.share_token = tok) then
+        insert into public.lists (user_id, name, owner_label, share_enabled)
+        values (uid, r->>'name', coalesce(r->>'owner_label', ''), coalesce((r->>'share_enabled')::boolean, true)) returning id into lid;
+      else
+        insert into public.lists (user_id, name, owner_label, share_token, share_enabled)
+        values (uid, r->>'name', coalesce(r->>'owner_label', ''), tok, coalesce((r->>'share_enabled')::boolean, true)) returning id into lid;
+      end if;
+      lnew := lnew + 1;
+    else
+      lmerged := lmerged + 1;
+    end if;
+    for it in select * from jsonb_array_elements(coalesce(r->'items', '[]')) loop
+      ikey := vosea_norm(coalesce(it->'data'->>'infinitive', it->'data'->>'word', it->'data'->>'phrase'));
+      if exists (select 1 from public.list_items i where i.list_id = lid and i.item_type = it->>'item_type'
+                 and vosea_norm(coalesce(i.data->>'infinitive', i.data->>'word', i.data->>'phrase')) = ikey) then
+        if p_prefer = 'backup' then
+          delete from public.list_items i where i.list_id = lid and i.item_type = it->>'item_type'
+            and vosea_norm(coalesce(i.data->>'infinitive', i.data->>'word', i.data->>'phrase')) = ikey;
+          insert into public.list_items (list_id, item_type, data) values (lid, it->>'item_type', it->'data');
+        end if;
+      else
+        insert into public.list_items (list_id, item_type, data) values (lid, it->>'item_type', it->'data');
+        iadd := iadd + 1;
+      end if;
+    end loop;
+    lid := null;
+  end loop;
+
+  -- progress (2026-10-10): history only ever grows, so it's merged by id
+  -- whatever p_prefer says: rows the app already has are left alone, the
+  -- rest come back. Older backups (version 1) have none of this.
+  insert into public.practice_log
+    select (jsonb_populate_record(null::public.practice_log, e.j || jsonb_build_object('user_id', uid))).*
+    from jsonb_array_elements(coalesce(b.data->'practice', '[]')) as e(j)
+  on conflict do nothing;
+  get diagnostics padd = row_count;
+  insert into public.rewards
+    select (jsonb_populate_record(null::public.rewards, e.j || jsonb_build_object('user_id', uid))).*
+    from jsonb_array_elements(coalesce(b.data->'rewards', '[]')) as e(j)
+  on conflict do nothing;
+  get diagnostics radd = row_count;
+  insert into public.game_records
+    select (jsonb_populate_record(null::public.game_records, e.j || jsonb_build_object('user_id', uid))).*
+    from jsonb_array_elements(coalesce(b.data->'records', '[]')) as e(j)
+  on conflict do nothing;
+  get diagnostics gadd = row_count;
+
+  return jsonb_build_object('inserted', ins, 'overwritten', ovw, 'kept', kept,
+                            'lists_created', lnew, 'lists_merged', lmerged, 'list_items_added', iadd,
+                            'practice_added', padd, 'rewards_added', radd, 'records_added', gadd);
+end;
+$$;
+
+do $$
+declare r record; v record;
+begin
+  for r in select * from (values
+  ('gustar', 'to like (me gusta el café = I like coffee)', 'to be attractive to, to appeal to (someone) (vos me gustás = I like you, I''m into you)'),
+  ('encantar', 'to love, to really like (me encanta = I love it)', 'to delight, to charm (vos me encantás = I adore you)'),
+  ('apasionar', 'to be passionate about (me apasiona la música = I''m passionate about music)', 'to thrill, to inspire (someone) (ese profe apasiona a sus alumnos = that teacher inspires his students)'),
+  ('interesar', 'to be interested in (me interesa = I''m interested)', 'to interest (someone) (no me interesás = I''m not interested in you)'),
+  ('molestar', 'to be bothered by (me molesta el ruido = the noise bothers me)', 'to bother, to annoy (someone) (perdón, ¿te molesto? = sorry, am I bothering you?)'),
+  ('fascinar', 'to be fascinated by, to love (me fascina = it fascinates me, I love it)', 'to fascinate (someone) (vos me fascinás = you fascinate me)'),
+  ('faltar', 'to be missing, to be short of (me faltan mil pesos = I''m a thousand pesos short)', 'to be absent, to miss (an event) (falté a clase = I missed class)'),
+  ('doler', 'to hurt, to ache (me duele la cabeza = my head hurts)', 'to hurt (someone) emotionally (me dolés cuando me hablás así = it hurts me when you talk to me like that)'),
+  ('importar', 'to matter, to care (no me importa = I don''t care)', 'to matter (to someone) (vos me importás = I care about you)'),
+  ('parecer', 'to think, to seem (to someone) (me parece bien = I think it''s fine)', 'to seem, to look (parecés de acá = you seem like a local)'),
+  ('aburrir', 'to be bored by (me aburre = it bores me)', 'to bore (someone) (¿te aburro? = am I boring you?)'),
+  ('sorprender', 'to be surprised by (me sorprende = it surprises me)', 'to surprise (someone) (te sorprendí = I surprised you)'),
+  ('pasar', 'to happen (to someone) (¿qué te pasó? = what happened to you?)', 'to pass, to come by; to spend (time) (pasé por tu casa = I came by your place)'),
+  ('quedar', 'to have left; to fit, to suit (me quedan dos = I have two left; te queda bien = it suits you)', 'to agree (to do something); to end up (quedamos en vernos a las ocho = we agreed to meet at eight)'),
+  ('tocar', 'to be someone''s turn; to get (by luck or draw) (te toca a vos = it''s your turn)', 'to touch; to play (an instrument) (toco la guitarra = I play guitar)'),
+  ('caer', 'to come across (well or badly) to someone (me cae bien = I like him/her)', 'to fall; to show up (caí a la fiesta sin avisar = I showed up at the party unannounced)'),
+  ('preocupar', 'to be worried about (me preocupa = it worries me)', 'to worry (someone) (no te quiero preocupar = I don''t want to worry you)'),
+  ('costar', 'to be hard (for someone) (me cuesta = it''s hard for me)', 'to cost (¿cuánto cuesta? = how much does it cost?)'),
+  ('sobrar', 'to have extra, to be left over (me sobra tiempo = I have time to spare)', 'to be in the way, to be one too many (acá sobro = I''m in the way here)'),
+  ('convenir', 'to suit, to be good for (me conviene = it''s better for me)', 'to agree (on) (convinimos un precio = we agreed on a price)')
+  ) as d(inf, def, pdef) loop
+    for v in select x.id, x.user_id, x.gustar_like, x.known_forms from public.verbs x where lower(trim(x.infinitive)) = r.inf loop
+      if v.gustar_like then
+        update public.verbs set personal_definition = r.pdef, also_personal_use = true
+          where id = v.id and personal_definition = '';
+        update public.verbs set also_personal_use = true where id = v.id;
+      else
+        update public.verbs set
+          gustar_like = true, also_personal_use = true,
+          definition = r.def, personal_definition = r.pdef,
+          known_forms = (select coalesce(jsonb_object_agg(case when e.k ~ '^(presente|preterito|imperfecto|futuro|condicional|subjPresente|subjPasado)\|(yo|vos|el|nosotros|ellos)$' then e.k || '|p' else e.k end, e.val), '{}'::jsonb)
+                         from jsonb_each(coalesce(v.known_forms, '{}'::jsonb)) as e(k, val))
+          where id = v.id;
+        update public.practice_log set form_key = form_key || '|p'
+          where user_id = v.user_id and item_kind = 'verb' and (item_id = v.id or item_key = r.inf)
+            and form_key ~ '^(presente|preterito|imperfecto|futuro|condicional|subjPresente|subjPasado)\|(yo|vos|el|nosotros|ellos)$';
+      end if;
+    end loop;
+  end loop;
+end $$;
+
+-- every other dative verb (one you added yourself) gets both uses too
+update public.verbs set also_personal_use = true where gustar_like and not also_personal_use;

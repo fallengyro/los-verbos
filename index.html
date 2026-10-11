@@ -187,8 +187,8 @@
          the gustar-tab handling around selectVerb() in app.js). Reuses the
          settings screen's .lang-toggle segmented-button look. -->
     <div class="lang-toggle gustar-mode-toggle" id="d-gustar-tabs" hidden>
-      <button type="button" class="lang-option" id="d-gustar-tab-personal" data-i18n="gustar_tab_personal">Uso personal</button>
       <button type="button" class="lang-option" id="d-gustar-tab-dativo" data-i18n="gustar_tab_dativo">Uso dativo</button>
+      <button type="button" class="lang-option" id="d-gustar-tab-personal" data-i18n="gustar_tab_personal">Uso personal</button>
     </div>
 
     <p class="conj-hint" data-i18n="conj_hint">deslizá para ver todos los tiempos &rarr;</p>
@@ -313,9 +313,10 @@
         <input type="checkbox" id="f-gustar-like" />
         <label for="f-gustar-like" style="margin:0;" data-i18n="check_gustar">¿Tipo gustar?</label>
       </div>
-      <div class="field checks" id="f-also-personal-use-wrap" hidden>
-        <input type="checkbox" id="f-also-personal-use" />
-        <label for="f-also-personal-use" style="margin:0;" data-i18n="check_also_personal_use">¿También tiene uso personal (no dativo)?</label>
+      <div class="field field-wide" id="f-personal-definition-wrap" hidden>
+        <label for="f-personal-definition" data-i18n="label_personal_definition">Definición en uso personal</label>
+        <input type="text" id="f-personal-definition" />
+        <small class="field-hint" data-i18n="hint_personal_definition">La definición de arriba es la del uso dativo («me gusta»). Esta es la de la persona como sujeto: «vos me gustás», «pasé por tu casa».</small>
       </div>
     </div>
 
