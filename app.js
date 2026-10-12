@@ -109,6 +109,52 @@
       logout_btn: "Cerrar sesión",
       acct_menu_aria: "Menú de cuenta",
       nav_verbs: "Verbos",
+      nav_hoy: "Hoy",
+      nav_col: "Colección",
+      deck_title: "Armar el mazo",
+      col_bar_btn: "Practicar",
+      col_bar_title: "Practicar con tus filtros",
+      col_bar_title_all: "Practicar todo",
+      col_bar_none: "Nada coincide con tus filtros",
+      col_filtered: " (filtrado)",
+      col_n_verbs: "{n} verbos",
+      col_n_verbs_one: "1 verbo",
+      col_n_words: "{n} palabras",
+      col_n_words_one: "1 palabra",
+      col_n_phrases: "{n} frases",
+      col_n_phrases_one: "1 frase",
+      hoy_k_practice: "Practicar",
+      hoy_k_learn: "Aprender",
+      hoy_k_play: "Jugar",
+      hoy_due_title: "{n} tarjetas para repasar",
+      hoy_due_title_one: "1 tarjeta para repasar",
+      hoy_due_sub: "Se te están por olvidar",
+      hoy_build: "Armar un mazo ›",
+      hoy_build_btn: "Armar un mazo",
+      hoy_nodue_title: "Nada para repasar hoy",
+      hoy_nodue_sub: "Armá un mazo con lo tuyo, o seguí con un tema.",
+      hoy_first_title: "Tus primeras tarjetas",
+      hoy_first_sub: "{v} verbos, {w} palabras y {p} frases en tu colección.",
+      hoy_empty_title: "Todavía no hay nada para practicar",
+      hoy_empty_sub: "Agregá en Colección lo primero que escuchaste hoy, o abrí un tema.",
+      hoy_to_col: "Ir a Colección",
+      hoy_learn_cont: "Seguí con «{name}»",
+      hoy_learn_start: "Empezá «{name}»",
+      hoy_learn_sub: "{lvl} · {firm} de {total} aprendidas",
+      hoy_learn_btn: "Abrir",
+      hoy_all_topics: "Todos los temas ›",
+      hoy_quote: "«{name}»",
+      hoy_play_best: "Tu mejor: {stars} · ¿vas por las tres?",
+      hoy_play_new: "Abierta · todavía no la jugaste",
+      hoy_play_btn: "Ver la escena",
+      hoy_play_locked: "Te faltan {n} frases para abrirla",
+      hoy_play_locked_one: "Te falta 1 frase para abrirla",
+      hoy_play_practice: "Practicar las {n}",
+      hoy_play_practice_one: "Practicar la que falta",
+      hoy_play_all3: "Todas las escenas con ★★★",
+      hoy_play_go: "Ir a Jugar",
+      hoy_all_scenes: "Todas las escenas ›",
+      hoy_reto: "{name} te retó · {what}",
       nav_words: "Vocabulario",
       nav_phrases: "Frases",
       nav_flashcards: "Tarjetas",
@@ -223,7 +269,7 @@
       label_literal: "Traducción literal",
       placeholder_literal: "ej. “ni siquiera borracho/a” (uso real: de ninguna manera)",
       flash_title: "Modo tarjetas",
-      flash_setup_note: "Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos, Vocabulario y Frases.",
+      flash_setup_note: "Las tarjetas salen de lo que tenés filtrado en Colección: Verbos, Vocabulario y Frases, cada parte con sus filtros. Apagá una para sacarla del mazo.",
       flash_group_times: "Tiempos, modos y personas",
       flash_group_pick: "¿Qué querés practicar?",
       flash_pick_all: "Todo",
@@ -1035,6 +1081,52 @@
       logout_btn: "Log out",
       acct_menu_aria: "Account menu",
       nav_verbs: "Verbs",
+      nav_hoy: "Today",
+      nav_col: "Collection",
+      deck_title: "Build a deck",
+      col_bar_btn: "Practice",
+      col_bar_title: "Practice with your filters",
+      col_bar_title_all: "Practice everything",
+      col_bar_none: "Nothing matches your filters",
+      col_filtered: " (filtered)",
+      col_n_verbs: "{n} verbs",
+      col_n_verbs_one: "1 verb",
+      col_n_words: "{n} words",
+      col_n_words_one: "1 word",
+      col_n_phrases: "{n} phrases",
+      col_n_phrases_one: "1 phrase",
+      hoy_k_practice: "Practice",
+      hoy_k_learn: "Learn",
+      hoy_k_play: "Play",
+      hoy_due_title: "{n} cards to review",
+      hoy_due_title_one: "1 card to review",
+      hoy_due_sub: "You're about to forget these",
+      hoy_build: "Build a deck ›",
+      hoy_build_btn: "Build a deck",
+      hoy_nodue_title: "Nothing to review today",
+      hoy_nodue_sub: "Build a deck from your own things, or keep going with a topic.",
+      hoy_first_title: "Your first cards",
+      hoy_first_sub: "{v} verbs, {w} words, and {p} phrases in your collection.",
+      hoy_empty_title: "Nothing to practice yet",
+      hoy_empty_sub: "Add the first thing you heard today in Collection, or open a topic.",
+      hoy_to_col: "Go to Collection",
+      hoy_learn_cont: "Keep going with “{name}”",
+      hoy_learn_start: "Start “{name}”",
+      hoy_learn_sub: "{lvl} · {firm} of {total} learned",
+      hoy_learn_btn: "Open",
+      hoy_all_topics: "All topics ›",
+      hoy_quote: "“{name}”",
+      hoy_play_best: "Your best: {stars} · going for three?",
+      hoy_play_new: "Open · you haven't played it yet",
+      hoy_play_btn: "See the scene",
+      hoy_play_locked: "{n} more phrases to open it",
+      hoy_play_locked_one: "1 more phrase to open it",
+      hoy_play_practice: "Practice the {n}",
+      hoy_play_practice_one: "Practice the last one",
+      hoy_play_all3: "Every scene at ★★★",
+      hoy_play_go: "Go to Play",
+      hoy_all_scenes: "All Escenas ›",
+      hoy_reto: "{name} challenged you · {what}",
       nav_words: "Vocabulary",
       nav_phrases: "Phrases",
       nav_flashcards: "Flashcards",
@@ -1143,7 +1235,7 @@
       label_literal: "Literal translation",
       placeholder_literal: "e.g., “not even drunk” (actual meaning: no way)",
       flash_title: "Flashcard mode",
-      flash_setup_note: "Flashcards are built from whatever is currently filtered in the Verbs, Vocabulary, and Phrases tabs.",
+      flash_setup_note: "Cards come from what you've filtered in Collection: Verbs, Vocabulary, and Phrases, each with its own filters. Turn one off to leave it out of the deck.",
       flash_group_times: "Tenses, moods, and persons",
       flash_group_pick: "What do you want to practice?",
       flash_pick_all: "All",
@@ -3632,10 +3724,21 @@
     verbHiddenText: document.getElementById("verb-hidden-text"),
     verbShowAllBtn: document.getElementById("verb-show-all-btn"),
 
-    tabVerbs: document.getElementById("tab-verbs"),
-    tabWords: document.getElementById("tab-words"),
-    tabPhrases: document.getElementById("tab-phrases"),
-    tabFlashcards: document.getElementById("tab-flashcards"),
+    tabHoy: document.getElementById("tab-hoy"),
+    tabCol: document.getElementById("tab-col"),
+    hoyPanel: document.getElementById("hoy-panel"),
+    hoyCards: document.getElementById("hoy-cards"),
+    colSegBox: document.getElementById("col-seg"),
+    colSeg_verbs: document.getElementById("col-seg-verbs"),
+    colSeg_words: document.getElementById("col-seg-words"),
+    colSeg_phrases: document.getElementById("col-seg-phrases"),
+    colSeg_lists: document.getElementById("col-seg-lists"),
+    colBar: document.getElementById("col-bar"),
+    colBarTitle: document.getElementById("col-bar-title"),
+    colBarSub: document.getElementById("col-bar-sub"),
+    colBarBtn: document.getElementById("col-bar-btn"),
+    deckOverlay: document.getElementById("deck-overlay"),
+    deckClose: document.getElementById("deck-close"),
     verbsPanel: document.getElementById("verbs-panel"),
     wordsPanel: document.getElementById("words-panel"),
     phrasesPanel: document.getElementById("phrases-panel"),
@@ -3781,7 +3884,6 @@
     flashArrowPrev: document.getElementById("flash-arrow-prev"),
     flashArrowNext: document.getElementById("flash-arrow-next"),
 
-    tabLists: document.getElementById("tab-lists"),
     tabProgress: document.getElementById("tab-progress"),
     tabTopics: document.getElementById("tab-topics"),
     tabPlay: document.getElementById("tab-play"),
@@ -5074,23 +5176,43 @@
 
   // ================= vocabulario (general words) =================
   function setMainTab(tab) {
-    el.tabVerbs.classList.toggle("active", tab === "verbs");
-    el.tabWords.classList.toggle("active", tab === "words");
-    el.tabPhrases.classList.toggle("active", tab === "phrases");
-    el.tabFlashcards.classList.toggle("active", tab === "flashcards");
-    el.tabLists.classList.toggle("active", tab === "lists");
+    // the old tab names still work: the four collection parts open
+    // Colección on that part, and "flashcards" opens Armar el mazo
+    if (tab === "flashcards") { openDeckBuilder(); return; }
+    if (el.deckOverlay && !el.deckOverlay.hidden) closeDeckBuilder();
+    if (COL_SEGS.indexOf(tab) !== -1) {
+      colSeg = tab;
+      try { localStorage.setItem(COL_SEG_KEY, tab); } catch (e) {}
+      tab = "col";
+    }
+    if (["hoy", "col", "topics", "play", "progress"].indexOf(tab) === -1) tab = "hoy";
+    currentTab = tab;
+    el.tabHoy.classList.toggle("active", tab === "hoy");
+    el.tabCol.classList.toggle("active", tab === "col");
     el.tabProgress.classList.toggle("active", tab === "progress");
     el.tabTopics.classList.toggle("active", tab === "topics");
     el.tabPlay.classList.toggle("active", tab === "play");
+    el.hoyPanel.hidden = tab !== "hoy";
+    el.colSegBox.hidden = tab !== "col";
     el.topicsPanel.hidden = tab !== "topics";
     el.playPanel.hidden = tab !== "play";
     el.progressPanel.hidden = tab !== "progress";
-    el.verbsPanel.hidden = tab !== "verbs";
-    el.wordsPanel.hidden = tab !== "words";
-    el.phrasesPanel.hidden = tab !== "phrases";
-    el.flashcardsPanel.hidden = tab !== "flashcards";
-    el.listsPanel.hidden = tab !== "lists";
-    if (tab === "flashcards") { renderFlashSetup(); renderLastSession(); }
+    el.verbsPanel.hidden = !(tab === "col" && colSeg === "verbs");
+    el.wordsPanel.hidden = !(tab === "col" && colSeg === "words");
+    el.phrasesPanel.hidden = !(tab === "col" && colSeg === "phrases");
+    el.listsPanel.hidden = !(tab === "col" && colSeg === "lists");
+    renderColSeg();
+    updateColBar();
+    tab = tab === "col" ? colSeg : tab;
+    if (tab === "hoy") {
+      renderHoy();
+      if (currentUser) {
+        loadPracticeHistory(false).then(function () { if (!el.hoyPanel.hidden) { renderHoy(); playCheckRacha(); } });
+        loadRewards();
+        loadGameRecords();
+        loadRetos();
+      }
+    }
     if (tab === "lists") {
       loadLists();
       loadPracticeHistory(false).then(function () { if (!el.listsPanel.hidden) decorateListRows(); });
@@ -5114,7 +5236,205 @@
       renderTopicList();
       if (currentUser) loadPracticeHistory(false).then(function () { if (!el.topicsPanel.hidden) { renderTopicList(); if (selectedTopicId) renderItemHistory("topic"); } });
     }
-    try { localStorage.setItem("vosea-main-tab", tab); } catch (e) {}
+    // (the tab isn't remembered any more: the app always opens on Hoy)
+  }
+
+  // ================= The new flow (2026-10-11) =================
+  // mason: "intuitive, clean, learning tool" — the app answers "what now?".
+  // Five tabs: Hoy · Colección · Temas · Jugar · Progreso
+  // (claude/vosea-flow-plan.md; mockup "voseá — five-tab mockup").
+  //   - Hoy is the home screen every time the app opens: the racha, then one
+  //     suggestion each to Practicar, Aprender and Jugar, from the practice
+  //     history, plus a challenge waiting for you.
+  //   - Colección holds the old Verbos / Vocabulario / Frases / Listas tabs
+  //     under one switch (colSeg). Old setMainTab("verbs") etc. still work:
+  //     they open Colección on that part.
+  //   - Tarjetas is no longer a tab: its setup is the "Armar el mazo" sheet,
+  //     opened from Colección's bar (with every part's filters, as before),
+  //     from Hoy and from Jugar. setMainTab("flashcards") opens it.
+  var COL_SEGS = ["verbs", "words", "phrases", "lists"];
+  var COL_SEG_KEY = "vosea-col-seg";
+  var colSeg = "verbs";
+  try { var savedSeg = localStorage.getItem(COL_SEG_KEY); if (COL_SEGS.indexOf(savedSeg) !== -1) colSeg = savedSeg; } catch (e) {}
+  var currentTab = "hoy";
+
+  function openDeckBuilder() {
+    el.deckOverlay.hidden = false;
+    el.flashcardsPanel.hidden = false;
+    renderFlashSetup();
+    renderLastSession();
+    document.body.classList.add("deck-open");
+    try { el.deckOverlay.querySelector(".deck-card").scrollTop = 0; } catch (e) {}
+    try { el.deckClose.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function closeDeckBuilder() {
+    el.deckOverlay.hidden = true;
+    el.flashcardsPanel.hidden = true;
+    document.body.classList.remove("deck-open");
+  }
+
+  // ---- Colección ----
+  function colPartLine(n, one, many) { return t(n === 1 ? one : many, { n: n }); }
+  function updateColBar() {
+    if (!el.colBar) return;
+    var parts = [
+      { n: filtered.length, all: allVerbs.length, one: "col_n_verbs_one", many: "col_n_verbs" },
+      { n: filteredWords.length, all: allWords.length, one: "col_n_words_one", many: "col_n_words" },
+      { n: filteredPhrases.length, all: allPhrases.length, one: "col_n_phrases_one", many: "col_n_phrases" }
+    ];
+    var anyFilter = parts.some(function (p) { return p.n < p.all; });
+    var bits = parts.filter(function (p) { return p.n > 0; }).map(function (p) { return colPartLine(p.n, p.one, p.many) + (p.n < p.all ? t("col_filtered") : ""); });
+    el.colBarTitle.textContent = t(anyFilter ? "col_bar_title" : "col_bar_title_all");
+    el.colBarSub.textContent = bits.length ? bits.join(" · ") : t("col_bar_none");
+    // a dot on a part that has filters (or a search) on, so you can tell
+    // from any part what the deck will hold
+    [["verbs", parts[0]], ["words", parts[1]], ["phrases", parts[2]]].forEach(function (x) {
+      var b = el["colSeg_" + x[0]];
+      if (b) b.classList.toggle("has-filter", x[1].n < x[1].all);
+    });
+    var detailOpen = (colSeg === "verbs" && !el.detail.hidden) || (colSeg === "words" && !el.wordDetail.hidden) || (colSeg === "phrases" && !el.phraseDetail.hidden);
+    var show = currentTab === "col" && colSeg !== "lists" && !detailOpen && !!currentUser && (allVerbs.length + allWords.length + allPhrases.length) > 0;
+    el.colBar.hidden = !show;
+    document.body.classList.toggle("has-col-bar", show);
+  }
+  function renderColSeg() {
+    COL_SEGS.forEach(function (k) {
+      var b = el["colSeg_" + k];
+      var on = k === colSeg;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
+
+  // ---- Hoy ----
+  var hoyTimer = 0;
+  function renderHoySoon() {
+    if (hoyTimer || !el.hoyPanel || el.hoyPanel.hidden) return;
+    hoyTimer = setTimeout(function () { hoyTimer = 0; renderHoy(); }, 40);
+  }
+  function hoyCard(o) {
+    var c = progEl("div", "hoy-card" + (o.cls ? " " + o.cls : ""));
+    if (o.id) c.id = o.id;
+    c.appendChild(progEl("div", "hoy-kicker", o.kicker));
+    c.appendChild(progEl("h3", "hoy-title", o.title));
+    if (o.sub) c.appendChild(progEl("p", "hoy-sub", o.sub));
+    var row = progEl("div", "hoy-row");
+    if (o.link) {
+      var a = progEl("button", "hoy-link", o.link);
+      a.type = "button";
+      a.addEventListener("click", o.onLink);
+      row.appendChild(a);
+    } else row.appendChild(progEl("span"));
+    if (o.btn) {
+      var b = progButton(o.btn, true, o.onGo);
+      b.classList.add("hoy-btn");
+      row.appendChild(b);
+    }
+    c.appendChild(row);
+    return c;
+  }
+  function hoyTopicPick() {
+    var list = TOPICS.slice().sort(function (a, b) { return a.order - b.order; });
+    var going = [];
+    list.forEach(function (tp) {
+      var st = topicStats(tp);
+      if (!st.rows.length) return;
+      if (st.firm >= st.total) return;
+      var last = 0;
+      st.rows.forEach(function (r) { var ms = Date.parse(r.shown_at) || 0; if (ms > last) last = ms; });
+      going.push({ tp: tp, st: st, last: last });
+    });
+    if (going.length) { going.sort(function (a, b) { return b.last - a.last; }); return { tp: going[0].tp, st: going[0].st, cont: true }; }
+    for (var i = 0; i < list.length; i++) {
+      var s2 = topicStats(list[i]);
+      if (!s2.rows.length) return { tp: list[i], st: s2, cont: false };
+    }
+    return null;
+  }
+  function hoyScenePick() {
+    if (!ESCENAS.length) return null;
+    var open = ESCENAS.filter(function (sc) { return escUnlocked(sc) && escBest(sc.id).stars < 3; });
+    if (open.length) {
+      // one you've played but not finished first, then a new one
+      var played = open.filter(function (sc) { return escBest(sc.id).plays; });
+      var sc = (played.length ? played : open)[0];
+      return { sc: sc, open: true, best: escBest(sc.id) };
+    }
+    var locked = ESCENAS.filter(function (sc) { return !escUnlocked(sc); }).map(function (sc) { return { sc: sc, miss: escMissing(sc) }; })
+      .sort(function (a, b) { return a.miss.length - b.miss.length; });
+    if (locked.length) return { sc: locked[0].sc, open: false, miss: locked[0].miss };
+    return { all3: true };
+  }
+  function renderHoy() {
+    if (!el.hoyPanel || el.hoyPanel.hidden) return;
+    var box = el.hoyCards;
+    box.innerHTML = "";
+    if (!currentUser) { el.playRacha.textContent = ""; return; }
+    drawRacha(playModel());
+
+    // Practicar
+    var rows = practiceAllRows();
+    var P = computeProgress(rows);
+    var idx = progContentIndex();
+    var units = Object.keys(P.units).map(function (k) { return P.units[k]; }).filter(function (u) { return !!progUnitItem(idx, u); });
+    var due = units.filter(function (u) { return u.due; });
+    var nMine = allVerbs.length + allWords.length + allPhrases.length;
+    var build = function () { openDeckBuilder(); };
+    if (due.length) {
+      var missed = due.filter(function (u) { return u.last && u.last.grade === "otra"; }).length;
+      box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t(due.length === 1 ? "hoy_due_title_one" : "hoy_due_title", { n: due.length }),
+        sub: missed ? t("prog_due_missed", { n: missed }) : t("hoy_due_sub"), btn: t("prog_due_btn"), onGo: function () { startPracticeDeck(cardsForUnits(due)); },
+        link: t("hoy_build"), onLink: build }));
+    } else if (nMine && P.events.length) {
+      box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_nodue_title"), sub: t("hoy_nodue_sub"), btn: t("hoy_build_btn"), onGo: build }));
+    } else if (nMine) {
+      box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_first_title"),
+        sub: t("hoy_first_sub", { v: allVerbs.length, w: allWords.length, p: allPhrases.length }), btn: t("hoy_build_btn"), onGo: build }));
+    } else {
+      box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_empty_title"), sub: t("hoy_empty_sub"), btn: t("hoy_to_col"), onGo: function () { setMainTab("col"); } }));
+    }
+
+    // Aprender
+    var tp = hoyTopicPick();
+    if (tp) {
+      box.appendChild(hoyCard({ id: "hoy-learn", kicker: t("hoy_k_learn"),
+        title: t(tp.cont ? "hoy_learn_cont" : "hoy_learn_start", { name: topicText(tp.tp.name) }),
+        sub: tp.cont ? t("hoy_learn_sub", { lvl: tp.tp.level, firm: tp.st.firm, total: tp.st.total }) : (tp.tp.level ? tp.tp.level + " · " : "") + topicText(tp.tp.desc),
+        btn: t("hoy_learn_btn"), onGo: function () { setMainTab("topics"); selectTopic(tp.tp.id); try { window.scrollTo({ top: 0 }); } catch (e) {} },
+        link: t("hoy_all_topics"), onLink: function () { setMainTab("topics"); } }));
+    }
+
+    // Jugar
+    var sp = hoyScenePick();
+    var toScenes = function () { setMainTab("play"); openEscenas(true); };
+    if (sp && sp.all3) {
+      box.appendChild(hoyCard({ id: "hoy-play", kicker: t("hoy_k_play"), title: t("hoy_play_all3"), btn: t("hoy_play_go"), onGo: function () { setMainTab("play"); } }));
+    } else if (sp && sp.open) {
+      var sc = escCast(sp.sc);
+      box.appendChild(hoyCard({ id: "hoy-play", kicker: t("hoy_k_play"), title: t("hoy_quote", { name: topicText(sc.name) }),
+        sub: sp.best.plays ? t("hoy_play_best", { stars: "★★★".slice(0, sp.best.stars) || "—" }) : t("hoy_play_new"),
+        btn: t("hoy_play_btn"), onGo: function () { setMainTab("play"); openEscenas(true, sp.sc.id); },
+        link: t("hoy_all_scenes", { what: t("esc_title") }), onLink: toScenes }));
+    } else if (sp) {
+      var scl = escCast(sp.sc), n = sp.miss.length;
+      box.appendChild(hoyCard({ id: "hoy-play", kicker: t("hoy_k_play"), title: t("hoy_quote", { name: topicText(scl.name) }),
+        sub: t(n === 1 ? "hoy_play_locked_one" : "hoy_play_locked", { n: n }),
+        btn: t(n === 1 ? "hoy_play_practice_one" : "hoy_play_practice", { n: n }),
+        onGo: function () { startPracticeDeck(escPrepDeck(sp.sc, sp.miss.map(function (it) { return it.id; }))); },
+        link: t("hoy_all_scenes", { what: t("esc_title") }), onLink: toScenes }));
+    }
+
+    // a challenge waiting for you
+    var toPlay = retos.loaded && !retos.missing ? rtToPlay() : [];
+    if (toPlay.length) {
+      var rb = progEl("button", "hoy-reto");
+      rb.type = "button";
+      rb.id = "hoy-reto";
+      rb.appendChild(progEl("span", null, t("hoy_reto", { name: rtOtherName(toPlay[0]), what: toPlay[0].title })));
+      rb.appendChild(progEl("span", "play-chev", "›"));
+      rb.addEventListener("click", function () { setMainTab("play"); openAmigos(true); });
+      box.appendChild(rb);
+    }
   }
 
   function wordCardRow(id, data) {
@@ -5909,6 +6229,8 @@
     el.flashWordCount.textContent = "(" + filteredWords.length + ")";
     el.flashPhraseCount.textContent = "(" + filteredPhrases.length + ")";
     updateFlashDeckCount();
+    updateColBar();
+    renderHoySoon();
   }
 
   // The switches and direction radios are the source of truth (mason,
@@ -7567,6 +7889,7 @@
   var flashDeckSource = "setup";
   function openFlashDeck(cards, source) {
     if (!cards.length) return false;
+    closeDeckBuilder(); // a deck closes back to where you were
     flashDeckSource = source || "setup";
     if (flashAutoPlayOn()) unlockTtsAudio();
     if (cards.some(function (c) { return c.speak; })) hablarPrepareMic(); // inside the tap, so iOS asks for the mic here
@@ -10068,6 +10391,7 @@
     playGoal = n;
     try { localStorage.setItem(PLAY_GOAL_KEY, String(n)); } catch (e) {}
     renderPlay();
+    renderHoy();
     if (currentUser) {
       supabaseClient.from("user_settings")
         .upsert({ user_id: currentUser.id, daily_goal: n, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
@@ -10447,6 +10771,7 @@
 
   // ---- the tab ----
   function renderPlay() {
+    renderHoySoon(); // rewards, records and challenges feed Hoy too
     if (!el.playPanel || el.playPanel.hidden) return;
     el.playHome.hidden = albumOpen || cronoOpen || amigosOpen || escOpen;
     el.playEscenas.hidden = !escOpen;
@@ -10454,14 +10779,14 @@
     el.playCrono.hidden = !cronoOpen;
     el.playAmigos.hidden = !amigosOpen || rtNewOpen;
     el.playRtNew.hidden = !(amigosOpen && rtNewOpen);
-    if (!currentUser) { el.playRacha.textContent = ""; return; }
+    if (!currentUser) return;
     if (escOpen) { drawEscenas(); return; }
     if (amigosOpen && rtNewOpen) { drawRtNew(); return; }
     if (amigosOpen) { drawAmigos(); return; }
     if (cronoOpen) { drawCrono(); return; }
     var m = playModel();
     if (albumOpen) { drawAlbum(); return; }
-    drawRacha(m);
+    drawRacha(m); // the racha card lives on Hoy now; kept current from here too
     drawPlayModes();
     drawPlayToday(m);
     drawAlbumEntry();
@@ -11167,6 +11492,8 @@
       ul.appendChild(li);
       return btn;
     }
+    // Escenas first: the "use it" part of the loop (flow plan, 2026-10-11)
+    if (ESCENAS.length) row(t("esc_title"), escRowStat(), t("esc_row_def"), function () { openEscenas(true); }).id = "play-escenas-row";
     var stat = b.n ? t(b.best ? "pt_row_stat" : "pt_row_stat_cards", { cards: b.cards, best: b.best }) : "";
     var p = row(t("pt_name"), stat, t(quietMode ? "pt_row_def_quiet" : "pt_row_def"), ptStart);
     p.id = "play-partida";
@@ -11180,7 +11507,6 @@
     var retoRow = row(t("pt_reto_name"), retoStat, retoDef, function () { openAmigos(true); });
     retoRow.id = "play-reto-row";
     if (toPlay.length || amigosIncoming().length) retoRow.querySelector(".stat").classList.add("is-new");
-    if (ESCENAS.length) row(t("esc_title"), escRowStat(), t("esc_row_def"), function () { openEscenas(true); }).id = "play-escenas-row";
   }
 
   // ================= Escenas (2026-10-10) =================
@@ -13343,6 +13669,7 @@
       practiceHistory.loadedAt = Date.now();
       practiceHistory.error = null;
       practiceHistory.loading = null;
+      renderHoySoon();
       return practiceAllRows();
     }, function (err) {
       console.warn("[progreso] couldn't load the practice log:", err && err.message);
@@ -14046,6 +14373,7 @@
   // language changes.
   function refreshPracticeViews() {
     renderLastSession();
+    if (el.hoyPanel && !el.hoyPanel.hidden) renderHoy();
     if (el.progressPanel && !el.progressPanel.hidden) renderProgress();
     if (selectedId) renderItemHistory("verb");
     if (selectedWordId) renderItemHistory("word");
@@ -15909,6 +16237,10 @@
       loadUsageRole();
       loadAmigos().then(amigoHandlePendingInvite);
       loadRetos();
+      if (el.hoyPanel && !el.hoyPanel.hidden) {
+        renderHoy();
+        loadPracticeHistory(false).then(function () { renderHoySoon(); playCheckRacha(); });
+      }
       if (currentShareList) renderSharePreview();
     } else {
       el.authScreen.hidden = false;
@@ -16152,8 +16484,21 @@
     openListPicker("verb", filtered.map(function (v) { return v.data; }));
   });
 
-  el.tabVerbs.addEventListener("click", function () { setMainTab("verbs"); });
-  el.tabWords.addEventListener("click", function () { setMainTab("words"); });
+  el.tabHoy.addEventListener("click", function () { setMainTab("hoy"); });
+  el.tabCol.addEventListener("click", function () { setMainTab("col"); });
+  COL_SEGS.forEach(function (k) { el["colSeg_" + k].addEventListener("click", function () { setMainTab(k); try { window.scrollTo({ top: 0 }); } catch (e) {} }); });
+  el.colBarBtn.addEventListener("click", openDeckBuilder);
+  el.deckClose.addEventListener("click", closeDeckBuilder);
+  el.deckOverlay.addEventListener("click", function (e) { if (e.target === el.deckOverlay) closeDeckBuilder(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !el.deckOverlay.hidden) closeDeckBuilder(); });
+  // the bar hides while a verb / word / phrase is open
+  if (window.MutationObserver) {
+    var colObs = new MutationObserver(function () { updateColBar(); });
+    [el.detail, el.wordDetail, el.phraseDetail].forEach(function (d) { if (d) colObs.observe(d, { attributes: true, attributeFilter: ["hidden"] }); });
+  }
+  // for the test suites (and the console): go to a tab, or open the deck
+  window.voseaGoTab = setMainTab;
+  window.voseaOpenDeckBuilder = openDeckBuilder;
 
   el.wordSearch.addEventListener("input", renderWordList);
   loadFilters(filtersStorageKey("words"), activeWordFilters);
@@ -16195,7 +16540,6 @@
     openListPicker("word", filteredWords.map(function (w) { return w.data; }));
   });
 
-  el.tabPhrases.addEventListener("click", function () { setMainTab("phrases"); });
   el.phraseSearch.addEventListener("input", renderPhraseList);
   loadFilters(filtersStorageKey("phrases"), activePhraseFilters);
   refreshChipVisuals(el.phraseFilters, activePhraseFilters);
@@ -16238,7 +16582,6 @@
     openListPicker("phrase", filteredPhrases.map(function (p) { return p.data; }));
   });
 
-  el.tabFlashcards.addEventListener("click", function () { setMainTab("flashcards"); });
   el.flashSrcVerbs.addEventListener("change", function () {
     activeFlashSources.verbs = el.flashSrcVerbs.checked;
     renderFlashSetup();
@@ -16328,7 +16671,6 @@
   el.flashArrowNext.addEventListener("click", nextFlashCard);
   el.flashArrowPrev.addEventListener("click", prevFlashCard);
 
-  el.tabLists.addEventListener("click", function () { setMainTab("lists"); });
   el.tabProgress.addEventListener("click", function () { setMainTab("progress"); });
   el.tabTopics.addEventListener("click", function () { setMainTab("topics"); });
   el.topicSearch.addEventListener("input", renderTopicList);
@@ -16413,17 +16755,9 @@
   el.flashPickAll.addEventListener("click", function () { setFlashPickAll(true); });
   el.flashPickNone.addEventListener("click", function () { setFlashPickAll(false); });
 
-  (function restoreMainTab() {
-    var saved = null;
-    try { saved = localStorage.getItem("vosea-main-tab"); } catch (e) {}
-    if (saved === "words") setMainTab("words");
-    else if (saved === "phrases") setMainTab("phrases");
-    else if (saved === "flashcards") setMainTab("flashcards");
-    else if (saved === "lists") setMainTab("lists");
-    else if (saved === "progress") setMainTab("progress");
-    else if (saved === "topics") setMainTab("topics");
-    else if (saved === "play") setMainTab("play");
-  })();
+  // Hoy is the landing point, every time (mason, 2026-10-11). The test
+  // suites set window.__voseaStartTab to start somewhere else.
+  setMainTab(typeof window.__voseaStartTab === "string" ? window.__voseaStartTab : "hoy");
 
   // A ?share=TOKEN link opens the share preview via the public get_shared_list
   // RPC (see schema.sql) regardless of login state — that's what lets a

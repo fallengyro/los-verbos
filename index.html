@@ -103,18 +103,37 @@
 
   <div class="main-tabs">
     <div class="main-tabs-scroll">
-      <button type="button" class="main-tab active" id="tab-verbs" data-i18n="nav_verbs">Verbos</button>
-      <button type="button" class="main-tab" id="tab-words" data-i18n="nav_words">Vocabulario</button>
-      <button type="button" class="main-tab" id="tab-phrases" data-i18n="nav_phrases">Frases</button>
+      <button type="button" class="main-tab active" id="tab-hoy" data-i18n="nav_hoy">Hoy</button>
+      <button type="button" class="main-tab" id="tab-col" data-i18n="nav_col">Colección</button>
       <button type="button" class="main-tab" id="tab-topics" data-i18n="nav_topics">Temas</button>
-      <button type="button" class="main-tab" id="tab-flashcards" data-i18n="nav_flashcards">Tarjetas</button>
       <button type="button" class="main-tab" id="tab-play" data-i18n="nav_play">Jugar</button>
       <button type="button" class="main-tab" id="tab-progress" data-i18n="nav_progress">Progreso</button>
-      <button type="button" class="main-tab" id="tab-lists" data-i18n="nav_lists">Listas</button>
     </div>
   </div>
 
-  <section id="verbs-panel">
+  <!-- Hoy (2026-10-11, the new flow, claude/vosea-flow-plan.md): the home
+       screen. The racha, then one suggestion each to Practicar, Aprender and
+       Jugar, built from the practice history. See app.js's renderHoy(). -->
+  <section id="hoy-panel" class="hoy-panel">
+    <div class="play-racha" id="play-racha"></div>
+    <div class="hoy-cards" id="hoy-cards"></div>
+  </section>
+
+  <!-- Colección: your verbs, words, phrases and lists (the old four tabs),
+       one at a time under this switch. The bar at the bottom opens "Armar
+       el mazo" (the old Tarjetas tab) with every part's filters. -->
+  <div class="col-seg lang-toggle" id="col-seg" role="tablist" hidden>
+    <button type="button" class="lang-option" id="col-seg-verbs" role="tab" data-i18n="nav_verbs">Verbos</button>
+    <button type="button" class="lang-option" id="col-seg-words" role="tab" data-i18n="nav_words">Vocabulario</button>
+    <button type="button" class="lang-option" id="col-seg-phrases" role="tab" data-i18n="nav_phrases">Frases</button>
+    <button type="button" class="lang-option" id="col-seg-lists" role="tab" data-i18n="nav_lists">Listas</button>
+  </div>
+  <div class="col-bar" id="col-bar" hidden>
+    <div class="col-bar-text"><b id="col-bar-title"></b><span id="col-bar-sub"></span></div>
+    <button type="button" class="btn-primary" id="col-bar-btn" data-i18n="col_bar_btn">Practicar</button>
+  </div>
+
+  <section id="verbs-panel" hidden>
 
   <div class="search-card">
     <div class="search-box">
@@ -707,13 +726,21 @@
     </section>
   </section>
 
+  <!-- Armar el mazo (2026-10-11): the old Tarjetas tab, now a sheet opened
+       from wherever you are (Colección's bar, Hoy, Jugar). Same setup as
+       before; it reads the filters you left in Colección. -->
+  <div class="modal-overlay deck-overlay" id="deck-overlay" hidden>
+  <div class="modal-card deck-card" role="dialog" aria-modal="true" aria-labelledby="deck-title">
+  <div class="deck-head">
+    <h2 id="deck-title" data-i18n="deck_title">Armar el mazo</h2>
+    <button type="button" class="icon-btn" id="deck-close" data-i18n="close">Cerrar</button>
+  </div>
   <section id="flashcards-panel" hidden>
     <div class="flash-setup">
-      <h2 data-i18n="flash_title">Modo tarjetas</h2>
       <!-- Última sesión (2026-10-03): how the last deck went, with a button to
            drill just the cards marked Otra vez. See renderLastSession(). -->
       <div class="last-session" id="last-session" hidden></div>
-      <p class="flash-setup-note" data-i18n="flash_setup_note">Las tarjetas se generan a partir de lo que esté filtrado ahora mismo en las pestañas Verbos y Vocabulario.</p>
+      <p class="flash-setup-note" data-i18n="flash_setup_note">Las tarjetas salen de lo que tenés filtrado en Colección: Verbos, Vocabulario y Frases, cada parte con sus filtros. Apagá una para sacarla del mazo.</p>
 
       <div class="flash-source-toggle">
         <label class="switch-row">
@@ -793,6 +820,8 @@
       </div>
     </div>
   </section>
+  </div>
+  </div>
 
   <!-- Progreso (2026-10-03): built from the practice log (schema.sql's
        practice_log). Every section ends in something to practice. Rendered
@@ -802,7 +831,6 @@
        "Jugar" section. -->
   <section id="play-panel" class="play-panel" hidden>
     <div id="play-home">
-      <div class="play-racha" id="play-racha"></div>
       <!-- The games (Partida; Contrarreloj and Te reto to come). -->
       <ul class="card-list play-modes" id="play-modes"></ul>
       <p class="form-msg play-msg" id="play-msg"></p>
