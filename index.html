@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- must match VOSEA_BUILD in app.js (and sw.js CACHE_NAME): see app.js "out of step" -->
+<meta name="vosea-build" content="111">
 <title>voseá</title>
 
 <!-- PWA: manifest + icons -->
@@ -150,10 +152,6 @@
     <button type="button" class="lang-option" id="col-seg-phrases" role="tab" data-i18n="nav_phrases">Frases</button>
     <button type="button" class="lang-option" id="col-seg-lists" role="tab" data-i18n="nav_lists">Listas</button>
   </div>
-  <div class="col-bar" id="col-bar" hidden>
-    <div class="col-bar-text"><b id="col-bar-title"></b><span id="col-bar-sub"></span></div>
-    <button type="button" class="btn-primary" id="col-bar-btn" data-i18n="col_bar_btn">Practicar</button>
-  </div>
 
   <section id="verbs-panel" hidden>
 
@@ -215,6 +213,7 @@
         <p class="definition" id="d-definition"></p>
       </div>
       <button type="button" class="detail-speak-btn" id="d-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+      <button type="button" class="detail-close-btn" id="d-close" data-i18n-aria-label="close" aria-label="Cerrar">&times;</button>
     </div>
     <div class="badges" id="d-badges"><button type="button" class="known-toggle sm" id="d-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="d-pattern"></p>
@@ -444,6 +443,7 @@
         <p class="definition" id="wd-definition"></p>
       </div>
       <button type="button" class="detail-speak-btn" id="wd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+      <button type="button" class="detail-close-btn" id="wd-close" data-i18n-aria-label="close" aria-label="Cerrar">&times;</button>
     </div>
     <div class="badges" id="wd-badges"><button type="button" class="known-toggle sm" id="wd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="wd-notes"></p>
@@ -582,6 +582,7 @@
         <p class="definition" id="pd-definition"></p>
       </div>
       <button type="button" class="detail-speak-btn" id="pd-speak" data-i18n-aria-label="tts_play_aria" aria-label="Escuchar pronunciación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><g class="tts-glyph"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M9 8.5a5 5 0 0 1 0 7"/><path d="M12.5 5.5a9 9 0 0 1 0 13"/></g><g class="tts-mute-mark"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></g></svg></button>
+      <button type="button" class="detail-close-btn" id="pd-close" data-i18n-aria-label="close" aria-label="Cerrar">&times;</button>
     </div>
     <div class="badges" id="pd-badges"><button type="button" class="known-toggle sm" id="pd-known" aria-pressed="false" data-i18n="known_toggle">Sabido</button></div>
     <p class="pattern-note" id="pd-literal"></p>
@@ -1048,6 +1049,14 @@
       </div>
     </section>
   </section>
+
+  <!-- Colección's Practicar bar (2026-10-12: moved here, last in the page,
+       and made sticky rather than fixed, so it is exactly as wide as the
+       cards and can never stick out past the screen's edge). -->
+  <div class="col-bar" id="col-bar" hidden>
+    <div class="col-bar-text"><b id="col-bar-title"></b><span id="col-bar-sub"></span></div>
+    <button type="button" class="btn-primary" id="col-bar-btn" data-i18n="col_bar_btn">Practicar</button>
+  </div>
 
 </div>
 

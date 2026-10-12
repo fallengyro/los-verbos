@@ -4356,8 +4356,46 @@
     importJsonPreviewList: document.getElementById("import-json-preview-list"),
     importJsonResultMsg: document.getElementById("import-json-result-msg"),
     importJsonConfirmBtn: document.getElementById("import-json-confirm-btn"),
-    importJsonCancelBtn: document.getElementById("import-json-cancel-btn")
+    importJsonCancelBtn: document.getElementById("import-json-cancel-btn"),
+    detailClose: document.getElementById("d-close"),
+    wordDetailClose: document.getElementById("wd-close"),
+    phraseDetailClose: document.getElementById("pd-close")
   };
+
+  // ---- index.html and app.js out of step (2026-10-12) ----
+  // An index.html older than this app.js (a deploy that left a file out, or
+  // a shell cached mid-deploy) used to stop the app at the first element it
+  // couldn't find. That was after the sign-in listener had been set, so
+  // signing in did nothing (mason: "no longer able to get through the login
+  // screen"). Now a missing element becomes a hidden stand-in that isn't on
+  // the page, the console says which ones, and the page fetches a fresh copy
+  // of itself once (VOSEA_BUILD has to match index.html's vosea-build meta;
+  // both go up with sw.js's CACHE_NAME).
+  var VOSEA_BUILD = "111";
+  var elMissing = [];
+  Object.keys(el).forEach(function (k) {
+    if (el[k]) return;
+    elMissing.push(k);
+    el[k] = document.createElement("div");
+    el[k].hidden = true;
+  });
+  if (elMissing.length) console.warn("[vosea] index.html is missing " + elMissing.length + " element(s): " + elMissing.join(", "));
+  (function checkBuild() {
+    var meta = document.querySelector('meta[name="vosea-build"]');
+    var pageBuild = meta ? meta.getAttribute("content") : "";
+    if (pageBuild === VOSEA_BUILD) return;
+    console.warn("[vosea] index.html is build " + (pageBuild || "(none)") + ", app.js is build " + VOSEA_BUILD + ": asking for a fresh copy");
+    var KEY = "vosea-build-reload", last = 0;
+    try { last = Number(sessionStorage.getItem(KEY) || 0); } catch (e) {}
+    if (Date.now() - last < 120000) return; // tried a moment ago: carry on with what we have
+    try { sessionStorage.setItem(KEY, String(Date.now())); } catch (e) {}
+    var go = function () { try { window.location.reload(); } catch (e) {} };
+    var reg = navigator.serviceWorker && navigator.serviceWorker.getRegistration ? navigator.serviceWorker.getRegistration().then(function (r) { return r && r.update ? r.update() : null; }).catch(function () {}) : Promise.resolve();
+    var clear = window.caches && caches.keys
+      ? caches.keys().then(function (names) { return Promise.all(names.filter(function (n) { return /^vosea-shell/.test(n); }).map(function (n) { return caches.delete(n); })); })
+      : Promise.resolve();
+    Promise.all([reg, clear]).then(go, go);
+  })();
 
   function showBanner(msg) { el.banner.textContent = msg; el.banner.hidden = false; }
   function clearBanner() { el.banner.hidden = true; }
@@ -16907,6 +16945,22 @@
     });
   }
 
+  // Signing in is set up before the wiring below (2026-10-12), so nothing
+  // further down can ever leave you stuck on the login screen. Both answer
+  // asynchronously, after the rest of this file has run.
+  supabaseClient.auth.onAuthStateChange(function (_event, session) {
+    currentUser = session ? session.user : null;
+    renderAuthState();
+    practiceFlush();
+    refreshPracticeViews();
+  });
+  supabaseClient.auth.getSession().then(function (res) {
+    currentUser = (res.data && res.data.session) ? res.data.session.user : null;
+    renderAuthState();
+    practiceFlush();
+    refreshPracticeViews();
+  });
+
   // ================= wiring =================
   el.tabLogin.addEventListener("click", function () { setAuthMode("login"); });
   el.tabSignup.addEventListener("click", function () { setAuthMode("signup"); });
@@ -17009,9 +17063,9 @@
   });
   el.verbListsTrigger.addEventListener("click", function () { openListFilterPicker("verbs"); });
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
-  document.getElementById("d-close").addEventListener("click", function () { deselectVerb(); renderList(); });
-  document.getElementById("wd-close").addEventListener("click", function () { deselectWord(); renderWordList(); });
-  document.getElementById("pd-close").addEventListener("click", function () { deselectPhrase(); renderPhraseList(); });
+  el.detailClose.addEventListener("click", function () { deselectVerb(); renderList(); });
+  el.wordDetailClose.addEventListener("click", function () { deselectWord(); renderWordList(); });
+  el.phraseDetailClose.addEventListener("click", function () { deselectPhrase(); renderPhraseList(); });
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
   el.form.addEventListener("submit", handleSubmit);
@@ -17365,18 +17419,6 @@
     if (token) openSharePreview(token);
   })();
 
-  supabaseClient.auth.onAuthStateChange(function (_event, session) {
-    currentUser = session ? session.user : null;
-    renderAuthState();
-    practiceFlush();
-    refreshPracticeViews();
-  });
-  supabaseClient.auth.getSession().then(function (res) {
-    currentUser = (res.data && res.data.session) ? res.data.session.user : null;
-    renderAuthState();
-    practiceFlush();
-    refreshPracticeViews();
-  });
 
   // The conjugation table's row-height sync (see syncConjRowHeights) runs
   // once when a verb is first shown, but the two independent tables it's
