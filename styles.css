@@ -2628,3 +2628,44 @@
   .camino-scene-sub { font-size: 12.5px; color: var(--ink-soft); }
   .esc-tema.is-ahead { color: var(--ink-soft); border-style: dashed; border-color: var(--line); font-weight: 500; }
   .esc-ahead-note { font-size: 12.5px; color: var(--ink-soft); margin: -2px 0 6px; }
+
+  /* Stage 3 (2026-10-12): the quick-add "+", empty states that point
+     forward, the starter pack and the welcome. */
+  .masthead-actions { display: flex; align-items: flex-start; gap: 8px; }
+  .qa-wrap { position: relative; margin-top: 4px; }
+  .qa-trigger { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .qa-trigger:hover, .qa-trigger[aria-expanded="true"] { background: var(--accent-deep); border-color: var(--accent-deep); color: var(--paper); }
+  .qa-menu { min-width: 260px; }
+  .qa-item { flex-direction: column; align-items: flex-start; gap: 1px; min-height: 48px; justify-content: center; }
+  .qa-t { font-size: 14.5px; }
+  .qa-s { font-size: 12.5px; font-weight: 400; color: var(--ink-soft); }
+  /* the toolbar's "load example X" buttons now live in the empty state */
+  #seed-toolbar-btn, #seed-words-toolbar-btn, #seed-phrases-toolbar-btn { display: none !important; }
+  .empty-note.empty-start { text-align: left; }
+  .empty-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 6px; }
+  .empty-actions button { min-height: 44px; }
+  .empty-pack-note { font-size: 12.5px; color: var(--ink-soft); margin: 2px 0 2px; line-height: 1.4; }
+  .empty-examples { min-height: 36px; font-size: 13px; font-weight: 500; padding: 0; }
+  .welcome-overlay { z-index: 240; }
+  .welcome-card { max-width: 420px; padding: 24px 22px 16px; }
+  .welcome-kick { font-size: 11px; letter-spacing: .12em; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+  .welcome-title { font-family: "Fraunces", Georgia, serif; font-size: 26px; font-weight: 600; margin: 6px 0 8px; line-height: 1.15; color: var(--ink); }
+  .welcome-text { font-size: 15.5px; line-height: 1.5; margin: 0; color: var(--ink); }
+  .welcome-pack { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line)); display: flex; flex-direction: column; gap: 3px; }
+  .welcome-pack[hidden] { display: none; }
+  .welcome-pack b { font-size: 14.5px; }
+  .welcome-pack span { font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+  .welcome-dots { display: flex; gap: 6px; justify-content: center; margin: 18px 0 10px; }
+  .welcome-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+  .welcome-dots i.on { background: var(--accent); width: 20px; border-radius: 4px; }
+  .welcome-actions { display: flex; align-items: center; gap: 8px; }
+  .welcome-actions .btn-primary { margin-left: auto; min-height: 44px; }
+  .welcome-actions .btn-secondary { min-height: 44px; }
+  .welcome-actions .hoy-link[hidden], .welcome-actions button[hidden] { display: none; }
+  .welcome-actions .btn-secondary:not([hidden]) + .btn-primary { margin-left: 0; }
+  .welcome-actions:has(.btn-secondary:not([hidden])) .btn-secondary { margin-left: auto; }
+  #pack-toast .quiet-toast-btn[hidden] { display: none; }
+  @media (max-width: 600px) {
+    .welcome-overlay { align-items: flex-end; padding: 0; }
+    .welcome-card { max-width: none; border-radius: 20px 20px 0 0; padding: 22px 18px calc(16px + env(safe-area-inset-bottom)); }
+  }

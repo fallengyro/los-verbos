@@ -134,10 +134,48 @@
       hoy_nodue_title: "Nada para repasar hoy",
       hoy_nodue_sub: "Armá un mazo con lo tuyo, o seguí con un tema.",
       hoy_first_title: "Tus primeras tarjetas",
-      hoy_first_sub: "{v} verbos, {w} palabras y {p} frases en tu colección.",
-      hoy_empty_title: "Todavía no hay nada para practicar",
-      hoy_empty_sub: "Agregá en Colección lo primero que escuchaste hoy, o abrí un tema.",
+      hoy_first_sub: "{v}, {w} y {p} en tu colección.",
+      hoy_empty_title: "Empezá con el paquete inicial",
+      hoy_empty_sub: "«Primeros días en Buenos Aires»: {n} verbos, palabras y frases para la calle. O agregá en Colección lo primero que escuchaste hoy.",
       hoy_to_col: "Ir a Colección",
+      pack_add_btn: "Agregar el paquete inicial",
+      pack_sub: "{n} verbos, palabras y frases para tus primeros días: el colectivo, el vuelto, ¿me cobrás?…",
+      pack_have_all: "Ya está en tu colección · ver la lista",
+      pack_adding: "Agregando «Primeros días en Buenos Aires»…",
+      pack_added: "Listo: «{name}» está en tu colección y en tus listas.",
+      pack_error: "No se pudo agregar el paquete. Probá de nuevo en un rato.",
+      pack_toast_btn: "Ver la lista",
+      qa_aria: "Agregar a tu colección",
+      qa_head: "Agregar a tu colección",
+      qa_verb: "Un verbo",
+      qa_verb_sub: "Con su conjugación",
+      qa_word: "Una palabra",
+      qa_word_sub: "Lo que escuchaste en la calle",
+      qa_phrase: "Una frase",
+      qa_phrase_sub: "Expresiones enteras",
+      qa_import: "Importar una lista",
+      qa_import_sub: "Un archivo JSON de un viaje o un tema",
+      qa_pack: "El paquete inicial",
+      welcome_menu: "Ver la bienvenida",
+      welcome_kick_0: "1 · Aprender",
+      welcome_title_0: "Los temas explican",
+      welcome_text_0: "Cómo funciona el castellano de acá, con ejemplos que vas a escuchar en la calle. Están todos abiertos: empezá por donde quieras.",
+      welcome_kick_1: "2 · Practicar",
+      welcome_title_1: "Las tarjetas fijan",
+      welcome_text_1: "Tu colección, tus listas y los temas, en tarjetas para leer, escuchar o decir en voz alta. Hoy te dice qué repasar.",
+      welcome_kick_2: "3 · Jugar",
+      welcome_title_2: "Las escenas te sueltan",
+      welcome_text_2: "Charlas de verdad: la panadería, el taxi, el médico. La panadería está abierta; las demás se abren cuando practicás las frases que usan.",
+      welcome_pack_title: "¿Arrancamos con el paquete inicial?",
+      welcome_next: "Siguiente",
+      welcome_start: "Empezar",
+      welcome_skip: "Saltar",
+      empty_add_verbs: "Agregar un verbo",
+      empty_add_words: "Agregar una palabra",
+      empty_add_phrases: "Agregar una frase",
+      empty_examples_verbs: "O cargá los verbos de ejemplo",
+      empty_examples_words: "O cargá las palabras de ejemplo",
+      empty_examples_phrases: "O cargá las frases de ejemplo",
       hoy_learn_cont: "Seguí con «{name}»",
       hoy_learn_start: "Empezá «{name}»",
       hoy_learn_sub: "{lvl} · {firm} de {total} aprendidas",
@@ -1116,10 +1154,48 @@
       hoy_nodue_title: "Nothing to review today",
       hoy_nodue_sub: "Build a deck from your own things, or keep going with a topic.",
       hoy_first_title: "Your first cards",
-      hoy_first_sub: "{v} verbs, {w} words, and {p} phrases in your collection.",
-      hoy_empty_title: "Nothing to practice yet",
-      hoy_empty_sub: "Add the first thing you heard today in Collection, or open a topic.",
+      hoy_first_sub: "{v}, {w}, and {p} in your collection.",
+      hoy_empty_title: "Start with the starter pack",
+      hoy_empty_sub: "“Primeros días en Buenos Aires”: {n} verbs, words, and phrases for the street. Or add the first thing you heard today in Collection.",
       hoy_to_col: "Go to Collection",
+      pack_add_btn: "Add the starter pack",
+      pack_sub: "{n} verbs, words, and phrases for your first days: el colectivo, el vuelto, ¿me cobrás?…",
+      pack_have_all: "Already in your collection · see the list",
+      pack_adding: "Adding “Primeros días en Buenos Aires”…",
+      pack_added: "Done: “{name}” is in your collection and your lists.",
+      pack_error: "Couldn't add the pack. Try again in a bit.",
+      pack_toast_btn: "See the list",
+      qa_aria: "Add to your collection",
+      qa_head: "Add to your collection",
+      qa_verb: "A verb",
+      qa_verb_sub: "With its conjugation",
+      qa_word: "A word",
+      qa_word_sub: "Something you heard on the street",
+      qa_phrase: "A phrase",
+      qa_phrase_sub: "Whole expressions",
+      qa_import: "Import a list",
+      qa_import_sub: "A JSON file from a trip or a topic",
+      qa_pack: "The starter pack",
+      welcome_menu: "See the welcome",
+      welcome_kick_0: "1 · Learn",
+      welcome_title_0: "Topics explain",
+      welcome_text_0: "How the Spanish here works, with examples you'll hear on the street. They're all open: start wherever you like.",
+      welcome_kick_1: "2 · Practice",
+      welcome_title_1: "Cards make it stick",
+      welcome_text_1: "Your collection, your lists, and the topics, on cards to read, listen to or say out loud. Today tells you what to review.",
+      welcome_kick_2: "3 · Play",
+      welcome_title_2: "Scenes set you loose",
+      welcome_text_2: "Real conversations: the bakery, the taxi, the doctor. The bakery is open; the others open once you practice the phrases they use.",
+      welcome_pack_title: "Start with the starter pack?",
+      welcome_next: "Next",
+      welcome_start: "Get started",
+      welcome_skip: "Skip",
+      empty_add_verbs: "Add a verb",
+      empty_add_words: "Add a word",
+      empty_add_phrases: "Add a phrase",
+      empty_examples_verbs: "Or load the example verbs",
+      empty_examples_words: "Or load the example words",
+      empty_examples_phrases: "Or load the example phrases",
       hoy_learn_cont: "Keep going with “{name}”",
       hoy_learn_start: "Start “{name}”",
       hoy_learn_sub: "{lvl} · {firm} of {total} learned",
@@ -3074,6 +3150,7 @@
     evt.stopPropagation();
     var willOpen = el.acctMenu.hidden;
     closeAcctMenu();
+    if (el.qaMenu && !el.qaMenu.hidden) closeQuickAdd();
     if (willOpen) {
       el.acctMenu.hidden = false;
       el.acctTrigger.setAttribute("aria-expanded", "true");
@@ -3463,6 +3540,92 @@
     { phrase: "¿Vos me estás cargando?", definition: "are you messing with me? / are you serious?", function: "sorpresa", register: "coloquial", idiomatic: true, literal: "are you loading/charging me?" }
   ];
 
+  // ================= starter pack "Primeros días en Buenos Aires" (2026-10-12, the new flow stage 3) =================
+  // mason: "i love the idea of a starter pack of content". One tap adds it
+  // (from Hoy, an empty Colección part, the "+" menu or the welcome): the
+  // verbs, words and phrases you need in your first week here, all in the
+  // Argentine choice (colectivo, vuelto, ¿me cobrás?), plus a list with the
+  // same name so it can be studied (and shared) as one deck. It goes
+  // through the import pipeline (version 1 format, see IMPORT_FORMAT_SPEC),
+  // so anything you already have is kept as is and only linked to the list.
+  // Eight verbs reuse STARTER_VERBS' full forms with an example from the
+  // city; tomar, pagar, pedir and vivir are written out here.
+  var STARTER_PACK_NAME = "Primeros días en Buenos Aires";
+  var STARTER_PACK_REUSE = [
+    ["ser", "¿Vos sos de acá?"],
+    ["estar", "¿Dónde está la parada del 39?"],
+    ["tener", "¿Tenés cambio de diez mil?"],
+    ["ir", "Voy al almacén, ¿querés algo?"],
+    ["querer", "Quiero media docena de medialunas."],
+    ["poder", "¿Puedo pagar con tarjeta?"],
+    ["gustar", "Me gustan las medialunas de manteca."],
+    ["llamarse", "¿Cómo te llamás?"]
+  ];
+  var STARTER_PACK_VERBS = [
+      { infinitive: "tomar", definition: "to take (a bus, the subway); to drink", example: "Tomamos el subte hasta Pueyrredón.", type: "-ar", irregularity: "regular", pattern: "regular -ar", reflexive: false, transitivity: "transitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "tomo", vos: "tomás", el: "toma", nosotros: "tomamos", ellos: "toman" }, preterito: { yo: "tomé", vos: "tomaste", el: "tomó", nosotros: "tomamos", ellos: "tomaron" }, imperfecto: { yo: "tomaba", vos: "tomabas", el: "tomaba", nosotros: "tomábamos", ellos: "tomaban" }, futuro: { yo: "tomaré", vos: "tomarás", el: "tomará", nosotros: "tomaremos", ellos: "tomarán" }, condicional: { yo: "tomaría", vos: "tomarías", el: "tomaría", nosotros: "tomaríamos", ellos: "tomarían" }, subjPresente: { yo: "tome", vos: "tomes", el: "tome", nosotros: "tomemos", ellos: "tomen" }, subjPasado: { yo: "tomara", vos: "tomaras", el: "tomara", nosotros: "tomáramos", ellos: "tomaran" }, imperativo: { vos: "tomá", usted: "tome", nosotros: "tomemos", ustedes: "tomen" }, gerundio: "tomando", participio: "tomado" }},
+      { infinitive: "pagar", definition: "to pay", example: "¿Pagás en efectivo o con tarjeta?", type: "-ar", irregularity: "regular", pattern: "regular -ar; spelling change g → gu before e (pagué, pague)", reflexive: false, transitivity: "transitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "pago", vos: "pagás", el: "paga", nosotros: "pagamos", ellos: "pagan" }, preterito: { yo: "pagué", vos: "pagaste", el: "pagó", nosotros: "pagamos", ellos: "pagaron" }, imperfecto: { yo: "pagaba", vos: "pagabas", el: "pagaba", nosotros: "pagábamos", ellos: "pagaban" }, futuro: { yo: "pagaré", vos: "pagarás", el: "pagará", nosotros: "pagaremos", ellos: "pagarán" }, condicional: { yo: "pagaría", vos: "pagarías", el: "pagaría", nosotros: "pagaríamos", ellos: "pagarían" }, subjPresente: { yo: "pague", vos: "pagues", el: "pague", nosotros: "paguemos", ellos: "paguen" }, subjPasado: { yo: "pagara", vos: "pagaras", el: "pagara", nosotros: "pagáramos", ellos: "pagaran" }, imperativo: { vos: "pagá", usted: "pague", nosotros: "paguemos", ustedes: "paguen" }, gerundio: "pagando", participio: "pagado" }},
+      { infinitive: "pedir", definition: "to ask for; to order (food, a ride)", example: "Pedimos una pizza por la app.", type: "-ir", irregularity: "cambio de raíz", pattern: "stem-change e→i", reflexive: false, transitivity: "transitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "pido", vos: "pedís", el: "pide", nosotros: "pedimos", ellos: "piden" }, preterito: { yo: "pedí", vos: "pediste", el: "pidió", nosotros: "pedimos", ellos: "pidieron" }, imperfecto: { yo: "pedía", vos: "pedías", el: "pedía", nosotros: "pedíamos", ellos: "pedían" }, futuro: { yo: "pediré", vos: "pedirás", el: "pedirá", nosotros: "pediremos", ellos: "pedirán" }, condicional: { yo: "pediría", vos: "pedirías", el: "pediría", nosotros: "pediríamos", ellos: "pedirían" }, subjPresente: { yo: "pida", vos: "pidas", el: "pida", nosotros: "pidamos", ellos: "pidan" }, subjPasado: { yo: "pidiera", vos: "pidieras", el: "pidiera", nosotros: "pidiéramos", ellos: "pidieran" }, imperativo: { vos: "pedí", usted: "pida", nosotros: "pidamos", ustedes: "pidan" }, gerundio: "pidiendo", participio: "pedido" }},
+      { infinitive: "vivir", definition: "to live", example: "Vivimos en un departamento en Palermo.", type: "-ir", irregularity: "regular", pattern: "regular -ir", reflexive: false, transitivity: "intransitivo", preposicion: "", auxiliar: false, forms: { presente: { yo: "vivo", vos: "vivís", el: "vive", nosotros: "vivimos", ellos: "viven" }, preterito: { yo: "viví", vos: "viviste", el: "vivió", nosotros: "vivimos", ellos: "vivieron" }, imperfecto: { yo: "vivía", vos: "vivías", el: "vivía", nosotros: "vivíamos", ellos: "vivían" }, futuro: { yo: "viviré", vos: "vivirás", el: "vivirá", nosotros: "viviremos", ellos: "vivirán" }, condicional: { yo: "viviría", vos: "vivirías", el: "viviría", nosotros: "viviríamos", ellos: "vivirían" }, subjPresente: { yo: "viva", vos: "vivas", el: "viva", nosotros: "vivamos", ellos: "vivan" }, subjPasado: { yo: "viviera", vos: "vivieras", el: "viviera", nosotros: "viviéramos", ellos: "vivieran" }, imperativo: { vos: "viví", usted: "viva", nosotros: "vivamos", ustedes: "vivan" }, gerundio: "viviendo", participio: "vivido" }}
+  ];
+  var STARTER_PACK_WORDS = [
+    { word: "colectivo", definition: "city bus", part_of_speech: "sustantivo", gender: "masculino", example: "Tomo el colectivo en la esquina.", notes: "También \"bondi\" (coloquial). En otros países: autobús." },
+    { word: "parada", definition: "bus stop", part_of_speech: "sustantivo", gender: "femenino", example: "La parada está a dos cuadras." },
+    { word: "cuadra", definition: "city block (as a distance)", part_of_speech: "sustantivo", gender: "femenino", example: "Es a tres cuadras de acá." },
+    { word: "subte", definition: "subway, the Buenos Aires metro", part_of_speech: "sustantivo", gender: "masculino", example: "Vamos en subte, es más rápido." },
+    { word: "vuelto", definition: "change (the money you get back)", part_of_speech: "sustantivo", gender: "masculino", example: "Quedate con el vuelto.", notes: "El vuelto es lo que te devuelven; \"cambio\" son billetes chicos o monedas." },
+    { word: "efectivo", definition: "cash", part_of_speech: "sustantivo", gender: "masculino", example: "¿Pagás con tarjeta o en efectivo?" },
+    { word: "plata", definition: "money (everyday word)", part_of_speech: "sustantivo", gender: "femenino", example: "No tengo plata encima." },
+    { word: "medialuna", definition: "croissant (the Argentine kind, smaller)", part_of_speech: "sustantivo", gender: "femenino", example: "Un café con leche y dos medialunas, por favor.", notes: "De manteca (dulce) o de grasa (salada)." },
+    { word: "factura", definition: "pastry from the bakery; also a bill or invoice", part_of_speech: "sustantivo", gender: "femenino", example: "Compramos facturas para el mate." },
+    { word: "verdulería", definition: "fruit and vegetable shop", part_of_speech: "sustantivo", gender: "femenino", example: "En la verdulería de la esquina las paltas están baratas." },
+    { word: "almacén", definition: "small neighborhood grocery store", part_of_speech: "sustantivo", gender: "masculino", example: "Voy al almacén a comprar leche." },
+    { word: "kiosco", definition: "corner shop for snacks, drinks and SUBE top-ups", part_of_speech: "sustantivo", gender: "masculino", example: "¿Hay un kiosco por acá?" },
+    { word: "departamento", definition: "apartment", part_of_speech: "sustantivo", gender: "masculino", example: "Vivimos en un departamento en Palermo.", notes: "Coloquial: \"depto\"." },
+    { word: "encargado", definition: "building superintendent (doorman and caretaker)", part_of_speech: "sustantivo", gender: "masculino", example: "Le dejé las llaves al encargado." },
+    { word: "feriado", definition: "public holiday", part_of_speech: "sustantivo", gender: "masculino", example: "El lunes es feriado, cierran los bancos." },
+    { word: "laburo", definition: "work, a job (everyday word)", part_of_speech: "sustantivo", gender: "masculino", example: "Me voy al laburo.", notes: "Lunfardo, de uso general. El verbo es \"laburar\"." }
+  ];
+  var STARTER_PACK_PHRASES = [
+    { phrase: "Buen día", definition: "good morning", function: "saludo", register: "neutro", idiomatic: false, notes: "Acá se dice más que \"buenos días\"." },
+    { phrase: "¿Cómo andás?", definition: "how are you doing?", function: "saludo", register: "neutro", idiomatic: false },
+    { phrase: "Che", definition: "hey (to get someone's attention)", function: "muletilla", register: "coloquial", idiomatic: false, example: "Che, ¿vamos a comer algo?" },
+    { phrase: "Dale", definition: "okay / sure / sounds good", function: "acuerdo", register: "coloquial", idiomatic: true, literal: "give it / go" },
+    { phrase: "¿Me das dos medialunas?", definition: "can I have two croissants? (how you order)", function: "pregunta", register: "neutro", idiomatic: false, notes: "Para pedir cualquier cosa: ¿Me das…? + lo que querés." },
+    { phrase: "¿Cuánto sale?", definition: "how much does it cost?", function: "pregunta", register: "coloquial", idiomatic: true, literal: "how much does it come out?" },
+    { phrase: "¿Me cobrás?", definition: "can I pay? (asking for the check)", function: "pregunta", register: "coloquial", idiomatic: true, literal: "will you charge me?", example: "Perdón, ¿me cobrás?" },
+    { phrase: "Nada más, gracias", definition: "that's all, thanks", function: "cortesía", register: "neutro", idiomatic: false },
+    { phrase: "Quedate con el vuelto", definition: "keep the change", function: "cortesía", register: "neutro", idiomatic: false },
+    { phrase: "Permiso", definition: "excuse me (to get past someone)", function: "cortesía", register: "neutro", idiomatic: false, example: "Permiso, bajo en la próxima." },
+    { phrase: "Bajo en la próxima", definition: "I'm getting off at the next stop", function: "otro", register: "neutro", idiomatic: false },
+    { phrase: "¿Pasa por Plaza Italia?", definition: "does it go by Plaza Italia? (asking about a bus route)", function: "pregunta", register: "neutro", idiomatic: false, notes: "Para preguntar por cualquier lugar: ¿Pasa por…?" },
+    { phrase: "Todo bien", definition: "all good / no worries / it's fine", function: "otro", register: "coloquial", idiomatic: true, literal: "all good" },
+    { phrase: "De una", definition: "absolutely / for sure", function: "acuerdo", register: "coloquial", idiomatic: true, literal: "in one go", example: "—¿Vamos al cine? —¡De una!" },
+    { phrase: "Al toque", definition: "right away", function: "otro", register: "coloquial", idiomatic: true, literal: "at the touch", example: "Te escribo al toque." },
+    { phrase: "Nos vemos", definition: "see you later", function: "despedida", register: "neutro", idiomatic: false }
+  ];
+  // the pack as an import v1 object
+  function starterPackData() {
+    var reuse = STARTER_PACK_REUSE.map(function (r) {
+      var src = STARTER_VERBS.filter(function (v) { return v.infinitive === r[0]; })[0];
+      var v = JSON.parse(JSON.stringify(src));
+      v.example = r[1];
+      return v;
+    });
+    return { version: 1, list_name: STARTER_PACK_NAME, verbs: reuse.concat(STARTER_PACK_VERBS), words: STARTER_PACK_WORDS, phrases: STARTER_PACK_PHRASES };
+  }
+  // how much of the pack is already in your collection
+  function starterPackHave() {
+    var d = starterPackData(), have = 0;
+    var vs = {}, ws = {}, ps = {};
+    allVerbs.forEach(function (v) { vs[norm(v.data.infinitive || "")] = true; });
+    allWords.forEach(function (w) { ws[norm(w.data.word || "")] = true; });
+    allPhrases.forEach(function (p) { ps[norm(p.data.phrase || "")] = true; });
+    d.verbs.forEach(function (v) { if (vs[norm(v.infinitive)]) have++; });
+    d.words.forEach(function (w) { if (ws[norm(w.word)]) have++; });
+    d.phrases.forEach(function (p) { if (ps[norm(p.phrase)]) have++; });
+    return { have: have, total: d.verbs.length + d.words.length + d.phrases.length };
+  }
+
   // ================= state =================
   var allVerbs = [];      // [{id, data}]
 
@@ -3752,6 +3915,28 @@
     tabCol: document.getElementById("tab-col"),
     hoyPanel: document.getElementById("hoy-panel"),
     hoyCards: document.getElementById("hoy-cards"),
+    qaTrigger: document.getElementById("qa-trigger"),
+    qaMenu: document.getElementById("qa-menu"),
+    qaVerb: document.getElementById("qa-verb"),
+    qaWord: document.getElementById("qa-word"),
+    qaPhrase: document.getElementById("qa-phrase"),
+    qaImport: document.getElementById("qa-import"),
+    qaPack: document.getElementById("qa-pack"),
+    qaPackSub: document.getElementById("qa-pack-sub"),
+    acctMenuWelcome: document.getElementById("acct-menu-welcome"),
+    welcomeOverlay: document.getElementById("welcome-overlay"),
+    welcomeKick: document.getElementById("welcome-kick"),
+    welcomeTitle: document.getElementById("welcome-title"),
+    welcomeText: document.getElementById("welcome-text"),
+    welcomePack: document.getElementById("welcome-pack"),
+    welcomePackSub: document.getElementById("welcome-pack-sub"),
+    welcomeDots: document.getElementById("welcome-dots"),
+    welcomeSkip: document.getElementById("welcome-skip"),
+    welcomeAlt: document.getElementById("welcome-alt"),
+    welcomeNext: document.getElementById("welcome-next"),
+    packToast: document.getElementById("pack-toast"),
+    packToastText: document.getElementById("pack-toast-text"),
+    packToastBtn: document.getElementById("pack-toast-btn"),
     colSegBox: document.getElementById("col-seg"),
     colSeg_verbs: document.getElementById("col-seg-verbs"),
     colSeg_words: document.getElementById("col-seg-words"),
@@ -4502,15 +4687,7 @@
       var note = document.createElement("div");
       note.className = "empty-note";
       if (allVerbs.length === 0) {
-        var p = document.createElement("p");
-        p.textContent = t("empty_no_verbs");
-        note.appendChild(p);
-        var seedBtn = document.createElement("button");
-        seedBtn.type = "button";
-        seedBtn.className = "seed-btn";
-        seedBtn.textContent = t("seed_verbs_btn");
-        seedBtn.addEventListener("click", seedStarterVerbs);
-        note.appendChild(seedBtn);
+        colEmptyStart(note, "verbs");
       } else if (!renderListAwareEmptyNote(note, {
         allItems: allVerbs,
         membership: function (v) { return verbListMembership[norm(v.data.infinitive || "")]; },
@@ -5099,6 +5276,7 @@
       .order("infinitive", { ascending: true })
       .then(function (res) {
         if (res.error) throw res.error;
+        contentReady.verbs = true;
         saveCache("verbs", res.data || []);
         markOnline("verbs");
         clearBanner();
@@ -5118,6 +5296,7 @@
         if (!cached) { showBanner(t("msg_error_cargar_verbos", { msg: (err && err.message) || err })); return; }
         allVerbs = sortByText(cached.rows.map(rowToVerb), "infinitive");
         markOffline("verbs", cached.savedAt);
+        contentReady.verbs = true;
         renderList();
       });
   }
@@ -5415,9 +5594,12 @@
       box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_nodue_title"), sub: t("hoy_nodue_sub"), btn: t("hoy_build_btn"), onGo: build }));
     } else if (nMine) {
       box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_first_title"),
-        sub: t("hoy_first_sub", { v: allVerbs.length, w: allWords.length, p: allPhrases.length }), btn: t("hoy_build_btn"), onGo: build }));
+        sub: t("hoy_first_sub", { v: colPartLine(allVerbs.length, "col_n_verbs_one", "col_n_verbs"), w: colPartLine(allWords.length, "col_n_words_one", "col_n_words"), p: colPartLine(allPhrases.length, "col_n_phrases_one", "col_n_phrases") }), btn: t("hoy_build_btn"), onGo: build }));
     } else {
-      box.appendChild(hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_empty_title"), sub: t("hoy_empty_sub"), btn: t("hoy_to_col"), onGo: function () { setMainTab("col"); } }));
+      var packCard = hoyCard({ id: "hoy-practice", kicker: t("hoy_k_practice"), title: t("hoy_empty_title"), sub: t("hoy_empty_sub", { n: starterPackHave().total }),
+        btn: t("pack_add_btn"), onGo: function () { addStarterPack(packCard.querySelector(".hoy-btn")); },
+        link: t("hoy_to_col"), onLink: function () { setMainTab("col"); } });
+      box.appendChild(packCard);
     }
 
     // Aprender
@@ -5461,6 +5643,152 @@
       rb.addEventListener("click", function () { setMainTab("play"); openAmigos(true); });
       box.appendChild(rb);
     }
+    maybeAutoWelcome(nMine, rows.length);
+  }
+
+  // ---- The starter pack, the quick-add "+", empty states and the welcome (2026-10-12, stage 3) ----
+  var packBusy = false;
+  var packToastTimer = 0;
+  function packSubText() {
+    var pk = starterPackHave();
+    if (pk.have >= pk.total) return t("pack_have_all");
+    return t("pack_sub", { n: pk.total - pk.have });
+  }
+  function showPackToast(msg, withBtn) {
+    el.packToastText.textContent = msg;
+    el.packToastBtn.hidden = !withBtn;
+    el.packToast.hidden = false;
+    clearTimeout(packToastTimer);
+    packToastTimer = setTimeout(function () { el.packToast.hidden = true; }, 7000);
+  }
+  // adds "Primeros días en Buenos Aires" through the import pipeline
+  function addStarterPack(btn) {
+    if (packBusy || !currentUser) return Promise.resolve({ ok: false });
+    packBusy = true;
+    if (btn) btn.disabled = true;
+    var d = starterPackData(), errors = [], warnings = [];
+    var ip = { verbs: [], words: [], phrases: [], listName: d.list_name };
+    d.verbs.forEach(function (v, i) { var r = validateImportVerb(v, i, errors, warnings); if (r) ip.verbs.push(r); });
+    d.words.forEach(function (w, i) { var r = validateImportWord(w, i, errors); if (r) ip.words.push(r); });
+    d.phrases.forEach(function (p, i) { var r = validateImportPhrase(p, i, errors); if (r) ip.phrases.push(r); });
+    if (errors.length) { try { console.warn("starter pack:", errors); } catch (e) {} }
+    showPackToast(t("pack_adding"), false);
+    return runImport(ip, function () {}).then(function (r) {
+      packBusy = false;
+      if (btn) btn.disabled = false;
+      if (r.ok) showPackToast(t("pack_added", { name: STARTER_PACK_NAME }), true);
+      else showPackToast(t("pack_error"), false);
+      renderHoySoon();
+      return r;
+    });
+  }
+  function openPackList() {
+    el.packToast.hidden = true;
+    setMainTab("lists");
+    var go = function () {
+      var hit = allLists.filter(function (l) { return l.data && l.data.name === STARTER_PACK_NAME; })[0];
+      if (hit) selectListRow(hit.id);
+      return !!hit;
+    };
+    if (!go()) setTimeout(go, 600);
+  }
+
+  // The quick-add "+": a small menu like the account one.
+  function closeQuickAdd() {
+    el.qaMenu.hidden = true;
+    el.qaTrigger.setAttribute("aria-expanded", "false");
+  }
+  function toggleQuickAdd(evt) {
+    evt.stopPropagation();
+    var willOpen = el.qaMenu.hidden;
+    closeQuickAdd();
+    closeAcctMenu();
+    if (willOpen) {
+      el.qaPackSub.textContent = packSubText();
+      el.qaMenu.hidden = false;
+      el.qaTrigger.setAttribute("aria-expanded", "true");
+    }
+  }
+  // opens Colección on that part with its "add" form
+  function quickAdd(part) {
+    closeQuickAdd();
+    closeDeckBuilder();
+    setMainTab(part);
+    if (part === "verbs") openForm("add");
+    else if (part === "words") openWordForm("add");
+    else if (part === "phrases") openPhraseForm("add");
+  }
+
+  // An empty Colección part points forward: the starter pack, your first
+  // one, or the old example set.
+  function colEmptyStart(note, part) {
+    note.classList.add("empty-start");
+    note.appendChild(progEl("p", null, t("empty_no_" + part)));
+    var pk = starterPackHave();
+    var row = progEl("div", "empty-actions");
+    if (pk.have < pk.total) {
+      var pb = progButton(t("pack_add_btn"), true, function () { addStarterPack(pb); });
+      pb.classList.add("empty-pack-btn");
+      row.appendChild(pb);
+    }
+    var ab = progButton(t("empty_add_" + part), pk.have >= pk.total, function () { quickAdd(part); });
+    ab.classList.add("empty-add-btn");
+    row.appendChild(ab);
+    note.appendChild(row);
+    if (pk.have < pk.total) note.appendChild(progEl("div", "empty-pack-note", packSubText()));
+    var ex = progEl("button", "hoy-link empty-examples", t("empty_examples_" + part));
+    ex.type = "button";
+    ex.addEventListener("click", part === "verbs" ? seedStarterVerbs : part === "words" ? seedStarterWords : seedStarterPhrases);
+    note.appendChild(ex);
+  }
+
+  // The welcome: Aprender / Practicar / Jugar.
+  var WELCOME_KEY = "vosea-welcome-seen";
+  var welcomeStep = 0;
+  var contentReady = {};
+  function welcomeSeen() { try { return localStorage.getItem(WELCOME_KEY) === "1"; } catch (e) { return false; } }
+  function markWelcomeSeen() { try { localStorage.setItem(WELCOME_KEY, "1"); } catch (e) {} }
+  function openWelcome() {
+    closeAcctMenu();
+    closeQuickAdd();
+    welcomeStep = 0;
+    markWelcomeSeen();
+    el.welcomeOverlay.hidden = false;
+    renderWelcome();
+    try { el.welcomeNext.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function closeWelcome() {
+    el.welcomeOverlay.hidden = true;
+    renderHoySoon();
+  }
+  function renderWelcome() {
+    var n = welcomeStep, last = n === 2;
+    el.welcomeKick.textContent = t("welcome_kick_" + n);
+    el.welcomeTitle.textContent = t("welcome_title_" + n);
+    el.welcomeText.textContent = t("welcome_text_" + n);
+    Array.prototype.forEach.call(el.welcomeDots.children, function (d, i) { d.className = i === n ? "on" : ""; });
+    var pk = starterPackHave();
+    var offer = last && !!currentUser && pk.have < pk.total;
+    el.welcomePack.hidden = !offer;
+    if (offer) el.welcomePackSub.textContent = packSubText();
+    el.welcomeSkip.hidden = last;
+    el.welcomeAlt.hidden = !offer;
+    el.welcomeAlt.textContent = t("welcome_start");
+    el.welcomeNext.textContent = !last ? t("welcome_next") : offer ? t("pack_add_btn") : t("welcome_start");
+  }
+  function welcomeNextClick() {
+    if (welcomeStep < 2) { welcomeStep++; renderWelcome(); return; }
+    var offer = !el.welcomePack.hidden;
+    closeWelcome();
+    if (offer) addStarterPack();
+  }
+  // shown by itself once: a signed-in account with nothing in its
+  // collection and no practice yet, after everything has loaded
+  function maybeAutoWelcome(nMine, nRows) {
+    if (window.__voseaWelcome === false) return;
+    if (!currentUser || nMine || nRows || welcomeSeen() || !el.welcomeOverlay.hidden) return;
+    if (!(contentReady.verbs && contentReady.words && contentReady.phrases && topicHistoryReady())) return;
+    openWelcome();
   }
 
   function wordCardRow(id, data) {
@@ -5516,15 +5844,7 @@
       var note = document.createElement("div");
       note.className = "empty-note";
       if (allWords.length === 0) {
-        var p = document.createElement("p");
-        p.textContent = t("empty_no_words");
-        note.appendChild(p);
-        var seedWordsBtn = document.createElement("button");
-        seedWordsBtn.type = "button";
-        seedWordsBtn.className = "seed-btn";
-        seedWordsBtn.textContent = t("seed_words_btn");
-        seedWordsBtn.addEventListener("click", seedStarterWords);
-        note.appendChild(seedWordsBtn);
+        colEmptyStart(note, "words");
       } else if (!renderListAwareEmptyNote(note, {
         allItems: allWords,
         membership: function (v) { return wordListMembership[norm(v.data.word || "")]; },
@@ -5650,6 +5970,7 @@
       .order("word", { ascending: true })
       .then(function (res) {
         if (res.error) throw res.error;
+        contentReady.words = true;
         saveCache("words", res.data || []);
         markOnline("words");
         clearBanner();
@@ -5665,6 +5986,7 @@
         if (!cached) { showBanner(t("msg_error_cargar_vocab", { msg: (err && err.message) || err })); return; }
         allWords = sortByText(cached.rows.map(rowToWord), "word");
         markOffline("words", cached.savedAt);
+        contentReady.words = true;
         renderWordList();
       });
   }
@@ -5797,15 +6119,7 @@
       var note = document.createElement("div");
       note.className = "empty-note";
       if (allPhrases.length === 0) {
-        var p = document.createElement("p");
-        p.textContent = t("empty_no_phrases");
-        note.appendChild(p);
-        var seedPhrasesBtn = document.createElement("button");
-        seedPhrasesBtn.type = "button";
-        seedPhrasesBtn.className = "seed-btn";
-        seedPhrasesBtn.textContent = t("seed_phrases_btn");
-        seedPhrasesBtn.addEventListener("click", seedStarterPhrases);
-        note.appendChild(seedPhrasesBtn);
+        colEmptyStart(note, "phrases");
       } else if (!renderListAwareEmptyNote(note, {
         allItems: allPhrases,
         membership: function (v) { return phraseListMembership[norm(v.data.phrase || "")]; },
@@ -5942,6 +6256,7 @@
       .order("phrase", { ascending: true })
       .then(function (res) {
         if (res.error) throw res.error;
+        contentReady.phrases = true;
         saveCache("phrases", res.data || []);
         markOnline("phrases");
         clearBanner();
@@ -5957,6 +6272,7 @@
         if (!cached) { showBanner(t("msg_error_cargar_frases", { msg: (err && err.message) || err })); return; }
         allPhrases = sortByText(cached.rows.map(rowToPhrase), "phrase");
         markOffline("phrases", cached.savedAt);
+        contentReady.phrases = true;
         renderPhraseList();
       });
   }
@@ -16244,12 +16560,21 @@
     if (!importParsed || !currentUser) return;
     el.importJsonConfirmBtn.disabled = true;
     el.importJsonResultMsg.textContent = t("msg_importando");
+    runImport(importParsed, function (msg) { el.importJsonResultMsg.textContent = msg; }).then(function (r) {
+      if (!r.ok) el.importJsonConfirmBtn.disabled = false;
+    });
+  }
+
+  // The import itself, for a validated { verbs, words, phrases, listName }
+  // (2026-10-12: split out of handleImportJsonConfirm so the starter pack
+  // can use it too). say(msg) shows the final message; resolves { ok, msg }.
+  function runImport(ip, say) {
 
     // Fetch the account's CURRENT verbs/words fresh (rather than trusting
     // whatever allVerbs/allWords happen to hold in memory) so the
     // already-exists check is accurate even if this tab hasn't been
     // reloaded recently.
-    Promise.all([
+    return Promise.all([
       supabaseClient.from("verbs").select("*"),
       supabaseClient.from("words").select("*"),
       supabaseClient.from("phrases").select("*")
@@ -16257,9 +16582,8 @@
       var vFetch = fetchResults[0], wFetch = fetchResults[1], pFetch = fetchResults[2];
       if (vFetch.error || wFetch.error || pFetch.error) {
         var ferr = vFetch.error || wFetch.error || pFetch.error;
-        el.importJsonResultMsg.textContent = t("msg_error_importar", { msg: ferr.message });
-        el.importJsonConfirmBtn.disabled = false;
-        return;
+        say(t("msg_error_importar", { msg: ferr.message }));
+        return { ok: false };
       }
       var existingInf = {};
       (vFetch.data || []).map(rowToVerb).forEach(function (v) { existingInf[norm(v.data.infinitive || "")] = v.data; });
@@ -16269,7 +16593,7 @@
       (pFetch.data || []).map(rowToPhrase).forEach(function (p) { existingPhraseMap[norm(p.data.phrase || "")] = p.data; });
 
       var toInsertV = [], alreadyHaveV = [];
-      importParsed.verbs.forEach(function (v) {
+      ip.verbs.forEach(function (v) {
         var key = norm(v.infinitive);
         if (existingInf[key]) { alreadyHaveV.push(existingInf[key]); return; }
         existingInf[key] = v; // guard against dupes within this same import batch
@@ -16277,7 +16601,7 @@
       });
 
       var toInsertW = [], alreadyHaveW = [];
-      importParsed.words.forEach(function (w) {
+      ip.words.forEach(function (w) {
         var key = norm(w.word);
         if (existingWordMap[key]) { alreadyHaveW.push(existingWordMap[key]); return; }
         existingWordMap[key] = w;
@@ -16292,7 +16616,7 @@
       });
 
       var toInsertP = [], alreadyHaveP = [];
-      importParsed.phrases.forEach(function (p) {
+      ip.phrases.forEach(function (p) {
         var key = norm(p.phrase);
         if (existingPhraseMap[key]) { alreadyHaveP.push(existingPhraseMap[key]); return; }
         existingPhraseMap[key] = p;
@@ -16312,13 +16636,12 @@
       var wordsPromise = toInsertW.length ? supabaseClient.from("words").insert(toInsertW).select() : Promise.resolve({ data: [], error: null });
       var phrasesPromise = toInsertP.length ? supabaseClient.from("phrases").insert(toInsertP).select() : Promise.resolve({ data: [], error: null });
 
-      Promise.all([verbsPromise, wordsPromise, phrasesPromise]).then(function (results) {
+      return Promise.all([verbsPromise, wordsPromise, phrasesPromise]).then(function (results) {
         var vRes = results[0], wRes = results[1], pRes = results[2];
         if (vRes.error || wRes.error || pRes.error) {
           var err = vRes.error || wRes.error || pRes.error;
-          el.importJsonResultMsg.textContent = t("msg_error_importar", { msg: err.message });
-          el.importJsonConfirmBtn.disabled = false;
-          return;
+          say(t("msg_error_importar", { msg: err.message }));
+          return { ok: false };
         }
         if (toInsertV.length) loadVerbs();
         if (toInsertW.length) loadWords();
@@ -16333,23 +16656,23 @@
           vSkip: alreadyHaveV.length, wSkip: alreadyHaveW.length, pSkip: alreadyHaveP.length
         });
 
-        if (!importParsed.listName) {
-          el.importJsonResultMsg.textContent = summaryMsg;
-          return;
+        if (!ip.listName) {
+          say(summaryMsg);
+          return { ok: true, msg: summaryMsg };
         }
 
         var allVerbSnapshots = insertedVerbData.concat(alreadyHaveV);
         var allWordSnapshots = insertedWordData.concat(alreadyHaveW);
         var allPhraseSnapshots = insertedPhraseData.concat(alreadyHaveP);
 
-        findOrCreateListByName(importParsed.listName).then(function (listResult) {
+        return findOrCreateListByName(ip.listName).then(function (listResult) {
           if (listResult.error) {
-            el.importJsonResultMsg.textContent = summaryMsg + t("import_json_result_list_error", { msg: listResult.error.message });
-            return;
+            say(summaryMsg + t("import_json_result_list_error", { msg: listResult.error.message }));
+            return { ok: true, msg: summaryMsg };
           }
-          var createdNote = listResult.created ? t("import_json_result_list_created", { name: importParsed.listName }) : "";
+          var createdNote = listResult.created ? t("import_json_result_list_created", { name: ip.listName }) : "";
 
-          Promise.all([
+          return Promise.all([
             addImportSnapshotsToList(listResult.id, "verb", allVerbSnapshots),
             addImportSnapshotsToList(listResult.id, "word", allWordSnapshots),
             addImportSnapshotsToList(listResult.id, "phrase", allPhraseSnapshots)
@@ -16362,13 +16685,17 @@
             } else {
               var addedTotal = (vAdd.added || 0) + (wAdd.added || 0) + (pAdd.added || 0);
               var alreadyTotal = (vAdd.already || 0) + (wAdd.already || 0) + (pAdd.already || 0);
-              msg += t("import_json_result_list_added", { name: importParsed.listName, added: addedTotal, already: alreadyTotal });
+              msg += t("import_json_result_list_added", { name: ip.listName, added: addedTotal, already: alreadyTotal });
             }
-            el.importJsonResultMsg.textContent = msg;
+            say(msg);
             loadLists();
+            return { ok: true, msg: msg };
           });
         });
       });
+    }).catch(function (e) {
+      say(t("msg_error_importar", { msg: (e && e.message) || String(e) }));
+      return { ok: false };
     });
   }
 
@@ -16410,6 +16737,9 @@
       el.usageOverlay.hidden = true;
       usageData = null;
       usageRole = { exempt: false, can_view_usage: false };
+      contentReady = {};
+      if (el.welcomeOverlay) el.welcomeOverlay.hidden = true;
+      if (el.qaMenu) closeQuickAdd();
       allVerbs = [];
       selectedId = null;
       el.detail.hidden = true;
@@ -16512,6 +16842,30 @@
   el.acctMenuUsage.addEventListener("click", function () {
     closeAcctMenu();
     openUsage();
+  });
+  el.acctMenuWelcome.addEventListener("click", openWelcome);
+  el.welcomeNext.addEventListener("click", welcomeNextClick);
+  el.welcomeAlt.addEventListener("click", closeWelcome);
+  el.welcomeSkip.addEventListener("click", closeWelcome);
+  el.welcomeOverlay.addEventListener("click", function (evt) { if (evt.target === el.welcomeOverlay) closeWelcome(); });
+  el.qaTrigger.addEventListener("click", toggleQuickAdd);
+  el.qaVerb.addEventListener("click", function () { quickAdd("verbs"); });
+  el.qaWord.addEventListener("click", function () { quickAdd("words"); });
+  el.qaPhrase.addEventListener("click", function () { quickAdd("phrases"); });
+  el.qaImport.addEventListener("click", function () { closeQuickAdd(); openImportJsonModal(); });
+  el.qaPack.addEventListener("click", function () {
+    closeQuickAdd();
+    var pk = starterPackHave();
+    if (pk.have >= pk.total) openPackList(); else addStarterPack();
+  });
+  el.packToastBtn.addEventListener("click", openPackList);
+  document.addEventListener("click", function (evt) {
+    if (!el.qaMenu.hidden && !evt.target.closest(".qa-wrap")) closeQuickAdd();
+  });
+  document.addEventListener("keydown", function (evt) {
+    if (evt.key !== "Escape") return;
+    if (!el.qaMenu.hidden) closeQuickAdd();
+    if (!el.welcomeOverlay.hidden) closeWelcome();
   });
   el.usageRefresh.addEventListener("click", function () { refreshUsage(); });
   el.usageClose.addEventListener("click", closeUsage);
