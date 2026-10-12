@@ -12,7 +12,7 @@
 // from cache immediately if we have it (fast, works offline), and in the
 // background fetch a fresh copy to store for next time.
 
-var CACHE_NAME = "vosea-shell-v108";
+var CACHE_NAME = "vosea-shell-v110";
 
 var SHELL_FILES = [
   "./",

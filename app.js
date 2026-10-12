@@ -908,6 +908,7 @@
       warm_set_precios: "Precios",
       warm_set_hora: "La hora",
       warm_set_fechas: "Fechas (sin año)",
+      warm_set_escenas: "Escenas: todo lo que dicen los personajes",
       warm_set_count: "{n} clips · ~{mb} MB",
       warm_voices_both: "Las dos voces",
       warm_total: "Total: {n} clips · {chars} caracteres · ~{mb} MB",
@@ -1922,6 +1923,7 @@
       warm_set_precios: "Prices",
       warm_set_hora: "Telling time",
       warm_set_fechas: "Dates (without the year)",
+      warm_set_escenas: "Escenas: everything the characters say",
       warm_set_count: "{n} clips · ~{mb} MB",
       warm_voices_both: "Both voices",
       warm_total: "Total: {n} clips · {chars} characters · ~{mb} MB",
@@ -2907,7 +2909,7 @@
   var warmPlan = null;      // { sets: [{key, texts}] }
   var warmRun = null;       // { total, done, hit, miss, error, stop, running }
   var warmVoices = "both";  // "both" | "elena" | "tomas"
-  var warmPicked = { oraciones: true, sonidos: true, numeros: true, precios: true, hora: true, fechas: true, album: true, coleccion: true, miles: false };
+  var warmPicked = { escenas: true, oraciones: true, sonidos: true, numeros: true, precios: true, hora: true, fechas: true, album: true, coleccion: true, miles: false };
   var WARM_BYTES_PER_CHAR = 560; // 64 kbit/s mp3 ≈ 8 KB a second; Spanish TTS ≈ 14 characters a second
   var WARM_CONCURRENCY = 4;
 
@@ -2963,6 +2965,58 @@
     if (tp.id === "precios" || tp.id === "hora" || tp.id === "fechas") return tp.id;
     return "sonidos";
   }
+  // Escenas (2026-10-12, ten ways for every line): every line the other
+  // people can say, exactly as a play asks for it — cast for each role's
+  // voice (a role is a woman with Elena, a man with Tomás, and lines can
+  // name the other roles' gender too, so every voice combination), with
+  // each {var} set's value said in words, every pick option, and the
+  // "wrong answer" replies. Each is a { text, voice } pair: a line is only
+  // ever asked for in the voice of the role that says it.
+  function warmEscenaPairs() {
+    var out = [], seen = {};
+    function lists(v) { return Array.isArray(v) ? [v] : (v && typeof v === "object" ? Object.keys(v).map(function (k) { return v[k]; }).filter(Array.isArray) : []); }
+    function fill(line, sc) {
+      var names = (String(line).match(/\{(\w+)\}/g) || []).map(function (m) { return m.slice(1, -1); });
+      var texts = [String(line)];
+      names.forEach(function (name) {
+        var sets = (sc.vars || {})[name] || [];
+        var next = [];
+        texts.forEach(function (tx) { sets.forEach(function (set) { next.push(tx.split("{" + name + "}").join(escSayValue(name, set[0]))); }); });
+        texts = next;
+      });
+      return texts;
+    }
+    ESCENAS.forEach(function (sc0) {
+      var keys = sc0.roles.map(function (r) { return r.key; });
+      for (var mask = 0; mask < (1 << keys.length); mask++) {
+        var voices = {};
+        keys.forEach(function (k, i) { voices[k] = (mask >> i) & 1 ? "tomas" : "elena"; });
+        var sc = escCast(sc0, voices);
+        var say = function (text, roleKey) {
+          text = String(text || "").trim();
+          var v = TTS_VOICES[voices[roleKey]];
+          if (!text || !v || seen[v + "\u0000" + text]) return;
+          seen[v + "\u0000" + text] = true;
+          out.push({ text: text, voice: v });
+        };
+        sc.steps.forEach(function (st) {
+          if (st.r) lists(st.es).forEach(function (ls) { ls.forEach(function (line) { fill(line, sc).forEach(function (tx) { say(tx, st.r); }); }); });
+          if (st.you && st.wrong) {
+            var ws = Array.isArray(st.wrong) ? [st.wrong] : Object.keys(st.wrong).map(function (k) { return st.wrong[k]; });
+            ws.forEach(function (list) { (list || []).forEach(function (w) { (w.es || []).forEach(function (tx) { say(tx, w.r); }); }); });
+          }
+        });
+      }
+    });
+    return out;
+  }
+  window.voseaWarmEscenaPairs = function () { return warmEscenaPairs(); }; // tests
+  function warmSetClips(s, voices) {
+    if (!s.pairs) return { n: s.texts.length * voices.length, chars: s.chars * voices.length };
+    var n = 0, chars = 0;
+    s.pairs.forEach(function (pr) { if (voices.indexOf(pr.voice) !== -1) { n++; chars += pr.text.length; } });
+    return { n: n, chars: chars };
+  }
   function buildWarmPlan() {
     var by = { oraciones: [], sonidos: [], numeros: [], miles: [], precios: [], hora: [], fechas: [], album: [], coleccion: [] };
     TOPICS.forEach(function (tp) {
@@ -2991,6 +3045,9 @@
       texts.forEach(function (s) { chars += s.length; });
       return { key: key, texts: texts, chars: chars };
     });
+    var pairs = [];
+    try { pairs = warmEscenaPairs(); } catch (e) { console.warn("[warm] escenas:", e && e.message); }
+    sets.unshift({ key: "escenas", texts: [], pairs: pairs, chars: 0 });
     return { sets: sets };
   }
   function warmVoiceList() {
@@ -2999,8 +3056,8 @@
     return Object.keys(TTS_VOICES).map(function (k) { return TTS_VOICES[k]; });
   }
   function warmTotals() {
-    var n = 0, chars = 0, nv = warmVoiceList().length;
-    (warmPlan ? warmPlan.sets : []).forEach(function (s) { if (warmPicked[s.key]) { n += s.texts.length * nv; chars += s.chars * nv; } });
+    var n = 0, chars = 0, vl = warmVoiceList();
+    (warmPlan ? warmPlan.sets : []).forEach(function (s) { if (warmPicked[s.key]) { var c = warmSetClips(s, vl); n += c.n; chars += c.chars; } });
     return { clips: n, chars: chars, bytes: chars * WARM_BYTES_PER_CHAR };
   }
   function warmStorageNow() {
@@ -3033,12 +3090,13 @@
       var cb = document.createElement("input");
       cb.type = "checkbox";
       cb.checked = !!warmPicked[s.key];
-      cb.disabled = running || !s.texts.length;
+      var sc = warmSetClips(s, warmVoiceList());
+      cb.disabled = running || !sc.n;
       cb.addEventListener("change", function () { warmPicked[s.key] = cb.checked; renderWarm(); });
       lab.appendChild(cb);
       var txt = uNode("span", "warm-set-name", t("warm_set_" + s.key));
       lab.appendChild(txt);
-      lab.appendChild(uNode("span", "count", t("warm_set_count", { n: progNum(s.texts.length * nv), mb: progNum(s.chars * nv * WARM_BYTES_PER_CHAR / 1048576) })));
+      lab.appendChild(uNode("span", "count", t("warm_set_count", { n: progNum(sc.n), mb: progNum(sc.chars * WARM_BYTES_PER_CHAR / 1048576) })));
       list.appendChild(lab);
     });
     sec.appendChild(list);
@@ -3083,6 +3141,7 @@
     var voices = warmVoiceList(), jobs = [];
     warmPlan.sets.forEach(function (s) {
       if (!warmPicked[s.key]) return;
+      if (s.pairs) { s.pairs.forEach(function (pr) { if (voices.indexOf(pr.voice) !== -1) jobs.push({ text: pr.text, voice: pr.voice }); }); return; }
       voices.forEach(function (voice) { s.texts.forEach(function (text) { jobs.push({ text: text, voice: voice }); }); });
     });
     if (!jobs.length) return;
@@ -4680,6 +4739,9 @@
     var wouldShow = allVerbs.filter(function (v) { return searchOk(v) && verbPassesFacets(v, true); });
     filtered.sort(function (a, b) { return compareText(a.data.infinitive || a.id, b.data.infinitive || b.id); });
     renderHiddenCount(el.verbHiddenRow, el.verbHiddenText, wouldShow.length - filtered.length);
+    // the open verb was filtered out (e.g. a Listas filter it isn't in):
+    // close it, or there would be no row left to close it from
+    if (selectedId && !wouldShow.some(function (v) { return v.id === selectedId; })) deselectVerb();
 
     el.list.innerHTML = "";
     if (filtered.length === 0) {
@@ -5496,8 +5558,9 @@
       var b = el["colSeg_" + x[0]];
       if (b) b.classList.toggle("has-filter", x[1].n < x[1].all);
     });
-    var detailOpen = (colSeg === "verbs" && !el.detail.hidden) || (colSeg === "words" && !el.wordDetail.hidden) || (colSeg === "phrases" && !el.phraseDetail.hidden);
-    var show = currentTab === "col" && colSeg !== "lists" && !detailOpen && !!currentUser && (allVerbs.length + allWords.length + allPhrases.length) > 0;
+    // (2026-10-12: stays visible with an item open too — mason couldn't
+    // find it on desktop with something selected)
+    var show = currentTab === "col" && colSeg !== "lists" && !!currentUser && (allVerbs.length + allWords.length + allPhrases.length) > 0;
     el.colBar.hidden = !show;
     document.body.classList.toggle("has-col-bar", show);
   }
@@ -5837,6 +5900,7 @@
     var wouldShow = allWords.filter(function (v) { return searchOk(v) && wordPassesFacets(v, true); });
     filteredWords.sort(function (a, b) { return compareText(a.data.word || a.id, b.data.word || b.id); });
     renderHiddenCount(el.wordHiddenRow, el.wordHiddenText, wouldShow.length - filteredWords.length);
+    if (selectedWordId && !wouldShow.some(function (v) { return v.id === selectedWordId; })) deselectWord();
 
     el.wordList.innerHTML = "";
     if (filteredWords.length === 0) {
@@ -6112,6 +6176,7 @@
     var wouldShow = allPhrases.filter(function (v) { return searchOk(v) && phrasePassesFacets(v, true); });
     filteredPhrases.sort(function (a, b) { return compareText(a.data.phrase || a.id, b.data.phrase || b.id); });
     renderHiddenCount(el.phraseHiddenRow, el.phraseHiddenText, wouldShow.length - filteredPhrases.length);
+    if (selectedPhraseId && !wouldShow.some(function (v) { return v.id === selectedPhraseId; })) deselectPhrase();
 
     el.phraseList.innerHTML = "";
     if (filteredPhrases.length === 0) {
@@ -12439,6 +12504,11 @@
 
   // ---- playing ----
   function escPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function escSample(arr, n) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
+    return a.slice(0, n);
+  }
   function escSayValue(name, v) {
     if (typeof v === "number") return /^precio/.test(name) ? pesosWords(v) : numWords(v);
     var m = /^(\d{1,2}):(\d{2})$/.exec(String(v));
@@ -12944,7 +13014,14 @@
       }
       main.appendChild(progEl("span", "esc-recap-you", r.kind === "check" ? r.answer : r.step.best));
       if (!r.ok) main.appendChild(progEl("span", "esc-said", r.kind === "check" ? t("esc_you_chose", { v: r.said }) : (r.skipped ? t("esc_skipped") : t("esc_you_said", { said: r.said || "—" }))));
-      if (r.kind === "speak" && (r.step.alts || []).length) main.appendChild(progEl("span", "esc-said esc-also", t("esc_also", { list: r.step.alts.map(function (x) { return "«" + x + "»"; }).join(" · ") })));
+      // three of the other ways, picked at random (mason, 2026-10-12: with
+      // ten per turn the whole list made the recap too long); not the one
+      // you said, and a different three each time
+      if (r.kind === "speak" && (r.step.alts || []).length) {
+        var saidN = speechNorm(r.said || "");
+        var pool = r.step.alts.filter(function (x) { return speechNorm(x) !== saidN; });
+        main.appendChild(progEl("span", "esc-said esc-also", t("esc_also", { list: escSample(pool, 3).map(function (x) { return "«" + x + "»"; }).join(" · ") })));
+      }
       line.appendChild(main);
       recap.appendChild(line);
     });
@@ -16932,6 +17009,9 @@
   });
   el.verbListsTrigger.addEventListener("click", function () { openListFilterPicker("verbs"); });
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
+  document.getElementById("d-close").addEventListener("click", function () { deselectVerb(); renderList(); });
+  document.getElementById("wd-close").addEventListener("click", function () { deselectWord(); renderWordList(); });
+  document.getElementById("pd-close").addEventListener("click", function () { deselectPhrase(); renderPhraseList(); });
   el.seedToolbarBtn.addEventListener("click", seedStarterVerbs);
   el.formCancel.addEventListener("click", closeForm);
   el.form.addEventListener("submit", handleSubmit);
