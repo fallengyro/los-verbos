@@ -654,6 +654,13 @@
        opens its detail page (lesson, practice, Tu historial). See app.js's
        "Temas" section. -->
   <section id="topics-panel" hidden>
+  <!-- Lista · Camino (2026-10-11): the same Temas as a list with filters,
+       or as the map by level with the Escenas as milestones. -->
+  <div class="lang-toggle topics-view" role="group" aria-label="Vista">
+    <button type="button" class="lang-option" id="topics-view-lista" data-i18n="topics_view_lista">Lista</button>
+    <button type="button" class="lang-option" id="topics-view-camino" data-i18n="topics_view_camino">Camino</button>
+  </div>
+  <div id="topics-list-view">
   <div class="search-card">
     <div class="search-box">
       <input type="text" id="topic-search" data-i18n-placeholder="topic_search_placeholder" placeholder="Buscá un tema… (ej. pasado)" autocomplete="off" />
@@ -686,6 +693,8 @@
     <p class="flash-setup-note topics-intro" data-i18n="topics_intro">Temas para practicar algo puntual. No suman nada a tus verbos, vocabulario ni frases.</p>
     <ul class="card-list topic-list" id="topic-list"></ul>
     <p class="empty-msg topic-no-match" id="topic-no-match" hidden data-i18n="topic_none_match">Ningún tema coincide con la búsqueda o los filtros.</p>
+  </div>
+    <div class="topic-camino" id="topic-camino" hidden></div>
     <section class="detail topic-detail" id="topic-detail" hidden>
       <div class="detail-head">
         <div class="detail-head-text">

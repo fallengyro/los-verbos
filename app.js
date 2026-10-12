@@ -572,7 +572,17 @@
       esc_noise_high: "Alto",
       esc_swap: "Cambiar voces",
       esc_uses: "Usa",
-      esc_temas: "Temas",
+      esc_temas: "Temas que usás",
+      esc_adelanta: "Te adelanta",
+      esc_adelanta_note: "Lo vas a escuchar, o lo podés decir de otra forma.",
+      topics_view_lista: "Lista",
+      topics_view_camino: "Camino",
+      camino_intro: "Un mapa, no un camino obligatorio: los temas están siempre abiertos, en el orden de los libros. Cada escena va después del último tema que necesitan tus respuestas, y se abre cuando sabés sus frases.",
+      camino_count: "{firm} de {total}",
+      camino_scene_open: "Abierta · todavía no la jugaste",
+      camino_scene_best: "Tu mejor",
+      camino_scene_locked: "Te faltan {n} frases",
+      camino_scene_locked_one: "Te falta 1 frase",
       esc_tema_aria: "Abrir el tema {name}",
       esc_best: "Tu mejor vuelta:",
       esc_first_try: "{ok} de {total} al primer intento",
@@ -1538,7 +1548,17 @@
       esc_noise_high: "High",
       esc_swap: "Swap voices",
       esc_uses: "Uses",
-      esc_temas: "Topics",
+      esc_temas: "Topics you use",
+      esc_adelanta: "Previews",
+      esc_adelanta_note: "You'll hear it, or you can say it another way.",
+      topics_view_lista: "List",
+      topics_view_camino: "Path",
+      camino_intro: "A map, not a required route: every topic is always open, in the order of the books. Each scene comes after the last topic your answers need, and opens once you know its phrases.",
+      camino_count: "{firm} of {total}",
+      camino_scene_open: "Open · you haven't played it yet",
+      camino_scene_best: "Your best",
+      camino_scene_locked: "{n} more phrases",
+      camino_scene_locked_one: "1 more phrase",
       esc_tema_aria: "Open the topic {name}",
       esc_best: "Your best run:",
       esc_first_try: "{ok} of {total} on the first try",
@@ -3640,6 +3660,10 @@
     settingsDiagClear: document.getElementById("settings-diag-clear"),
     settingsDiagMsg: document.getElementById("settings-diag-msg"),
     usageDiag: document.getElementById("usage-diag"),
+    topicsViewLista: document.getElementById("topics-view-lista"),
+    topicsViewCamino: document.getElementById("topics-view-camino"),
+    topicsListView: document.getElementById("topics-list-view"),
+    topicCamino: document.getElementById("topic-camino"),
     quietToast: document.getElementById("quiet-toast"),
     quietToastSettings: document.getElementById("quiet-toast-settings"),
     backupStatus: document.getElementById("backup-status"),
@@ -5233,6 +5257,7 @@
       }
     }
     if (tab === "topics") {
+      renderTopicsView();
       renderTopicList();
       if (currentUser) loadPracticeHistory(false).then(function () { if (!el.topicsPanel.hidden) { renderTopicList(); if (selectedTopicId) renderItemHistory("topic"); } });
     }
@@ -5353,14 +5378,15 @@
   }
   function hoyScenePick() {
     if (!ESCENAS.length) return null;
-    var open = ESCENAS.filter(function (sc) { return escUnlocked(sc) && escBest(sc.id).stars < 3; });
+    var path = escPathOrder();
+    var open = path.filter(function (sc) { return escUnlocked(sc) && escBest(sc.id).stars < 3; });
     if (open.length) {
       // one you've played but not finished first, then a new one
       var played = open.filter(function (sc) { return escBest(sc.id).plays; });
       var sc = (played.length ? played : open)[0];
       return { sc: sc, open: true, best: escBest(sc.id) };
     }
-    var locked = ESCENAS.filter(function (sc) { return !escUnlocked(sc); }).map(function (sc) { return { sc: sc, miss: escMissing(sc) }; })
+    var locked = path.filter(function (sc) { return !escUnlocked(sc); }).map(function (sc) { return { sc: sc, miss: escMissing(sc) }; })
       .sort(function (a, b) { return a.miss.length - b.miss.length; });
     if (locked.length) return { sc: locked[0].sc, open: false, miss: locked[0].miss };
     return { all3: true };
@@ -9697,8 +9723,11 @@
     ["preguntas", "A1"], ["demostrativos", "A1"], ["gustar", "A1"], ["cuantos", "A1"], ["hay-que", "A1"],
     ["ir-a", "A1"], ["dia-a-dia", "A1"], ["comparativos", "A1"], ["se-impersonal", "A1"], ["ciudad", "A1"],
     ["saber-poder", "A2"], ["gerundio", "A2"], ["preterito", "A2"], ["ya-todavia", "A2"],
-    ["objeto-directo", "A2"], ["objeto-indirecto", "A2"], ["dobles", "A2"], ["ser-estar", "A2"],
-    ["imperfecto", "A2"], ["historia", "A2"], ["imperativo", "A2"], ["futuro", "A2"], ["condicional", "A2"],
+    ["objeto-directo", "A2"], ["ser-estar", "A2"],
+    ["imperfecto", "A2"], ["historia", "A2"],
+    // Objeto indirecto and Me lo · se lo sit next to the imperative, as in
+    // Aula del Sur 2, U11 (2026-10-11, the new flow)
+    ["objeto-indirecto", "A2"], ["dobles", "A2"], ["imperativo", "A2"], ["futuro", "A2"], ["condicional", "A2"],
     ["conectores", "A2"],
     ["subjuntivo", "B1"], ["opinion", "B1"], ["cuando-subj", "B1"], ["lo-que-dijo", "B1"], ["relativos", "B1"],
     ["por-para", "B1"], ["si-tuviera", "B1"]
@@ -9923,6 +9952,132 @@
     });
     fitTopicList();
     el.topicList.scrollTop = keepScroll;
+    if (topicsView === "camino") renderTopicCamino();
+  }
+  // ---- Camino (2026-10-11, the new flow stage 2) ----
+  // The Temas in the books' order, grouped roughly by Aula del Sur unit,
+  // with each Escena as a milestone right after the last Tema its answers
+  // NEED (escenas.js `needs`). A map, not a path you must follow: every
+  // Tema is open; only scenes have a gate (their own phrases).
+  var CAMINO = [
+    { lvl: "A1", title: L("Para arrancar", "Getting started"), groups: [
+      { name: L("Sonidos y números", "Sounds and numbers"), temas: ["abecedario", "vocales", "consonantes", "c-g", "numeros", "precios", "hora", "fechas"] },
+      { name: L("Quién sos", "Who you are"), temas: ["presentarse", "pronombres", "articulos", "presente"] },
+      { name: L("Qué hay y qué te gusta", "What there is and what you like"), temas: ["hay-estar", "preguntas", "demostrativos", "gustar", "cuantos"] },
+      { name: L("Tu día y tu barrio", "Your day and your neighborhood"), temas: ["hay-que", "ir-a", "dia-a-dia", "comparativos", "se-impersonal", "ciudad"] }
+    ] },
+    { lvl: "A2", title: L("Moverte solo", "Getting around on your own"), groups: [
+      { name: L("Lo que podés y lo que pasó", "What you can do and what happened"), temas: ["saber-poder", "gerundio", "preterito", "ya-todavia"] },
+      { name: L("Lo y la · ser y estar", "Lo and la · ser and estar"), temas: ["objeto-directo", "ser-estar"] },
+      { name: L("Antes y después", "Then and now"), temas: ["imperfecto", "historia"] },
+      { name: L("Pedir: le, se lo, el imperativo", "Asking: le, se lo, the imperative"), temas: ["objeto-indirecto", "dobles", "imperativo"] },
+      { name: L("Planes y cortesía", "Plans and courtesy"), temas: ["futuro", "condicional", "conectores"] }
+    ] },
+    { lvl: "B1", title: L("Opinar y contar", "Giving opinions, telling stories"), groups: [
+      { name: L("El subjuntivo", "The subjunctive"), temas: ["subjuntivo", "opinion", "cuando-subj"] },
+      { name: L("Lo que te dijeron", "What they told you"), temas: ["lo-que-dijo", "relativos", "por-para", "si-tuviera"] }
+    ] }
+  ];
+  var TOPICS_VIEW_KEY = "vosea-topics-view";
+  var topicsView = "lista";
+  try { if (localStorage.getItem(TOPICS_VIEW_KEY) === "camino") topicsView = "camino"; } catch (e) {}
+  // where a scene sits: [level index, group index] of the latest Tema it needs
+  function escPathPos(sc) {
+    var best = null;
+    (sc.needs || []).forEach(function (id) {
+      CAMINO.forEach(function (L, li) {
+        L.groups.forEach(function (g, gi) {
+          var ti = g.temas.indexOf(id);
+          if (ti === -1) return;
+          var key = li * 10000 + gi * 100 + ti;
+          if (best === null || key > best.key) best = { key: key, li: li, gi: gi };
+        });
+      });
+    });
+    return best || { key: 0, li: 0, gi: 0 };
+  }
+  // the scenes in path order (ties keep escenas.js order)
+  function escPathOrder() {
+    return ESCENAS.map(function (sc, i) { return { sc: sc, i: i, pos: escPathPos(sc) }; })
+      .sort(function (a, b) { return (a.pos.li * 100 + a.pos.gi) - (b.pos.li * 100 + b.pos.gi) || a.i - b.i; })
+      .map(function (x) { return x.sc; });
+  }
+  function setTopicsView(v) {
+    topicsView = v === "camino" ? "camino" : "lista";
+    try { localStorage.setItem(TOPICS_VIEW_KEY, topicsView); } catch (e) {}
+    renderTopicsView();
+  }
+  function renderTopicsView() {
+    if (!el.topicsViewLista) return;
+    var cam = topicsView === "camino";
+    el.topicsViewLista.classList.toggle("active", !cam);
+    el.topicsViewCamino.classList.toggle("active", cam);
+    el.topicsViewLista.setAttribute("aria-pressed", cam ? "false" : "true");
+    el.topicsViewCamino.setAttribute("aria-pressed", cam ? "true" : "false");
+    el.topicsListView.hidden = cam;
+    el.topicCamino.hidden = !cam;
+    if (cam) renderTopicCamino(); else fitTopicList();
+  }
+  function caminoDot(tp, ready) {
+    if (!ready) return "camino-dot";
+    var st = topicStats(tp);
+    return "camino-dot" + (st.total && st.firm >= st.total ? " is-done" : st.practiced ? " is-part" : "");
+  }
+  function renderTopicCamino() {
+    var box = el.topicCamino;
+    if (!box || box.hidden) return;
+    box.innerHTML = "";
+    var ready = topicHistoryReady() || practiceQueue.length;
+    box.appendChild(progEl("p", "camino-intro", t("camino_intro")));
+    var placed = {};
+    ESCENAS.forEach(function (sc) { var p = escPathPos(sc); (placed[p.li + ":" + p.gi] || (placed[p.li + ":" + p.gi] = [])).push(sc); });
+    CAMINO.forEach(function (L, li) {
+      var head = progEl("div", "camino-level");
+      head.appendChild(progEl("b", null, L.lvl));
+      head.appendChild(progEl("span", null, topicText(L.title)));
+      box.appendChild(head);
+      var rail = progEl("div", "camino-rail");
+      L.groups.forEach(function (g, gi) {
+        rail.appendChild(progEl("div", "camino-group", topicText(g.name)));
+        g.temas.forEach(function (id) {
+          var tp = topicById(id);
+          if (!tp) return;
+          var b = progEl("button", "camino-node" + (tp.id === selectedTopicId ? " is-selected" : ""));
+          b.type = "button";
+          b.dataset.topicId = tp.id;
+          b.appendChild(progEl("span", caminoDot(tp, ready)));
+          b.appendChild(progEl("span", "camino-name", topicText(tp.name)));
+          if (ready) {
+            var st = topicStats(tp);
+            if (st.practiced) b.appendChild(progEl("span", "camino-count", t("camino_count", { firm: st.firm, total: st.total })));
+          }
+          b.addEventListener("click", function () { if (selectedTopicId === tp.id) deselectTopic(); else selectTopic(tp.id); });
+          rail.appendChild(b);
+        });
+        (placed[li + ":" + gi] || []).forEach(function (sc) {
+          var cs = escCast(sc), open = escUnlocked(sc), best = escBest(sc.id);
+          var m = progEl("button", "camino-scene" + (open ? "" : " is-locked"));
+          m.type = "button";
+          m.dataset.scene = sc.id;
+          var ic = progEl("span", "camino-scene-icon");
+          ic.innerHTML = open
+            ? '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>'
+            : '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+          m.appendChild(ic);
+          var txtBox = progEl("span", "camino-scene-text");
+          txtBox.appendChild(progEl("span", "camino-scene-name", topicText(cs.name)));
+          var miss = open ? [] : escMissing(sc);
+          txtBox.appendChild(progEl("span", "camino-scene-sub", open
+            ? (best.plays ? t("camino_scene_best") : t("camino_scene_open"))
+            : t(miss.length === 1 ? "camino_scene_locked_one" : "camino_scene_locked", { n: miss.length })));
+          m.appendChild(txtBox);
+          if (open && best.plays) m.appendChild(escStarsNode(best.stars));
+          m.addEventListener("click", function () { setMainTab("play"); openEscenas(true, sc.id); });
+          rail.appendChild(m);
+        });
+      });
+      box.appendChild(rail);
+    });
   }
   // ---- search + Familia / Nivel chips (mason, 2026-10-09: "a similar
   // search/filter card at the top like the other content sections") ----
@@ -11829,7 +11984,10 @@
     el.escHeadDesc.textContent = t("esc_desc");
     el.escBack.textContent = t("play_album_back");
     var list = progEl("div", "esc-list");
-    ESCENAS.forEach(function (sc) {
+    // the ones you can play first, then the rest, each in path order (2026-10-11)
+    var ordered = escPathOrder();
+    ordered = ordered.filter(escUnlocked).concat(ordered.filter(function (sc) { return !escUnlocked(sc); }));
+    ordered.forEach(function (sc) {
       var open = escUnlocked(sc), b = escBest(sc.id);
       var row = progEl(open ? "button" : "div", "esc-row" + (open ? "" : " is-locked"));
       if (open) { row.type = "button"; row.addEventListener("click", function () { openEscenas(true, sc.id); }); }
@@ -11919,12 +12077,15 @@
     // the Temas it uses (2026-10-11, mason: "better tie the escenas in to
     // the rest of the app… tag them with the temas encountered in them"):
     // each chip opens that Tema on the Temas tab.
-    var temas = (sc.temas || []).map(topicById).filter(Boolean);
-    if (temas.length) {
-      box.appendChild(progEl("div", "esc-label", t("esc_temas")));
-      var tchips = progEl("div", "esc-chips esc-temas");
+    // the Temas behind your answers, then what the scene previews (2026-10-11)
+    [["needs", "esc_temas", ""], ["adelanta", "esc_adelanta", " is-ahead"]].forEach(function (kind) {
+      var temas = (sc[kind[0]] || []).map(topicById).filter(Boolean);
+      if (!temas.length) return;
+      box.appendChild(progEl("div", "esc-label", t(kind[1])));
+      if (kind[0] === "adelanta") box.appendChild(progEl("p", "esc-ahead-note", t("esc_adelanta_note")));
+      var tchips = progEl("div", "esc-chips esc-temas" + kind[2]);
       temas.forEach(function (tm) {
-        var tb = progEl("button", "esc-chip esc-tema", topicText(tm.name));
+        var tb = progEl("button", "esc-chip esc-tema" + kind[2], topicText(tm.name));
         tb.type = "button";
         tb.setAttribute("data-tema", tm.id);
         tb.setAttribute("aria-label", t("esc_tema_aria", { name: topicText(tm.name) }));
@@ -11932,7 +12093,7 @@
         tchips.appendChild(tb);
       });
       box.appendChild(tchips);
-    }
+    });
     var tp = escTopic(sc);
     if (tp) {
       box.appendChild(progEl("div", "esc-label", t("esc_uses")));
@@ -16674,6 +16835,8 @@
   el.tabProgress.addEventListener("click", function () { setMainTab("progress"); });
   el.tabTopics.addEventListener("click", function () { setMainTab("topics"); });
   el.topicSearch.addEventListener("input", renderTopicList);
+  el.topicsViewLista.addEventListener("click", function () { setTopicsView("lista"); });
+  el.topicsViewCamino.addEventListener("click", function () { setTopicsView("camino"); });
   loadFilters(filtersStorageKey("topics"), activeTopicFilters);
   refreshChipVisuals(el.topicFilters, activeTopicFilters);
   el.topicFiltersClear.hidden = !anyFilterActive(activeTopicFilters);

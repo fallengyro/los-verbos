@@ -2601,3 +2601,30 @@
     .deck-overlay { align-items: flex-end; padding: 0; }
     .deck-card { max-width: none; border-radius: 20px 20px 0 0; max-height: 92vh; padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); }
   }
+
+  /* Temas: Lista · Camino, and the scene start's two Temas rows (2026-10-11, stage 2) */
+  .topics-view { display: flex; margin: -8px 0 14px; }
+  .topics-view .lang-option { flex: 1; min-height: 40px; }
+  .topic-camino { margin-bottom: 18px; }
+  .camino-intro { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 6px; line-height: 1.45; }
+  .camino-level { display: flex; align-items: baseline; gap: 10px; margin: 18px 0 6px; border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+  .camino-level b { font-family: "Fraunces", Georgia, serif; font-size: 26px; color: var(--accent-deep); }
+  .camino-level span { font-size: 14px; color: var(--ink-soft); }
+  .camino-rail { border-left: 2px solid var(--line); margin-left: 10px; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
+  .camino-group { font-size: 11px; letter-spacing: .12em; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; margin: 12px 0 4px; }
+  .camino-node { display: flex; align-items: center; gap: 10px; margin-left: -28px; background: none; border: 0; padding: 5px 4px 5px 0; font: inherit; color: var(--ink); text-align: left; cursor: pointer; min-height: 44px; border-radius: 10px; }
+  .camino-node:hover .camino-name, .camino-node.is-selected .camino-name { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+  .camino-dot { width: 22px; height: 22px; border-radius: 50%; flex: none; border: 2px solid var(--line); background: var(--paper); }
+  .camino-dot.is-done { background: var(--teal); border-color: var(--teal); }
+  .camino-dot.is-part { background: linear-gradient(90deg, var(--teal) 50%, var(--paper) 50%); border-color: var(--teal); }
+  .camino-name { font-size: 15px; }
+  .camino-count { font-size: 12px; color: var(--ink-soft); margin-left: auto; font-variant-numeric: tabular-nums; }
+  .camino-scene { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px -28px; width: calc(100% + 28px); background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line)); border-radius: 14px; padding: 10px 12px; font: inherit; color: var(--ink); text-align: left; cursor: pointer; min-height: 52px; }
+  .camino-scene.is-locked { background: var(--paper-raised); border-style: dashed; border-color: var(--line); }
+  .camino-scene-icon { width: 30px; height: 30px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--gold); color: var(--gold-soft); }
+  .camino-scene.is-locked .camino-scene-icon { background: var(--ink-soft); color: var(--paper-raised); }
+  .camino-scene-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .camino-scene-name { font-weight: 600; font-size: 15px; }
+  .camino-scene-sub { font-size: 12.5px; color: var(--ink-soft); }
+  .esc-tema.is-ahead { color: var(--ink-soft); border-style: dashed; border-color: var(--line); font-weight: 500; }
+  .esc-ahead-note { font-size: 12.5px; color: var(--ink-soft); margin: -2px 0 6px; }
