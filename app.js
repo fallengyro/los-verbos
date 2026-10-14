@@ -4371,7 +4371,7 @@
   // the page, the console says which ones, and the page fetches a fresh copy
   // of itself once (VOSEA_BUILD has to match index.html's vosea-build meta;
   // both go up with sw.js's CACHE_NAME).
-  var VOSEA_BUILD = "111";
+  var VOSEA_BUILD = "112";
   var elMissing = [];
   Object.keys(el).forEach(function (k) {
     if (el[k]) return;
@@ -8878,7 +8878,7 @@
       source: "escena",
       item: (p && p.sc ? p.sc.id : "?") + ":t" + (p && p.cur ? p.cur.i : "?"),
       expected: step ? step.best : ""
-    }, evt, { extra: Object.assign({ ruido: escRuido ? escRuido.level : "off", try: p && p.cur ? (p.cur.tries || 0) + 1 : undefined, pick: pick }, evt.extra || {}) });
+    }, evt, { extra: Object.assign({ ruido: escRuido ? escRuido.level : "off", try: p && p.cur ? (p.cur.tries || 0) + 1 : undefined, pick: pick, playback: escAudioState() }, evt.extra || {}) });
   }
   function speechDiagLog(evt) {
     if (!speechDiagOn || !currentUser || !evt) return;
@@ -12230,6 +12230,42 @@
     try { if (ctx.state === "suspended") ctx.resume(); } catch (e) {}
     return escPhoneAudio;
   }
+  // ---- the iPhone (2026-10-12) ----
+  // mason: "On iPhone I am not hearing the speaker, the background noise,
+  // or sometimes both" (desktop fine). Three iOS rules were in the way:
+  //  - each <audio> element has to be started from a tap once; the voices'
+  //    own element (escAudio, and the phone one) was first used after a
+  //    download, so iOS could refuse it. Both are now started silently in
+  //    the Empezar tap, like the cards' element.
+  //  - opening the microphone switches iOS into a call-like audio mode,
+  //    which can stop (interrupt) the Web Audio that plays the background
+  //    noise and the phone voices. The scene now asks for that mode from
+  //    the start where the browser lets it (navigator.audioSession), and
+  //    wakes the audio up again before every line and after every answer.
+  //  - Web Audio follows the ring/silent switch; with the play-and-record
+  //    session it plays anyway.
+  // escAudioState() goes into the voice diagnostics, so a failing iPhone
+  // shows what happened.
+  var escAudioFails = 0;
+  function escIsIOS() { var ua = navigator.userAgent || ""; return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1); }
+  function escAudioSession(on) {
+    try { if (navigator.audioSession && "type" in navigator.audioSession) navigator.audioSession.type = on ? "play-and-record" : "auto"; } catch (e) {}
+  }
+  function escAudioWake() {
+    try { if (escRuidoCtx && escRuidoCtx.state !== "running" && escRuidoCtx.state !== "closed") escRuidoCtx.resume(); } catch (e) {}
+  }
+  function escUnlockAudio(sc) {
+    function silent(a) { try { a.src = SILENT_WAV; var pr = a.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} }
+    if (!escAudio) { try { escAudio = new Audio(); } catch (e) {} }
+    if (escAudio) silent(escAudio);
+    if (sc && sc.ruido && sc.ruido.phone && escRuidoLevel() !== "off") {
+      var ph = escPhoneAudioFor({ phone: sc.ruido.phone }, sc.ruido.phone[0]);
+      if (ph) silent(ph);
+    }
+  }
+  function escAudioState() {
+    return { ctx: escRuidoCtx ? escRuidoCtx.state : "none", fails: escAudioFails, session: (navigator.audioSession && navigator.audioSession.type) || "" };
+  }
   window.voseRuidoState = function () {
     var r = escRuido;
     return { level: escRuidoLevel(), playing: !!(r && r.src), scene: r ? r.scene : null, ducked: !!(r && r.ducked), target: r ? r.target : null, phone: !!(r && escPlay && escPlay.phone) };
@@ -12567,9 +12603,14 @@
   function escStart(sc) {
     if (!escCanPlay()) return;
     sc = escApplyPicks(escCast(sc), escChoosePicks(sc._base || sc));
-    hablarPrepareMic(); // the permission prompt comes up on this tap
+    escAudioFails = 0;
+    escAudioSession(true);
     unlockTtsAudio();
+    escUnlockAudio(sc);
     var lead = escRuidoStart(sc);
+    // the permission prompt comes up on this tap; once the mic is open,
+    // wake the audio it may have interrupted
+    if (hablarSupported()) hablarGetStream().then(escAudioWake, escAudioWake);
     var vals = {};
     Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escPick(sc.vars[k]); });
     escPlay = {
@@ -12607,13 +12648,15 @@
   // then the text shows, so the scene can go on).
   function escSay(text, vk, bubble, roleKey) {
     escStopAudio();
+    escAudioWake();
     return ttsLoadAudio(text, vk).then(function (r) {
+      escAudioWake();
       return new Promise(function (resolve) {
         if (!escAudio) escAudio = new Audio();
         var a = escPhoneAudioFor(escPlay, roleKey) || escAudio, done = false;
         function fin() {
           if (done) return; done = true; clearTimeout(guard); a.onended = a.onerror = null; if (bubble) bubble.classList.remove("is-playing");
-          if (escPlay && escPlay.cur && escPlay.cur.step.you && !escPlay.rec && !escPlay.busy) hablarPrepareMic(); // a replay during your turn
+          if (escPlay && escPlay.cur && escPlay.cur.step.you && !escPlay.rec && !escPlay.busy && hablarSupported()) hablarGetStream().then(escAudioWake, escAudioWake); // a replay during your turn
           resolve(true);
         }
         var guard = setTimeout(fin, 15000);
@@ -12621,7 +12664,7 @@
         a.src = r.src;
         if (bubble) bubble.classList.add("is-playing");
         var pr = a.play();
-        if (pr && pr.catch) pr.catch(function () { if (bubble) bubble.reveal(); fin(); });
+        if (pr && pr.catch) pr.catch(function (err) { escAudioFails++; console.warn("[escenas] the browser didn't play a line:", err && err.name); if (bubble) bubble.reveal(); fin(); });
       });
     }).catch(function (err) {
       console.warn("[escenas] couldn't play a line:", err && err.message);
@@ -12835,6 +12878,7 @@
         if (p.rec === rec) p.rec = null;
         escRuidoDuck(false);
         if (rec.vad) rec.vad.stop();
+        escAudioWake();
         var size = rec.chunks.reduce(function (n, c) { return n + (c.size || 0); }, 0);
         if (failed || size < 400) { var det = hablarMicDetail(stream, rec, failed ? "recorder_error" : "empty"); speechDiagLog(escDiagBase(p, { outcome: failed ? "recorder_error" : "mic_empty", rec_ms: Date.now() - rec.started, detail: det, extra: { mime: mr.mimeType || "" } })); hablarDropStream(); escTurnPanel("speak", { hint: t("speak_mic_nothing"), detail: det }); return; }
         rec.detail = hablarMicDetail(stream, rec, "");
@@ -13050,14 +13094,18 @@
         them.appendChild(document.createTextNode(r.prompt.text));
         main.appendChild(them);
       }
-      main.appendChild(progEl("span", "esc-recap-you", r.kind === "check" ? r.answer : r.step.best));
+      // a turn you got right shows what YOU said (mason, 2026-10-12: showing
+      // the model answer there was confusing); a missed one shows the model
+      // answer, then what you said
+      var mineOk = r.kind === "speak" && r.ok && r.said;
+      main.appendChild(progEl("span", "esc-recap-you", r.kind === "check" ? r.answer : (mineOk ? r.said : r.step.best)));
       if (!r.ok) main.appendChild(progEl("span", "esc-said", r.kind === "check" ? t("esc_you_chose", { v: r.said }) : (r.skipped ? t("esc_skipped") : t("esc_you_said", { said: r.said || "—" }))));
-      // three of the other ways, picked at random (mason, 2026-10-12: with
-      // ten per turn the whole list made the recap too long); not the one
-      // you said, and a different three each time
+      // three other ways, picked at random (mason, 2026-10-12: with ten per
+      // turn the whole list made the recap too long): the model answer can
+      // be one of them when you said it your own way; never the one shown
       if (r.kind === "speak" && (r.step.alts || []).length) {
-        var saidN = speechNorm(r.said || "");
-        var pool = r.step.alts.filter(function (x) { return speechNorm(x) !== saidN; });
+        var shownN = speechNorm(mineOk ? r.said : r.step.best), saidN = speechNorm(r.said || "");
+        var pool = (mineOk ? [r.step.best] : []).concat(r.step.alts).filter(function (x, i, a) { var n = speechNorm(x); return n !== shownN && n !== saidN && a.map(speechNorm).indexOf(n) === i; });
         main.appendChild(progEl("span", "esc-said esc-also", t("esc_also", { list: escSample(pool, 3).map(function (x) { return "«" + x + "»"; }).join(" · ") })));
       }
       line.appendChild(main);
@@ -13081,6 +13129,7 @@
     var p = escPlay;
     escStopAudio();
     escRuidoStop();
+    escAudioSession(false);
     if (p && p.rec) { try { p.rec.done = true; if (p.rec.mr.state !== "inactive") p.rec.mr.stop(); } catch (e) {} }
     hablarRelease();
     escPlay = null;
