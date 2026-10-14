@@ -4371,7 +4371,7 @@
   // the page, the console says which ones, and the page fetches a fresh copy
   // of itself once (VOSEA_BUILD has to match index.html's vosea-build meta;
   // both go up with sw.js's CACHE_NAME).
-  var VOSEA_BUILD = "112";
+  var VOSEA_BUILD = "113";
   var elMissing = [];
   Object.keys(el).forEach(function (k) {
     if (el[k]) return;
@@ -12101,7 +12101,7 @@
   // (reason "escena:<id>").
   var ESC_READY_SHARE = 0.7;
   var ESC_VOICES_KEY = "vosea-escenas-voces";
-  var ESC_PAUSE_MS = 350;
+  var ESC_PAUSE_MS = 200; // between two lines in a row (was 350; mason, 2026-10-13: "too much time in between")
   var escOpen = false;  // the Escenas page on the Jugar tab
   var escSel = null;    // the scene on the start screen (null = the list)
   var escPlay = null;   // the scene being played
@@ -12142,7 +12142,12 @@
     return v === "bajo" || v === "alto" ? v : "off";
   }
   function escSetRuidoLevel(v) { try { localStorage.setItem(ESC_RUIDO_KEY, v); } catch (e) {} }
-  function escRuidoGain(level) { return ESC_RUIDO_GAIN[level] || 0; }
+  // On the iPhone the noise came out much louder against the voices than on
+  // the computer (mason, 2026-10-13: Alto "so loud … i can just barely hear
+  // the speakers", Bajo "a little too loud"), so it plays about 6 dB lower
+  // there.
+  var ESC_RUIDO_IOS = 0.5;
+  function escRuidoGain(level) { return (ESC_RUIDO_GAIN[level] || 0) * (escIsIOS() ? ESC_RUIDO_IOS : 1); }
   function escRuidoContext() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -12578,6 +12583,29 @@
 
   // ---- playing ----
   function escPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  // The values (prices, times…) go round every set before any comes back
+  // (mason, 2026-10-13: "on 'at the cafe' i got the same two prices
+  // repeatedly"): a shuffled bag per scene and value, kept on this device,
+  // and never the same one twice in a row.
+  var ESC_VALS_KEY = "vosea-escenas-valores";
+  window.voseaEscNextValue = function (id, name, sets) { return escNextValue({ id: id }, name, sets); }; // tests
+  function escNextValue(sc, name, sets) {
+    if (!sets || !sets.length) return null;
+    var all = {};
+    try { all = JSON.parse(localStorage.getItem(ESC_VALS_KEY) || "{}") || {}; } catch (e) { all = {}; }
+    var mine = all[sc.id] || (all[sc.id] = {});
+    var bag = (mine[name] && Array.isArray(mine[name].bag) ? mine[name].bag : []).filter(function (i) { return i >= 0 && i < sets.length; });
+    var last = mine[name] ? mine[name].last : -1;
+    if (!bag.length) {
+      bag = sets.map(function (_, i) { return i; });
+      for (var i = bag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = bag[i]; bag[i] = bag[j]; bag[j] = x; }
+      if (bag.length > 1 && bag[0] === last) { bag.push(bag.shift()); }
+    }
+    var pick = bag.shift();
+    mine[name] = { bag: bag, last: pick };
+    try { localStorage.setItem(ESC_VALS_KEY, JSON.stringify(all)); } catch (e) {}
+    return sets[pick];
+  }
   function escSample(arr, n) {
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
@@ -12612,7 +12640,7 @@
     // wake the audio it may have interrupted
     if (hablarSupported()) hablarGetStream().then(escAudioWake, escAudioWake);
     var vals = {};
-    Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escPick(sc.vars[k]); });
+    Object.keys(sc.vars || {}).forEach(function (k) { vals[k] = escNextValue(sc._base || sc, k, sc.vars[k]); });
     escPlay = {
       sc: sc, id: practiceUuid(), session: practiceUuid(), started: Date.now(), voices: escVoices(sc), vals: vals,
       lines: {}, i: 0, turnN: 0, total: escSceneTurns(sc), results: [], pending: [], cur: null, rec: null, busy: false, done: false,
@@ -12742,6 +12770,17 @@
   }
   function escRevealPending(p) { p.pending.forEach(function (b) { b.reveal(); }); p.pending = []; }
 
+  // Downloads the audio for these lines ahead of time, so the next person
+  // starts right after the last one finishes (mason, 2026-10-13: "too much
+  // time in between" speakers): each line used to be fetched only once the
+  // one before it had ended.
+  function escPrefetch(p, idxs) {
+    (idxs || []).forEach(function (i) {
+      var st = p.sc.steps[i];
+      if (!st || !st.r) return;
+      try { ttsLoadAudio(escLine(p, i), p.voices[st.r]).catch(function () {}); } catch (e) {}
+    });
+  }
   function escNext() {
     var p = escPlay;
     if (!escAlive(p)) return;
@@ -12751,6 +12790,7 @@
     if (s.r) {
       var run = [];
       while (p.i < steps.length && steps[p.i].r) { run.push(p.i); p.i++; }
+      escPrefetch(p, run);
       escTurnPanel("listen");
       var chain = Promise.resolve();
       run.forEach(function (i) {
@@ -12766,6 +12806,10 @@
       return;
     }
     p.cur = { i: p.i, step: s, tries: 0, shownAt: new Date().toISOString(), t0: Date.now(), logged: false };
+    // while you answer, the lines that come next are already on their way
+    var nextRun = [];
+    for (var k = p.i + 1; k < steps.length && steps[k].r; k++) nextRun.push(k);
+    escPrefetch(p, nextRun);
     p.replays = 0; p.peeked = false;
     escUpdateTop();
     escTurnPanel(s.you ? "speak" : "check");
@@ -12905,11 +12949,31 @@
     clearTimeout(rec.watch);
     rec.watch = setTimeout(function () { rec.finish(false); }, 1500);
   }
+  // A list of pieces: every piece has to be in what you said. Stricter
+  // since 2026-10-12 (mason: "some pretty questionable answers were
+  // accepted"): a piece now has to START a word ("carg" matches cargás,
+  // not descargar, "eso" no longer matches peso), and a one- or two-letter
+  // one ("no", "si", "va", "41") has to BE a word, so "no" doesn't match
+  // bueno or uno.
+  function escPieceIn(h, piece) {
+    var p = speechNorm(piece);
+    if (!p) return false;
+    var hh = " " + h + " ";
+    if (p.length <= 2 && p.indexOf(" ") === -1) return hh.indexOf(" " + p + " ") !== -1;
+    return hh.indexOf(" " + p) !== -1;
+  }
+  window.voseaEscSpec = function (spec, heard) { return escSpec(spec, heard); }; // tests
   function escSpec(spec, heard) {
     var h = speechNorm(heard);
     if (!h) return false;
-    if (Array.isArray(spec)) return spec.every(function (piece) { return h.indexOf(speechNorm(piece)) !== -1; });
+    if (Array.isArray(spec)) return spec.every(function (piece) { return escPieceIn(h, piece); });
     return speechMatches(spec, heard);
+  }
+  // how much of b's longer words a also has (0–1)
+  function escWordOverlap(a, b) {
+    var wa = speechNorm(a).split(" "), wb = speechNorm(b).split(" ").filter(function (w) { return w.length > 2; });
+    if (!wb.length) return 1;
+    return wb.filter(function (w) { return wa.indexOf(w) !== -1; }).length / wb.length;
   }
   // Azure sometimes runs two sentences together ("por favor.Sí") and, with
   // background voices in the room, adds a lone word at the end that nobody
@@ -12950,7 +13014,12 @@
     // ("media docena de marinas" the first time, medialunas the second)
     var pa = ((data && data.assessments) || [])[0] || {};
     var paText = pa.ok ? String(pa.lexical || pa.display || "") : "";
-    if (paText && paText !== heard && (pa.scores && pa.scores.accuracy >= 60) && (step.ok || []).some(function (spec) { return escSpec(spec, paText); })) { res.auto_grade = "bien"; res.rule = "assessed_text"; res.heard_scored = paText; return res; }
+    // (2026-10-13, stricter: that pass leans toward the model answer, so it
+    // only counts when it scored well AND either the first hearing already
+    // had most of its words, or the scoring found no word said wrong)
+    var paErr = (pa.words || []).some(function (w) { return w.error && w.error !== "None"; });
+    var paAcc = pa.scores ? pa.scores.accuracy : 0;
+    if (paText && paText !== heard && paAcc >= 75 && (escWordOverlap(heard, paText) >= 0.5 || (paAcc >= 80 && !paErr)) && (step.ok || []).some(function (spec) { return escSpec(spec, paText); })) { res.auto_grade = "bien"; res.rule = "assessed_text"; res.heard_scored = paText; return res; }
     return res; // score / unsure / nothing / none, as in Hablar
   }
   function escAnalyse(p, blob, recMs, recInfo) {

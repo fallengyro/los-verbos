@@ -74,7 +74,7 @@ window.VOSEA_ESCENAS = [
       { id: "p05", es: "Pago [con tarjeta].", en: "I'll pay by card.", p: "con tarjeta · en efectivo" },
       { id: "p06", es: "¡Gracias, [igualmente]!", en: "Thanks, you too!", p: "igualmente" }
     ],
-    vars: { precio: [[2400, 4200, 2040], [3600, 6300, 3060], [2800, 8200, 2080], [4500, 5400, 4050]] },
+    vars: { precio: [[2400, 4200, 2040], [3600, 6300, 3060], [2800, 8200, 2080], [4500, 5400, 4050], [3200, 2300, 3020], [2600, 6200, 2060], [5200, 2500, 5020], [3900, 9300, 3090]] },
     picks: { tipo: ["manteca", "grasa"], pago: ["tarjeta", "efectivo"] },
     steps: [
       { r: "e", es: ["¡Hola! ¿Qué te doy?", "Buen día, ¿qué andás buscando?", "Hola, ¿qué llevás?", "Buenas, decime qué te doy.", "¡Buen día! ¿Qué vas a llevar?", "Hola, ¿qué va a ser?", "Buenas, ¿qué vas a querer?", "¡Hola! Decime, ¿qué necesitás?", "Buen día, ¿qué te llevás hoy?", "Hola, buen día. ¿Qué te puedo dar?"] },
@@ -110,7 +110,7 @@ window.VOSEA_ESCENAS = [
       { id: "k05", es: "¿Tenés [cambio] de diez mil?", en: "Do you have change for ten thousand?", p: "cambio de…" },
       { id: "k06", es: "Acá tenés [el vuelto].", en: "Here's your change.", p: "el vuelto" }
     ],
-    vars: { precio: [[6800, 8600, 6080], [7200, 2700, 7020], [6500, 5600, 6050]] },
+    vars: { precio: [[6800, 8600, 6080], [7200, 2700, 7020], [6500, 5600, 6050], [7400, 4700, 7040], [5800, 8500, 5080], [8200, 2800, 8020], [6300, 3600, 6030], [7600, 6700, 7060]] },
     picks: { sabor: ["chocolate", "dulce"] },
     steps: [
       { r: "k", es: ["Hola, ¿qué necesitás?", "Buenas, decime.", "Hola, ¿qué andás buscando?", "Buenas, ¿qué te doy?", "Hola, ¿qué llevás?", "Buen día, ¿qué buscabas?", "Hola, ¿qué te hace falta?", "Buenas, ¿en qué te ayudo?", "Hola, ¿qué va a ser?", "Buenas. ¿Qué querías?"] },
@@ -149,7 +149,7 @@ window.VOSEA_ESCENAS = [
       { id: "c06", es: "Hoy [invito yo].", en: "Today it's on me.", p: "invitar" },
       { id: "c07", es: "Se [nos terminaron] las medialunas.", en: "We've run out of croissants.", p: "se + terminar" }
     ],
-    vars: { precio: [[7400, 4700, 7040], [9600, 6900, 9060], [8300, 3800, 8030]] },
+    vars: { precio: [[7400, 4700, 7040], [9600, 6900, 9060], [8300, 3800, 8030], [8600, 6800, 8060], [9200, 2900, 9020], [7600, 6700, 7060], [8900, 9800, 8090], [9400, 4900, 9040]] },
     picks: { cafe: ["cortado", "cafeconleche"], relleno: ["dulce", "crema"] },
     steps: [
       { r: "l", es: ["¡Qué lindo este lugar! ¿Vos qué vas a pedir?", "Me encanta este café. ¿Qué vas a tomar?", "Está buenísimo este lugar, ¿no? ¿Qué te vas a pedir?", "Che, qué lindo acá. ¿Vos qué tomás?", "Qué buena onda este café, ¿no? ¿Qué vas a pedir?", "Mirá qué lindo lugar. Che, ¿vos qué te pedís?", "Me gusta mucho acá. ¿Y vos qué querés tomar?", "Qué lindo que está esto. Decime, ¿qué vas a tomar?", "Ay, este lugar es divino. ¿Ya sabés qué vas a pedir?", "Che, está re lindo acá, ¿no? ¿Qué pedís vos?"] },
@@ -233,7 +233,7 @@ window.VOSEA_ESCENAS = [
       { id: "f05", es: "Cada [ocho] horas.", en: "Every eight hours.", p: "cada + número" },
       { id: "f06", es: "¿[Necesito] receta?", en: "Do I need a prescription?", p: "la receta" }
     ],
-    vars: { horas: [[8, 6, 12], [6, 8, 4], [12, 2, 8]], precio: [[12500, 15200, 12050], [9800, 8900, 9080], [14300, 13400, 14030]] },
+    vars: { horas: [[8, 6, 12], [6, 8, 4], [12, 2, 8]], precio: [[12500, 15200, 12050], [9800, 8900, 9080], [14300, 13400, 14030], [11600, 16100, 11060], [13200, 12300, 13020], [10800, 18000, 10080], [15400, 14500, 15040], [9600, 6900, 9060]] },
     picks: { forma: ["jarabe", "pastillas"], desde: ["ayer", "anoche"] },
     steps: [
       { r: "f", es: ["Hola, ¿en qué te puedo ayudar?", "Buenas, ¿qué necesitás?", "Buen día, decime, ¿qué andás buscando?", "Hola, ¿qué tal? ¿Qué te hace falta?", "Buenas, decime.", "Buen día. ¿Qué buscabas?", "Hola, buenas. ¿Te ayudo con algo?", "Hola, ¿cómo estás? ¿En qué te ayudo?", "Buenas, ¿qué precisás?", "¿Quién sigue? Hola, ¿qué te doy?"] },
@@ -359,7 +359,7 @@ window.VOSEA_ESCENAS = [
       { id: "t05", es: "[Acá] está bien, gracias.", en: "Here's fine, thanks.", p: "acá" },
       { id: "t06", es: "[Quedate] con el vuelto.", en: "Keep the change.", p: "quedarse con" }
     ],
-    vars: { minutos: [[15, 50, 5], [20, 12, 25], [30, 13, 40]], precio: [[9800, 8900, 9080], [11500, 15100, 11050], [12700, 7200, 12070]] },
+    vars: { minutos: [[15, 50, 5], [20, 12, 25], [30, 13, 40]], precio: [[9800, 8900, 9080], [11500, 15100, 11050], [12700, 7200, 12070], [10600, 16000, 10060], [13400, 14300, 13040], [8700, 7800, 8070], [14200, 12400, 14020], [12100, 11200, 12010]] },
     picks: { ruta: ["autopista", "libertador"], pago: ["efectivo", "transferencia"] },
     steps: [
       { r: "t", es: ["Buenas, ¿adónde vamos?", "Hola, ¿adónde te llevo?", "¡Buenas! ¿Para dónde vamos?", "Hola, ¿qué tal? Decime adónde vamos.", "¿Qué tal? ¿Adónde?", "Hola, buenas. ¿Para dónde te llevo?", "¡Hola! ¿Adónde vas?", "Buenas, buenas. ¿Adónde te alcanzo?", "Hola, subí nomás. ¿Para qué lado vamos?", "Hola, ¿cómo andás? ¿Adónde querés ir?"] },
@@ -400,7 +400,7 @@ window.VOSEA_ESCENAS = [
       { id: "v05", es: "Pago [en efectivo].", en: "I'll pay in cash.", p: "en efectivo" },
       { id: "v06", es: "Pago [con cincuenta mil].", en: "I'll pay with fifty thousand.", p: "pagar con" }
     ],
-    vars: { precio: [[24500, 25400, 24050], [31800, 38100, 31080], [27600, 26700, 27060]], minutos: [[40, 14, 45], [30, 13, 35], [45, 54, 15]] },
+    vars: { precio: [[24500, 25400, 24050], [31800, 38100, 31080], [27600, 26700, 27060], [26300, 23600, 26030], [29400, 24900, 29040], [33500, 35300, 33050], [22800, 28200, 22080], [35200, 32500, 35020]], minutos: [[40, 14, 45], [30, 13, 35], [45, 54, 15]] },
     picks: { pago: ["efectivo", "tarjeta"], empanadas: ["carne", "jamon"] },
     steps: [
       { r: "p", es: ["Pizzería Los Amigos, hola. ¿Qué vas a pedir?", "Hola, Los Amigos. ¿Qué te mando?", "Los Amigos, buenas noches. Decime.", "Pizzería Los Amigos, buenas. ¿Qué te preparo?", "Los Amigos, hola. ¿Qué te mandamos?", "Hola, pizzería Los Amigos. ¿Qué vas a querer?", "Buenas noches, Los Amigos. ¿Qué te anoto?", "Pizzería Los Amigos, ¿qué tal? Decime qué querés pedir.", "Hola, sí, pizzería Los Amigos. ¿Qué pedís?", "Los Amigos, buenas noches. ¿Qué te gustaría pedir?"] },
@@ -460,7 +460,7 @@ window.VOSEA_ESCENAS = [
       { r: "d", to: "s", es: ["{s:Silvia|Sergio}, dale un turno para la semana que viene, por favor.", "{s:Silvia|Sergio}, ¿le das un turno para la semana que viene?", "{s:Silvia|Sergio}, por favor, anotale un control para la semana que viene.", "{s:Silvia|Sergio}, buscale un turno para la próxima semana, ¿sí?", "{s:Silvia|Sergio}, ¿podés darle un control para la semana próxima?", "{s:Silvia|Sergio}, necesito verle la garganta de nuevo la semana que viene. ¿Le das un turno?", "{s:Silvia|Sergio}, fijate si hay un turno para la semana que viene, por favor.", "{s:Silvia|Sergio}, agendale un control para la semana que viene, ¿dale?", "{s:Silvia|Sergio}, la semana que viene tiene que volver. ¿Le buscás un turno?", "Listo. {s:Silvia|Sergio}, ¿le conseguís un turnito para la semana que viene?"] },
       { r: "s", es: ["¿Te queda bien el martes a {hora}?", "Tengo el martes a {hora}. ¿Te sirve?", "El martes a {hora} hay un lugar. ¿Te viene bien?", "¿Puede ser el martes a {hora}?", "Para el martes tengo a {hora}. ¿Te queda cómodo?", "Mirá, el martes a {hora} está libre. ¿Lo querés?", "Dejame ver… El martes a {hora}. ¿Te viene bien ese horario?", "Te puedo dar el martes a {hora}. ¿Está bien?", "¿Qué tal el martes a {hora}?", "Lo más cercano que tengo es el martes a {hora}. ¿Te va?"] },
       { check: "hora", q: { es: "¿A qué hora es el turno del martes?", en: "What time is Tuesday's appointment?" } },
-      { you: "Say yes, perfect, and thank {s:Silvia|Sergio}.", ok: [["perfecto", "gracias"], ["dale", "gracias"], ["si", "gracias"], ["bien", "gracias"], ["genial", "gracias"], ["barbaro", "gracias"], ["buenisimo", "gracias"], ["listo", "gracias"], ["agradezc"]], best: "Sí, perfecto. ¡Gracias!", prep: [], alts: ["Dale, perfecto, gracias.", "Sí, me viene bien. ¡Muchas gracias!", "Perfecto, el martes entonces. Gracias.", "Sí, me sirve. Gracias, {s:Silvia|Sergio}.", "Bárbaro, el martes. ¡Gracias!", "Sí, perfecto. Muchas gracias, {s:Silvia|Sergio}.", "Sí, me queda bárbaro. ¡Gracias!", "Perfecto, ahí estoy el martes. Gracias, {s:Silvia|Sergio}.", "Joya, me sirve. Muchas gracias.", "Sí, ese horario está perfecto. Te agradezco."] }
+      { you: "Say yes, perfect, and thank {s:Silvia|Sergio}.", ok: [["perfecto", "gracias"], ["dale", "gracias"], ["si", "gracias"], ["bien", "gracias"], ["genial", "gracias"], ["barbaro", "gracias"], ["buenisimo", "gracias"], ["listo", "gracias"], ["agradezc"], ["joya", "gracias"], ["sirve", "gracias"]], best: "Sí, perfecto. ¡Gracias!", prep: [], alts: ["Dale, perfecto, gracias.", "Sí, me viene bien. ¡Muchas gracias!", "Perfecto, el martes entonces. Gracias.", "Sí, me sirve. Gracias, {s:Silvia|Sergio}.", "Bárbaro, el martes. ¡Gracias!", "Sí, perfecto. Muchas gracias, {s:Silvia|Sergio}.", "Sí, me queda bárbaro. ¡Gracias!", "Perfecto, ahí estoy el martes. Gracias, {s:Silvia|Sergio}.", "Joya, me sirve. Muchas gracias.", "Sí, ese horario está perfecto. Te agradezco."] }
     ]
   },
   {
@@ -483,7 +483,7 @@ window.VOSEA_ESCENAS = [
       { id: "d05", es: "¿Cuándo [estaría] disponible?", en: "When would it be available?", p: "condicional de cortesía" },
       { id: "d06", es: "Me [interesa]. ¿Qué necesito?", en: "I'm interested. What do I need?", p: "interesar, como gustar" }
     ],
-    vars: { precio: [[650000, 560000, 605000], [720000, 270000, 702000], [600000, 900000, 660000]], precioExp: [[85000, 58000, 85500], [120000, 112000, 102000], [95000, 59000, 90500]] },
+    vars: { precio: [[650000, 560000, 605000], [720000, 270000, 702000], [600000, 900000, 660000], [680000, 860000, 608000], [750000, 570000, 705000], [640000, 460000, 604000], [690000, 960000, 609000], [580000, 850000, 508000]], precioExp: [[85000, 58000, 85500], [120000, 112000, 102000], [95000, 59000, 90500], [90000, 19000, 99000], [110000, 101000, 111000], [75000, 57000, 70500], [105000, 150000, 100500], [130000, 103000, 113000]] },
     picks: { mascota: ["perro", "gato"] },
     steps: [
       { r: "r", es: ["Hola, ¿qué necesitás?", "Buenas, ¿a quién buscás?", "Hola, buenas tardes. ¿En qué te puedo ayudar?", "Buenas, ¿venís por algo en particular?", "Hola, ¿te puedo ayudar en algo?", "Hola, ¿qué andás buscando?", "Hola, ¿qué tal? ¿Necesitás algo?", "Buenas, ¿qué se te ofrece?", "Hola. ¿Venís a ver a alguien del edificio?", "Buenas, ¿venís por algún departamento?"] },
@@ -530,7 +530,7 @@ window.VOSEA_ESCENAS = [
       { id: "t07", es: "Si a mi hermana no [le gusta], ¿[la puede cambiar]?", en: "If my sister doesn't like it, can she exchange it?", p: "le = a mi hermana · la = la bufanda" },
       { id: "t08", es: "¿Puedo pagar en [tres cuotas sin interés]?", en: "Can I pay in three interest-free installments?", p: "en cuotas" }
     ],
-    vars: { precio: [[384500, 348500, 394500], [413000, 431000, 403000], [376800, 367800, 386800], [439900, 493900, 429900]] },
+    vars: { precio: [[384500, 348500, 394500], [413000, 431000, 403000], [376800, 367800, 386800], [439900, 493900, 429900], [398000, 389000, 408000], [425500, 452500, 415500], [362400, 326400, 372400], [451200, 415200, 461200]] },
     picks: { prenda: ["campera", "pantalon"], calzado: ["zapatillas", "mocasines"], regalo: ["bufanda", "cinturon"], pago: ["cuotas", "debito"] },
     steps: [
       { r: "v", es: ["¡Hola! ¿Te puedo ayudar en algo?", "Buenas, ¿buscabas algo en particular?", "Hola, ¿qué andás buscando?", "¡Hola! Avisame si te puedo ayudar con algo.", "Buenas, ¿te ayudo con algo?", "¡Hola! ¿Qué te puedo mostrar?", "¡Hola! Cualquier cosa me decís.", "Buenas, ¿querés que te muestre algo?", "Buenas tardes. ¿Estás buscando algo?", "Hola, buenas. Mirá sin apuro, y si necesitás algo, avisame."] },
