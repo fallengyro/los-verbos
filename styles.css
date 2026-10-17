@@ -2683,3 +2683,7 @@
   @media (max-width: 600px) {
     #search, #word-search, #phrase-search, #topic-search, #list-filter-search { font-size: 16px; }
   }
+
+  /* Temas: how many cards, next to Practicar (2026-10-17) */
+  .flash-start-row .topic-limit { display: inline-flex; flex: none; }
+  .topic-limit .lang-option { min-width: 44px; min-height: 40px; padding: 0 10px; }

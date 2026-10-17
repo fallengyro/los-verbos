@@ -675,6 +675,8 @@
       topic_what: "¿Qué practicar?",
       topic_start: "Practicar",
       topic_count: "{n} tarjetas",
+      topic_limit_all: "Todas",
+      topic_limit_aria: "Cuántas tarjetas",
       topic_pick_one: "Elegí al menos un tramo.",
       topic_pick_part: "Elegí al menos una parte.",
       topic_ord_short: "antes de un sustantivo: {x} (el {x} piso)",
@@ -1690,6 +1692,8 @@
       topic_what: "What to practice?",
       topic_start: "Practice",
       topic_count: "{n} cards",
+      topic_limit_all: "All",
+      topic_limit_aria: "How many cards",
       topic_pick_one: "Pick at least one range.",
       topic_pick_part: "Pick at least one part.",
       topic_ord_short: "before a noun: {x} (el {x} piso)",
@@ -4274,6 +4278,7 @@
     tdMsg: document.getElementById("td-msg"),
     tdStart: document.getElementById("td-start"),
     tdCount: document.getElementById("td-count"),
+    tdLimit: document.getElementById("td-limit"),
     tdSentencesWrap: document.getElementById("td-sentences-wrap"),
     tdSentencesToggle: document.getElementById("td-sentences-toggle"),
     tdSentences: document.getElementById("td-sentences"),
@@ -4371,7 +4376,7 @@
   // the page, the console says which ones, and the page fetches a fresh copy
   // of itself once (VOSEA_BUILD has to match index.html's vosea-build meta;
   // both go up with sw.js's CACHE_NAME).
-  var VOSEA_BUILD = "113";
+  var VOSEA_BUILD = "114";
   var elMissing = [];
   Object.keys(el).forEach(function (k) {
     if (el[k]) return;
@@ -4601,6 +4606,27 @@
   // a single tab's button would otherwise silently drop it out from under
   // the other two tabs mid-review, so that's left to the list-filter modal's
   // own "Limpiar selección" or the picker's tri-state toggle instead.
+  // "Limpiar filtros" shows whenever anything narrows the list: a chip, the
+  // search box, or a list in Listas (mason, 2026-10-17: the search and the
+  // lists didn't bring it up, only the chips). It clears all three; the
+  // Listas choice is shared by Verbos, Vocabulario and Frases, so it goes
+  // for all of them.
+  function clearBtnShouldShow(tab) {
+    var search = tab === "verbs" ? el.search : tab === "words" ? el.wordSearch : el.phraseSearch;
+    return anyFilterActive(activeFiltersForTab(tab)) || !!(search && search.value.trim()) ||
+      sharedListFilter.list.include.size + sharedListFilter.list.exclude.size > 0;
+  }
+  function clearAllFiltersFor(tab) {
+    var search = tab === "verbs" ? el.search : tab === "words" ? el.wordSearch : el.phraseSearch;
+    if (search) search.value = "";
+    var hadLists = sharedListFilter.list.include.size + sharedListFilter.list.exclude.size > 0;
+    sharedListFilter.list.include.clear();
+    sharedListFilter.list.exclude.clear();
+    saveFilters(SHARED_LIST_STORAGE_KEY, sharedListFilter);
+    if (hadLists) { renderList(); renderWordList(); renderPhraseList(); }
+    else rerenderTab(tab);
+    ["verbs", "words", "phrases"].forEach(updateListsTrigger);
+  }
   function clearTabFiltersOnly(tab) {
     var filters = activeFiltersForTab(tab);
     Object.keys(filters).forEach(function (f) { filters[f].include.clear(); filters[f].exclude.clear(); });
@@ -4813,6 +4839,7 @@
     el.list.scrollTop = 0;
     fitShortSelectionList(el.list);
     el.count.textContent = allVerbs.length ? (filtered.length + " / " + allVerbs.length) : "";
+    el.verbFiltersClear.hidden = !clearBtnShouldShow("verbs");
     updateFlashCounts();
   }
 
@@ -5969,6 +5996,7 @@
     el.wordList.scrollTop = 0;
     fitShortSelectionList(el.wordList);
     el.wordCount.textContent = allWords.length ? (filteredWords.length + " / " + allWords.length) : "";
+    el.wordFiltersClear.hidden = !clearBtnShouldShow("words");
     updateFlashCounts();
   }
 
@@ -6243,6 +6271,7 @@
     el.phraseList.scrollTop = 0;
     fitShortSelectionList(el.phraseList);
     el.phraseCount.textContent = allPhrases.length ? (filteredPhrases.length + " / " + allPhrases.length) : "";
+    el.phraseFiltersClear.hidden = !clearBtnShouldShow("phrases");
     updateFlashCounts();
   }
 
@@ -9740,7 +9769,28 @@
         { id: "c29", part: "isimo", es: "Es una ciudad [lindísima].", en: "It's a really beautiful city.", p: "linda → lindísima" },
         { id: "c30", part: "isimo", es: "Hace [muchísimo] calor.", en: "It's incredibly hot.", p: "mucho → muchísimo" },
         { id: "c31", part: "isimo", es: "Llegaste [tardísimo].", en: "You got here really late.", p: "tarde → tardísimo" },
-        { id: "c32", part: "isimo", es: "El examen fue [facilísimo].", en: "The exam was super easy.", p: "fácil → facilísimo (sin tilde)" }
+        { id: "c32", part: "isimo", es: "El examen fue [facilísimo].", en: "The exam was super easy.", p: "fácil → facilísimo (sin tilde)" },
+        { id: "c33", part: "mas", es: "Los tomates de la verdulería son [más] baratos [que] los del súper.", en: "The tomatoes at the produce store are cheaper than the ones at the supermarket.", p: "más + adjetivo + que" },
+        { id: "c34", part: "mas", es: "Mi hermana toma [menos] mate [que] yo.", en: "My sister drinks less mate than I do.", p: "menos + sustantivo + que" },
+        { id: "c35", part: "tan", es: "El colectivo no es [tan] cómodo [como] el subte.", en: "The bus isn't as comfortable as the subway.", p: "tan + adjetivo + como" },
+        { id: "c36", part: "tan", es: "Ustedes no viven [tan] lejos [como] nosotros.", en: "You guys don't live as far away as we do.", p: "tan + adverbio + como" },
+        { id: "c37", part: "tan", es: "Ella no come [tanta] carne [como] su marido.", en: "She doesn't eat as much meat as her husband.", p: "tanto/a + sustantivo + como" },
+        { id: "c38", part: "tan", es: "Hoy en la feria no hay [tantas] personas [como] el sábado.", en: "There aren't as many people at the market today as on Saturday.", p: "tantos/as + sustantivo + como" },
+        { id: "c39", part: "tan", es: "Mi novio no duerme [tanto como] yo.", en: "My boyfriend doesn't sleep as much as I do.", p: "verbo + tanto como" },
+        { id: "c40", part: "mejor", es: "La pizza de acá es [mejor que] la de mi barrio.", en: "The pizza here is better than the pizza in my neighborhood.", p: "mejor que" },
+        { id: "c41", part: "mejor", es: "Esta silla es [peor que] la vieja.", en: "This chair is worse than the old one.", p: "peor que" },
+        { id: "c42", part: "mejor", es: "¿Tu hermano es [menor que] vos?", en: "Is your brother younger than you?", p: "menor que" },
+        { id: "c43", part: "mejor", es: "Mis primos son [mayores que] yo.", en: "My cousins are older than me.", p: "mayores que · plural" },
+        { id: "c44", part: "mejor", es: "Ella cocina [mejor] que su mamá.", en: "She cooks better than her mom.", p: "mejor · con un verbo" },
+        { id: "c45", part: "super", es: "Es la plaza [más] linda [de] Caballito.", en: "It's the prettiest square in Caballito.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c46", part: "super", es: "Diciembre es el mes [más] caro [del] año.", en: "December is the most expensive month of the year.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c47", part: "super", es: "Vos sos el [más] alto [de] la clase.", en: "You're the tallest in the class.", p: "el + más + adjetivo + de" },
+        { id: "c48", part: "super", es: "Este es el colectivo [más] lento [de] la ciudad.", en: "This is the slowest bus in the city.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c49", part: "super", es: "Es la línea de subte [menos] llena [de] todas.", en: "It's the least crowded subway line of all.", p: "el/la + menos + adjetivo + de" },
+        { id: "c50", part: "super", es: "Para mí, el asado es la comida [más] rica [del] mundo.", en: "For me, asado is the tastiest food in the world.", p: "el/la + sustantivo + más + adjetivo + de" },
+        { id: "c51", part: "super", es: "Es el [mejor] bar [de] Palermo.", en: "It's the best bar in Palermo.", p: "el/la mejor + sustantivo + de" },
+        { id: "c52", part: "isimo", es: "La parada queda [cerquísima] de casa.", en: "The stop is super close to home.", p: "cerca → cerquísima (c → qu)" },
+        { id: "c53", part: "isimo", es: "Las facturas de esta panadería son [buenísimas].", en: "The pastries at this bakery are amazing.", p: "buenas → buenísimas" }
       ]
     },
     {
@@ -9782,7 +9832,35 @@
         { id: "h21", part: "querer", es: "Mi hermana [quiere] aprender a bailar tango.", en: "My sister wants to learn to dance tango.", p: "querer + infinitivo" },
         { id: "h22", part: "querer", es: "¿[Preferís] quedarte en casa?", en: "Would you rather stay home?", p: "preferir + infinitivo" },
         { id: "h23", part: "querer", es: "No [necesitás] reservar.", en: "You don't need to make a reservation.", p: "no necesitar + infinitivo" },
-        { id: "h24", part: "querer", es: "[Queremos] alquilar un departamento.", en: "We want to rent an apartment.", p: "querer + infinitivo" }
+        { id: "h24", part: "querer", es: "[Queremos] alquilar un departamento.", en: "We want to rent an apartment.", p: "querer + infinitivo" },
+        { id: "h25", part: "obligacion", es: "[Hay que] sacar la basura después de las ocho de la noche.", en: "You have to take the trash out after eight at night.", p: "hay que · en general" },
+        { id: "h26", part: "obligacion", es: "Con este calor [hay que] tomar mucha agua.", en: "In this heat you have to drink lots of water.", p: "hay que · en general" },
+        { id: "h27", part: "obligacion", es: "¿[Hay que] llevar algo al asado?", en: "Is everyone supposed to bring something to the asado?", p: "hay que · en general" },
+        { id: "h28", part: "obligacion", es: "En el banco [hay que] hacer una fila larguísima.", en: "At the bank you have to wait in a really long line.", p: "hay que · en general" },
+        { id: "h29", part: "obligacion", es: "Para parar el colectivo [hay que] hacer seña con la mano.", en: "To get the bus to stop, you have to wave it down.", p: "hay que · en general" },
+        { id: "h30", part: "obligacion", es: "[Tengo que] pasar por la farmacia.", en: "I have to stop by the pharmacy.", p: "tener que · yo" },
+        { id: "h31", part: "obligacion", es: "Mis viejos [tienen que] renovar el pasaporte.", en: "My parents have to renew their passports.", p: "tener que · ellos" },
+        { id: "h32", part: "obligacion", es: "¿A qué hora [tenés que] estar en el laburo?", en: "What time do you have to be at work?", p: "tener que · vos" },
+        { id: "h33", part: "obligacion", es: "Mañana mi mujer [tiene que] ir al dentista.", en: "Tomorrow my wife has to go to the dentist.", p: "tener que · ella" },
+        { id: "h34", part: "obligacion", es: "Usted [tiene que] firmar acá, por favor.", en: "You need to sign here, please.", p: "tener que · usted" },
+        { id: "h35", part: "querer", es: "[Quiero] aprender a hacer empanadas.", en: "I want to learn how to make empanadas.", p: "querer + infinitivo" },
+        { id: "h36", part: "querer", es: "¿[Necesitás] sacar plata del cajero?", en: "Do you need to get money from the ATM?", p: "necesitar · vos" },
+        { id: "h37", part: "querer", es: "Mi marido [prefiere] quedarse en casa los viernes.", en: "My husband prefers to stay home on Fridays.", p: "preferir · él: e → ie" },
+        { id: "h38", part: "querer", es: "Los chicos [quieren] ir a la plaza.", en: "The kids want to go to the playground.", p: "querer · ellos: e → ie" },
+        { id: "h39", part: "querer", es: "[Preferimos] ir en subte, es más rápido.", en: "We'd rather take the subway; it's faster.", p: "preferir · nosotros" },
+        { id: "h40", part: "querer", es: "¿Ustedes [quieren] venir al asado del domingo?", en: "Do you guys want to come to the asado on Sunday?", p: "querer · ustedes" },
+        { id: "h41", part: "querer", es: "[Necesito] dormir más.", en: "I need to get more sleep.", p: "necesitar + infinitivo" },
+        { id: "h42", part: "querer", es: "¿[Preferís] cenar afuera o cocinar?", en: "Would you rather eat out or cook?", p: "preferir · vos" },
+        { id: "h43", part: "querer", es: "La señora [necesita] sentarse un rato.", en: "The lady needs to sit down for a bit.", p: "necesitar · ella" },
+        { id: "h44", part: "querer", es: "No [quiero] llegar tarde a la reunión.", en: "I don't want to be late for the meeting.", p: "no querer + infinitivo" },
+        { id: "h45", part: "querer", es: "Mi hermana [prefiere] alquilar cerca del trabajo.", en: "My sister would rather rent near work.", p: "preferir · ella" },
+        { id: "h46", part: "querer", es: "[Necesitamos] llamar al plomero.", en: "We need to call the plumber.", p: "necesitar · nosotros" },
+        { id: "h47", part: "querer", es: "¿[Querés] compartir una pizza?", en: "Do you want to split a pizza?", p: "querer · vos" },
+        { id: "h48", part: "querer", es: "Ellos [necesitan] encontrar un departamento antes de marzo.", en: "They need to find an apartment before March.", p: "necesitar · ellos" },
+        { id: "h49", part: "querer", es: "¿Usted [quiere] dejar un mensaje?", en: "Would you like to leave a message?", p: "querer · usted" },
+        { id: "h50", part: "querer", es: "[Prefiero] no hablar de eso.", en: "I'd rather not talk about that.", p: "preferir + no + infinitivo" },
+        { id: "h51", part: "querer", es: "Este finde [queremos] conocer Tigre.", en: "This weekend we want to check out Tigre.", p: "querer · nosotros" },
+        { id: "h52", part: "querer", es: "¿Ustedes [prefieren] sentarse adentro o afuera?", en: "Would you rather sit inside or outside?", p: "preferir · ustedes" }
       ]
     },
     {
@@ -9831,7 +9909,32 @@
         { id: "y25", part: "he", es: "Este año [hemos viajado] mucho.", en: "We've traveled a lot this year.", p: "hemos viajado = viajamos" },
         { id: "y26", part: "he", es: "¿Qué [has hecho] hoy?", en: "What have you done today?", p: "has hecho = ¿hiciste?" },
         { id: "y27", part: "he", es: "Nunca [he visto] algo así.", en: "I've never seen anything like it.", p: "he visto = vi" },
-        { id: "y28", part: "he", es: "Ya [ha llegado] el paquete.", en: "The package has already arrived.", p: "ha llegado = llegó" }
+        { id: "y28", part: "he", es: "Ya [ha llegado] el paquete.", en: "The package has already arrived.", p: "ha llegado = llegó" },
+        { id: "y29", part: "ya", es: "¿[Todavía] estás en el laburo?", en: "Are you still at work?", p: "todavía · still" },
+        { id: "y30", part: "ya", es: "[Ya] no tomo café de noche.", en: "I don't drink coffee at night anymore.", p: "ya no" },
+        { id: "y31", part: "ya", es: "El encargado [todavía] no arregló el ascensor.", en: "The super still hasn't fixed the elevator.", p: "todavía no" },
+        { id: "y32", part: "ya", es: "—¿Me cebás un mate? —[Ya] va.", en: "Will you make me a mate? —Coming right up.", p: "ya va · muy de acá" },
+        { id: "y33", part: "ya", es: "Son las dos de la mañana y los vecinos [todavía] están de fiesta.", en: "It's two in the morning and the neighbors are still partying.", p: "todavía · still" },
+        { id: "y34", part: "ya", es: "Mi hija [ya] sabe leer.", en: "My daughter already knows how to read.", p: "ya · already" },
+        { id: "y35", part: "vez", es: "¿[Alguna vez] tomaste mate con azúcar?", en: "Have you ever had mate with sugar?", p: "alguna vez + pretérito" },
+        { id: "y36", part: "vez", es: "Mi marido [nunca] se tomó el subte.", en: "My husband has never taken the subway.", p: "nunca + pretérito" },
+        { id: "y37", part: "vez", es: "¿Ustedes fueron [alguna vez] a Tigre?", en: "Have you guys ever been to Tigre?", p: "alguna vez" },
+        { id: "y38", part: "vez", es: "No probé [nunca] el fernet.", en: "I've never tried fernet.", p: "no… nunca" },
+        { id: "y39", part: "vez", es: "¿[Alguna vez] te perdiste en el subte?", en: "Have you ever gotten lost on the subway?", p: "alguna vez + pretérito" },
+        { id: "y40", part: "vez", es: "Mis viejos [nunca] vinieron a Buenos Aires.", en: "My parents have never come to Buenos Aires.", p: "nunca + pretérito" },
+        { id: "y41", part: "vez", es: "¿Tuvo [alguna vez] problemas de presión?", en: "Have you ever had blood pressure problems?", p: "alguna vez · usted" },
+        { id: "y42", part: "vez", es: "[Nunca] hicimos un asado nosotros solos.", en: "We've never made an asado on our own.", p: "nunca + pretérito" },
+        { id: "y43", part: "vez", es: "¿Vos viviste [alguna vez] afuera?", en: "Have you ever lived abroad?", p: "alguna vez" },
+        { id: "y44", part: "vez", es: "Ella no faltó [nunca] a una clase.", en: "She's never missed a class.", p: "no… nunca" },
+        { id: "y45", part: "vez", es: "—¿Fuiste alguna vez a las cataratas? —No, [nunca].", en: "Have you ever been to the falls? —No, never.", p: "no, nunca · respuesta corta" },
+        { id: "y46", part: "he", es: "¿[Has probado] el dulce de leche?", en: "Have you tried dulce de leche?", p: "has probado = ¿probaste?" },
+        { id: "y47", part: "he", es: "Mis amigos [han venido] a visitarnos.", en: "My friends have come to visit us.", p: "han venido = vinieron" },
+        { id: "y48", part: "he", es: "Hoy [he caminado] muchísimo.", en: "I've walked a ton today.", p: "he caminado = caminé" },
+        { id: "y49", part: "he", es: "¿Usted [ha tenido] fiebre?", en: "Have you had a fever?", p: "ha tenido = ¿tuvo?" },
+        { id: "y50", part: "he", es: "[Hemos aprendido] mucho castellano acá.", en: "We've learned a lot of Spanish here.", p: "hemos aprendido = aprendimos" },
+        { id: "y51", part: "he", es: "¿[Han visto] mis anteojos?", en: "Have you guys seen my glasses?", p: "han visto = ¿vieron?" },
+        { id: "y52", part: "he", es: "Ella siempre [ha vivido] en Caballito.", en: "She's always lived in Caballito.", p: "ha vivido = vivió" },
+        { id: "y53", part: "he", es: "El precio del pan [ha subido] otra vez.", en: "The price of bread has gone up again.", p: "ha subido = subió" }
       ]
     }
   ];
@@ -10025,7 +10128,40 @@
         { id: "p17", part: "prep", es: "¿Querés venir [con nosotros]?", en: "Do you want to come with us?", p: "con + nosotros" },
         { id: "p18", part: "prep", es: "Hablamos mucho de [ellos].", en: "We talk about them a lot.", p: "de + ellos" },
         { id: "p19", part: "prep", es: "Hay un lugar libre atrás de [mí].", en: "There's a free seat behind me.", p: "atrás de + mí" },
-        { id: "p20", part: "prep", es: "Entre [vos y yo], no me gusta.", en: "Between you and me, I don't like it.", p: "entre vos y yo" }
+        { id: "p20", part: "prep", es: "Entre [vos y yo], no me gusta.", en: "Between you and me, I don't like it.", p: "entre vos y yo" },
+        { id: "p21", part: "sujeto", es: "[Yo] tomo el subte y [vos] el colectivo.", en: "I take the subway and you take the bus.", p: "yo · vos" },
+        { id: "p22", part: "sujeto", es: "¿[Usted] sabe dónde queda la parada?", en: "Do you (formal) know where the stop is?", p: "usted" },
+        { id: "p23", part: "sujeto", es: "[Ellos] viven en Caballito, cerca del parque.", en: "They live in Caballito, near the park.", p: "ellos" },
+        { id: "p24", part: "sujeto", es: "[Él] es el encargado del edificio.", en: "He's the building manager.", p: "él" },
+        { id: "p25", part: "sujeto", es: "[Nosotros] llevamos el vino y [ustedes] la carne.", en: "We'll bring the wine and you guys bring the meat.", p: "nosotros · ustedes" },
+        { id: "p26", part: "sujeto", es: "[Ella] es la dueña de la verdulería.", en: "She's the owner of the produce store.", p: "ella" },
+        { id: "p27", part: "sujeto", es: "[Ellas] son mis compañeras de laburo.", en: "They're my coworkers.", p: "ellas · todas mujeres" },
+        { id: "p28", part: "sujeto", es: "¿[Ustedes] vienen al asado del sábado?", en: "Are you guys coming to the asado on Saturday?", p: "ustedes" },
+        { id: "p29", part: "sujeto", es: "[Nosotras] vamos a la feria los sábados.", en: "We (women) go to the street market on Saturdays.", p: "nosotras" },
+        { id: "p30", part: "sujeto", es: "[Vos] cocinás muy bien, ¿eh?", en: "You're a really good cook, you know?", p: "vos" },
+        { id: "p31", part: "sujeto", es: "Mi mujer es de Texas y [yo] soy de Ohio.", en: "My wife is from Texas and I'm from Ohio.", p: "yo" },
+        { id: "p32", part: "sujeto", es: "¿Quién paga? ¿[Vos] o [yo]?", en: "Who's paying? You or me?", p: "vos · yo" },
+        { id: "p33", part: "sujeto", es: "[Usted] tiene que firmar acá, señor.", en: "You need to sign here, sir.", p: "usted" },
+        { id: "p34", part: "sujeto", es: "[Ellos] no hablan inglés, pero [nosotros] sí.", en: "They don't speak English, but we do.", p: "ellos · nosotros" },
+        { id: "p35", part: "sujeto", es: "[Él] y [yo] somos vecinos.", en: "He and I are neighbors.", p: "él · yo" },
+        { id: "p36", part: "prep", es: "A [mí] me encanta Palermo.", en: "I love Palermo.", p: "a + mí" },
+        { id: "p37", part: "prep", es: "¿Y a [vos] qué te parece?", en: "And what do you think?", p: "a + vos" },
+        { id: "p38", part: "prep", es: "Mañana voy al cine [con ella].", en: "Tomorrow I'm going to the movies with her.", p: "con + ella" },
+        { id: "p39", part: "prep", es: "Después de [usted], señora.", en: "After you, ma'am.", p: "después de + usted" },
+        { id: "p40", part: "prep", es: "Mis viejos viven cerca de [nosotros].", en: "My parents live near us.", p: "cerca de + nosotros" },
+        { id: "p41", part: "prep", es: "¿Vas a ir [conmigo] o [con ellos]?", en: "Are you going with me or with them?", p: "conmigo · con + ellos" },
+        { id: "p42", part: "prep", es: "Siempre pienso en [vos].", en: "I always think about you.", p: "en + vos" },
+        { id: "p43", part: "prep", es: "Sin [ustedes] la fiesta no es lo mismo.", en: "The party isn't the same without you guys.", p: "sin + ustedes" },
+        { id: "p44", part: "prep", es: "El encargado tiene un paquete para [ella].", en: "The building manager has a package for her.", p: "para + ella" },
+        { id: "p45", part: "prep", es: "¿Querés tomar unos mates [conmigo]?", en: "Do you want to have some mate with me?", p: "con + mí → conmigo" },
+        { id: "p46", part: "prep", es: "No sé nada de [él] desde el verano.", en: "I haven't heard from him since the summer.", p: "de + él" },
+        { id: "p47", part: "prep", es: "Laburo [con ellas] en la misma oficina.", en: "I work with them in the same office.", p: "con + ellas" },
+        { id: "p48", part: "prep", es: "Este mensaje no es para [vos], es para [él].", en: "This message isn't for you, it's for him.", p: "para + vos · para + él" },
+        { id: "p49", part: "prep", es: "Según [ella], el subte está cerrado.", en: "According to her, the subway is closed.", p: "según + ella" },
+        { id: "p50", part: "prep", es: "¿Me esperás? Voy [con vos].", en: "Will you wait for me? I'll go with you.", p: "con + vos, no «contigo»" },
+        { id: "p51", part: "prep", es: "Los chicos juegan [con él] en la plaza.", en: "The kids play with him in the park.", p: "con + él" },
+        { id: "p52", part: "prep", es: "Por [mí], está bien.", en: "It's fine by me.", p: "por + mí" },
+        { id: "p53", part: "prep", es: "¿Hay lugar para [nosotros] en la mesa?", en: "Is there room for us at the table?", p: "para + nosotros" }
       ]
     },
     {
@@ -10053,7 +10189,45 @@
         { id: "d11", es: "¿La cuenta? Ya [la] pagué.", en: "The check? I already paid it.", p: "la = la cuenta" },
         { id: "d12", es: "¿[Me] llamás después?", en: "Will you call me later?", p: "me = a mí" },
         { id: "d13", es: "La película está buena: quiero ver[la] otra vez.", en: "The movie is good: I want to see it again.", p: "pegado al infinitivo" },
-        { id: "d14", es: "No [lo] sé.", en: "I don't know.", p: "lo = eso" }
+        { id: "d14", es: "No [lo] sé.", en: "I don't know.", p: "lo = eso" },
+        { id: "d15", es: "¿El mate? [Lo] preparo yo.", en: "The mate? I'll make it.", p: "lo = el mate" },
+        { id: "d16", es: "Se terminó la yerba: [la] anoto en la lista.", en: "We're out of yerba: I'll put it on the list.", p: "la = la yerba" },
+        { id: "d17", es: "Ayer [la] vi a tu prima en el subte.", en: "I saw your cousin on the subway yesterday.", p: "la + a tu prima · muy de acá" },
+        { id: "d18", es: "[Lo] conozco a tu jefe, es muy buena onda.", en: "I know your boss; he's really nice.", p: "lo + a tu jefe · muy de acá" },
+        { id: "d19", es: "¿[Me] acompañás a la verdulería?", en: "Will you come with me to the produce store?", p: "me = a mí" },
+        { id: "d20", es: "El encargado [nos] ayudó con la mudanza.", en: "The super helped us with the move.", p: "nos = a nosotros" },
+        { id: "d21", es: "[Te] invito a cenar el viernes.", en: "I'm inviting you to dinner on Friday.", p: "te = a vos" },
+        { id: "d22", es: "¿[Los] llevo a Ezeiza?", en: "Should I drive you guys to Ezeiza?", p: "los = a ustedes" },
+        { id: "d23", es: "Chicas, [las] espero en la plaza.", en: "Girls, I'll wait for you in the plaza.", p: "las = a ustedes" },
+        { id: "d24", es: "Señora, ¿[la] atienden?", en: "Ma'am, is someone helping you?", p: "la = a usted" },
+        { id: "d25", es: "Señor, ¿[lo] ayudo con las bolsas?", en: "Sir, can I help you with your bags?", p: "lo = a usted" },
+        { id: "d26", es: "El colectivo [lo] tomo en la esquina de casa.", en: "I catch the bus on the corner by my place.", p: "lo = el colectivo" },
+        { id: "d27", es: "Esta camisa [la] lavo a mano.", en: "I wash this shirt by hand.", p: "la = la camisa" },
+        { id: "d28", es: "¿Las facturas? [Las] trae mi suegra.", en: "The pastries? My mother-in-law is bringing them.", p: "las = las facturas" },
+        { id: "d29", es: "¿Querés el diario? Ya [lo] leí.", en: "Do you want the paper? I already read it.", p: "lo = el diario" },
+        { id: "d30", es: "Los platos están sucios: tengo que lavar[los].", en: "The dishes are dirty: I have to wash them.", p: "pegado al infinitivo" },
+        { id: "d31", es: "Mi amiga llega hoy y voy a buscar[la] a Retiro.", en: "My friend arrives today and I'm going to pick her up at Retiro.", p: "pegado al infinitivo" },
+        { id: "d32", es: "Las plantas [las] tenés que regar todos los días.", en: "You have to water the plants every day.", p: "antes del verbo conjugado" },
+        { id: "d33", es: "¿El informe? Estoy terminándo[lo].", en: "The report? I'm finishing it.", p: "pegado al gerundio, con tilde" },
+        { id: "d34", es: "¿Y el celular? [Lo] estoy buscando hace una hora.", en: "And my phone? I've been looking for it for an hour.", p: "antes de estar + gerundio" },
+        { id: "d35", es: "La puerta está abierta: cerra[la], por favor.", en: "The door is open: close it, please.", p: "pegado al imperativo · cerrá + la" },
+        { id: "d36", es: "Si ves a Pablo, saluda[lo] de mi parte.", en: "If you see Pablo, say hi to him for me.", p: "pegado al imperativo · saludá + lo" },
+        { id: "d37", es: "¿El ventilador? No [lo] apagues, hace calor.", en: "The fan? Don't turn it off, it's hot.", p: "no + pronombre + verbo" },
+        { id: "d38", es: "Esa serie no [la] vi todavía.", en: "I haven't watched that show yet.", p: "la = la serie" },
+        { id: "d39", es: "Un perro [me] mordió en la plaza.", en: "A dog bit me in the plaza.", p: "me = a mí" },
+        { id: "d40", es: "[Te] vi ayer en el colectivo.", en: "I saw you on the bus yesterday.", p: "te = a vos" },
+        { id: "d41", es: "Los vecinos [nos] invitaron a un asado.", en: "The neighbors invited us to an asado.", p: "nos = a nosotros" },
+        { id: "d42", es: "A tus viejos [los] quiero mucho.", en: "I really love your parents.", p: "los = a tus viejos" },
+        { id: "d43", es: "La plata [la] guardo en el cajón.", en: "I keep the money in the drawer.", p: "la = la plata" },
+        { id: "d44", es: "¿El vino? [Lo] elegís vos.", en: "The wine? You pick it.", p: "lo = el vino" },
+        { id: "d45", es: "A los chicos [los] busco yo en el colegio.", en: "I'll pick up the kids at school.", p: "los = a los chicos" },
+        { id: "d46", es: "Mi abuela hace ñoquis y [los] comemos el veintinueve.", en: "My grandma makes gnocchi and we eat them on the twenty-ninth.", p: "los = los ñoquis" },
+        { id: "d47", es: "Ese departamento es lindo, pero no [lo] podemos pagar.", en: "That apartment is nice, but we can't afford it.", p: "antes del verbo conjugado" },
+        { id: "d48", es: "¿Las empanadas? Hay que calentar[las] un poco.", en: "The empanadas? They need to be heated up a little.", p: "pegado al infinitivo" },
+        { id: "d49", es: "Mañana es el cumple de Lucía y quiero sorprender[la].", en: "Tomorrow is Lucía's birthday and I want to surprise her.", p: "pegado al infinitivo" },
+        { id: "d50", es: "No [te] entiendo, hablá más despacio.", en: "I don't understand you; talk slower.", p: "te = a vos" },
+        { id: "d51", es: "El ascensor no anda: están arreglándo[lo].", en: "The elevator is out: they're fixing it.", p: "pegado al gerundio, con tilde" },
+        { id: "d52", es: "La leche está vencida: tira[la].", en: "The milk is past its date: throw it out.", p: "pegado al imperativo · tirá + la" }
       ]
     },
     {
@@ -10082,7 +10256,45 @@
         { id: "i11", es: "¿[Le] podés dar esto a Ana?", en: "Can you give this to Ana?", p: "le = a Ana" },
         { id: "i12", es: "[Nos] encanta Buenos Aires.", en: "We love Buenos Aires.", p: "encantar: nos" },
         { id: "i13", es: "Voy a decir[le] la verdad.", en: "I'm going to tell him the truth.", p: "pegado al infinitivo" },
-        { id: "i14", es: "A ustedes, ¿[les] gusta el asado?", en: "Do you (all) like asado?", p: "gustar: les" }
+        { id: "i14", es: "A ustedes, ¿[les] gusta el asado?", en: "Do you (all) like asado?", p: "gustar: les" },
+        { id: "i15", es: "¿[Le] avisaste al encargado?", en: "Did you let the super know?", p: "le = al encargado" },
+        { id: "i16", es: "[Le] pagué al plomero en efectivo.", en: "I paid the plumber in cash.", p: "le = al plomero" },
+        { id: "i17", es: "El verdulero [me] regaló un limón.", en: "The produce guy gave me a lemon for free.", p: "me = a mí" },
+        { id: "i18", es: "¿[Te] cobraron la bolsa?", en: "Did they charge you for the bag?", p: "te = a vos" },
+        { id: "i19", es: "[Les] mandé un audio a mis amigas.", en: "I sent my friends a voice message.", p: "les = a mis amigas" },
+        { id: "i20", es: "¿[Nos] sacás una foto?", en: "Can you take a picture of us?", p: "nos = a nosotros" },
+        { id: "i21", es: "Mi suegra [nos] presta el auto los domingos.", en: "My mother-in-law lends us her car on Sundays.", p: "nos = a nosotros" },
+        { id: "i22", es: "Si querés, [te] presto mi bici.", en: "If you want, I'll lend you my bike.", p: "te = a vos" },
+        { id: "i23", es: "¿[Me] explicás cómo funciona esto?", en: "Can you explain to me how this works?", p: "me = a mí" },
+        { id: "i24", es: "¿Qué [le] pasa al perro?", en: "What's wrong with the dog?", p: "le = al perro" },
+        { id: "i25", es: "¿Qué [te] pasa? Estás muy callada.", en: "What's wrong? You're very quiet.", p: "te = a vos" },
+        { id: "i26", es: "[Le] pedí un descuento al vendedor.", en: "I asked the salesman for a discount.", p: "le = al vendedor" },
+        { id: "i27", es: "Disculpe, ¿[le] puedo hacer una pregunta?", en: "Excuse me, can I ask you a question?", p: "le = a usted" },
+        { id: "i28", es: "Señora, ¿[le] cobro?", en: "Ma'am, can I ring you up?", p: "le = a usted" },
+        { id: "i29", es: "Tengo que contar[te] algo.", en: "I have to tell you something.", p: "pegado al infinitivo" },
+        { id: "i30", es: "Vamos a comprar[le] flores a la abuela.", en: "We're going to buy Grandma some flowers.", p: "pegado al infinitivo" },
+        { id: "i31", es: "[Le] tengo que devolver la plata a Martín.", en: "I have to pay Martín back.", p: "antes del verbo conjugado" },
+        { id: "i32", es: "Estoy escribiéndo[le] a mi hermano.", en: "I'm writing to my brother.", p: "pegado al gerundio, con tilde" },
+        { id: "i33", es: "¿[Me] estás mintiendo?", en: "Are you lying to me?", p: "antes de estar + gerundio" },
+        { id: "i34", es: "Deci[le] a Juan que llego tarde.", en: "Tell Juan I'll be late.", p: "pegado al imperativo · decí + le" },
+        { id: "i35", es: "Pregunta[le] al chofer si para en Plaza Italia.", en: "Ask the driver if he stops at Plaza Italia.", p: "pegado al imperativo · preguntá + le" },
+        { id: "i36", es: "Manda[me] la dirección por mensaje.", en: "Text me the address.", p: "pegado al imperativo · mandá + me" },
+        { id: "i37", es: "No [le] des de comer al perro en la mesa.", en: "Don't feed the dog at the table.", p: "no + pronombre + verbo" },
+        { id: "i38", es: "Esos zapatos [te] quedan bárbaro.", en: "Those shoes look great on you.", p: "quedar: te" },
+        { id: "i39", es: "¿[Les] falta algo, chicos?", en: "Do you guys need anything else?", p: "faltar: les · a ustedes" },
+        { id: "i40", es: "Para el invierno [me] hace falta un abrigo.", en: "I need a coat for the winter.", p: "hacer falta: me" },
+        { id: "i41", es: "A mi vieja [le] cuesta subir la escalera.", en: "It's hard for my mom to climb the stairs.", p: "costar: le" },
+        { id: "i42", es: "[Le] conté a mi jefa lo del viaje.", en: "I told my boss about the trip.", p: "le = a mi jefa" },
+        { id: "i43", es: "El médico [me] recetó un jarabe para la tos.", en: "The doctor prescribed me some cough syrup.", p: "me = a mí" },
+        { id: "i44", es: "Ya [te] mandé la plata por transferencia.", en: "I already sent you the money by bank transfer.", p: "te = a vos" },
+        { id: "i45", es: "La profe [nos] dio mucha tarea.", en: "The teacher gave us a lot of homework.", p: "nos = a nosotros" },
+        { id: "i46", es: "¿[Les] dejo la llave a ustedes?", en: "Should I leave the key with you guys?", p: "les = a ustedes" },
+        { id: "i47", es: "[Le] escribí a la dueña por el calefón.", en: "I wrote to the landlady about the water heater.", p: "le = a la dueña" },
+        { id: "i48", es: "El kiosquero [me] dio mal el vuelto.", en: "The kiosk guy gave me the wrong change.", p: "me = a mí" },
+        { id: "i49", es: "¿Ya [les] contestaste a tus primos?", en: "Did you answer your cousins yet?", p: "les = a tus primos" },
+        { id: "i50", es: "Quiero mostrar[te] el barrio.", en: "I want to show you the neighborhood.", p: "pegado al infinitivo" },
+        { id: "i51", es: "¿Podés alcanzar[me] el control?", en: "Can you hand me the remote?", p: "pegado al infinitivo" },
+        { id: "i52", es: "Mis viejos [les] mandan saludos a ustedes.", en: "My parents say hi to you guys.", p: "les = a ustedes" }
       ]
     },
     {
@@ -10121,7 +10333,39 @@
         { id: "x17", part: "infinitivo", es: "[Se lo] estoy diciendo.", en: "I'm telling him.", p: "antes de estar + gerundio" },
         { id: "x18", part: "infinitivo", es: "No [te lo] quiero decir.", en: "I don't want to tell you.", p: "antes del verbo conjugado" },
         { id: "x19", part: "infinitivo", es: "Quiero regalár[selo] a mi mamá.", en: "I want to give it to my mom.", p: "pegado al infinitivo, con tilde" },
-        { id: "x20", part: "infinitivo", es: "Tenés que devolvér[melo].", en: "You have to give it back to me.", p: "pegado al infinitivo, con tilde" }
+        { id: "x20", part: "infinitivo", es: "Tenés que devolvér[melo].", en: "You have to give it back to me.", p: "pegado al infinitivo, con tilde" },
+        { id: "x21", part: "juntos", es: "¿Le devolviste la fuente a la vecina? Sí, ya [se la] devolví.", en: "Did you return the dish to the neighbor? Yes, I already gave it back to her.", p: "le + la → se la" },
+        { id: "x22", part: "juntos", es: "¿Les mostraste el departamento a tus viejos? Sí, [se lo] mostré.", en: "Did you show your parents the apartment? Yes, I showed it to them.", p: "les + lo → se lo" },
+        { id: "x23", part: "juntos", es: "Esta bufanda [me la] tejió mi abuela.", en: "My grandma knitted me this scarf.", p: "me + la" },
+        { id: "x24", part: "juntos", es: "¿El número del plomero? [Te lo] paso por mensaje.", en: "The plumber's number? I'll text it to you.", p: "te + lo" },
+        { id: "x25", part: "juntos", es: "Si tenés las fotos del asado, mandá[melas].", en: "If you have the photos from the asado, send them to me.", p: "pegado al imperativo, con tilde" },
+        { id: "x26", part: "juntos", es: "Es un regalo para tu hermana: dá[selo] vos.", en: "It's a gift for your sister: you give it to her.", p: "le + lo → se lo · pegado al imperativo" },
+        { id: "x27", part: "juntos", es: "No vi el final de la película: contá[melo].", en: "I didn't see the end of the movie: tell me how it ends.", p: "pegado al imperativo, con tilde" },
+        { id: "x28", part: "juntos", es: "Es un secreto: no [se lo] digas a nadie.", en: "It's a secret: don't tell anyone.", p: "no + se lo + verbo" },
+        { id: "x29", part: "juntos", es: "¿Las entradas? [Nos las] vendió un amigo.", en: "The tickets? A friend sold them to us.", p: "nos + las" },
+        { id: "x30", part: "juntos", es: "Si necesitan el auto, [se lo] presto.", en: "If you guys need the car, I'll lend it to you.", p: "les + lo → se lo · a ustedes" },
+        { id: "x31", part: "juntos", es: "Señora, ¿[se lo] dejo en la puerta?", en: "Ma'am, should I leave it at your door?", p: "le + lo → se lo · a usted" },
+        { id: "x32", part: "juntos", es: "Si te gusta el libro, [te lo] regalo.", en: "If you like the book, I'll give it to you.", p: "te + lo" },
+        { id: "x33", part: "juntos", es: "Mi vieja me pidió la receta y [se la] mandé.", en: "My mom asked me for the recipe and I sent it to her.", p: "le + la → se la" },
+        { id: "x34", part: "juntos", es: "¿La plata del alquiler? [Se la] pagamos al dueño ayer.", en: "The rent money? We paid it to the landlord yesterday.", p: "le + la → se la" },
+        { id: "x35", part: "juntos", es: "Los chicos querían helado y [se lo] compré.", en: "The kids wanted ice cream, so I bought them some.", p: "les + lo → se lo" },
+        { id: "x36", part: "infinitivo", es: "La bici es de Pablo: ¿podés alcanzár[sela]?", en: "The bike is Pablo's: can you bring it over to him?", p: "pegado al infinitivo, con tilde" },
+        { id: "x37", part: "infinitivo", es: "¿El taladro del vecino? [Se lo] tengo que devolver hoy.", en: "The neighbor's drill? I have to give it back to him today.", p: "antes del verbo conjugado" },
+        { id: "x38", part: "infinitivo", es: "¿La dirección? Puedo mandár[tela] por mensaje.", en: "The address? I can text it to you.", p: "pegado al infinitivo, con tilde" },
+        { id: "x39", part: "infinitivo", es: "La remera me queda chica: ¿[me la] podés cambiar?", en: "The T-shirt is too small on me: can you exchange it for me?", p: "antes del verbo conjugado" },
+        { id: "x40", part: "infinitivo", es: "¿Las fotos? Estoy mandándo[telas] ahora.", en: "The photos? I'm sending them to you now.", p: "pegado al gerundio, con tilde" },
+        { id: "x41", part: "infinitivo", es: "¿El lavarropas? [Nos lo] están arreglando.", en: "The washing machine? They're fixing it for us.", p: "antes de estar + gerundio" },
+        { id: "x42", part: "infinitivo", es: "No entendemos la regla y la profe sigue explicándo[nosla].", en: "We don't get the rule, and the teacher keeps explaining it to us.", p: "pegado al gerundio, con tilde" },
+        { id: "x43", part: "infinitivo", es: "¿El auto? Mis suegros quieren prestár[noslo].", en: "The car? My in-laws want to lend it to us.", p: "pegado al infinitivo, con tilde" },
+        { id: "x44", part: "infinitivo", es: "Hice un flan y quiero llevár[selo] a los vecinos.", en: "I made a flan and I want to take it to the neighbors.", p: "les + lo → se lo · pegado al infinitivo" },
+        { id: "x45", part: "infinitivo", es: "Tranquila, no [se lo] voy a contar a nadie.", en: "Don't worry, I'm not going to tell anyone.", p: "antes del verbo conjugado" },
+        { id: "x46", part: "infinitivo", es: "¿El final? Prefiero no contár[telo].", en: "The ending? I'd rather not tell you.", p: "pegado al infinitivo, con tilde" },
+        { id: "x47", part: "infinitivo", es: "Si quiere, puedo envolvér[selo] para regalo.", en: "If you'd like, I can gift-wrap it for you.", p: "le + lo → se lo · a usted" },
+        { id: "x48", part: "infinitivo", es: "Esta pizzería [se la] quiero recomendar a mis amigos.", en: "I want to recommend this pizza place to my friends.", p: "antes del verbo conjugado" },
+        { id: "x49", part: "infinitivo", es: "¿La cena? [Te la] estoy calentando.", en: "Dinner? I'm heating it up for you.", p: "antes de estar + gerundio" },
+        { id: "x50", part: "infinitivo", es: "¿Las empanadas? El mozo está trayéndo[noslas].", en: "The empanadas? The waiter is bringing them to us.", p: "pegado al gerundio, con tilde" },
+        { id: "x51", part: "infinitivo", es: "Me olvidé el cargador: ¿podés prestár[melo]?", en: "I forgot my charger: can you lend me yours?", p: "pegado al infinitivo, con tilde" },
+        { id: "x52", part: "infinitivo", es: "Si lo llevás hoy, [te lo] puedo dejar más barato.", en: "If you take it today, I can let you have it for less.", p: "antes del verbo conjugado" }
       ]
     }
   );
@@ -10138,7 +10382,7 @@
   var TOPIC_ORDER = [
     ["abecedario", "A1"], ["vocales", "A1"], ["consonantes", "A1"], ["c-g", "A1"],
     ["numeros", "A1"], ["precios", "A1"], ["hora", "A1"], ["fechas", "A1"],
-    ["presentarse", "A1"], ["pronombres", "A1"], ["articulos", "A1"], ["presente", "A1"], ["hay-estar", "A1"],
+    ["presentarse", "A1"], ["pronombres", "A1"], ["articulos", "A1"], ["verbos", "A1"], ["presente", "A1"], ["hay-estar", "A1"],
     ["preguntas", "A1"], ["demostrativos", "A1"], ["gustar", "A1"], ["cuantos", "A1"], ["hay-que", "A1"],
     ["ir-a", "A1"], ["dia-a-dia", "A1"], ["comparativos", "A1"], ["se-impersonal", "A1"], ["ciudad", "A1"],
     ["saber-poder", "A2"], ["gerundio", "A2"], ["preterito", "A2"], ["ya-todavia", "A2"],
@@ -10211,6 +10455,30 @@
   });
   TOPICS.sort(function (a, b) { return a.order - b.order; });
   var TOPIC_DECK_SIZE = 20;
+  // How many cards a Tema deck takes (mason, 2026-10-17: "randomly shuffled
+  // either 10 cards - 20 cards - or all cards", picked by the Practicar
+  // button): one setting for every Tema, kept on this device. "all" on a
+  // generated Tema without a fixed size (numbers, prices…) means 50.
+  var TOPIC_LIMIT_KEY = "vosea-topic-deck";
+  var TOPIC_LIMITS = ["10", "20", "all"];
+  var topicLimit = "20";
+  try { var savedLim = localStorage.getItem(TOPIC_LIMIT_KEY); if (TOPIC_LIMITS.indexOf(savedLim) !== -1) topicLimit = savedLim; } catch (e) {}
+  var TOPIC_ALL_GEN = 50;
+  function topicLimitN() { return topicLimit === "all" ? Infinity : Number(topicLimit); }
+  function setTopicLimit(v) {
+    topicLimit = TOPIC_LIMITS.indexOf(v) !== -1 ? v : "20";
+    try { localStorage.setItem(TOPIC_LIMIT_KEY, topicLimit); } catch (e) {}
+    renderTopicLimit();
+    renderTopicRanges();
+  }
+  function renderTopicLimit() {
+    if (!el.tdLimit) return;
+    Array.prototype.forEach.call(el.tdLimit.querySelectorAll("button"), function (b) {
+      var on = b.getAttribute("data-limit") === topicLimit;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
   var TOPIC_RANGES_KEY = "vosea-topic-ranges";
   var topicData = {}; // id -> { topic: id } (the card's data object, shared per topic)
   TOPICS.forEach(function (tp) { topicData[tp.id] = { topic: tp.id }; });
@@ -10351,6 +10619,7 @@
     var ready = topicHistoryReady() || practiceQueue.length;
     var shown = TOPICS.filter(topicPassesFilters);
     el.topicCount.textContent = shown.length + " / " + TOPICS.length;
+    el.topicFiltersClear.hidden = !(anyFilterActive(activeTopicFilters) || !!el.topicSearch.value.trim());
     el.topicNoMatch.hidden = shown.length > 0;
     shown.forEach(function (tp) {
       var li = document.createElement("li");
@@ -10381,7 +10650,7 @@
   var CAMINO = [
     { lvl: "A1", title: L("Para arrancar", "Getting started"), groups: [
       { name: L("Sonidos y números", "Sounds and numbers"), temas: ["abecedario", "vocales", "consonantes", "c-g", "numeros", "precios", "hora", "fechas"] },
-      { name: L("Quién sos", "Who you are"), temas: ["presentarse", "pronombres", "articulos", "presente"] },
+      { name: L("Quién sos", "Who you are"), temas: ["presentarse", "pronombres", "articulos", "verbos", "presente"] },
       { name: L("Qué hay y qué te gusta", "What there is and what you like"), temas: ["hay-estar", "preguntas", "demostrativos", "gustar", "cuantos"] },
       { name: L("Tu día y tu barrio", "Your day and your neighborhood"), temas: ["hay-que", "ir-a", "dia-a-dia", "comparativos", "se-impersonal", "ciudad"] }
     ] },
@@ -10640,14 +10909,15 @@
   // How many cards Practicar makes: 20, or fewer when the chosen ranges
   // are short word lists (a pack: all its sentences, up to 20).
   function topicDeckSize(tp, on) {
+    var lim = topicLimitN();
     if (tp.type === "pack") {
       var n = tp.parts ? tp.items.filter(function (it) { return on.indexOf(it.part) !== -1; }).length : tp.items.length;
-      return Math.min(TOPIC_DECK_SIZE, n);
+      return Math.min(lim, n);
     }
     var sized = on.map(function (k) { return topicRange(tp, k); }).filter(Boolean);
     if (!sized.length) return 0;
-    if (sized.some(function (r) { return !r.size; })) return TOPIC_DECK_SIZE;
-    return Math.min(TOPIC_DECK_SIZE, sized.reduce(function (s, r) { return s + r.size; }, 0));
+    if (sized.some(function (r) { return !r.size; })) return Math.min(lim, TOPIC_ALL_GEN);
+    return Math.min(lim, sized.reduce(function (s, r) { return s + r.size; }, 0));
   }
   function renderTopicModeControls() {
     if (!el.tdModeRead) return;
@@ -10670,13 +10940,14 @@
   function buildTopicCards(tp) {
     var st = topicStats(tp);
     var cards = [], seen = {};
-    function add(key) { if (seen[key] || cards.length >= TOPIC_DECK_SIZE) return; var c = topicCard(tp, key); if (c) { seen[key] = true; cards.push(c); } }
+    var size = tp.type === "gen" ? topicDeckSize(tp, topicSavedRanges(tp)) : Infinity;
+    function add(key) { if (seen[key] || cards.length >= size) return; var c = topicCard(tp, key); if (c) { seen[key] = true; cards.push(c); } }
     if (tp.type === "gen") {
       var on = topicSavedRanges(tp);
       if (!on.length) return [];
       st.hard.filter(function (u) { return on.indexOf(String(u.formKey).split(":")[0]) !== -1; })
-        .slice(0, Math.floor(TOPIC_DECK_SIZE / 4)).forEach(function (u) { add(u.formKey); });
-      for (var guard = 0; cards.length < TOPIC_DECK_SIZE && guard < 400; guard++) {
+        .slice(0, Math.floor(size / 4)).forEach(function (u) { add(u.formKey); });
+      for (var guard = 0; cards.length < size && guard < 400; guard++) {
         var r = topicRange(tp, on[guard % on.length]);
         add(r.key + ":" + r.gen());
       }
@@ -10693,7 +10964,10 @@
         else if (u.due || (u.last && u.last.grade === "otra")) first.push(it.id);
         else rest.push(it.id);
       });
-      first.concat(unseen, rest).forEach(add);
+      // the ones to review first, then new ones, then the rest — as many as
+      // the 10 · 20 · Todas switch says, in a random order
+      first.concat(unseen, rest).slice(0, topicLimitN()).forEach(add);
+      cards = shuffleArray(cards);
     }
     return cards;
   }
@@ -10826,6 +11100,10 @@
   el.tdModeListen.addEventListener("click", function () { setFlashMode("escuchar"); });
   el.tdModeSpeak.addEventListener("click", function () { setFlashMode("hablar"); });
   el.tdStart.addEventListener("click", startTopicDeck);
+  Array.prototype.forEach.call(el.tdLimit.querySelectorAll("button"), function (b) {
+    b.addEventListener("click", function () { setTopicLimit(b.getAttribute("data-limit")); });
+  });
+  renderTopicLimit();
   el.tdSentencesToggle.addEventListener("click", function () {
     var open = el.tdSentences.hidden;
     el.tdSentences.hidden = !open;
@@ -12101,7 +12379,17 @@
   // (reason "escena:<id>").
   var ESC_READY_SHARE = 0.7;
   var ESC_VOICES_KEY = "vosea-escenas-voces";
-  var ESC_PAUSE_MS = 200; // between two lines in a row (was 350; mason, 2026-10-13: "too much time in between")
+  var ESC_PAUSE_MS = 200; // the shortest gap between two lines in a row
+  // Gaps between lines vary (mason, 2026-10-17: "the same time between each
+  // sets up what feels like an un-natural conversation"): the same person
+  // going on pauses briefly, someone else answering takes a little longer,
+  // and each time it's a bit different. Lines where time passes add their
+  // own `wait` (escenas.js).
+  function escGap(prev, cur) {
+    function between(a, b) { return Math.round(a + Math.random() * (b - a)); }
+    if (!prev || prev.r === cur.r) return between(ESC_PAUSE_MS - 60, ESC_PAUSE_MS + 160);
+    return between(380, 850);
+  }
   var escOpen = false;  // the Escenas page on the Jugar tab
   var escSel = null;    // the scene on the start screen (null = the list)
   var escPlay = null;   // the scene being played
@@ -12793,13 +13081,21 @@
       escPrefetch(p, run);
       escTurnPanel("listen");
       var chain = Promise.resolve();
-      run.forEach(function (i) {
+      run.forEach(function (i, k) {
         chain = chain.then(function () {
           if (!escAlive(p)) return;
-          var st = steps[i], text = escLine(p, i);
-          var b = escBubble(p, st.r, text, st.to);
-          p.pending.push(b);
-          return escSay(text, p.voices[st.r], b, st.r).then(function () { return new Promise(function (r) { setTimeout(r, ESC_PAUSE_MS); }); });
+          var st = steps[i];
+          // the pause before this line: a varied gap after the line before
+          // it (none for the first of a run: the turn before already
+          // paused), plus the scene's own wait where time passes
+          var ms = (k ? escGap(steps[run[k - 1]], st) : 0) + (st.wait || 0);
+          return (ms ? new Promise(function (r) { setTimeout(r, ms); }) : Promise.resolve()).then(function () {
+            if (!escAlive(p)) return;
+            var text = escLine(p, i);
+            var b = escBubble(p, st.r, text, st.to);
+            p.pending.push(b);
+            return escSay(text, p.voices[st.r], b, st.r);
+          });
         });
       });
       chain.then(function () { if (escAlive(p)) escNext(); });
@@ -15611,7 +15907,7 @@
     var refs = listsTriggerEls(tab);
     var filters = activeFiltersForTab(tab);
     refs.group.hidden = !allLists.length;
-    refs.clearBtn.hidden = !anyFilterActive(filters);
+    refs.clearBtn.hidden = !clearBtnShouldShow(tab);
     var incCount = sharedListFilter.list.include.size;
     var excCount = sharedListFilter.list.exclude.size;
     if (incCount + excCount === 0) {
@@ -17180,6 +17476,7 @@
     updateListsTrigger("verbs");
   });
   el.verbListsTrigger.addEventListener("click", function () { openListFilterPicker("verbs"); });
+  el.verbFiltersClear.addEventListener("click", function () { clearAllFiltersFor("verbs"); });
   el.toggleAdd.addEventListener("click", function () { openForm("add"); });
   el.detailClose.addEventListener("click", function () { deselectVerb(); renderList(); });
   el.wordDetailClose.addEventListener("click", function () { deselectWord(); renderWordList(); });
@@ -17285,6 +17582,7 @@
     updateListsTrigger("words");
   });
   el.wordListsTrigger.addEventListener("click", function () { openListFilterPicker("words"); });
+  el.wordFiltersClear.addEventListener("click", function () { clearAllFiltersFor("words"); });
   el.toggleAddWord.addEventListener("click", function () { openWordForm("add"); });
   el.seedWordsToolbarBtn.addEventListener("click", seedStarterWords);
   el.wordFormCancel.addEventListener("click", closeWordForm);
@@ -17325,6 +17623,7 @@
     updateListsTrigger("phrases");
   });
   el.phraseListsTrigger.addEventListener("click", function () { openListFilterPicker("phrases"); });
+  el.phraseFiltersClear.addEventListener("click", function () { clearAllFiltersFor("phrases"); });
   el.toggleAddPhrase.addEventListener("click", function () { openPhraseForm("add"); });
   el.seedPhrasesToolbarBtn.addEventListener("click", seedStarterPhrases);
   el.phraseFormCancel.addEventListener("click", closePhraseForm);
@@ -17447,6 +17746,7 @@
   refreshChipVisuals(el.topicFilters, activeTopicFilters);
   el.topicFiltersClear.hidden = !anyFilterActive(activeTopicFilters);
   wireFilterChips(el.topicFilters, el.topicFiltersClear, activeTopicFilters, filtersStorageKey("topics"), renderTopicList);
+  el.topicFiltersClear.addEventListener("click", function () { el.topicSearch.value = ""; renderTopicList(); });
   el.tabPlay.addEventListener("click", function () { setMainTab("play"); });
   el.playAlbumEntry.addEventListener("click", function () { openAlbum(true); });
   el.playAlbumBack.addEventListener("click", function () { openAlbum(false); });

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- must match VOSEA_BUILD in app.js (and sw.js CACHE_NAME): see app.js "out of step" -->
-<meta name="vosea-build" content="113">
+<meta name="vosea-build" content="114">
 <title>voseá</title>
 
 <!-- PWA: manifest + icons -->
@@ -744,6 +744,12 @@
         <p class="form-msg" id="td-msg"></p>
         <div class="flash-start-row">
           <button type="button" class="btn-primary" id="td-start" data-i18n="topic_start">Practicar</button>
+          <!-- how many cards (2026-10-17): 10 · 20 · all, shuffled -->
+          <div class="lang-toggle topic-limit" id="td-limit" role="group" data-i18n-aria-label="topic_limit_aria" aria-label="Cuántas tarjetas">
+            <button type="button" class="lang-option" data-limit="10">10</button>
+            <button type="button" class="lang-option" data-limit="20">20</button>
+            <button type="button" class="lang-option" data-limit="all" data-i18n="topic_limit_all">Todas</button>
+          </div>
           <span class="flash-deck-count" id="td-count"></span>
         </div>
       </div>
