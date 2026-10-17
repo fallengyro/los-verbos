@@ -2967,6 +2967,7 @@
   function warmSetOf(tp, r) {
     if (tp.id === "numeros") return r.key === "miles" ? "miles" : "numeros";
     if (tp.id === "precios" || tp.id === "hora" || tp.id === "fechas") return tp.id;
+    if (tp.id === "irregulares") return "oraciones";
     return "sonidos";
   }
   // Escenas (2026-10-12, ten ways for every line): every line the other
@@ -4376,7 +4377,7 @@
   // the page, the console says which ones, and the page fetches a fresh copy
   // of itself once (VOSEA_BUILD has to match index.html's vosea-build meta;
   // both go up with sw.js's CACHE_NAME).
-  var VOSEA_BUILD = "114";
+  var VOSEA_BUILD = "115";
   var elMissing = [];
   Object.keys(el).forEach(function (k) {
     if (el[k]) return;
@@ -9964,6 +9965,185 @@
   function letraNames(ch) { var e = LETRAS.find(function (x) { return x[0] === ch; }); return e ? e[1] : [ch]; }
   function spellWord(word) { return word.toLowerCase().split("").map(function (ch) { return letraNames(ch)[0]; }); }
 
+  // ---- Los irregulares (2026-10-17, mason: "a topic to introduce what
+  // makes irregular verbs irregular"; mockup irregulares_mockup.png) ----
+  // You see the infinitive and the person and give the whole form; the
+  // back marks the letters that changed and reminds you of vos, which in
+  // Buenos Aires never changes the stem (querés, podés, pedís: the stress
+  // is on the ending). A part of vos pairs makes you give both forms.
+  // Every card is one value of a range, "verb|person", so the Tema works
+  // like Números: chips, 10 · 20 · Todas, Leer / Escuchar / Hablar.
+  var IRR_PERSONS = {
+    yo: { en: "I", third: false }, vos: { en: "you", third: false }, "él": { en: "he", third: true }, ella: { en: "she", third: true },
+    nosotros: { en: "we", third: false }, ellos: { en: "they", third: false }
+  };
+  function irrPlain(s) { return String(s).replace(/[\[\]]/g, ""); }
+  function irrVosNos(inf) {
+    var base = inf.replace(/se$/, ""), stem = base.slice(0, -2), end = base.slice(-2);
+    var v = { ar: "ás", er: "és", ir: "ís" }[end], n = { ar: "amos", er: "emos", ir: "imos" }[end];
+    return { vos: stem + v, nos: stem + n };
+  }
+  function irrEn(verb, person) {
+    var p = IRR_PERSONS[person];
+    return p.en + " " + (p.third ? verb.en3 : verb.en);
+  }
+  // stem changes: [infinitive, yo, él/ella, ellos, English, English 3rd person]
+  function irrStem(list) {
+    return list.map(function (x, i) {
+      return { inf: x[0], forms: { yo: x[1], third: x[2], ellos: x[3] }, en: x[4], en3: x[5], third: i % 2 ? "ella" : "él", tag: x[6] };
+    });
+  }
+  var IRR_EIE = irrStem([
+    ["querer", "qu[ie]ro", "qu[ie]re", "qu[ie]ren", "want", "wants"],
+    ["pensar", "p[ie]nso", "p[ie]nsa", "p[ie]nsan", "think", "thinks"],
+    ["empezar", "emp[ie]zo", "emp[ie]za", "emp[ie]zan", "start", "starts"],
+    ["cerrar", "c[ie]rro", "c[ie]rra", "c[ie]rran", "close", "closes"],
+    ["preferir", "pref[ie]ro", "pref[ie]re", "pref[ie]ren", "prefer", "prefers"],
+    ["entender", "ent[ie]ndo", "ent[ie]nde", "ent[ie]nden", "understand", "understands"],
+    ["perder", "p[ie]rdo", "p[ie]rde", "p[ie]rden", "lose", "loses"],
+    ["sentir", "s[ie]nto", "s[ie]nte", "s[ie]nten", "feel", "feels"],
+    ["comenzar", "com[ie]nzo", "com[ie]nza", "com[ie]nzan", "begin", "begins"],
+    ["recomendar", "recom[ie]ndo", "recom[ie]nda", "recom[ie]ndan", "recommend", "recommends"]
+  ]);
+  var IRR_OUE = irrStem([
+    ["poder", "p[ue]do", "p[ue]de", "p[ue]den", "can", "can"],
+    ["dormir", "d[ue]rmo", "d[ue]rme", "d[ue]rmen", "sleep", "sleeps"],
+    ["volver", "v[ue]lvo", "v[ue]lve", "v[ue]lven", "come back", "comes back"],
+    ["encontrar", "enc[ue]ntro", "enc[ue]ntra", "enc[ue]ntran", "find", "finds"],
+    ["almorzar", "alm[ue]rzo", "alm[ue]rza", "alm[ue]rzan", "have lunch", "has lunch"],
+    ["recordar", "rec[ue]rdo", "rec[ue]rda", "rec[ue]rdan", "remember", "remembers"],
+    ["mostrar", "m[ue]stro", "m[ue]stra", "m[ue]stran", "show", "shows"],
+    ["contar", "c[ue]nto", "c[ue]nta", "c[ue]ntan", "tell", "tells"],
+    ["probar", "pr[ue]bo", "pr[ue]ba", "pr[ue]ban", "try", "tries"],
+    ["jugar", "j[ue]go", "j[ue]ga", "j[ue]gan", "play", "plays", "u → ue"]
+  ]);
+  var IRR_EI = irrStem([
+    ["pedir", "p[i]do", "p[i]de", "p[i]den", "ask for", "asks for"],
+    ["servir", "s[i]rvo", "s[i]rve", "s[i]rven", "serve", "serves"],
+    ["repetir", "rep[i]to", "rep[i]te", "rep[i]ten", "repeat", "repeats"],
+    ["seguir", "s[i]go", "s[i]gue", "s[i]guen", "keep going", "keeps going"],
+    ["medir", "m[i]do", "m[i]de", "m[i]den", "measure", "measures"],
+    ["conseguir", "cons[i]go", "cons[i]gue", "cons[i]guen", "get", "gets"],
+    ["elegir", "el[i]jo", "el[i]ge", "el[i]gen", "choose", "chooses"]
+  ]);
+  // only yo is different: [infinitive, yo, English (I …), the rest]
+  var IRR_GO = [
+    ["tener", "ten[go]", "have", L("y e → ie: él tiene, ellos tienen · pero vos tenés", "and e → ie: él tiene, ellos tienen · but vos tenés")],
+    ["venir", "ven[go]", "come", L("y e → ie: ella viene · pero vos venís", "and e → ie: ella viene · but vos venís")],
+    ["decir", "di[go]", "say", L("y e → i: él dice · pero vos decís", "and e → i: él dice · but vos decís")],
+    ["hacer", "ha[go]", "do, make", L("lo demás es regular: vos hacés, él hace", "the rest is regular: vos hacés, él hace")],
+    ["poner", "pon[go]", "put", L("lo demás es regular: vos ponés, ella pone", "the rest is regular: vos ponés, ella pone")],
+    ["salir", "sal[go]", "go out", L("lo demás es regular: vos salís, él sale", "the rest is regular: vos salís, él sale")],
+    ["traer", "tra[igo]", "bring", L("lo demás es regular: vos traés, ella trae", "the rest is regular: vos traés, ella trae")],
+    ["oír", "o[igo]", "hear", L("y la y: vos oís, él oye, ellos oyen", "and the y: vos oís, él oye, ellos oyen")]
+  ];
+  var IRR_ZCO = [
+    ["conocer", "cono[zco]", "know (a person, a place)", L("-cer, -cir → -zco · vos conocés, él conoce", "-cer, -cir → -zco · vos conocés, él conoce")],
+    ["parecer", "pare[zco]", "seem", L("-cer → -zco · vos parecés, ella parece", "-cer → -zco · vos parecés, ella parece")],
+    ["agradecer", "agrade[zco]", "am grateful for", L("-cer → -zco · vos agradecés", "-cer → -zco · vos agradecés")],
+    ["ofrecer", "ofre[zco]", "offer", L("-cer → -zco · vos ofrecés", "-cer → -zco · vos ofrecés")],
+    ["traducir", "tradu[zco]", "translate", L("-cir → -zco · vos traducís", "-cir → -zco · vos traducís")],
+    ["conducir", "condu[zco]", "drive", L("-cir → -zco · vos conducís (acá también: manejo)", "-cir → -zco · vos conducís (here also: manejo)")],
+    ["saber", "[sé]", "know (a fact)", L("solo yo: vos sabés, él sabe", "only yo: vos sabés, él sabe")],
+    ["ver", "v[e]o", "see", L("solo yo: vos ves, ella ve", "only yo: vos ves, ella ve")],
+    ["dar", "d[oy]", "give", L("solo yo: vos das, él da", "only yo: vos das, él da")]
+  ];
+  // all of it: [infinitive, English, English 3rd, [person, form]...]
+  var IRR_TOTAL = [
+    ["ser", "am", "is", [["yo", "[soy]"], ["vos", "[sos]"], ["él", "[es]"], ["nosotros", "[somos]"], ["ellos", "[son]"]], { yo: "I am", vos: "you are", "él": "he is", nosotros: "we are", ellos: "they are" }],
+    ["ir", "go", "goes", [["yo", "[voy]"], ["vos", "[vas]"], ["ella", "[va]"], ["nosotros", "[vamos]"], ["ellos", "[van]"]], null],
+    ["estar", "am", "is", [["yo", "est[oy]"], ["vos", "est[ás]"], ["él", "est[á]"], ["nosotros", "estamos"], ["ellos", "est[á]n"]], { yo: "I am", vos: "you are", "él": "he is", nosotros: "we are", ellos: "they are" }]
+  ];
+  // the vos pairs: [infinitive, person, its form, English, English 3rd]
+  var IRR_VOS = [
+    ["querer", "yo", "qu[ie]ro", "want", "wants"], ["poder", "yo", "p[ue]do", "can", "can"],
+    ["pedir", "ella", "p[i]de", "ask for", "asks for"], ["dormir", "ellos", "d[ue]rmen", "sleep", "sleeps"],
+    ["tener", "él", "t[ie]ne", "have", "has"], ["venir", "yo", "ven[go]", "come", "comes"],
+    ["entender", "yo", "ent[ie]ndo", "understand", "understands"], ["volver", "ella", "v[ue]lve", "come back", "comes back"],
+    ["empezar", "él", "emp[ie]za", "start", "starts"], ["jugar", "yo", "j[ue]go", "play", "plays"],
+    ["preferir", "ellos", "pref[ie]ren", "prefer", "prefer"], ["seguir", "ella", "s[i]gue", "keep going", "keeps going"],
+    ["decir", "él", "d[i]ce", "say", "says"], ["pensar", "yo", "p[ie]nso", "think", "thinks"],
+    ["recordar", "yo", "rec[ue]rdo", "remember", "remembers"], ["servir", "él", "s[i]rve", "serve", "serves"]
+  ];
+  // value "verb|person" → the card
+  var IRR_CARDS = {};
+  function irrAdd(range, key, c) { (IRR_CARDS[range] || (IRR_CARDS[range] = {}))[key] = c; }
+  function irrSingle(range, tag, inf, person, rich, en, note) {
+    var form = irrPlain(rich);
+    irrAdd(range, inf + "|" + person, {
+      frontMain: inf, frontSub: person + " · " + en, choice: tag, wordFront: true,
+      backMain: form, backRich: rich, backSpeak: form, answers: [form], backSub: note,
+      listenBackMain: form, listenBackRich: rich, listenBackSub: inf + " · " + person
+    });
+  }
+  [["eie", IRR_EIE, "e → ie"], ["oue", IRR_OUE, "o → ue"], ["ei", IRR_EI, "e → i"]].forEach(function (g) {
+    g[1].forEach(function (v) {
+      var vn = irrVosNos(v.inf);
+      var note = L("pero vos " + vn.vos + " · nosotros " + vn.nos, "but vos " + vn.vos + " · nosotros " + vn.nos);
+      var tag = v.tag || g[2];
+      irrSingle(g[0], tag, v.inf, "yo", v.forms.yo, irrEn(v, "yo"), note);
+      irrSingle(g[0], tag, v.inf, v.third, v.forms.third, irrEn(v, v.third), note);
+      irrSingle(g[0], tag, v.inf, "ellos", v.forms.ellos, irrEn(v, "ellos"), note);
+    });
+  });
+  IRR_GO.forEach(function (x) { irrSingle("go", "yo: -go", x[0], "yo", x[1], "I " + x[2], x[3]); });
+  IRR_ZCO.forEach(function (x) { irrSingle("zco", /zco/.test(x[1]) ? "yo: -zco" : "yo", x[0], "yo", x[1], "I " + x[2], x[3]); });
+  IRR_TOTAL.forEach(function (x) {
+    x[3].forEach(function (pf) {
+      var en = x[4] ? x[4][pf[0]] : (IRR_PERSONS[pf[0]].en + " " + (IRR_PERSONS[pf[0]].third ? x[2] : x[1]));
+      irrSingle("total", L("todo irregular", "all irregular"), x[0], pf[0], pf[1], en, L("", ""));
+    });
+  });
+  irrSingle("total", L("todo irregular", "all irregular"), "haber", "impersonal", "[hay]", "there is · there are",
+    L("una sola forma, para uno o para muchos: hay un café, hay dos cafés", "one form for one or many: hay un café, hay dos cafés"));
+  IRR_VOS.forEach(function (x) {
+    var vn = irrVosNos(x[0]), form = irrPlain(x[2]);
+    var v = { en: x[3], en3: x[4] };
+    irrAdd("vos", x[0] + "|" + x[1] + "+vos", {
+      frontMain: x[0], frontSub: x[1] + " · vos — " + irrEn(v, x[1]) + " · you " + x[3], choice: L("¿cambia con vos?", "does it change with vos?"), wordFront: true,
+      backMain: form + " · " + vn.vos, backRich: x[2] + " · " + vn.vos, backSpeak: form + ", " + vn.vos,
+      answers: [form + " " + vn.vos, form + " y " + vn.vos, x[1] + " " + form + " vos " + vn.vos],
+      backSub: L("con vos el acento cae en la terminación: la raíz no cambia", "with vos the stress falls on the ending, so the stem doesn't change"),
+      listenBackMain: form + " · " + vn.vos, listenBackRich: x[2] + " · " + vn.vos, listenBackSub: x[0] + " · " + x[1] + " · vos"
+    });
+  });
+  function irrRange(key, label) {
+    var values = Object.keys(IRR_CARDS[key] || {});
+    return { key: key, label: label, size: values.length, values: values, gen: function () { return topicPick(values); } };
+  }
+  var IRREGULARES_TOPIC = {
+    id: "irregulares", type: "gen", name: L("Los irregulares", "Irregular verbs"),
+    desc: L("Qué cambia en un verbo irregular, y dónde: quiero, podés, tengo.", "What changes in an irregular verb, and where: quiero, podés, tengo."),
+    tag: L("irregulares", "irregular verbs"),
+    ranges: [
+      irrRange("eie", L("e → ie", "e → ie")),
+      irrRange("oue", L("o → ue", "o → ue")),
+      irrRange("ei", L("e → i", "e → i")),
+      irrRange("go", L("yo: -go", "yo: -go")),
+      irrRange("zco", L("yo: -zco y otros", "yo: -zco and others")),
+      irrRange("vos", L("con vos: ¿cambia?", "with vos: does it change?")),
+      irrRange("total", L("ser · ir · estar", "ser · ir · estar"))
+    ],
+    defaults: ["eie", "oue", "ei", "go", "zco", "vos", "total"],
+    card: function (range, v) {
+      var c = (IRR_CARDS[range] || {})[v];
+      if (!c) return null;
+      var o = Object.assign({}, c);
+      if (o.choice && typeof o.choice === "object") o.choice = topicText(o.choice);
+      if (o.backSub && typeof o.backSub === "object") o.backSub = topicText(o.backSub);
+      o.listenBackSub = o.listenBackSub;
+      return o;
+    },
+    lesson: [
+      { f: "e → ie · o → ue · e → i: cuando el acento cae en la raíz", ex: "qu[ie]ro · p[ue]do · p[i]do" },
+      { f: "con vos y nosotros el acento va en la terminación: no cambia", ex: "querés · podés · pedís · queremos" },
+      { f: "solo yo: -go, -zco, y algunos más", ex: "ten[go] · ha[go] · cono[zco] · [sé] · v[e]o · d[oy]" },
+      { f: "todo irregular: ser, ir, estar, hay", ex: "[soy] · [sos] · [voy] · [vas] · est[oy] · [hay]" }
+    ],
+    tip: L("Los libros de España enseñan la «bota»: cambian yo, tú, él y ellos. Con vos la bota es más chica: vos no cambia nunca.",
+           "Textbooks from Spain teach the “boot”: yo, tú, él, and ellos change. With vos the boot is smaller: vos never changes.")
+  };
+
   TOPICS.push(
     {
       id: "abecedario", type: "gen", name: L("El abecedario", "The alphabet"),
@@ -10367,7 +10547,8 @@
         { id: "x51", part: "infinitivo", es: "Me olvidé el cargador: ¿podés prestár[melo]?", en: "I forgot my charger: can you lend me yours?", p: "pegado al infinitivo, con tilde" },
         { id: "x52", part: "infinitivo", es: "Si lo llevás hoy, [te lo] puedo dejar más barato.", en: "If you take it today, I can let you have it for less.", p: "antes del verbo conjugado" }
       ]
-    }
+    },
+    IRREGULARES_TOPIC
   );
   // ---- the Temas built from mason's books (2026-10-10): temas.js ----
   // Each is a sentence pack with parts (see "parts" below). They come in
@@ -10382,7 +10563,7 @@
   var TOPIC_ORDER = [
     ["abecedario", "A1"], ["vocales", "A1"], ["consonantes", "A1"], ["c-g", "A1"],
     ["numeros", "A1"], ["precios", "A1"], ["hora", "A1"], ["fechas", "A1"],
-    ["presentarse", "A1"], ["pronombres", "A1"], ["articulos", "A1"], ["verbos", "A1"], ["presente", "A1"], ["hay-estar", "A1"],
+    ["presentarse", "A1"], ["pronombres", "A1"], ["articulos", "A1"], ["verbos", "A1"], ["irregulares", "A1"], ["presente", "A1"], ["hay-estar", "A1"],
     ["preguntas", "A1"], ["demostrativos", "A1"], ["gustar", "A1"], ["cuantos", "A1"], ["hay-que", "A1"],
     ["ir-a", "A1"], ["dia-a-dia", "A1"], ["comparativos", "A1"], ["se-impersonal", "A1"], ["ciudad", "A1"],
     ["saber-poder", "A2"], ["gerundio", "A2"], ["preterito", "A2"], ["ya-todavia", "A2"],
@@ -10402,11 +10583,13 @@
     abecedario: ["sonidos"], vocales: ["sonidos"], consonantes: ["sonidos"], "c-g": ["sonidos"],
     numeros: ["numeros"], precios: ["numeros"], hora: ["numeros"], fechas: ["numeros"],
     pronombres: ["pronombres"], "objeto-directo": ["pronombres"], "objeto-indirecto": ["pronombres"], dobles: ["pronombres"],
-    "hay-que": ["presente"], comparativos: ["articulos"], "ya-todavia": ["pasado"]
+    "hay-que": ["presente"], comparativos: ["articulos"], "ya-todavia": ["pasado"], irregulares: ["presente"]
   };
   // The 2–3 sentences that introduce each Tema on its detail page (mason,
   // 2026-10-09); the new Temas carry theirs in temas.js.
   var TOPIC_INTROS = {
+    "irregulares": L("Un verbo es irregular cuando su raíz cambia. Muchos cambian solo cuando el acento cae en la raíz: quiero, puede, piden. Con vos y nosotros el acento cae en la terminación, así que la raíz queda igual: querés, podemos. Otros cambian solo en yo (tengo, hago, conozco), y unos pocos son irregulares en todo: ser, ir, estar.",
+      "A verb is irregular when its stem changes. Many change only when the stress falls on the stem: quiero, puede, piden. With vos and nosotros the stress falls on the ending, so the stem stays the same: querés, podemos. Others change only in yo (tengo, hago, conozco), and a few are irregular all the way through: ser, ir, estar."),
     "abecedario": L("El abecedario tiene 27 letras: las del inglés más la ñ. Con los nombres de las letras deletreás tu nombre, un mail o una dirección por teléfono. Algunas tienen dos nombres: la b es «be» o «be larga» y la v, «ve» o «ve corta».",
       "The alphabet has 27 letters: the English ones plus ñ. Letter names are how you spell your name, an email, or an address over the phone. Some have two names: b is “be” or “be larga,” and v is “ve” or “ve corta.”"),
     "vocales": L("El español tiene cinco vocales y cada una suena siempre igual, en cualquier palabra. Son cortas y limpias: no se alargan ni se deslizan como en inglés. La sílaba fuerte también importa: la tilde te dice dónde va cuando no sigue la regla.",
@@ -10650,7 +10833,7 @@
   var CAMINO = [
     { lvl: "A1", title: L("Para arrancar", "Getting started"), groups: [
       { name: L("Sonidos y números", "Sounds and numbers"), temas: ["abecedario", "vocales", "consonantes", "c-g", "numeros", "precios", "hora", "fechas"] },
-      { name: L("Quién sos", "Who you are"), temas: ["presentarse", "pronombres", "articulos", "verbos", "presente"] },
+      { name: L("Quién sos", "Who you are"), temas: ["presentarse", "pronombres", "articulos", "verbos", "irregulares", "presente"] },
       { name: L("Qué hay y qué te gusta", "What there is and what you like"), temas: ["hay-estar", "preguntas", "demostrativos", "gustar", "cuantos"] },
       { name: L("Tu día y tu barrio", "Your day and your neighborhood"), temas: ["hay-que", "ir-a", "dia-a-dia", "comparativos", "se-impersonal", "ciudad"] }
     ] },
@@ -10947,6 +11130,14 @@
       if (!on.length) return [];
       st.hard.filter(function (u) { return on.indexOf(String(u.formKey).split(":")[0]) !== -1; })
         .slice(0, Math.floor(size / 4)).forEach(function (u) { add(u.formKey); });
+      // ranges with a fixed list (Los irregulares): deal from all of it, shuffled
+      var listed = on.map(function (k) { return topicRange(tp, k); }).filter(function (r) { return r && r.values; });
+      if (listed.length === on.length) {
+        var pool = [];
+        listed.forEach(function (r) { r.values.forEach(function (v) { pool.push(r.key + ":" + v); }); });
+        shuffleArray(pool).forEach(add);
+        return shuffleArray(cards);
+      }
       for (var guard = 0; cards.length < size && guard < 400; guard++) {
         var r = topicRange(tp, on[guard % on.length]);
         add(r.key + ":" + r.gen());
@@ -10999,6 +11190,8 @@
     } else {
       // pronunciation words: the letters in focus highlighted
       if (card.frontRich && !card.listen) topicSentenceInto(el.flashFrontMain, card.frontRich, "fill");
+      // Los irregulares: the letters that changed, on the back
+      if (card.backRich && !card.listen) topicSentenceInto(el.flashBackMain, card.backRich, "fill");
       if (card.listen && card.listenBackRich) topicSentenceInto(el.flashBackMain, card.listenBackRich, "fill");
     }
   }
